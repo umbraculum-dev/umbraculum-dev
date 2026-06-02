@@ -1,6 +1,6 @@
 # Community forum production infra (`forum.umbraculum.dev`)
 
-**Purpose:** Maintainer reference for the **production** Discourse stack on Contabo. This tree is **not** deployed via root [`docker-compose.yml`](../../docker-compose.yml) (local monorepo dev only).
+**Purpose:** Maintainer reference for the **production** Discourse stack on Contabo (or equivalent bootstrap VPS). Phase 0 may be **maintainer-operated provisional** hosting until entity-owned migration ([`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../../docs/CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7). This tree is **not** deployed via root [`docker-compose.yml`](../../docker-compose.yml) (local monorepo dev only).
 
 ---
 
@@ -33,7 +33,8 @@ Browser → forum.umbraculum.dev (Cloudflare DNS grey) → Contabo VPS :443
 | [`docs/design/community-forum-vps-security.md`](../../docs/design/community-forum-vps-security.md) | SSH, UFW, fail2ban **before** install |
 | [`docs/design/community-forum-ssl-strategy.md`](../../docs/design/community-forum-ssl-strategy.md) | Grey cloud + Let's Encrypt decision record |
 | [`docs/design/community-forum-secrets-inventory.md`](../../docs/design/community-forum-secrets-inventory.md) | Vault labels, keyring migration |
-| [`MAINTENANCE.md`](MAINTENANCE.md) | Upgrades, backups, monthly cadence |
+| [`MAINTENANCE.md`](MAINTENANCE.md) | Upgrades, backups, monthly cadence, §7 host migration |
+| [`docs/CORE-DEVELOPMENT-AND-COMMUNITY.md`](../../docs/CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7 | Bootstrap custody; entity-owned migration policy |
 
 ---
 
@@ -42,11 +43,12 @@ Browser → forum.umbraculum.dev (Cloudflare DNS grey) → Contabo VPS :443
 | Line | €/month |
 |------|---------|
 | Contabo Cloud VPS 10 | 3.60 |
-| Contabo Auto Backup | 1.50 |
+| Contabo Auto Backup (from kick-off) | 1.50 |
 | Contabo Object Storage (planned) | 2.50 |
-| **Itemized total** | **7.60** |
+| **Bootstrap (VPS only)** | **3.60** |
+| **Full target** | **7.60** |
 
-Public/support copy uses **~€10/month** round figure — see [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../../docs/CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.5.
+Public/support copy: **~€4/month** bootstrap, **~€10/month** full target — see [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../../docs/CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.5.
 
 ---
 

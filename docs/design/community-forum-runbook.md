@@ -16,9 +16,10 @@
 |------|--------|
 | **URL** | `https://forum.umbraculum.dev` |
 | **Software** | [Discourse](https://www.discourse.org/) (GPL, self-host via official Docker launcher) |
-| **VPS** | Contabo **Cloud VPS 10** — Ubuntu **24.04 LTS**, 75 GB NVMe, Auto Backup on |
-| **Infra cost (itemized)** | **€7.60/month** — VPS €3.60 + Auto Backup €1.50 + Object Storage €2.50 (planned) |
-| **Infra cost (public round figure)** | **~€10/month** (~€120/year) for support/donation copy |
+| **VPS** | Contabo **Cloud VPS 10** — Ubuntu **24.04 LTS**, 75 GB NVMe; **Auto Backup optional until kick-off** (§10) |
+| **Infra cost (itemized)** | **€3.60/month** at bootstrap (VPS only) → **€5.10** after kick-off (+ Auto Backup) → **€7.60** full target (+ Object Storage planned) |
+| **Infra cost (public round figure)** | **~€4/month** bootstrap → **~€10/month** when backup layers fully enabled |
+| **Infrastructure custody** | Phase 0 may run on **maintainer-operated provisional VPS**; entity-owned hosting after community vote — [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7; [`LICENSING.md`](../LICENSING.md) §7.6 |
 | **DNS** | Cloudflare **A** record `forum` → VPS IPv4, **proxy off** (grey cloud) at bootstrap |
 | **Brochure / docs** | Cloudflare **Workers** — do **not** route the forum through Workers/Pages |
 
@@ -34,21 +35,23 @@
 | SMTP credentials | [Brevo](https://www.brevo.com/) free tier (~300 emails/day). **Account login:** maintainer Proton inbox. **Sender:** `forum@umbraculum.dev` only (domain authenticated in Brevo). See §5.1 |
 | Admin email | `forum@umbraculum.dev` (monitored via Cloudflare Email Routing → maintainer inbox) |
 | Ubuntu **24.04 LTS** on VPS | Discourse official path; fresh VM, no conflicting web servers on :80/:443 |
-| Contabo VPS ordered | Cloud VPS 10 + Auto Backup; IPv4 assigned |
+| Contabo VPS ordered | Cloud VPS 10; IPv4 assigned (**Auto Backup** may wait until kick-off — §10) |
 | Brevo + `forum@` smoke-tested | Test send/receive before `./discourse-setup` |
 
 **Checklist before VPS work:**
 
 - [ ] Brevo domain authenticated; SMTP key in password manager
 - [ ] `forum@` Email Routing delivers to maintainer inbox
-- [ ] Contabo VPS provisioned (24.04, NVMe, Auto Backup)
+- [ ] Contabo VPS provisioned (24.04, NVMe; Auto Backup at kick-off if not yet enabled)
 - [ ] VPS IPv4 recorded in password manager
 
 ---
 
 ## 3. Contabo VPS
 
-1. Order **Cloud VPS 10** (auto backup enabled, 12-month term, **75 GB NVMe**).
+> **Custody.** At bootstrap the forum may run on a **maintainer-operated** VPS (personal Contabo or equivalent). Migration to **Umbraculum entity-owned** hosting is by **Discourse backup + restore + DNS cutover**, not VPS/account transfer — see [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7.
+
+1. Order **Cloud VPS 10** (12-month term, **75 GB NVMe**). **Auto Backup (€1.50/mo)** is **optional until forum kick-off** — see §10.
 2. Choose **Ubuntu 24.04 LTS** (Noble).
 3. Note the **public IPv4** — needed for Cloudflare DNS.
 4. SSH as root; apply security baseline per **[§3.1 VPS security](#31-vps-security)**.
@@ -58,7 +61,7 @@
 
 ### 3.1 VPS security
 
-Apply **[`community-forum-vps-security.md`](community-forum-vps-security.md)** **before** `./discourse-setup`: SSH key-only, UFW (22/80/443), fail2ban, unattended-upgrades, confirm Auto Backup in Contabo panel.
+Apply **[`community-forum-vps-security.md`](community-forum-vps-security.md)** **before** `./discourse-setup`: SSH key-only, UFW (22/80/443), fail2ban, unattended-upgrades. Enable **Auto Backup** in the Contabo panel at **kick-off** (§10), not necessarily before first install.
 
 ---
 
@@ -203,7 +206,7 @@ Create categories in **Admin → Categories** (order matters for navigation):
 
 **Pinned topics to create:**
 
-1. **Community policy** — link [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), §6 anti-verticality summary, §6.1 authentic representation.
+1. **Community policy** — link [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), §4.6.7 infrastructure custody (bootstrap VPS → entity-owned migration via backup + restore), §6 anti-verticality summary, §6.1 authentic representation.
 2. **How to write a proposal** — template:
 
    ```markdown
@@ -351,15 +354,25 @@ Manual:
 | Task | Cadence |
 |------|---------|
 | `./launcher rebuild app` when **Admin → Dashboard → Updates** shows a stable upgrade | Monthly or when security advisory lands |
-| Contabo Auto Backup verification in panel | After major upgrade |
+| Contabo Auto Backup verification in panel | After kick-off and after major upgrade |
 | **Discourse → Contabo Object Storage** (€2.50/mo) | Enable post-flip — deferred at bootstrap; see [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) |
 | Review `./launcher logs app` after rebuild | Per upgrade |
 | Spam / CoC moderation | As needed |
 | Publish meeting minutes to **Meetings** | Per §4.3 cadence |
 
-**Backup policy (phased):** Contabo Auto Backup is sufficient to **launch**. Object Storage off-site backups are **deferred for maintainer convenience at alpha bootstrap**, not because skipping them is acceptable long-term — enable within the first post-flip window or before second maintainer / first governance vote.
+**Backup policy (phased):**
 
-**Infra cost (itemized):** €7.60/month (VPS €3.60 + Auto Backup €1.50 + Object Storage €2.50 planned). Public/support copy: **~€10/month**.
+| Layer | When | Cost |
+|-------|------|------|
+| **VPS only** | Bootstrap — provision, install, smoke-test | €3.60/mo |
+| **Contabo Auto Backup** | **Kick-off** — forum announced as canonical governance home ([`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md)); enable **before** first `./launcher rebuild app` once posts/categories matter | +€1.50/mo |
+| **Discourse → Object Storage** | Post-flip window or before first governance vote — see MAINTENANCE | +€2.50/mo |
+
+**Kick-off** means the public flip points contributors at `forum.umbraculum.dev`, not a visitor-count threshold — an empty forum still gets Auto Backup once it is the governance surface.
+
+**Pre-kick-off without Auto Backup:** acceptable while the host is install-only or disposable smoke-test data. Take a **manual snapshot** before risky rebuilds (VPS 10 includes one snapshot slot). If the VPS is lost, reinstall `./discourse-setup` — no archive obligation yet.
+
+**Infra cost (itemized):** €3.60 bootstrap → €5.10 at kick-off → €7.60 full target. Public/support copy: **~€4/month** at bootstrap, **~€10/month** when backup layers are fully enabled.
 
 **Upgrade command:**
 

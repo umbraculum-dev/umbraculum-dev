@@ -42,7 +42,7 @@ ss -tlnp | grep -E ':80|:443' || true
 
 - [ ] Ubuntu **24.04 LTS** (Noble)
 - [ ] ~8 GB RAM available
-- [ ] Contabo **Auto Backup** enabled in panel ([restore guide](https://help.contabo.com/en/support/solutions/articles/103000331776-how-can-i-restore-my-vps-to-the-latest-auto-backup-))
+- [ ] Contabo **Auto Backup** enabled at **forum kick-off** (optional pre-kick-off — see [`community-forum-runbook.md`](community-forum-runbook.md) §10, [`MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) §2)
 - [ ] SSH public key works; password login will be disabled in §4
 
 ---
@@ -127,12 +127,13 @@ Document a different TZ in the runbook §12 sign-off if you choose maintainer-lo
 | Item | Detail |
 |------|--------|
 | **Cost** | €1.50/month add-on |
+| **When** | Enable at **forum kick-off** (canonical governance surface live) — may stay **off** during install-only bootstrap |
 | **Retention** | Up to 10 daily rolling backups, off-server |
 | **Restore** | Contabo Customer Control Panel → VPS Auto Backup → **Restore last backup** |
 
-Take a **manual snapshot** in the Contabo panel before risky `./launcher rebuild app` operations (VPS 10 includes one snapshot slot).
+Take a **manual snapshot** in the Contabo panel before risky `./launcher rebuild app` operations (VPS 10 includes one snapshot slot). **Required** pre-kick-off when Auto Backup is still off.
 
-Auto Backup is **layer 1** only — see [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) for phased Discourse → Object Storage backups (layer 2).
+Auto Backup is **layer 1** — see [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) for kick-off timing and Discourse → Object Storage backups (layer 2).
 
 ---
 
@@ -152,6 +153,6 @@ Re-run §7.5 hardening in [`community-forum-runbook.md`](community-forum-runbook
 
 ## 11. Sign-off
 
-| Date | Maintainer | SSH keys only | UFW | fail2ban | Auto Backup confirmed | Notes |
+| Date | Maintainer | SSH keys only | UFW | fail2ban | Auto Backup (kick-off) | Notes |
 |------|------------|---------------|-----|----------|----------------------|-------|
 | — | — | ☐ | ☐ | ☐ | ☐ | — |
