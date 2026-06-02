@@ -25,6 +25,7 @@ import {
   listWaterProfiles,
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { fetchAuthMe } from "../../../../_lib/fetchAuthMe.js";
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
@@ -161,7 +162,7 @@ export default function SpargeWaterPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const res = await apiFetch("/api/auth/me");
+      const res = await fetchAuthMe();
       if (cancelled) return;
       setAuthed(res.ok);
       setAuthChecked(true);

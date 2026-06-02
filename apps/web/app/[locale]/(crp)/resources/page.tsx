@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  ResourceListResponseSchema,
-  WorkCenterListResponseSchema,
-  type Resource,
-  type WorkCenter,
-} from "@umbraculum/crp-contracts";
+  listCapacityConflicts,
+  listResources,
+  listWorkCenters,
+} from "@umbraculum/api-client/crp";
+import { type Resource, type WorkCenter } from "@umbraculum/crp-contracts";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
@@ -13,8 +13,8 @@ import { H1, SizableText, XStack, YStack } from "tamagui";
 import { Link } from "../../../../src/i18n/navigation";
 import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import {
   RefreshButton,
   ResourceSummary,
@@ -42,26 +42,11 @@ export default function CrpResourcesPage() {
     setError(null);
     setLoading(true);
     try {
-      const [resourcesRes, workCentersRes] = await Promise.all([
-        apiFetch("/api/crp/resources"),
-        apiFetch("/api/crp/work-centers"),
+      const client = webPlatformApiClient();
+      const [parsedResources, parsedWorkCenters] = await Promise.all([
+        listResources(client),
+        listWorkCenters(client),
       ]);
-      if (!resourcesRes.ok) {
-        throw new Error(
-          typeof resourcesRes.data === "string"
-            ? resourcesRes.data
-            : JSON.stringify(resourcesRes.data),
-        );
-      }
-      if (!workCentersRes.ok) {
-        throw new Error(
-          typeof workCentersRes.data === "string"
-            ? workCentersRes.data
-            : JSON.stringify(workCentersRes.data),
-        );
-      }
-      const parsedResources = ResourceListResponseSchema.parse(resourcesRes.data);
-      const parsedWorkCenters = WorkCenterListResponseSchema.parse(workCentersRes.data);
       setResources(parsedResources.items);
       setWorkCenters(parsedWorkCenters.items);
     } catch (err) {

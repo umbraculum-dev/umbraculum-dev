@@ -5,9 +5,8 @@ import { useLocale } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import type { AuthMeResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse } from "@umbraculum/contracts";
 
-import { apiFetch } from "./apiClient";
+import { fetchAuthMe } from "./fetchAuthMe.js";
 
 export type { AuthMeResponse };
 
@@ -31,7 +30,7 @@ export function useRequireAuth(options?: { requireActiveWorkspace?: boolean; req
     setState({ status: "loading" });
     void (async () => {
       try {
-        const res = await apiFetch("/api/auth/me");
+        const res = await fetchAuthMe();
         if (!res.ok) {
           // Not authenticated -> go to login, preserve where we were going.
           const qs = searchParams?.toString();
@@ -39,7 +38,7 @@ export function useRequireAuth(options?: { requireActiveWorkspace?: boolean; req
           router.replace(`/${locale}/login?next=${encodeURIComponent(current)}`);
           return;
         }
-        const me = parseAuthMeResponse(res.data);
+        const me = res.data;
         if (requireActiveWorkspace && !me.activeWorkspaceId) {
           router.replace(`/${locale}/select-workspace`);
           return;

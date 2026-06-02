@@ -4,15 +4,14 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, H1, SizableText, YStack } from "tamagui";
-import {
-  AttributeSetGetResponseSchema,
-  type AttributeSet,
-} from "@umbraculum/pim-contracts";
+import { ApiClientError } from "@umbraculum/api-client";
+import { getAttributeSet } from "@umbraculum/api-client/pim";
+import { type AttributeSet } from "@umbraculum/pim-contracts";
 
 import { Link } from "../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../../_components/recipe-edit";
-import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_lib/webApiClient";
 
 /**
  * PIM attribute set detail — Week 1 audit shape.
@@ -43,20 +42,15 @@ export default function PimAttributeSetDetailPage() {
     setNotFound(false);
     setLoading(true);
     try {
-      const res = await apiFetch(`/api/pim/attribute-sets/${encodeURIComponent(setId)}`);
-      if (res.status === 404) {
+      const client = webPlatformApiClient();
+      const data = await getAttributeSet(client, setId);
+      setAttributeSet(data.item);
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 404) {
         setAttributeSet(null);
         setNotFound(true);
         return;
       }
-      if (!res.ok) {
-        throw new Error(
-          typeof res.data === "string" ? res.data : JSON.stringify(res.data),
-        );
-      }
-      const parsed = AttributeSetGetResponseSchema.parse(res.data);
-      setAttributeSet(parsed.item);
-    } catch (err) {
       setError(String(err));
       setAttributeSet(null);
     } finally {

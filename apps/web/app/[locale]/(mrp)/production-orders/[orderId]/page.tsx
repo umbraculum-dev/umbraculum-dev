@@ -1,10 +1,13 @@
 "use client";
 
+import { ApiClientError } from "@umbraculum/api-client";
 import {
-  MaterialRequirementListResponseSchema,
+  getProductionOrder,
+  listMaterialRequirements,
+} from "@umbraculum/api-client/mrp";
+import {
   MRP_ROUTE_CARD_PDF_TEMPLATE_REF,
   MRP_WORK_ORDER_PDF_TEMPLATE_REF,
-  ProductionOrderGetResponseSchema,
   type MaterialRequirement,
   type Operation,
   type ProductionOrder,
@@ -17,8 +20,8 @@ import { H1, SizableText, XStack, YStack } from "tamagui";
 import { Link } from "../../../../../src/i18n/navigation";
 import { AsyncExportButton } from "../../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../../_components/recipe-edit";
-import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_lib/webApiClient";
 import {
   DetailRow,
   formatDateTime,
@@ -61,32 +64,23 @@ export default function MrpProductionOrderDetailPage() {
     setNotFound(false);
     setLoading(true);
     try {
-      const encodedOrderId = encodeURIComponent(orderId);
-      const orderRes = await apiFetch(`/api/mrp/production-orders/${encodedOrderId}`);
-      if (orderRes.status === 404) {
+      const client = webPlatformApiClient();
+      const parsedOrder = await getProductionOrder(client, orderId);
+      setOrder(parsedOrder.item);
+
+      try {
+        const parsedRequirements = await listMaterialRequirements(client, orderId);
+        setRequirements(parsedRequirements.items);
+      } catch {
+        setRequirements(parsedOrder.item.materialRequirements);
+      }
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 404) {
         setOrder(null);
         setRequirements([]);
         setNotFound(true);
         return;
       }
-      if (!orderRes.ok) {
-        throw new Error(
-          typeof orderRes.data === "string" ? orderRes.data : JSON.stringify(orderRes.data),
-        );
-      }
-      const parsedOrder = ProductionOrderGetResponseSchema.parse(orderRes.data);
-      setOrder(parsedOrder.item);
-
-      const requirementsRes = await apiFetch(
-        `/api/mrp/production-orders/${encodedOrderId}/material-requirements`,
-      );
-      if (!requirementsRes.ok) {
-        setRequirements(parsedOrder.item.materialRequirements);
-        return;
-      }
-      const parsedRequirements = MaterialRequirementListResponseSchema.parse(requirementsRes.data);
-      setRequirements(parsedRequirements.items);
-    } catch (err) {
       setOrder(null);
       setRequirements([]);
       setError(String(err));

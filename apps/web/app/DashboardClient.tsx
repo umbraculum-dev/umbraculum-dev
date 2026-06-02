@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { SizableText } from "tamagui";
 
-import { apiFetch } from "./_lib/apiClient";
+import { fetchAuthMe } from "./_lib/fetchAuthMe.js";
 
 /**
  * Props for `DashboardClient`.
@@ -41,8 +41,8 @@ export function DashboardClient(_props: DashboardClientProps = {}) {
     let cancelled = false;
     (async () => {
       if (cancelled) return;
-      // Trigger centralized 401 handling (banner + timed redirect) via apiFetch.
-      await apiFetch("/api/auth/me");
+      // Trigger centralized 401 handling (banner + timed redirect) via fetchAuthMe.
+      await fetchAuthMe();
     })().catch(() => {});
     return () => {
       cancelled = true;

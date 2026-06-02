@@ -6,10 +6,10 @@ import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } f
 
 import { Link } from "../../../../src/i18n/navigation";
 import type { AuthMeResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse } from "@umbraculum/contracts";
 
 import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
 import { apiFetch } from "../../../_lib/apiClient";
 
 type EquipmentProfile = {
@@ -78,12 +78,12 @@ export default function EquipmentPage() {
     setError(null);
     setLoading(true);
     try {
-      const meRes = await apiFetch("/api/auth/me");
+      const meRes = await fetchAuthMe();
       if (!meRes.ok) {
         setAuth(null);
         throw new Error(t("errors.notAuthenticated"));
       }
-      setAuth(parseAuthMeResponse(meRes.data));
+      setAuth(meRes.data);
 
       const listRes = await apiFetch("/api/equipment-profiles");
       if (!listRes.ok) throw new Error(JSON.stringify(listRes.data));

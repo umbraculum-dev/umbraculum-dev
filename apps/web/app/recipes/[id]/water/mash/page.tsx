@@ -30,8 +30,8 @@ import {
   listWaterProfiles,
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { fetchAuthMe } from "../../../../_lib/fetchAuthMe.js";
 import { apiFetch, type AuthMeResponse, type WaterProfilesResponse } from "../_lib/api";
-import { parseAuthMeResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
@@ -229,8 +229,8 @@ export default function MashWaterPage() {
     setProfilesError(null);
     setLoadingProfiles(true);
     try {
-      const meRes = await apiFetch("/api/auth/me");
-      setMe(meRes.ok ? parseAuthMeResponse(meRes.data) : null);
+      const meRes = await fetchAuthMe();
+      setMe(meRes.ok ? meRes.data : null);
 
       const profilesRes = await listWaterProfiles(webBreweryApiClient());
       setProfiles(profilesRes);

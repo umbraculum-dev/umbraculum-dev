@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Typed API client with pluggable auth strategies (cookie sessions for web; bearer tokens for native + Node). The transport layer between any client and services/api. Returned payloads are runtime-validated by parsers from @umbraculum/contracts. Platform-classified per sub-plan #9 §1.1 — no brewery-domain logic.",
   "scripts": {
-    "build": "tsup src/index.ts src/brewery/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "build": "tsup src/index.ts src/brewery/index.ts src/automation/index.ts src/pim/index.ts src/mrp/index.ts src/crp/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "openapi:codegen": "node ./scripts/openapi-codegen.mjs",
     "openapi:codegen:check": "node ./scripts/openapi-codegen.mjs --check",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -23,12 +23,40 @@
       "import": "./dist/brewery/index.js",
       "require": "./dist/brewery/index.cjs",
       "default": "./dist/brewery/index.js"
+    },
+    "./automation": {
+      "types": "./dist/automation/index.d.ts",
+      "import": "./dist/automation/index.js",
+      "require": "./dist/automation/index.cjs",
+      "default": "./dist/automation/index.js"
+    },
+    "./pim": {
+      "types": "./dist/pim/index.d.ts",
+      "import": "./dist/pim/index.js",
+      "require": "./dist/pim/index.cjs",
+      "default": "./dist/pim/index.js"
+    },
+    "./mrp": {
+      "types": "./dist/mrp/index.d.ts",
+      "import": "./dist/mrp/index.js",
+      "require": "./dist/mrp/index.cjs",
+      "default": "./dist/mrp/index.js"
+    },
+    "./crp": {
+      "types": "./dist/crp/index.d.ts",
+      "import": "./dist/crp/index.js",
+      "require": "./dist/crp/index.cjs",
+      "default": "./dist/crp/index.js"
     }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@umbraculum/contracts": "file:../contracts"
+    "@umbraculum/automation-contracts": "file:../automation-contracts",
+    "@umbraculum/contracts": "file:../contracts",
+    "@umbraculum/crp-contracts": "file:../crp-contracts",
+    "@umbraculum/mrp-contracts": "file:../mrp-contracts",
+    "@umbraculum/pim-contracts": "file:../pim-contracts"
   },
   "devDependencies": {
     "openapi-typescript": "^7.10.1",

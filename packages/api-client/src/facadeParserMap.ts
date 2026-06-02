@@ -38,3 +38,32 @@ export const BREWERY_FACADE_PARSER_MAP = {
   "/water-calc/mash-acidification-manual": "WaterCalcWithDerivationResponseSchema",
   "/water-calc/mash-acidification-target-mash-ph": "WaterCalcResultOnlyResponseSchema",
 } as const;
+
+export const AUTOMATION_FACADE_PARSER_MAP = {
+  "/automation/vessels": "VesselListResponseSchema",
+  "/automation/vessels/{code}": "VesselStateResponseSchema",
+} as const;
+
+export const PIM_FACADE_PARSER_MAP = {
+  "/pim/products": "ProductListResponseSchema / ProductGetResponseSchema (POST)",
+  "/pim/products/{productId}": "ProductGetResponseSchema",
+  "/pim/products/{productId}/variants": "VariantListResponseSchema",
+  "/pim/attribute-sets": "AttributeSetListResponseSchema",
+  "/pim/attribute-sets/{setId}": "AttributeSetGetResponseSchema",
+  "/pim/categories": "CategoryListResponseSchema",
+} as const;
+
+export const MRP_FACADE_PARSER_MAP = {
+  "/mrp/production-orders": "ProductionOrderListResponseSchema",
+  "/mrp/production-orders/{orderId}": "ProductionOrderGetResponseSchema",
+  "/mrp/production-orders/{orderId}/material-requirements": "MaterialRequirementListResponseSchema",
+} as const;
+
+export const CRP_FACADE_PARSER_MAP = {
+  "/crp/resources": "ResourceListResponseSchema",
+  "/crp/resources/{resourceId}": "ResourceGetResponseSchema",
+  "/crp/work-centers": "WorkCenterListResponseSchema",
+  "/crp/scheduled-operations": "ScheduledOperationListResponseSchema",
+  "/crp/conflicts": "CapacityConflictListResponseSchema",
+  "/crp/capacity-load": "CapacityLoadResponseSchema",
+} as const;

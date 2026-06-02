@@ -3,15 +3,13 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
-import {
-  AttributeSetListResponseSchema,
-  type AttributeSet,
-} from "@umbraculum/pim-contracts";
+import { listAttributeSets } from "@umbraculum/api-client/pim";
+import { type AttributeSet } from "@umbraculum/pim-contracts";
 
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 
 /**
  * PIM attribute sets list — Week 1 audit shape.
@@ -39,14 +37,9 @@ export default function PimAttributeSetsPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/pim/attribute-sets");
-      if (!res.ok) {
-        throw new Error(
-          typeof res.data === "string" ? res.data : JSON.stringify(res.data),
-        );
-      }
-      const parsed = AttributeSetListResponseSchema.parse(res.data);
-      setSets(parsed.items);
+      const client = webPlatformApiClient();
+      const data = await listAttributeSets(client);
+      setSets(data.items);
     } catch (err) {
       setError(String(err));
       setSets([]);

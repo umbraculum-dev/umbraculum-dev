@@ -5,11 +5,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import type { AuthMeResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse } from "@umbraculum/contracts";
 import type { WebShellNavItem } from "@umbraculum/module-sdk";
 import { SizableText, XStack } from "tamagui";
 
-import { apiFetch } from "../_lib/apiClient";
+import { fetchAuthMe } from "../_lib/fetchAuthMe.js";
 import { AccessibilityLink } from "./AccessibilityLink";
 import { AuthExpiredNotice } from "./AuthExpiredNotice";
 import { AppMainNav } from "./AppMainNav";
@@ -62,7 +61,7 @@ export function PrimaryNav({ shellNavItems }: { shellNavItems: readonly WebShell
     let cancelled = false;
     const check = async () => {
       try {
-        const res = await apiFetch("/api/auth/me");
+        const res = await fetchAuthMe();
         if (cancelled) return;
         setAuthKnown(true);
         setAuthError(null);
@@ -70,7 +69,7 @@ export function PrimaryNav({ shellNavItems }: { shellNavItems: readonly WebShell
           setMe(null);
           return;
         }
-        const next = parseAuthMeResponse(res.data);
+        const next = res.data;
         setMe(next);
 
         const active =

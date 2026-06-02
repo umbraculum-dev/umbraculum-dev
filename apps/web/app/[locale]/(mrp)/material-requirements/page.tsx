@@ -1,14 +1,15 @@
 "use client";
 
-import { ProductionOrderListResponseSchema, type ProductionOrder } from "@umbraculum/mrp-contracts";
+import { listProductionOrders } from "@umbraculum/api-client/mrp";
+import { type ProductionOrder } from "@umbraculum/mrp-contracts";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { ProductionOrderSummary, RefreshButton, SectionCard } from "../_components/MrpReadOnly";
 
 export default function MrpMaterialRequirementsPage() {
@@ -30,12 +31,9 @@ export default function MrpMaterialRequirementsPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/mrp/production-orders");
-      if (!res.ok) {
-        throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      }
-      const parsed = ProductionOrderListResponseSchema.parse(res.data);
-      setOrders(parsed.items);
+      const client = webPlatformApiClient();
+      const data = await listProductionOrders(client);
+      setOrders(data.items);
     } catch (err) {
       setError(String(err));
       setOrders([]);

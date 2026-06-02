@@ -1,11 +1,10 @@
 "use client";
 
 import {
-  CapacityConflictListResponseSchema,
-  ScheduledOperationListResponseSchema,
-  type CapacityConflict,
-  type ScheduledOperation,
-} from "@umbraculum/crp-contracts";
+  listCapacityConflicts,
+  listScheduledOperations,
+} from "@umbraculum/api-client/crp";
+import { type CapacityConflict, type ScheduledOperation } from "@umbraculum/crp-contracts";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
@@ -13,8 +12,8 @@ import { H1, SizableText, XStack, YStack } from "tamagui";
 import { Link } from "../../../../src/i18n/navigation";
 import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import {
   ConflictSummary,
   RefreshButton,
@@ -42,26 +41,11 @@ export default function CrpSchedulePage() {
     setError(null);
     setLoading(true);
     try {
-      const [operationsRes, conflictsRes] = await Promise.all([
-        apiFetch("/api/crp/scheduled-operations"),
-        apiFetch("/api/crp/conflicts"),
+      const client = webPlatformApiClient();
+      const [parsedOperations, parsedConflicts] = await Promise.all([
+        listScheduledOperations(client),
+        listCapacityConflicts(client),
       ]);
-      if (!operationsRes.ok) {
-        throw new Error(
-          typeof operationsRes.data === "string"
-            ? operationsRes.data
-            : JSON.stringify(operationsRes.data),
-        );
-      }
-      if (!conflictsRes.ok) {
-        throw new Error(
-          typeof conflictsRes.data === "string"
-            ? conflictsRes.data
-            : JSON.stringify(conflictsRes.data),
-        );
-      }
-      const parsedOperations = ScheduledOperationListResponseSchema.parse(operationsRes.data);
-      const parsedConflicts = CapacityConflictListResponseSchema.parse(conflictsRes.data);
       setOperations(parsedOperations.items);
       setConflicts(parsedConflicts.items);
     } catch (err) {

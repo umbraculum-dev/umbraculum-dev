@@ -4,17 +4,14 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
-import {
-  ProductGetResponseSchema,
-  VariantListResponseSchema,
-  type Product,
-  type Variant,
-} from "@umbraculum/pim-contracts";
+import { ApiClientError } from "@umbraculum/api-client";
+import { getProduct, listProductVariants } from "@umbraculum/api-client/pim";
+import { type Product, type Variant } from "@umbraculum/pim-contracts";
 
 import { Link } from "../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../../_components/recipe-edit";
-import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_lib/webApiClient";
 
 /**
  * PIM product detail — Week 1 audit shape.
@@ -47,38 +44,19 @@ export default function PimProductDetailPage() {
     setNotFound(false);
     setLoading(true);
     try {
-      const productRes = await apiFetch(
-        `/api/pim/products/${encodeURIComponent(productId)}`,
-      );
-      if (productRes.status === 404) {
+      const client = webPlatformApiClient();
+      const parsedProduct = await getProduct(client, productId);
+      setProduct(parsedProduct.item);
+
+      const parsedVariants = await listProductVariants(client, productId);
+      setVariants(parsedVariants.items);
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 404) {
         setProduct(null);
         setVariants([]);
         setNotFound(true);
         return;
       }
-      if (!productRes.ok) {
-        throw new Error(
-          typeof productRes.data === "string"
-            ? productRes.data
-            : JSON.stringify(productRes.data),
-        );
-      }
-      const parsedProduct = ProductGetResponseSchema.parse(productRes.data);
-      setProduct(parsedProduct.item);
-
-      const variantsRes = await apiFetch(
-        `/api/pim/products/${encodeURIComponent(productId)}/variants`,
-      );
-      if (!variantsRes.ok) {
-        throw new Error(
-          typeof variantsRes.data === "string"
-            ? variantsRes.data
-            : JSON.stringify(variantsRes.data),
-        );
-      }
-      const parsedVariants = VariantListResponseSchema.parse(variantsRes.data);
-      setVariants(parsedVariants.items);
-    } catch (err) {
       setError(String(err));
       setProduct(null);
       setVariants([]);

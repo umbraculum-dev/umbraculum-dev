@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox } from "../../../_components/recipe-edit";
+import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
 import { apiFetch } from "../../../_lib/apiClient";
 import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";
-import { parseAuthMeResponse, type AuthMeResponseWorkspace } from "@umbraculum/contracts";
+import type { AuthMeResponseWorkspace } from "@umbraculum/contracts";
 
 type WorkspaceListItem = AuthMeResponseWorkspace;
 
@@ -43,14 +44,12 @@ export default function SelectWorkspacePage() {
     setError(null);
     void (async () => {
       try {
-        const res = await apiFetch("/api/auth/me");
+        const res = await fetchAuthMe();
         if (!res.ok) {
           setAuthExpired(true);
           return;
         }
-        // parseAuthMeResponse normalises the legacy `accounts` field
-        // to `workspaces`, so we don't need to handle both shapes here.
-        const parsed = parseAuthMeResponse(res.data);
+        const parsed = res.data;
         if (!cancelled) setWorkspaces(parsed.workspaces);
       } catch (err) {
         if (!cancelled) setError(String(err));

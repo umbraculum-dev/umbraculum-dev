@@ -3,15 +3,13 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Button, H1, SizableText, YStack } from "tamagui";
-import {
-  CategoryListResponseSchema,
-  type CategoryTreeNode,
-} from "@umbraculum/pim-contracts";
+import { listCategories } from "@umbraculum/api-client/pim";
+import { type CategoryTreeNode } from "@umbraculum/pim-contracts";
 
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 
 /**
  * PIM categories — Week 1 audit shape.
@@ -55,14 +53,9 @@ export default function PimCategoriesPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/pim/categories");
-      if (!res.ok) {
-        throw new Error(
-          typeof res.data === "string" ? res.data : JSON.stringify(res.data),
-        );
-      }
-      const parsed = CategoryListResponseSchema.parse(res.data);
-      setTree(parsed.tree);
+      const client = webPlatformApiClient();
+      const data = await listCategories(client);
+      setTree(data.tree);
     } catch (err) {
       setError(String(err));
       setTree([]);

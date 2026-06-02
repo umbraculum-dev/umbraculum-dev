@@ -1,6 +1,8 @@
 "use client";
 
-import { ResourceGetResponseSchema, type Resource } from "@umbraculum/crp-contracts";
+import { ApiClientError } from "@umbraculum/api-client";
+import { getResource } from "@umbraculum/api-client/crp";
+import { type Resource } from "@umbraculum/crp-contracts";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,8 +10,8 @@ import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../../_components/recipe-edit";
-import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_lib/webApiClient";
 import {
   DetailRow,
   formatDateTime,
@@ -42,18 +44,15 @@ export default function CrpResourceDetailPage() {
     setNotFound(false);
     setLoading(true);
     try {
-      const res = await apiFetch(`/api/crp/resources/${encodeURIComponent(resourceId)}`);
-      if (res.status === 404) {
+      const client = webPlatformApiClient();
+      const data = await getResource(client, resourceId);
+      setResource(data.item);
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 404) {
         setResource(null);
         setNotFound(true);
         return;
       }
-      if (!res.ok) {
-        throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      }
-      const parsed = ResourceGetResponseSchema.parse(res.data);
-      setResource(parsed.item);
-    } catch (err) {
       setResource(null);
       setError(String(err));
     } finally {

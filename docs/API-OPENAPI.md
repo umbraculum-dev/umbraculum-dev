@@ -145,10 +145,14 @@ Phase E adds **hand-written facades** on `@umbraculum/api-client`: OpenAPI path 
 |--------|--------|
 | Main entry `@umbraculum/api-client` | Platform facades: auth, workspaces, health, billing, integrations list, rendering jobs |
 | Subpath `@umbraculum/api-client/brewery` | Brewery add-on: recipes, brew sessions, water profiles/settings/compute-and-save/calc preview, hub summary |
+| Subpath `@umbraculum/api-client/automation` | Canonical automation hot paths: vessels list/detail |
+| Subpath `@umbraculum/api-client/pim` | Canonical PIM hot paths: products, variants, attribute-sets, categories |
+| Subpath `@umbraculum/api-client/mrp` | Canonical MRP hot paths: production orders, material requirements |
+| Subpath `@umbraculum/api-client/crp` | Canonical CRP hot paths: resources, work centers, schedule, conflicts, capacity load |
 
-**Pilot consumers:** `apps/native` (recipes/brew-sessions lists; all `Water*` screens), `apps/web` (`renderJobClient` → platform rendering; `breweryWaterClient` → recipe water pages + water-profiles).
+**Pilot consumers:** `apps/native` (recipes/brew-sessions lists; all `Water*` screens), `apps/web` (`renderJobClient` → platform rendering; `breweryWaterClient` → recipe water pages + water-profiles; `fetchAuthMe` → all auth/me call sites; canonical module pages under `(automation|pim|mrp|crp)/`).
 
-**Plans:** OpenAPI Phase E + F10 (`openapi_phase_e_f10_7a3c2d91`); Phase E5 water facades (`openapi_phase_e5_water_10eb23aa`); Phase E6 web water + `/water-calc/*` (`openapi_phase_e6_web_5fd28069`).
+**Plans:** OpenAPI Phase E + F10 (`openapi_phase_e_f10_7a3c2d91`); Phase E5 water facades (`openapi_phase_e5_water_10eb23aa`); Phase E6 web water + `/water-calc/*` (`openapi_phase_e6_web_5fd28069`); Phase E6d-platform + E7 (`e7_auth_+_modules_af183047`).
 
 ---
 
@@ -161,6 +165,27 @@ Phase E5 completes deferred E2 PR2: typed `@umbraculum/api-client/brewery` facad
 ## Phase E6 — standalone water-calc facades + web migration (2026-06-01)
 
 Phase E6 adds all **10** `/water-calc/*` POST facades on `@umbraculum/api-client/brewery` (`waterCalc.ts`) and migrates web recipe water pages + standalone water-profiles page off raw `apiFetch` to typed facades via `apps/web/app/_lib/breweryWaterClient.ts` (`webBreweryApiClient()` + `cookieAuth()`). Completes the Phase E water family after E5 (native recipe-scoped paths).
+
+---
+
+## Phase E6d-platform — web auth/me migration (2026-06-02)
+
+Phase E6d-platform migrates all remaining web `GET /api/auth/me` call sites to the existing `getAuthMe` facade while preserving centralized session-expired UX (`brewery:auth-expired`, `brewery:auth-changed`). Web apps use `fetchAuthMe()` in `apps/web/app/_lib/fetchAuthMe.ts`, which wraps `getAuthMe(webPlatformApiClient())` and shares session tracking with `apiFetch` via `sessionAuthUx.ts`. Shared cookie client factory: `webPlatformApiClient()` in `apps/web/app/_lib/webApiClient.ts` (also used by `renderJobClient`, `breweryWaterClient`, and E7 canonical module pages).
+
+---
+
+## Phase E7 — canonical-module facades + web migration (2026-06-02)
+
+Phase E7 adds typed facade subpaths for the four canonical modules and migrates all existing web pages under `(automation|pim|mrp|crp)/` off raw `apiFetch`:
+
+| Subpath | Facades (hot paths) | Contracts package |
+|---------|---------------------|-------------------|
+| `@umbraculum/api-client/automation` | `listVessels`, `getVessel` | `@umbraculum/automation-contracts` |
+| `@umbraculum/api-client/pim` | `listProducts`, `createProduct`, `getProduct`, `listProductVariants`, `listAttributeSets`, `getAttributeSet`, `listCategories` | `@umbraculum/pim-contracts` |
+| `@umbraculum/api-client/mrp` | `listProductionOrders`, `getProductionOrder`, `listMaterialRequirements` | `@umbraculum/mrp-contracts` |
+| `@umbraculum/api-client/crp` | `listResources`, `getResource`, `listWorkCenters`, `listScheduledOperations`, `listCapacityConflicts`, `getCapacityLoad` | `@umbraculum/crp-contracts` |
+
+Render-job POST URLs on module pages remain on `renderJobClient` (unchanged). Full OpenAPI catalog coverage for each module is deferred to E7-follow-up.
 
 ---
 

@@ -32,16 +32,24 @@ First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI pa
 | `brewery/waterCompute` | `computeAndSaveMash`, `computeAndSaveSparge`, `computeAndSaveBoil` | `parseMashComputeAndSaveResponse`, … |
 | `brewery/waterCalc` | `calcSaltAdditions`, `estimateMashPh`, `calcMashOverall`, `calcSpargeOverall`, `calcBoilOverall`, … (10 `/water-calc/*` POSTs) | `WaterCalcWithDerivationResponseSchema`, `WaterCalcResultOnlyResponseSchema` |
 | `brewery/water` | `getRecipeWaterHubSummary` | `parseRecipeWaterHubSummaryResponse` |
+| `automation/vessels` | `listVessels`, `getVessel` | `VesselListResponseSchema`, `VesselStateResponseSchema` |
+| `pim/products` | `listProducts`, `createProduct`, `getProduct`, `listProductVariants` | `Product*ResponseSchema`, `VariantListResponseSchema` |
+| `pim/attributeSets` | `listAttributeSets`, `getAttributeSet` | `AttributeSet*ResponseSchema` |
+| `pim/categories` | `listCategories` | `CategoryListResponseSchema` |
+| `mrp/productionOrders` | `listProductionOrders`, `getProductionOrder`, `listMaterialRequirements` | `ProductionOrder*ResponseSchema`, `MaterialRequirementListResponseSchema` |
+| `crp/planning` | `listResources`, `getResource`, `listWorkCenters`, `listScheduledOperations`, `listCapacityConflicts`, `getCapacityLoad` | `@umbraculum/crp-contracts` response schemas |
 
-Full path → parser map: [`src/facadeParserMap.ts`](src/facadeParserMap.ts).
+Full path → parser map: [`src/facadeParserMap.ts`](src/facadeParserMap.ts) (`PLATFORM_*`, `BREWERY_*`, `AUTOMATION_*`, `PIM_*`, `MRP_*`, `CRP_*` maps).
 
 ```typescript
 import { bearerTokenAuth, createApiClient, listWorkspaces } from "@umbraculum/api-client";
 import { listRecipes } from "@umbraculum/api-client/brewery";
+import { listVessels } from "@umbraculum/api-client/automation";
 
 const client = createApiClient(baseUrl, bearerTokenAuth(() => token));
 const workspaces = await listWorkspaces(client);
 const recipes = await listRecipes(client);
+const vessels = await listVessels(client);
 ```
 
 Errors from non-2xx responses throw `ApiClientError` (status + body).
@@ -54,6 +62,10 @@ Errors from non-2xx responses throw `ApiClientError` (status + body).
 - `bearerTokenAuth(getToken)` (native + Node)
 - Platform facades — see `src/platform/*` (re-exported from main entry)
 - `@umbraculum/api-client/brewery` — brewery add-on facades only (tree-shaking friendly)
+- `@umbraculum/api-client/automation` — canonical automation facades
+- `@umbraculum/api-client/pim` — canonical PIM facades
+- `@umbraculum/api-client/mrp` — canonical MRP facades
+- `@umbraculum/api-client/crp` — canonical CRP facades
 - `PlatformOpenApiPaths`, `BreweryOpenApiPaths`, and related `components` / `operations` type exports (generated from committed OpenAPI JSON)
 
 ## OpenAPI codegen (Phase E)
@@ -95,11 +107,11 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 ## How it fits in
 
 - **Consumed by**: `apps/web` (cookie auth), `apps/native` (bearer auth); Node-side test harnesses and scripts that need to call the API as an authenticated user (also bearer).
-- **Depends on**: `@umbraculum/contracts` (for the response parsers and DTO types). Does **not** depend on Next.js, Expo, React Navigation, or any UI framework.
+- **Depends on**: `@umbraculum/contracts` (platform parsers), `@umbraculum/*-contracts` (canonical module parsers). Does **not** depend on Next.js, Expo, React Navigation, or any UI framework.
 
 ## Status
 
-**Phase E complete (2026-06-01). Phase E5 (2026-06-01):** brewery water facades (profiles, settings, compute-and-save, hub summary) + native water screen migration. npm publish remains a separate LICENSING decision.
+**Phase E complete (2026-06-01). Phase E5–E7 (2026-06):** brewery water facades + native migration; web auth/me via `fetchAuthMe`; canonical module facade subpaths + web `(automation|pim|mrp|crp)/` page migration. npm publish remains a separate LICENSING decision.
 
 The "webview caveat" above is the one explicitly-flagged limitation: bearer-only native auth does not automatically give a webview an authenticated session — that requires a future bridging mechanism (cookie/session handoff or token-to-session exchange), which is on the trajectory but not yet implemented.
 

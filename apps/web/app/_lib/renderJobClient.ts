@@ -1,6 +1,4 @@
 import {
-  cookieAuth,
-  createApiClient,
   fetchRenderJobDownloadUrl as fetchRenderJobDownloadUrlCore,
   pollRenderJobUntilSucceeded as pollRenderJobUntilSucceededCore,
   runAsyncRenderJobExport as runAsyncRenderJobExportCore,
@@ -9,26 +7,24 @@ import {
   type RenderJobPhase,
 } from "@umbraculum/api-client";
 
+import { webPlatformApiClient } from "./webApiClient.js";
+
 export type { RenderJobPhase };
 export { toWebArtifactUrl };
-
-function webApiClient() {
-  return createApiClient("", cookieAuth());
-}
 
 export async function submitRenderJob(
   postUrl: string,
   body?: Record<string, unknown>,
 ): Promise<{ jobId: string }> {
-  return submitRenderJobCore(webApiClient(), postUrl, body);
+  return submitRenderJobCore(webPlatformApiClient(), postUrl, body);
 }
 
 export async function pollRenderJobUntilSucceeded(jobId: string): Promise<void> {
-  return pollRenderJobUntilSucceededCore(webApiClient(), jobId);
+  return pollRenderJobUntilSucceededCore(webPlatformApiClient(), jobId);
 }
 
 export async function fetchRenderJobDownloadUrl(jobId: string): Promise<string> {
-  return fetchRenderJobDownloadUrlCore(webApiClient(), jobId, { platform: "web" });
+  return fetchRenderJobDownloadUrlCore(webPlatformApiClient(), jobId, { platform: "web" });
 }
 
 /** Submit async render job, poll to success, return browser-ready download URL. */
@@ -36,5 +32,5 @@ export async function runAsyncRenderJobExport(
   postUrl: string,
   body?: Record<string, unknown>,
 ): Promise<string> {
-  return runAsyncRenderJobExportCore(webApiClient(), postUrl, { body, platform: "web" });
+  return runAsyncRenderJobExportCore(webPlatformApiClient(), postUrl, { body, platform: "web" });
 }

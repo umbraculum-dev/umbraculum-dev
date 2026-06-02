@@ -1,6 +1,7 @@
 "use client";
 
-import { CapacityLoadResponseSchema, type CapacityBucket } from "@umbraculum/crp-contracts";
+import { getCapacityLoad } from "@umbraculum/api-client/crp";
+import { type CapacityBucket } from "@umbraculum/crp-contracts";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
@@ -8,8 +9,8 @@ import { H1, SizableText, XStack, YStack } from "tamagui";
 import { Link } from "../../../../src/i18n/navigation";
 import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { CapacityBucketSummary, RefreshButton, SectionCard } from "../_components/CrpReadOnly";
 
 export default function CrpCapacityPage() {
@@ -32,12 +33,9 @@ export default function CrpCapacityPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/crp/capacity-load");
-      if (!res.ok) {
-        throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      }
-      const parsed = CapacityLoadResponseSchema.parse(res.data);
-      setBuckets(parsed.item.buckets);
+      const client = webPlatformApiClient();
+      const data = await getCapacityLoad(client);
+      setBuckets(data.item.buckets);
     } catch (err) {
       setError(String(err));
       setBuckets([]);

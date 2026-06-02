@@ -1,7 +1,8 @@
 import * as _umbraculum_contracts from '@umbraculum/contracts';
 import { BrewSessionsListResponse, RecipesListResponse, WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema, BoilComputeAndSaveResponseV1, MashComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSchema } from '@umbraculum/contracts';
 export { BoilComputeAndSaveResponseV1, BrewSessionListItem, MashComputeAndSaveResponseV1, RecipeListItem, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse } from '@umbraculum/contracts';
-import { p as paths, a as ApiClient } from '../brewery.openapi-BgnnB0s0.cjs';
+import { a as ApiClient } from '../client-Dia82S7S.cjs';
+import { p as paths } from '../brewery.openapi-CXYEPddO.cjs';
 
 type RecipesListPath = "/recipes";
 type RecipesListGet = paths[RecipesListPath]["get"];

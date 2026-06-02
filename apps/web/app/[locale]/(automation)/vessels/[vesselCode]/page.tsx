@@ -4,15 +4,14 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
-import {
-  VesselStateResponseSchema,
-  type VesselState,
-} from "@umbraculum/automation-contracts";
+import { ApiClientError } from "@umbraculum/api-client";
+import { getVessel } from "@umbraculum/api-client/automation";
+import { type VesselState } from "@umbraculum/automation-contracts";
 
 import { Link } from "../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../../_components/recipe-edit";
-import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_lib/webApiClient";
 
 /**
  * Phase B-3 automation vessel — detail page.
@@ -61,20 +60,15 @@ export default function AutomationVesselDetailPage() {
     setNotFound(false);
     setLoading(true);
     try {
-      const res = await apiFetch(`/api/automation/vessels/${encodeURIComponent(code)}`);
-      if (res.status === 404) {
+      const client = webPlatformApiClient();
+      const data = await getVessel(client, code);
+      setVessel(data.vessel);
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 404) {
         setVessel(null);
         setNotFound(true);
         return;
       }
-      if (!res.ok) {
-        throw new Error(
-          typeof res.data === "string" ? res.data : JSON.stringify(res.data),
-        );
-      }
-      const parsed = VesselStateResponseSchema.parse(res.data);
-      setVessel(parsed.vessel);
-    } catch (err) {
       setVessel(null);
       setError(String(err));
     } finally {

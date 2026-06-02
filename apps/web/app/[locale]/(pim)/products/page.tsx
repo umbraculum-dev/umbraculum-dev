@@ -3,16 +3,13 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { Button, H1, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
-import {
-  ProductGetResponseSchema,
-  ProductListResponseSchema,
-  type Product,
-} from "@umbraculum/pim-contracts";
+import { createProduct as createProductApi, listProducts } from "@umbraculum/api-client/pim";
+import { type Product } from "@umbraculum/pim-contracts";
 
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 
 /**
  * PIM products list — Week 1 audit shape.
@@ -70,14 +67,9 @@ export default function PimProductsPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/pim/products");
-      if (!res.ok) {
-        throw new Error(
-          typeof res.data === "string" ? res.data : JSON.stringify(res.data),
-        );
-      }
-      const parsed = ProductListResponseSchema.parse(res.data);
-      setProducts(parsed.items);
+      const client = webPlatformApiClient();
+      const data = await listProducts(client);
+      setProducts(data.items);
     } catch (err) {
       setError(String(err));
       setProducts([]);
@@ -106,23 +98,14 @@ export default function PimProductsPage() {
     setCreateSuccess(false);
     setCreating(true);
     try {
-      const res = await apiFetch("/api/pim/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sku,
-          name,
-          description: createDescription.trim() || null,
-          primaryAttributeSetId: createAttributeSetId.trim() || null,
-          status: "draft",
-        }),
+      const client = webPlatformApiClient();
+      await createProductApi(client, {
+        sku,
+        name,
+        description: createDescription.trim() || null,
+        primaryAttributeSetId: createAttributeSetId.trim() || null,
+        status: "draft",
       });
-      if (!res.ok) {
-        throw new Error(
-          typeof res.data === "string" ? res.data : JSON.stringify(res.data),
-        );
-      }
-      ProductGetResponseSchema.parse(res.data);
       setCreateSku("");
       setCreateName("");
       setCreateDescription("");

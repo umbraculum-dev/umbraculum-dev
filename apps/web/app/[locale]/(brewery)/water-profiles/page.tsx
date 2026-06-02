@@ -7,7 +7,6 @@ import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } f
 import { Link } from "../../../../src/i18n/navigation";
 
 import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse } from "@umbraculum/contracts";
 import {
   createWaterProfile,
   deleteWaterProfile,
@@ -17,7 +16,7 @@ import {
 } from "@umbraculum/api-client/brewery";
 
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
-import { apiFetch } from "../../../_lib/apiClient";
+import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
 import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 
@@ -56,10 +55,9 @@ export default function WaterProfilesPage() {
     setError(null);
     setLoading(true);
     try {
-      const meRes = await apiFetch("/api/auth/me");
-      if (meRes.ok && meRes.data) {
-        const parsed = parseAuthMeResponse(meRes.data);
-        setMe(parsed);
+      const meRes = await fetchAuthMe();
+      if (meRes.ok) {
+        setMe(meRes.data);
       } else {
         setMe(null);
       }

@@ -7,6 +7,7 @@ import { H1, SizableText, View, YStack } from "tamagui";
 
 import { BrewSelect } from "../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
+import { fetchAuthMe } from "../../_lib/fetchAuthMe.js";
 import { apiFetch } from "../../_lib/apiClient";
 
 type UiThemeKey = "default" | "hc_dark" | "hc_light";
@@ -74,13 +75,12 @@ export default function AccessibilityPage() {
         setHtmlDataset("density", cDensity);
 
         // Try to load server-side preferences (if authenticated).
-        const res = await apiFetch("/api/auth/me");
+        const res = await fetchAuthMe();
         if (!res.ok) {
           if (!cancelled) setLoaded(true);
           return;
         }
-        const me = res.data as { user?: Record<string, unknown> } | null | undefined;
-        const u: Record<string, unknown> = me?.user ?? {};
+        const u: Record<string, unknown> = res.data.user ?? {};
         const pTheme = oneOf(u['preferredTheme'], allowedTheme, cTheme);
         const pFont = oneOf(u['preferredFontScale'], allowedFont, cFont);
         const pDensity = oneOf(u['preferredDensity'], allowedDensity, cDensity);
