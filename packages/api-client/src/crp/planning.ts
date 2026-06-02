@@ -90,11 +90,6 @@ export async function getCapacityLoad(client: ApiClient): Promise<CapacityLoadRe
   );
 }
 
-type CrpCapacityLoadRenderJobsPath = "/crp/capacity-load/render-jobs";
-type CrpScheduleRenderJobsPath = "/crp/schedule/render-jobs";
-type CrpResourcesCalendarRenderJobsPath = "/crp/resources/calendar/render-jobs";
-type CrpConflictsRenderJobsPath = "/crp/conflicts/render-jobs";
-
 export type RenderJobBody = { visibility?: RenderVisibility };
 
 export function capacityLoadRenderJobsPath(resourceId?: string): string {

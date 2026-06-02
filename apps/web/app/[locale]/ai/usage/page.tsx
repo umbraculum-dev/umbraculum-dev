@@ -13,13 +13,6 @@ import { DashboardClient } from "../../../DashboardClient";
 
 import { UsageTokenChart } from "../_components/UsageTokenChart";
 
-interface DailyPoint {
-  day: string;
-  tokensIn: number;
-  tokensOut: number;
-  calls: number;
-}
-
 interface ByUserRow {
   userId: string;
   email: string | null;
@@ -30,20 +23,6 @@ interface ByUserRow {
   tokensOutMonth: number;
   costMicroUsdMonth: number;
   callCountMonth: number;
-}
-
-interface RoleAlert {
-  role: string;
-  used: number;
-  limit: number;
-  percent: number;
-}
-
-interface UserAlert {
-  userId: string;
-  usedToday: number;
-  cap: number;
-  percent: number;
 }
 
 interface UsageResponse extends WorkspaceAiUsageResponse {}

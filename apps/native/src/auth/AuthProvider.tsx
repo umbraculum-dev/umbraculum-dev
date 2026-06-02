@@ -70,8 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         if (!baseUrl) return { ok: false, error: "Missing EXPO_PUBLIC_API_BASE_URL" };
 
-        const api = createApiClient(baseUrl, bearerTokenAuth(() => null));
-        const res = await loginNative(api, input);
+        const res = await loginNative(nativePlatformApiClient(null, baseUrl), input);
         const token = parseToken(res);
         if (!token) return { ok: false, error: "Login response missing token" };
 

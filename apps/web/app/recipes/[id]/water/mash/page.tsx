@@ -353,8 +353,8 @@ export default function MashWaterPage() {
       // Back-compat / single source of truth:
       // If mixing volumes are not set but an older saved mashWaterVolumeLiters exists,
       // seed tap volume from the saved mash volume so the new derived volume model works.
-      const tap = s.tapWaterVolumeLiters ?? 0;
-      const dil = s.dilutionWaterVolumeLiters ?? 0;
+      const tap = typeof s.tapWaterVolumeLiters === "number" ? s.tapWaterVolumeLiters : 0;
+      const dil = typeof s.dilutionWaterVolumeLiters === "number" ? s.dilutionWaterVolumeLiters : 0;
       const totalMix = tap + dil;
       if (totalMix <= 0 && typeof s.mashWaterVolumeLiters === "number" && Number.isFinite(s.mashWaterVolumeLiters) && s.mashWaterVolumeLiters > 0) {
         setTapVolumeLiters(s.mashWaterVolumeLiters);

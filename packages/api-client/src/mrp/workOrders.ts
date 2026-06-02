@@ -22,11 +22,6 @@ import {
 type MrpWorkOrderPreviewPath = "/mrp/work-orders/{orderId}/preview";
 type MrpWorkOrderPreviewGet = PlatformOpenApiPaths[MrpWorkOrderPreviewPath]["get"];
 
-type MrpWorkOrderRenderJobsPath = "/mrp/work-orders/{orderId}/render-jobs";
-type MrpMaterialRequirementsRenderJobsPath =
-  "/mrp/production-orders/{orderId}/material-requirements/render-jobs";
-type MrpProductionOrdersRenderJobsPath = "/mrp/production-orders/render-jobs";
-
 export type WorkOrderRenderTemplateRef =
   | typeof MRP_WORK_ORDER_PDF_TEMPLATE_REF
   | typeof MRP_ROUTE_CARD_PDF_TEMPLATE_REF;

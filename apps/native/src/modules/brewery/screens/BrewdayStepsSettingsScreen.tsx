@@ -300,7 +300,7 @@ export function BrewdayStepsSettingsScreen() {
     } finally {
       setSaving(false);
     }
-  }, [baseUrl, brewdayNotes, brewingType, canCall, customSteps, defaultSteps, sections, t, token]);
+  }, [brewdayNotes, brewingType, canCall, customSteps, defaultSteps, sections, t, token]);
 
   const recapLines = useMemo(() => {
     const all = [...defaultSteps, ...customSteps].filter((s) => s && s.exclude !== true);

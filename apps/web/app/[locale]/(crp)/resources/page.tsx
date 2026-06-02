@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  listCapacityConflicts,
   listResources,
   listWorkCenters,
 } from "@umbraculum/api-client/crp";
