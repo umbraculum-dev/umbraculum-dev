@@ -1,7 +1,7 @@
 name: dogfood-npm-smoke
 
-# Registry-only install smoke for @umbraculum/contracts + @umbraculum/api-client.
-# Manifest job: .umbraculum/ci-parity.json → dogfood-npm-smoke
+# Registry-only install smoke for published @umbraculum/* SDK packages (contracts,
+# api-client, module-sdk α batch). Manifest job: .umbraculum/ci-parity.json → dogfood-npm-smoke
 
 on:
   push:
@@ -9,6 +9,14 @@ on:
     paths:
       - "packages/contracts/**"
       - "packages/api-client/**"
+      - "packages/ai-tool-sdk/**"
+      - "packages/i18n-keys/**"
+      - "packages/module-sdk/**"
+      - "packages/*-contracts/**"
+      - "apps/web/package.json"
+      - "apps/native/package.json"
+      - "services/api/package.json"
+      - "packages/rendering/package.json"
       - "scripts/dogfood-npm-smoke.sh"
       - ".umbraculum/ci-parity.json"
       - ".github/workflows/dogfood-npm-smoke.yml"
@@ -18,6 +26,14 @@ on:
     paths:
       - "packages/contracts/**"
       - "packages/api-client/**"
+      - "packages/ai-tool-sdk/**"
+      - "packages/i18n-keys/**"
+      - "packages/module-sdk/**"
+      - "packages/*-contracts/**"
+      - "apps/web/package.json"
+      - "apps/native/package.json"
+      - "services/api/package.json"
+      - "packages/rendering/package.json"
       - "scripts/dogfood-npm-smoke.sh"
       - ".umbraculum/ci-parity.json"
       - ".github/workflows/dogfood-npm-smoke.yml"

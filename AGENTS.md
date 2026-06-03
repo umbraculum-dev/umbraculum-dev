@@ -317,10 +317,19 @@ job** in the manifest; do not invent host-only verification scripts.
 
 When adding or editing `.github/workflows/*.yml`:
 
-- **No cron by default.** Do not add `on.schedule` / `cron:` unless the user or
-  task **explicitly** requests scheduled runs. Existing scheduled workflows
-  (e.g. `dogfood-npm-smoke.yml`) are documented exceptions — do not copy that
-  pattern into new workflows without instruction.
+- **No cron by default.** Do not add `on.schedule` / `cron:` unless the user
+  **specifically asks** for scheduled runs. Do not add weekly crons as a
+  "helpful default" or by copying an existing workflow. Existing scheduled
+  workflows are documented exceptions (see inventory below) — do not extend
+  that list without instruction.
+- **Weekly cron inventory (this repo, 2026-06-03):**
+  - [`dogfood-npm-smoke.yml`](.github/workflows/dogfood-npm-smoke.yml) —
+    `0 6 * * 1` (Mon 06:00 UTC); registry install smoke (~1 min).
+  - [`integrator-live-smoke.yml`](.github/workflows/integrator-live-smoke.yml) —
+    **no cron** (opt-in label + `workflow_dispatch` only; weekly cron removed
+    2026-06-03).
+  - **Sister repo** [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) —
+    no schedule; live job is `workflow_dispatch` only.
 - **Heavy workflows.** Prefer `workflow_dispatch` + PR label opt-in over
   automatic `push` / ungated `pull_request` for jobs that need full Docker
   stacks or multi-minute runtime (see `integrator-live-smoke.yml`).

@@ -85,13 +85,13 @@ The **seven-package July α batch** (`ai-tool-sdk`, `i18n-keys`, `module-sdk`, f
 | `@umbraculum/mrp-contracts` | `^0.0.2` |
 | `@umbraculum/crp-contracts` | `^0.0.2` |
 
-[`scripts/dogfood-npm-smoke.sh`](../../scripts/dogfood-npm-smoke.sh) phase 2 installs `module-sdk` + peers from the registry in a temp dir (no new ci-parity job id).
+[`scripts/dogfood-npm-smoke.sh`](../../scripts/dogfood-npm-smoke.sh) phase 2 installs `module-sdk`, all four canonical `*-contracts`, and `ai-tool-sdk` from the registry in a temp dir (no new ci-parity job id).
 
 ---
 
 ## Tooling / CI
 
-- **ci-parity job `dogfood-npm-smoke`:** runs [`scripts/dogfood-npm-smoke.sh`](../../scripts/dogfood-npm-smoke.sh) (npm registry network). GHA: [`.github/workflows/dogfood-npm-smoke.yml`](../../.github/workflows/dogfood-npm-smoke.yml) — on SDK path changes + weekly schedule.
+- **ci-parity job `dogfood-npm-smoke`:** runs [`scripts/dogfood-npm-smoke.sh`](../../scripts/dogfood-npm-smoke.sh) (npm registry network). GHA: [`.github/workflows/dogfood-npm-smoke.yml`](../../.github/workflows/dogfood-npm-smoke.yml) — on SDK path changes, consumer manifest pins (`apps/web`, `apps/native`, `services/api`, `packages/rendering`), and weekly schedule (Mon 06:00 UTC).
 - **umbraculum-toolset:** optional cross-link from publish checklist in sister-repo; not a daily Cursor rule in this repo.
 
 ---
