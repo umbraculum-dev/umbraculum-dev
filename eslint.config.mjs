@@ -421,7 +421,7 @@ export default [
   // configs like babel.config.js, metro.config.js can use either.)
   // -------------------------------------------------------------------
   {
-    files: ["**/*.cjs", "**/babel.config.js", "**/metro.config.js"],
+    files: ["**/*.cjs", "**/babel.config.js", "**/metro.config.js", "**/app.config.js"],
     languageOptions: {
       sourceType: "commonjs",
       globals: {
