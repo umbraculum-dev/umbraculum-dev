@@ -61,7 +61,7 @@ Pin `peerDependencies` to `^` those versions (or newer patch/minor within range)
 
 **HTTP integrator walkthrough (no module registration):** [`INTEGRATOR-QUICKSTART.md`](../../INTEGRATOR-QUICKSTART.md) — install from npm, bearer login, platform API reads. **Sample repo:** [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) (public, no monorepo clone).
 
-**Monorepo fallback.** Umbraculum contributors and forks still use npm workspaces + `file:` links against `packages/*` (see [`DEVELOPMENT.md`](../../../DEVELOPMENT.md)). Git dependencies on the monorepo checkout remain valid when you need unreleased pins.
+**Monorepo hybrid (contributors).** Umbraculum contributors use npm workspaces: **consumer** manifests pin the same registry semver as third-party repos (`^0.0.2` module-sdk batch, `^0.0.1` contracts/api-client); workspaces still symlink in-tree `packages/*` for active co-dev. Unpublished monorepo packages (`ui`, `i18n`, brewery vertical, …) remain `file:` links. See [`npm-sdk-monorepo-dogfood.md`](../../design/npm-sdk-monorepo-dogfood.md). Git dependencies on the monorepo checkout remain valid when you need unreleased pins.
 
 ---
 

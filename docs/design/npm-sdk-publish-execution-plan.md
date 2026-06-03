@@ -279,16 +279,16 @@ Content: clone structure of [`ci-parity-npm-trusted-publishing.md`](ci-parity-np
 
 ## 8. Monorepo dependency policy (post-publish)
 
-**Chosen policy for α:** committed `module-sdk/package.json` **keeps** `file:../ai-tool-sdk` and `file:../i18n-keys` so workspace CI does not require registry round-trips.
+**Publisher co-dev:** committed `module-sdk/package.json` **keeps** `file:../ai-tool-sdk` and `file:../i18n-keys` so workspace CI does not require registry round-trips for spine + leaf co-development.
 
 | Consumer | Install path |
 |----------|--------------|
-| External third-party module repo | `npm install @umbraculum/module-sdk@^0.0.1` (+ peers) |
-| Umbraculum monorepo contributor | `npm install` at repo root (workspaces + `file:`) |
+| External third-party module repo | `npm install @umbraculum/module-sdk@^0.0.2` (+ peers) |
+| Umbraculum monorepo contributor | `npm install` at repo root — **consumer** manifests use registry `^` pins; npm workspaces symlink in-tree `packages/*` for active co-dev |
 
 Document this split in [`third-party-module.md`](../modules/contribute/third-party-module.md) §npm registry vs monorepo.
 
-**Future (post-α):** optional PR to pin registry versions in monorepo for dogfooding — not required for this batch.
+**Done (2026-06-03):** consumer manifests dogfood the module-sdk α batch — see [`npm-sdk-monorepo-dogfood.md`](npm-sdk-monorepo-dogfood.md) § Module-sdk α batch.
 
 ---
 
