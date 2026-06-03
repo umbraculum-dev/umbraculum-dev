@@ -36,10 +36,14 @@ const ADMIN_EMAIL = "e2e-admin@brewery.local";
 const MEMBER_EMAIL = "e2e-member@brewery.local";
 const VIEWER_EMAIL = "e2e-viewer@brewery.local";
 const MULTI_ADMIN_EMAIL = "e2e-multi-admin@brewery.local";
-const ADMIN_PASSWORD = process.env['E2E_ADMIN_PASSWORD'] ?? "e2e-admin-pw!";
-const MEMBER_PASSWORD = process.env['E2E_MEMBER_PASSWORD'] ?? "e2e-member-pw!";
-const VIEWER_PASSWORD = process.env['E2E_VIEWER_PASSWORD'] ?? "e2e-viewer-pw!";
-const MULTI_ADMIN_PASSWORD = process.env['E2E_MULTI_ADMIN_PASSWORD'] ?? "e2e-multi-admin-pw!";
+// `||` (not `??`) so that empty-string env values fall back to defaults.
+// Compose injects `E2E_*_PASSWORD: ${VAR:-}` which becomes "" (not undefined)
+// when .env omits the override; without this, "" gets hashed as the password
+// and every E2E persona returns 401 on login.
+const ADMIN_PASSWORD = process.env['E2E_ADMIN_PASSWORD'] || "e2e-admin-pw!";
+const MEMBER_PASSWORD = process.env['E2E_MEMBER_PASSWORD'] || "e2e-member-pw!";
+const VIEWER_PASSWORD = process.env['E2E_VIEWER_PASSWORD'] || "e2e-viewer-pw!";
+const MULTI_ADMIN_PASSWORD = process.env['E2E_MULTI_ADMIN_PASSWORD'] || "e2e-multi-admin-pw!";
 
 interface Persona {
   id: string;
