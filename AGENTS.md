@@ -335,6 +335,24 @@ When adding or editing `.github/workflows/*.yml`:
   stacks or multi-minute runtime (see `integrator-live-smoke.yml`).
 - **Path discipline.** Match path filters to the smallest surface that actually
   requires the job.
+- **Standard GitHub-hosted runners.** Default `runs-on: ubuntu-latest` (or
+  `windows-latest` / `macos-latest` only when the job requires that OS). Do not
+  add larger runners or custom high-core runner labels without explicit
+  maintainer approval — larger runners bill even on public repos. Standard
+  runners are minute-free on public repositories per
+  [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+  See [`DEVELOPMENT.md`](DEVELOPMENT.md) policies.
+- **`native-eas-build` + Expo free tier.** EAS cloud builds are **not
+  unlimited** — Free plan **monthly** caps (~**30** builds: **≤15 Android** +
+  **≤15 iOS**), **1 concurrency**, plus EAS Update MAU/bandwidth limits (see
+  [Expo billing FAQ](https://docs.expo.dev/billing/faq/)). Queue on the free
+  tier (*waiting for concurrency* / *available worker*) can be **slow (often
+  30–90+ minutes)** — **acceptable** for occasional demo APKs, not a CI bug. GHA
+  may log *Waiting for build to complete* while Expo shows *Waiting to start*.
+  **Private repo:** do not leave this workflow running during a long queue
+  (minute burn). **Public repo:** manual dispatch is fine on `ubuntu-latest`.
+  See [`apps/native/EAS-DEMO-SETUP.md`](apps/native/EAS-DEMO-SETUP.md) § “Expo
+  free tier”.
 
 ## ci-parity manifest / version changes (agent mandatory — do not skip)
 

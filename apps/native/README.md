@@ -36,7 +36,7 @@ The native app expects `services/api` to be reachable; for local development aga
 ## Build / test / lint (local)
 
 - **Build (Expo dev)**: `npx expo start` (Metro bundler in dev mode).
-- **Build (EAS demo)**: `eas.json` `preview` profile → `https://demo.umbraculum.dev`; operator steps: [`EAS-DEMO-SETUP.md`](EAS-DEMO-SETUP.md); policy: [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md); [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md) §5.
+- **Build (EAS demo)**: `eas.json` `preview` profile → `https://demo.umbraculum.dev`; operator steps: [`EAS-DEMO-SETUP.md`](EAS-DEMO-SETUP.md) (includes **Expo free tier** — monthly build caps + slow queue are expected); policy: [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md); [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md) §5.
 - **Lint**: not yet configured in this workspace (see [`docs/LINTING.md`](../../docs/LINTING.md) for the platform-wide linting strategy and current scope tiers).
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace carries all 6 candidate strict flags after Phase 6h, and was the first non-pilot workspace to land `noUncheckedIndexedAccess` in Phase 6b — fixing 6 latent index-out-of-bounds sites in the process).
 - **i18n coverage check**: `npm run i18n:guardrail`.

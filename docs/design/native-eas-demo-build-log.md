@@ -114,7 +114,9 @@ Record last green run date here when executed: **2026-05-27** (agent): `check-pa
 | APK URL | _pending_ |
 | `EXPO_PUBLIC_API_BASE_URL` baked | `https://demo.umbraculum.dev` |
 
-**Trigger:** GitHub Actions → `native-eas-build` → `platform=android`, `profile=preview` (requires `EXPO_TOKEN`).
+**Trigger:** GitHub Actions → `native-eas-build` → `platform=android`, `profile=preview` (requires `EXPO_TOKEN`) — **prefer GHA when the repo is public**; while private, use local `eas build` or expo.dev only during long free-tier queues (see [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) § “Expo free tier”).
+
+**Queue + quota note (2026-06-03):** Expo **Free** plan — **monthly** build allowance (dashboard: **15 Android** + **15 iOS** of **30** total; **1 concurrency**; EAS Update **1,000 MAUs** + **100 GiB** / month). Not unlimited; occasional demo builds are within policy. First `preview` Android build sat in **Free Tier Queue** (~1h+ *waiting for available worker*) while a private-repo GHA job polled *Waiting for build to complete* — expected. GHA workflow canceled; Expo build allowed to finish independently. See [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) § “Expo free tier”.
 
 ---
 

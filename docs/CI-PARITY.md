@@ -96,6 +96,8 @@ Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 **When adding a GHA workflow:** register its verify commands as a **ci-parity job** in `.umbraculum/ci-parity.json`. One command list for local + CI; no parallel host-only bash scripts.
 
+**Runners:** use **standard** GitHub-hosted runners (`ubuntu-latest` by default). Avoid [larger runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/about-larger-runners) unless a maintainer explicitly approves — they are always metered, including on public repositories. On public repos, standard runner **minutes are not billed** ([GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)); private repos consume the org’s included minute pool. Policy: [`DEVELOPMENT.md`](../DEVELOPMENT.md) policies, [`AGENTS.md`](../AGENTS.md) § GHA workflow authoring.
+
 **When GHA is still required:** OIDC npm publish, tag-only deploys, secrets, first-time trusted-publisher setup — run ci-parity first, then trigger GHA.
 
 Agent rule (toolset): `72-ci-parity-local-vs-ci-divergence.mdc` § Agent anti-patterns.

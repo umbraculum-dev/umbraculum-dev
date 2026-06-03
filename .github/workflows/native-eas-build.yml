@@ -1,4 +1,9 @@
 # Manual EAS internal builds for July 2026 brewery alpha (non-blocking on PRs).
+# Expo Free plan: ~30 cloud builds/month (≤15 Android + ≤15 iOS), 1 concurrency,
+# slow free-tier queue (30–90+ min common) — acceptable for occasional demo APKs;
+# see apps/native/EAS-DEMO-SETUP.md § "Expo free tier". Prefer this workflow
+# when the repo is public (standard ubuntu-latest: no minute billing). While the
+# repo is private, long queue waits burn Actions minutes — prefer local eas build.
 name: native-eas-build
 
 on:
