@@ -139,12 +139,14 @@ iOS/Android obligations in §3–§4 apply to **`apps/native` (Expo)** only. **U
 
 ### 5.1 Device smoke checklist (EAS `preview` → demo host)
 
-- [ ] `expo install --check` passes (CI: `.github/workflows/native-deps.yml`).
-- [ ] `./scripts/check-packages-dist-up-to-date.sh` passes before release branch.
-- [ ] Login → select workspace → recipes list → open recipe → water hub on device (Expo Go on LAN **or** EAS APK against **demo**).
-- [ ] API health on dashboard against **demo** (or LAN dev stack during local work).
-- [ ] Inventory tab shows blocked + **Open on web** succeeds (same origin as demo).
-- [ ] EAS Android internal build installs and launches.
+- [x] `expo install --check` passes (CI: `.github/workflows/native-deps.yml`) — 2026-05-27 pre-build.
+- [x] `./scripts/check-packages-dist-up-to-date.sh` passes before release branch — 2026-05-27.
+- [x] Login → select workspace → recipes list → open recipe → water hub on device (EAS APK against **demo**) — 2026-06-03.
+- [x] API health on dashboard against **demo** — 2026-06-03.
+- [x] Inventory tab shows blocked + **Open on web** succeeds (same origin as demo) — 2026-06-03.
+- [x] EAS Android internal build installs and launches — 2026-06-03.
+
+**Optional (not a G1 gate):** Brew session **Export work order (PDF)** on native — **FAIL** on EAS `preview` APK (2026-06-03); **PASS** on [demo web (e2e session)](https://demo.umbraculum.dev/en/production-orders/brewery-brew-session-e2e00000-0000-0000-0000-000000000bbe). Tracked in [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) § Known gaps; fix deferred.
 
 ### 5.2 Demo distribution
 
@@ -161,6 +163,7 @@ Tracked for post-alpha cleanup; not blocking July alpha.
 
 | Area | Status |
 |------|--------|
+| Brew session PDF export (native) | **FAIL** EAS `preview` vs demo (2026-06-03); **PASS** demo web + localhost web — render pipeline OK; native `runAsyncRenderJobExport` + `Linking.openURL` path — see [build log § Known gaps](native-eas-demo-build-log.md#known-gaps-address-later) |
 | Water screens | Largely use `parseXxx` from `@umbraculum/contracts` |
 | `RecipesListScreen`, `BrewSessionsListScreen` | Use `parseRecipesListResponse` / `parseBrewSessionsListResponse` (2026-05-27) |
 | `YeastScreen`, `RecipeEditScreen` | Partial — BeerJSON/recipe body still uses narrowed records + some casts for editor state |
@@ -187,7 +190,7 @@ Full cast elimination is scheduled with [pr3-routes-migration-handoff.md](pr3-ro
 | Gate | Condition | Work |
 |------|-----------|------|
 | G0 | This doc accepted | Phase 1 EAS copy |
-| G1 | Native EAS demo loop closed (§5.1 on device vs demo) — **open; repo wiring shipped 2026-05-27; resume per build log** | [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) |
+| G1 | Native EAS demo loop **core closed** (§5.1 rows 1–5 on device vs demo, 2026-06-03); optional native brew-session PDF deferred | [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) |
 | G2 | MRP/CRP alpha demo signed off | Optional native deep links / web fallback expansion |
 | G3 | WMS surface draft exists | `apps/native/src/modules/wms/` — [wms.md](../modules/canonical/wms.md) §4 |
 | G4 | H2 2027 | Re.Pack federation spike vs PWA + scanner companion |

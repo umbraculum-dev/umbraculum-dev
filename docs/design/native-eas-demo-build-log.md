@@ -1,9 +1,9 @@
 # Native EAS demo build log
 
 **Tier:** Public  
-**Status:** **Blocked on maintainer — G1 open** (demo DNS/VPS + `eas login` + physical device; see [G1 resume attempt](#g1-resume-attempt-2026-05-27))  
+**Status:** **G1 core closed 2026-06-03** — EAS `preview` APK + device §5.1 (rows 1–5) PASS on demo; optional row 6 (native PDF) **FAIL** — tracked [below](#known-gaps-address-later)  
 **Started:** 2026-05-27  
-**Last updated:** 2026-05-27 (G1 resume attempt)  
+**Last updated:** 2026-06-03 (device smoke + native PDF gap)  
 **Scope:** July 2026 native EAS demo closure — `preview` APK → `https://demo.umbraculum.dev`
 
 > [!NOTE]
@@ -17,10 +17,10 @@
 |-------|--------|-------------------|
 | **Repo / docs (this commit)** | **Done** | `eas.json` → demo URL; runbooks; surface doc §5.2; [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) |
 | **Pre-build gates (local)** | **Done** (2026-05-27) | Re-run before EAS if `packages/**` or `apps/native/**` changed |
-| **Phase 0 — `demo.umbraculum.dev` live** | **Blocked** | `./scripts/demo-host-verify.sh` fails — see runbook §Current status |
-| **Phase 1b/c — EAS project + `EXPO_TOKEN`** | **Blocked** | `eas whoami` → not logged in; `EXPO_TOKEN` not in agent env |
-| **Phase 3–4 — APK + device smoke** | **Not started** | You: install APK, fill §5.1 table below |
-| **Gate G1** ([surface doc](canonical-native-platform-surface.md) §8) | **Open** | Closes when phases 0, 1b/c, 3–4 pass |
+| **Phase 0 — `demo.umbraculum.dev` live** | **Done** | Demo web + API in use for smoke (2026-06-03) |
+| **Phase 1b/c — EAS project + `EXPO_TOKEN`** | **Done** | `@umbraculum/umbraculum-brewery`; `app.config.js` bakes demo URL into `expo.extra` |
+| **Phase 3–4 — APK + device smoke** | **Core done** | Local `eas build --profile preview`; §5.1 rows 1–5 PASS; row 6 native PDF FAIL |
+| **Gate G1** ([surface doc](canonical-native-platform-surface.md) §8) | **Core closed** | Optional native PDF deferred — [Known gaps](#known-gaps-address-later) |
 
 **When you return:** work top-to-bottom in [Maintainer closure (required for G1)](#maintainer-closure-required-for-g1), then check §5.1 boxes in [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) and update this log.
 
@@ -38,14 +38,14 @@
 
 | Phase | Status | Deliverable | Verification |
 |-------|--------|-------------|--------------|
-| 0 — Demo host | Pending | `demo.umbraculum.dev` live | `curl https://demo.umbraculum.dev/api/health` → `{"ok":true}` |
+| 0 — Demo host | **Done** (2026-06-03) | `demo.umbraculum.dev` live | `curl https://demo.umbraculum.dev/api/health` → `{"ok":true}` |
 | 1 — EAS repo wiring | Shipped | `eas.json` `preview.env`, runbook, cloud stub | See commit on `master` |
-| 1b — EAS project ID | Pending | `eas init` + real `projectId` in `app.json` | Replace `REPLACE_WITH_EAS_PROJECT_ID` |
-| 1c — GitHub secret | Pending | `EXPO_TOKEN` on repo | Manual dispatch `native-eas-build` succeeds |
-| 2 — Pre-build gates | **Shipped** (2026-05-27) | dist check, native-deps, vitest | See [Pre-build gates](#pre-build-gates-maintainer--ci); demo curl pending Phase 0 |
-| 3 — Android `preview` build | Pending | Expo internal APK URL | Workflow or `eas build` |
-| 4 — Device smoke | Pending | §5.1 checklist on physical device | Record in table below |
-| 5 — Docs sign-off | **Shipped** (repo) | Surface doc §5.2 URL, this log, runbook, cloud stub | G1 closes when Phase 3–4 pass |
+| 1b — EAS project ID | **Done** (2026-06-03) | `eas init` + `projectId` in `app.json` / `app.config.js` | `@umbraculum/umbraculum-brewery` |
+| 1c — GitHub secret | **Done** (2026-06-03) | `EXPO_TOKEN` on repo | Local `eas build` used; GHA optional when public |
+| 2 — Pre-build gates | **Shipped** (2026-05-27) | dist check, native-deps, vitest | See [Pre-build gates](#pre-build-gates-maintainer--ci) |
+| 3 — Android `preview` build | **Done** (2026-06-03) | Expo internal APK | Local `eas build --profile preview` (APK installed on device) |
+| 4 — Device smoke | **Core done** (2026-06-03) | §5.1 rows 1–5 on physical Android | Row 6 native PDF FAIL — see [Known gaps](#known-gaps-address-later) |
+| 5 — Docs sign-off | **Shipped** (repo) | Surface doc §5.2 URL, this log, runbook, cloud stub | G1 core closed 2026-06-03 |
 
 ---
 
@@ -124,24 +124,44 @@ Record last green run date here when executed: **2026-05-27** (agent): `check-pa
 
 | # | Check | Pass? | Notes |
 |---|--------|-------|-------|
-| 1 | Cold start | | |
-| 2 | Login (demo admin) | | |
-| 3 | Dashboard / health | | |
-| 4 | Recipes → recipe → water hub | | |
-| 5 | Inventory → Open on web | | |
-| 6 | Brew session PDF (optional) | | |
-| 7 | Yeast media | | |
+| 1 | Cold start | **Yes** | EAS `preview` APK, 2026-06-03 |
+| 2 | Login (demo admin) | **Yes** | `e2e-admin@brewery.local` / demo password |
+| 3 | Dashboard / health | **Yes** | API health `{ok:true}` on demo |
+| 4 | Recipes → recipe → water hub | **Yes** | Via **Mashing and sparging** recipe |
+| 5 | Inventory → Open on web | **Yes** | Opens `demo.umbraculum.dev/en/inventory` |
+| 6 | Brew session PDF (optional) | **No (native)** | **PASS** [demo web (e2e session)](https://demo.umbraculum.dev/en/production-orders/brewery-brew-session-e2e00000-0000-0000-0000-000000000bbe); **FAIL** native **Export work order (PDF)** — see [Known gaps](#known-gaps-address-later) |
+| 7 | Yeast media | | Not run |
+
+---
+
+## Known gaps (address later)
+
+### Native brew session PDF export (2026-06-03)
+
+| Surface | Result |
+|---------|--------|
+| Demo web | **PASS** — e.g. [brewery-brew-session-e2e00000-…000bbe](https://demo.umbraculum.dev/en/production-orders/brewery-brew-session-e2e00000-0000-0000-0000-000000000bbe) |
+| Local web (`localhost:18080`) | **PASS** (same flow on dev stack) |
+| EAS `preview` APK → `https://demo.umbraculum.dev` | **FAIL** — generic “export failed” alert |
+
+**Implication:** Demo rendering / Gotenberg / MRP work-order templates are OK. The gap is **native-only**: async render job + artifact URL for `platform: "native"` + `Linking.openURL` (Bearer client), not demo VPS.
+
+**Code path:** [`apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx`](../../apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx) → `runAsyncRenderJobExport` → [`packages/api-client/src/platform/rendering.ts`](../../packages/api-client/src/platform/rendering.ts).
+
+**Scope:** Optional §5.1 row 6 — does not reopen G1 core closure. Fix deferred.
 
 ---
 
 ## Maintainer closure (required for G1)
 
-Repo wiring for this plan is **shipped**. Gate **G1** in [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) §8 closes only after:
+Repo wiring for this plan is **shipped**. Gate **G1** in [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) §8 **core closed 2026-06-03** after:
 
-1. **Demo host live** — follow [`demo-host-runbook.md`](demo-host-runbook.md) §Infra bring-up.
-2. **`eas init`** + commit `projectId` — [`apps/native/EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md).
-3. **`EXPO_TOKEN`** on GitHub + successful **native-eas-build** workflow run.
-4. **Device smoke** — fill §5.1 table above on a physical Android device.
+1. **Demo host live** — done.
+2. **`eas init`** + `projectId` + `app.config.js` `extra` for demo API URL — done.
+3. **`EXPO_TOKEN`** on GitHub — done; preview APK built locally (GHA optional when repo public).
+4. **Device smoke** — §5.1 rows 1–5 PASS on physical Android (table above).
+
+**Open follow-up:** [Native brew session PDF](#native-brew-session-pdf-export-2026-06-03) on device (optional row 6).
 
 ---
 
