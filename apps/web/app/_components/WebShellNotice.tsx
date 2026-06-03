@@ -41,21 +41,16 @@ type CredentialRow = {
 };
 
 function CredentialsTable({
-  heading,
   columns,
   rows,
   footnote,
 }: {
-  heading: string;
   columns: { role: string; email: string; password: string };
   rows: CredentialRow[];
   footnote: string;
 }) {
   return (
     <div className="brew-shell-notice__credentials">
-      <SizableText size="$3" fontWeight="650" color="var(--text)">
-        {heading}
-      </SizableText>
       <table className="brew-shell-notice__table">
         <thead>
           <tr>
@@ -117,16 +112,20 @@ function DemoShellNoticeBody() {
         {t("summaryLine")}
       </SizableText>
 
-      <CredentialsTable
-        heading={t("credentialsHeading")}
-        columns={{
-          role: t("columnRole"),
-          email: t("columnEmail"),
-          password: t("columnPassword"),
-        }}
-        rows={credentialRows}
-        footnote={t("fixtureWorkspace", { workspaceId: DEMO_FIXTURE_WORKSPACE_ID })}
-      />
+      <details className="brew-shell-notice__details">
+        <summary className="brew-shell-notice__summary">{t("credentialsHeading")}</summary>
+        <div className="brew-shell-notice__expander-body">
+          <CredentialsTable
+            columns={{
+              role: t("columnRole"),
+              email: t("columnEmail"),
+              password: t("columnPassword"),
+            }}
+            rows={credentialRows}
+            footnote={t("fixtureWorkspace", { workspaceId: DEMO_FIXTURE_WORKSPACE_ID })}
+          />
+        </div>
+      </details>
 
       <details className="brew-shell-notice__details">
         <summary className="brew-shell-notice__summary">{t("expanderLabel")}</summary>
