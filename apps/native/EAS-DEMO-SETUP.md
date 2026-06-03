@@ -70,6 +70,12 @@ Priority queue / paid Expo plans are optional operator upgrades, not required fo
 
 ---
 
+## Metro config (SDK 54 monorepo)
+
+[`metro.config.js`](metro.config.js) extends Expo via `getDefaultConfig` + `mergeConfig` (see [Work with monorepos](https://docs.expo.dev/guides/monorepos/)). EAS may still warn about monorepo `extraNodeModules`; answer **`n`** to continue unless the bundle fails.
+
+---
+
 ## Local build (optional)
 
 ```bash
@@ -78,6 +84,14 @@ cd "$REPO_ROOT"
 cd apps/native
 npx eas-cli build --platform android --profile preview
 ```
+
+---
+
+## Troubleshooting: login `Network request failed` on device
+
+If `https://demo.umbraculum.dev/api/health` works in the phone browser but the EAS APK login shows **Network request failed**, the build likely fell back to the dev LAN default in `apiBaseUrl.ts` (`http://192.168.…:18080`) because `EXPO_PUBLIC_API_BASE_URL` was not in `expo.extra` at runtime.
+
+**Fix (repo):** [`app.config.js`](app.config.js) mirrors `eas.json` `env` into `extra` at EAS build time. **Operator:** run a new `preview` Android build and reinstall the APK.
 
 ---
 

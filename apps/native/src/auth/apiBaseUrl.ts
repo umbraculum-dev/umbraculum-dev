@@ -75,8 +75,8 @@ function maybeRewriteForAndroidEmulator(baseUrl: string): string {
 }
 
 export function getApiBaseUrl(): string {
-  // 1. Explicit override via Expo config `extra` — used by EAS staging/prod
-  //    builds (eas.json) and anyone who wants to pin a specific URL in app.json.
+  // 1. Explicit override via Expo config `extra` — EAS `preview`/`production`
+  //    (eas.json `env` → app.config.js → extra) and manual pins in app.json.
   const expoExtra = (Constants.expoConfig as { extra?: { EXPO_PUBLIC_API_BASE_URL?: unknown } } | null | undefined)?.extra;
   const fromExtra = normalizeBaseUrl(expoExtra?.EXPO_PUBLIC_API_BASE_URL);
   if (fromExtra) return maybeRewriteForAndroidEmulator(fromExtra);

@@ -38,6 +38,8 @@ __pycache__/
 # Node / Next.js / TypeScript
 # ------------------------------------------------------------
 node_modules/
+.expo/
+apps/native/.expo/
 .next/
 # Backup dirs created by our “move aside .next” reset
 apps/web/.next.bak-*/
