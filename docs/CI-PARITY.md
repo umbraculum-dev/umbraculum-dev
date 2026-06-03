@@ -164,7 +164,7 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 | `lint` | `.github/workflows/web-lint.yml` | `npm run lint` after root `npm ci` |
 | `typecheck` | `.github/workflows/typecheck.yml` | 15 workspaces + nested `apps/web/e2e` install |
 | `sdk-publish-prep` | `.github/workflows/publish-sdk-batch.yml` (verify steps only; OIDC publish is GHA-only) | `build:packages`, `test:packages`, batch workspace tests, `npm pack --dry-run` for seven MIT SDK packages |
-| `dogfood-npm-smoke` | `.github/workflows/dogfood-npm-smoke.yml` | Registry install of `@umbraculum/contracts` + `@umbraculum/api-client` outside monorepo (`scripts/dogfood-npm-smoke.sh`) |
+| `dogfood-npm-smoke` | `.github/workflows/dogfood-npm-smoke.yml` | Registry install smoke outside monorepo: `@umbraculum/contracts`, `@umbraculum/api-client`, module-sdk α batch (`module-sdk`, `ai-tool-sdk`, four `*-contracts`) via [`scripts/dogfood-npm-smoke.sh`](../scripts/dogfood-npm-smoke.sh) |
 
 **Outside ci-parity (needs live stack):**
 
