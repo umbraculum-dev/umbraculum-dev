@@ -1,10 +1,10 @@
 # Demo host runbook (`demo.umbraculum.dev`)
 
 **Tier:** Public  
-**Status:** Operator runbook — **Phase 0 not started** (DNS/host not live as of 2026-05-27); repo `eas.json` already points `preview` APK at this URL  
+**Status:** Operator runbook — **LIVE** on Contabo VPS `84.247.163.121` since 2026-06-03; HTTPS via Traefik v3.6 + Let's Encrypt  
 **Audience:** maintainers standing up or resetting the public **demo** stack (not production `cloud`)
 
-> **Resume point:** Native EAS demo work is **paused** until you complete this runbook’s infra checklist. Track overall progress in [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) §“Where we are”.
+> **Resume point:** Native EAS demo work can resume — see [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) §"Where we are".
 
 > [!IMPORTANT]
 > **`demo.umbraculum.dev` is a demonstration environment only.**  
@@ -18,7 +18,7 @@
 
 ## What runs on the demo host
 
-Single HTTPS origin (nginx) serving:
+Single HTTPS origin (Traefik → internal nginx) serving:
 
 | Path | Backend |
 |------|---------|
@@ -26,7 +26,7 @@ Single HTTPS origin (nginx) serving:
 | `/{locale}/**` | `apps/web` |
 | `/media/**` | synced web static assets |
 
-Required services (same as local dev): **api**, **web**, **nginx**, **postgres**, **gotenberg**, **redis**.
+Required services (production-mode containers): **traefik**, **nginx**, **api**, **web**, **postgres** (pgvector), **redis**, **gotenberg**.
 
 **Clients:**
 
@@ -39,17 +39,18 @@ Required services (same as local dev): **api**, **web**, **nginx**, **postgres**
 
 ## Demo accounts (credentials)
 
-Demo logins use the **E2E seed personas** ([`apps/web/e2e/personas.json`](../../apps/web/e2e/personas.json)). After deploy, you may change emails to `@umbraculum.dev` in the database; update this table when you do.
+Demo logins use the **E2E seed personas** (defaults; ship-safe — same on every demo). Source of truth: [`apps/web/e2e/personas.json`](../../apps/web/e2e/personas.json) and `services/api/src/cli/seedE2eFixture.ts`.
 
-| Role | Email (default seed) | Password source |
-|------|----------------------|-----------------|
-| Admin (primary demo) | `e2e-admin@brewery.local` | `E2E_ADMIN_PASSWORD` env on API, else default in personas: `e2e-admin-pw!` |
-| Member | `e2e-member@brewery.local` | `E2E_MEMBER_PASSWORD` / `e2e-member-pw!` |
-| Viewer | `e2e-viewer@brewery.local` | `E2E_VIEWER_PASSWORD` / `e2e-viewer-pw!` |
+| Role | Email | Default password |
+|------|-------|------------------|
+| **Brewery admin (primary demo)** | `e2e-admin@brewery.local` | `e2e-admin-pw!` |
+| Member | `e2e-member@brewery.local` | `e2e-member-pw!` |
+| Viewer | `e2e-viewer@brewery.local` | `e2e-viewer-pw!` |
+| Multi-workspace admin (SelectWorkspace flow) | `e2e-multi-admin@brewery.local` | `e2e-multi-admin-pw!` |
 
-**Do not commit production passwords to git.** Set strong passwords via server env or post-deploy `DEVELOPMENT-LOCAL.md` private notes; share demo credentials through your agreed channel (password manager, secure chat).
+**Active workspace (fixtures):** `e2e00000-0000-0000-0000-0000000000aa`.
 
-**Active workspace (fixtures):** `e2e00000-0000-0000-0000-0000000000aa` (see personas `fixture` block).
+These credentials are **public by design** — they exist only on the demo host whose DB may be wiped at any time. They are intended for the header banner once added to the web shell. To override on a private install, set `E2E_ADMIN_PASSWORD` etc. in `/opt/umbraculum-hosting-demo/.env` and re-run `seed:e2e` (upsert hashes the new value into the same user row, no data loss).
 
 **Native login:** `POST /api/auth/login/native` with the same email/password as web.
 
@@ -68,36 +69,96 @@ BASE_URL=https://demo.umbraculum.dev ./scripts/demo-native-api-smoke.sh
 |-------|--------|
 | DNS `A` | `84.247.163.121` (Contabo VPS 10, `vmi3344577`) |
 | `https://demo.umbraculum.dev/api/health` | **`{"ok":true}`** — Traefik v3.6 + Let's Encrypt |
-| Browser `https://demo.umbraculum.dev/en` | Dashboard renders (App permissions, API health, Brew-day shelves) |
+| Browser `https://demo.umbraculum.dev/en` | `307 → /en/login` for anonymous; dashboard after login |
 | `demo-native-api-smoke.sh` (5/5) | health, native login, `/auth/me`, `/recipes`, `/auth/webview-exchange` all green |
 
 **Stack:** umbraculum-hosting-demo `main` (compose + Traefik v3.6 + nginx) at `/opt/umbraculum-hosting-demo`; umbraculum-dev `master` at `/opt/umbraculum-dev`; volumes `umbraculum_demo_*` (data) + reused `umbraculum_root_node_modules`/`umbraculum_npm_cache` (build).
 
-**Open follow-ups (non-blocking for demo):**
+**Local preflight (optional):** `BASE_URL=http://localhost:18080 ./scripts/demo-native-api-smoke.sh` — proves API paths against your dev stack; does **not** close G1.
 
-- **Phase 0 Step 2 — SSH key-only hardening:** verify key login from a second terminal then run `bin/harden --ssh-hardening` on the VPS to disable password SSH.
-- **Pin Traefik image to a digest** when tagging hosting-demo for the public flip.
-- **Revoke the temporary GitHub PAT** used to clone the private umbraculum-dev repo when the repo flips public.
+---
 
-**Local preflight (optional):** `BASE_URL=http://localhost:18080 ./scripts/demo-native-api-smoke.sh` — proves API paths; does **not** close G1.
+## Open follow-ups (non-blocking for demo)
+
+### 1. Phase 0 Step 2 — SSH key-only hardening
+
+**Status:** keys installed and working; password SSH is still enabled as a fallback. Close this before treating the VPS as long-lived.
+
+**Procedure:**
+
+1. From your **laptop**, open a **second** terminal (keep your existing root SSH session open in the first):
+
+   ```bash
+   ssh -o PreferredAuthentications=publickey -o PasswordAuthentication=no umbdemo 'echo OK && hostname'
+   ```
+
+   Must print `OK` and `vmi3344577` with no password prompt. **Do not proceed otherwise** — you risk a permanent lockout.
+
+2. On the VPS:
+
+   ```bash
+   cd /opt/umbraculum-hosting-demo
+   bin/harden --ssh-hardening
+   ```
+
+   This applies the `umbraculum-hosting-common` security baseline plus `PasswordAuthentication no` in `/etc/ssh/sshd_config.d/99-umbraculum-hosting.conf`. The script's post-flight check fails the run if SSH did not reload cleanly.
+
+3. Verify from a **third** terminal that password login is now refused:
+
+   ```bash
+   ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no umbdemo
+   # expect: Permission denied (publickey).
+   ```
+
+**Recovery if locked out:** Contabo VNC console → log in as root → restore `/etc/ssh/sshd_config.d/99-umbraculum-hosting.conf` (or `systemctl edit ssh` to override `PasswordAuthentication yes`) → `systemctl restart ssh`.
+
+### 2. Pin Traefik image to a digest
+
+**Status:** **DONE** as of 2026-06-03 — [`docker-compose.demo.yml`](https://github.com/umbraculum-dev/umbraculum-hosting-demo/blob/main/docker-compose.demo.yml) pins `traefik:v3.6@sha256:802adc80a7bb20a6766c9385c2ad547f0de98564cd20d31d0b6d8f726f906f66`. Bump procedure (when a v3.6.x release lands):
+
+```bash
+docker pull traefik:v3.6
+docker inspect traefik:v3.6 --format '{{index .RepoDigests 0}}'
+# update the image: line in docker-compose.demo.yml, commit, push, then on VPS:
+cd /opt/umbraculum-hosting-demo && bin/pull
+docker compose -f docker-compose.demo.yml --env-file .env up -d traefik
+```
+
+### 3. Revoke the temporary GitHub PAT (after `umbraculum-dev` flips public)
+
+**Status:** while `umbraculum-dev` is private, the VPS clones it over HTTPS with a classic PAT (org policy disables deploy keys). When the repo flips public:
+
+1. **GitHub** → Profile → **Settings** → **Developer settings** → **Personal access tokens (classic)** → revoke `umbdemo-read` (or whatever you named it).
+2. **VPS** — wipe stored credentials:
+
+   ```bash
+   git config --global --unset credential.helper
+   rm -f /root/.git-credentials
+   ```
+
+3. Confirm anonymous clone still works:
+
+   ```bash
+   cd /opt/umbraculum-dev && git fetch origin && git status
+   ```
 
 ---
 
 ## Infra bring-up checklist (maintainer)
 
 1. **DNS** — `demo.umbraculum.dev` → A/AAAA or CNAME to the host running Docker Compose (must reach **your** Umbraculum nginx, not a registrar parking page).
-2. **TLS** — HTTPS at nginx (e.g. Let's Encrypt). Android EAS builds require HTTPS.
-3. **Deploy** — On the demo host: `docker compose up -d` (api, web, nginx, postgres, gotenberg, redis). Default **`reference`** profile includes brewery; see [`platform-module-profile.md`](platform-module-profile.md). Mount [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf) (or equivalent `server_name demo.umbraculum.dev`).
-4. **Env** — Production-like env for API/web: `DATABASE_URL`, session secrets, `E2E_*` passwords if overriding defaults. Enable **gotenberg** + **redis** for PDF export smoke.
-5. **Seed** — Ensure E2E/brewery seed has run (`docker compose` seed/migrate per [`DEVELOPMENT.md`](../../DEVELOPMENT.md)).
+2. **TLS** — HTTPS at Traefik (Let's Encrypt HTTP-01). Android EAS builds require HTTPS.
+3. **Deploy** — Follow [umbraculum-hosting-demo `docs/OPERATOR.md`](https://github.com/umbraculum-dev/umbraculum-hosting-demo/blob/main/docs/OPERATOR.md) C1–C7.
+4. **Env** — Production env in `/opt/umbraculum-hosting-demo/.env`: `ACME_EMAIL`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `APP_AI_KEY_SECRET`, `RENDERING_SIGNING_SECRET`.
+5. **Migrate + seed** — `prisma migrate deploy` then `npm run seed:e2e -w @umbraculum/api`.
 6. **Verify**
    ```bash
-   curl -sS https://demo.umbraculum.dev/api/health
-   # expect {"ok":true}
+   curl -fsS https://demo.umbraculum.dev/api/health    # {"ok":true}
+   ./scripts/demo-host-verify.sh
+   BASE_URL=https://demo.umbraculum.dev ./scripts/demo-native-api-smoke.sh
    ```
-7. **Smoke web** — Log in at `https://demo.umbraculum.dev/en` with demo admin; run [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md) steps 1–4.
+7. **Smoke web** — Log in at `https://demo.umbraculum.dev/en` as `e2e-admin@brewery.local` and run [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md) steps 1–4.
 8. **Smoke native** — Install EAS `preview` APK; follow [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) §5.1.
-9. **Verify gate** — `./scripts/demo-host-verify.sh` exits 0; optional `BASE_URL=https://demo.umbraculum.dev ./scripts/demo-native-api-smoke.sh`.
 
 ---
 
@@ -111,6 +172,7 @@ BASE_URL=https://demo.umbraculum.dev ./scripts/demo-native-api-smoke.sh
 
 ## Related docs
 
+- [`demo-host-ssl-strategy.md`](demo-host-ssl-strategy.md) — Traefik v3.6 + ACME ADR
 - [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) — EAS build IDs and device smoke status
 - [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) §5 — native demo scope and checklist
 - [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md) — UT webapp shell strategy
