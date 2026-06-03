@@ -151,6 +151,29 @@ async function ensureMembership(
   });
 }
 
+/** FK target for E2E recipes (`styleKey: "custom"`). Normally from `prisma db seed`; required on fresh demo DBs. */
+async function ensureCustomBeerStyle(prisma: PrismaClient) {
+  await prisma.beerStyle.upsert({
+    where: { key: "custom" },
+    create: {
+      key: "custom",
+      source: "system",
+      version: "v1",
+      code: "custom",
+      name: "Custom",
+      category: null,
+      categoryId: null,
+      sortOrder: 1_000_000,
+      isActive: true,
+    },
+    update: {
+      name: "Custom",
+      sortOrder: 1_000_000,
+      isActive: true,
+    },
+  });
+}
+
 async function seed() {
   const prisma = new PrismaClient();
   try {
@@ -195,6 +218,8 @@ async function seed() {
     }
     await ensureMembership(prisma, E2E_WORKSPACE_ID, E2E_USER_MULTI_ADMIN_ID, "brewery_admin");
     await ensureMembership(prisma, E2E_WORKSPACE_2_ID, E2E_USER_MULTI_ADMIN_ID, "brewery_admin");
+
+    await ensureCustomBeerStyle(prisma);
 
     await prisma.waterProfile.upsert({
       where: { id: E2E_WATER_PROFILE_ID },
