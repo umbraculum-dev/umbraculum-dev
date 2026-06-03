@@ -55,22 +55,29 @@ Demo logins use the **E2E seed personas** ([`apps/web/e2e/personas.json`](../../
 
 ---
 
-## Current status (last checked 2026-05-27)
+## Current status (last checked 2026-06-03)
 
 Run from repo root:
 
 ```bash
 ./scripts/demo-host-verify.sh
+BASE_URL=https://demo.umbraculum.dev ./scripts/demo-native-api-smoke.sh
 ```
 
 | Check | Result |
 |-------|--------|
-| DNS `A` | `216.40.34.41` |
-| `https://demo.umbraculum.dev/api/health` | **Timeout** — HTTPS not serving Umbraculum |
-| `http://demo.umbraculum.dev/api/health` | **HTML parking page** — not `{"ok":true}` |
-| SSH `:22` to `216.40.34.41` | **Timeout** from dev environment |
+| DNS `A` | `84.247.163.121` (Contabo VPS 10, `vmi3344577`) |
+| `https://demo.umbraculum.dev/api/health` | **`{"ok":true}`** — Traefik v3.6 + Let's Encrypt |
+| Browser `https://demo.umbraculum.dev/en` | Dashboard renders (App permissions, API health, Brew-day shelves) |
+| `demo-native-api-smoke.sh` (5/5) | health, native login, `/auth/me`, `/recipes`, `/auth/webview-exchange` all green |
 
-**Action:** On the demo VPS, follow **umbraculum-hosting-demo** [`docs/OPERATOR.md`](https://github.com/umbraculum-dev/umbraculum-hosting-demo/blob/main/docs/OPERATOR.md) (Traefik + `docker-compose.demo.yml`). Nginx vhost: [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf) (synced to hosting-demo `nginx/demo.conf`). SSL ADR: [`demo-host-ssl-strategy.md`](demo-host-ssl-strategy.md). Then re-run `demo-host-verify.sh` until it exits 0.
+**Stack:** umbraculum-hosting-demo `main` (compose + Traefik v3.6 + nginx) at `/opt/umbraculum-hosting-demo`; umbraculum-dev `master` at `/opt/umbraculum-dev`; volumes `umbraculum_demo_*` (data) + reused `umbraculum_root_node_modules`/`umbraculum_npm_cache` (build).
+
+**Open follow-ups (non-blocking for demo):**
+
+- **Phase 0 Step 2 — SSH key-only hardening:** verify key login from a second terminal then run `bin/harden --ssh-hardening` on the VPS to disable password SSH.
+- **Pin Traefik image to a digest** when tagging hosting-demo for the public flip.
+- **Revoke the temporary GitHub PAT** used to clone the private umbraculum-dev repo when the repo flips public.
 
 **Local preflight (optional):** `BASE_URL=http://localhost:18080 ./scripts/demo-native-api-smoke.sh` — proves API paths; does **not** close G1.
 
