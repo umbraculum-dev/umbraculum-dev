@@ -40,12 +40,12 @@ export function HealthStatusContent() {
 
   return (
     <>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
         {t("subtitle", { url: `${apiBase}/health` })}
       </SizableText>
       <YStack gap="$3" mt="$3">
         <View bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" overflow="auto">
-          <SizableText size="$2" fontFamily={MONO_FONT} whiteSpace="pre-wrap">
+          <SizableText size="$2" style={{ fontFamily: MONO_FONT }} whiteSpace="pre-wrap">
             {JSON.stringify(state, null, 2)}
           </SizableText>
         </View>
@@ -106,7 +106,7 @@ export function AppPermissionsContent() {
 
   return (
     <>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
         {t("appPermissions.subtitle")}
       </SizableText>
 

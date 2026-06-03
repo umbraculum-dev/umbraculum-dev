@@ -70,7 +70,7 @@ Run from repo root:
 | `http://demo.umbraculum.dev/api/health` | **HTML parking page** — not `{"ok":true}` |
 | SSH `:22` to `216.40.34.41` | **Timeout** from dev environment |
 
-**Action:** On the VPS that should host demo, deploy the compose stack + [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf), enable TLS, then re-run `demo-host-verify.sh` until it exits 0.
+**Action:** On the demo VPS, follow **umbraculum-hosting-demo** [`docs/OPERATOR.md`](https://github.com/umbraculum-dev/umbraculum-hosting-demo/blob/main/docs/OPERATOR.md) (Traefik + `docker-compose.demo.yml`). Nginx vhost: [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf) (synced to hosting-demo `nginx/demo.conf`). SSL ADR: [`demo-host-ssl-strategy.md`](demo-host-ssl-strategy.md). Then re-run `demo-host-verify.sh` until it exits 0.
 
 **Local preflight (optional):** `BASE_URL=http://localhost:18080 ./scripts/demo-native-api-smoke.sh` — proves API paths; does **not** close G1.
 
