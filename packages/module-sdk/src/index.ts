@@ -123,4 +123,12 @@ export {
   type WebShellNavItem,
 } from "./composeWebShellNav.js";
 
+export {
+  WEB_SHELL_NOTICE_IDS,
+  resolveWebShellNotice,
+  type WebShellNoticeConfig,
+  type WebShellNoticeId,
+  type WebShellNoticeVariant,
+} from "./resolveWebShellNotice.js";
+
 export type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";

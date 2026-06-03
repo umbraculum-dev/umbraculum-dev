@@ -45,6 +45,7 @@ __export(index_exports, {
   ReservedTierLimitKeyError: () => ReservedTierLimitKeyError,
   TierLimitKeyCollisionError: () => TierLimitKeyCollisionError,
   UrlSegmentAlreadyOwnedError: () => UrlSegmentAlreadyOwnedError,
+  WEB_SHELL_NOTICE_IDS: () => WEB_SHELL_NOTICE_IDS,
   aggregateNativeAvailableRouteIds: () => aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable: () => assertModuleCodeAvailable,
   assertValidModuleCode: () => assertValidModuleCode,
@@ -78,6 +79,7 @@ __export(index_exports, {
   resolveEnabledModuleCodes: () => resolveEnabledModuleCodes,
   resolveModuleProfile: () => resolveModuleProfile,
   resolveRoutePromptOverlay: () => resolveRoutePromptOverlay,
+  resolveWebShellNotice: () => resolveWebShellNotice,
   snapshotAddonCodeOwnership: () => snapshotAddonCodeOwnership,
   snapshotModule: () => snapshotModule,
   snapshotSegmentOwnership: () => snapshotSegmentOwnership
@@ -830,6 +832,27 @@ function composeWebShellNavItems() {
     (a, b) => a.order - b.order || a.href.localeCompare(b.href)
   );
 }
+
+// src/resolveWebShellNotice.ts
+var WEB_SHELL_NOTICE_IDS = ["demo"];
+var DEMO_NOTICE_CONFIG = {
+  id: "demo",
+  variant: "notice",
+  dismissible: false
+};
+function isWebShellNoticeId(value) {
+  return WEB_SHELL_NOTICE_IDS.includes(value);
+}
+function resolveWebShellNotice(env = process.env) {
+  const raw = env["NEXT_PUBLIC_WEB_SHELL_NOTICE_ID"]?.trim();
+  if (!raw || !isWebShellNoticeId(raw)) {
+    return null;
+  }
+  if (raw === "demo") {
+    return DEMO_NOTICE_CONFIG;
+  }
+  return null;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
@@ -857,6 +880,7 @@ function composeWebShellNavItems() {
   ReservedTierLimitKeyError,
   TierLimitKeyCollisionError,
   UrlSegmentAlreadyOwnedError,
+  WEB_SHELL_NOTICE_IDS,
   aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable,
   assertValidModuleCode,
@@ -890,6 +914,7 @@ function composeWebShellNavItems() {
   resolveEnabledModuleCodes,
   resolveModuleProfile,
   resolveRoutePromptOverlay,
+  resolveWebShellNotice,
   snapshotAddonCodeOwnership,
   snapshotModule,
   snapshotSegmentOwnership

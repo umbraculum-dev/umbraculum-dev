@@ -208,6 +208,24 @@ All module pages live under static sub-segments registered in `ownedUrlSegments`
 - `getSegmentOwner(segment: string): string | undefined`
 - `snapshotSegmentOwnership(): ReadonlyArray<readonly [segment, ownerCode]>`
 
+## Web shell notice — `resolveWebShellNotice()`
+
+Optional top-of-shell banner for deployed environments (demo credentials, operator messaging). The web app **always mounts** `WebShellNotice`; this resolver returns `null` unless `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID` is set at **web build** time.
+
+| Env | Preset | Behavior |
+|-----|--------|----------|
+| `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID=demo` | `demo` | Non-dismissible notice; i18n copy in `@umbraculum/i18n` (`shellNotice.demo.*`) |
+| unset / unknown | — | No banner (local dev, integrator stacks) |
+
+Demo VPS operators set the env in **umbraculum-hosting-demo** `docker-compose.demo.yml` only — see [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md).
+
+```typescript
+import { resolveWebShellNotice } from "@umbraculum/module-sdk";
+
+const notice = resolveWebShellNotice(process.env);
+// → { id: "demo", variant: "notice", dismissible: false } | null
+```
+
 ## Build / test / lint (local)
 
 From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):

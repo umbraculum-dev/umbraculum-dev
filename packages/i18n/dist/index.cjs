@@ -1859,6 +1859,12 @@ var en_default = {
       toolCall: "Looking up: {tool}",
       toolError: "Tool error: {message}"
     },
+    proposals: {
+      apply: "Apply",
+      dismiss: "Dismiss",
+      applied: "Applied",
+      dismissed: "Dismissed"
+    },
     errors: {
       subscriptionRequired: "AI consultant is available on paid tiers.",
       subscriptionRequiredCta: "Upgrade to unlock",
@@ -1877,7 +1883,7 @@ var en_default = {
       enableLabel: "Enable AI consultant",
       enableHint: "When enabled, members can use the AI consultant in this workspace.",
       providerLabel: "AI provider",
-      providerHint: "Currently only Anthropic Claude is supported.",
+      providerHint: "Anthropic (full tools) or OpenAI BYOK (chat without tools until adapter completes).",
       apiKeyLabel: "Anthropic API key",
       apiKeyHint: "Stored encrypted at rest. We never display the key back; clear by saving an empty value.",
       apiKeyConfigured: "A key is currently configured.",
@@ -1963,6 +1969,49 @@ var en_default = {
       openSettings: "AI settings",
       openUsage: "View usage",
       tryAgain: "Try again"
+    }
+  },
+  shellNotice: {
+    demo: {
+      ariaLabel: "Demo environment notice",
+      summaryLine: "Public demonstration environment on demo.umbraculum.dev \u2014 illustrative data only; may be reset without notice.",
+      dataLossWarning: "Do not store records you cannot afford to lose.",
+      expanderLabel: "About this demo and Umbraculum",
+      platformIntro: "Umbraculum is an open-source platform for workspace-shaped operational applications \u2014 shared backbone (auth, workspaces, billing, AI, rendering) plus canonical modules (PIM, MRP, CRP, automation, \u2026) that vertical products compose.",
+      referenceVertical: "This demo runs the brewery reference vertical: an example manufacturing product the Umbraculum core team ships in the monorepo to show how a team builds a specific vertical on the platform. It is a showcase, not proof that Umbraculum is brewery-only.",
+      credentialsHeading: "Demo sign-in",
+      roleAdmin: "Brewery admin (primary)",
+      roleMember: "Member",
+      roleViewer: "Viewer",
+      roleMultiAdmin: "Multi-workspace admin",
+      columnRole: "Role",
+      columnEmail: "Email",
+      columnPassword: "Password",
+      emailAdmin: "e2e-admin@brewery.local",
+      passwordAdmin: "e2e-admin-pw!",
+      emailMember: "e2e-member@brewery.local",
+      passwordMember: "e2e-member-pw!",
+      emailViewer: "e2e-viewer@brewery.local",
+      passwordViewer: "e2e-viewer-pw!",
+      emailMultiAdmin: "e2e-multi-admin@brewery.local",
+      passwordMultiAdmin: "e2e-multi-admin-pw!",
+      fixtureWorkspace: "Fixture workspace: {workspaceId} (primary admin).",
+      linkGettingStarted: "Getting started",
+      linkGettingStartedDesc: "setup, vocabulary, first contribution path",
+      linkBuildingVertical: "Building your vertical",
+      linkBuildingVerticalDesc: "how ISVs/integrators build their own product on Umbraculum",
+      linkGlossary: "Glossary",
+      linkGlossaryDesc: "vertical vs canonical module (precise definitions)",
+      unsurePrefix: "Unsure? Read the docs above, then ask on the ",
+      unsureForumLink: "community forum",
+      unsureSuffix: ".",
+      nativeIntro: "Mobile (brewery native): Internal EAS preview builds point at this same origin (https://demo.umbraculum.dev). Sign in with the same demo accounts above. Brew-day flows run on device; MRP, CRP, PIM, and inventory use Open on web (browser on this host).",
+      nativeLinkNativeCi: "Native strategy & CI",
+      nativeLinkDemoRunbook: "Demo host runbook",
+      nativeLinkSmoke: "Canonical native platform surface \xA75.1",
+      nativeBulletOperators: "Operators / contributors:",
+      nativeBulletSmokeLabel: "Device smoke checklist:",
+      nativeBulletApk: "Build/install APK: repo path apps/native/EAS-DEMO-SETUP.md (GitHub: umbraculum-dev monorepo) or workflow native-eas-build with profile preview."
     }
   }
 };
@@ -3898,6 +3947,49 @@ var it_default = {
       openSettings: "Impostazioni AI",
       openUsage: "Vedi utilizzo",
       tryAgain: "Riprova"
+    }
+  },
+  shellNotice: {
+    demo: {
+      ariaLabel: "Avviso ambiente demo",
+      summaryLine: "Ambiente di dimostrazione pubblico su demo.umbraculum.dev \u2014 dati solo dimostrativi; possono essere reimpostati senza preavviso.",
+      dataLossWarning: "Non conservare dati che non puoi permetterti di perdere.",
+      expanderLabel: "Informazioni su questa demo e su Umbraculum",
+      platformIntro: "Umbraculum \xE8 una piattaforma open source per applicazioni operative organizzate per workspace \u2014 backbone condiviso (autenticazione, workspace, fatturazione, AI, rendering) pi\xF9 moduli canonici (PIM, MRP, CRP, automazione, \u2026) che i prodotti verticali compongono.",
+      referenceVertical: "Questa demo esegue il vertical di riferimento brewery: un esempio di prodotto manifatturiero che il team core di Umbraculum distribuisce nel monorepo per mostrare come un team costruisce un vertical specifico sulla piattaforma. \xC8 una vetrina, non la prova che Umbraculum sia solo per birrifici.",
+      credentialsHeading: "Accesso demo",
+      roleAdmin: "Amministratore birrificio (principale)",
+      roleMember: "Membro",
+      roleViewer: "Visualizzatore",
+      roleMultiAdmin: "Amministratore multi-workspace",
+      columnRole: "Ruolo",
+      columnEmail: "Email",
+      columnPassword: "Password",
+      emailAdmin: "e2e-admin@brewery.local",
+      passwordAdmin: "e2e-admin-pw!",
+      emailMember: "e2e-member@brewery.local",
+      passwordMember: "e2e-member-pw!",
+      emailViewer: "e2e-viewer@brewery.local",
+      passwordViewer: "e2e-viewer-pw!",
+      emailMultiAdmin: "e2e-multi-admin@brewery.local",
+      passwordMultiAdmin: "e2e-multi-admin-pw!",
+      fixtureWorkspace: "Workspace di fixture: {workspaceId} (admin principale).",
+      linkGettingStarted: "Primi passi",
+      linkGettingStartedDesc: "setup, vocabolario, percorso per il primo contributo",
+      linkBuildingVertical: "Costruire il tuo vertical",
+      linkBuildingVerticalDesc: "come ISV/integratori realizzano il proprio prodotto su Umbraculum",
+      linkGlossary: "Glossario",
+      linkGlossaryDesc: "vertical vs modulo canonico (definizioni precise)",
+      unsurePrefix: "Dubbi? Leggi la documentazione sopra, poi chiedi sul ",
+      unsureForumLink: "forum della community",
+      unsureSuffix: ".",
+      nativeIntro: "Mobile (native brewery): le build interne EAS preview puntano allo stesso host (https://demo.umbraculum.dev). Accedi con gli stessi account demo sopra. I flussi brew-day girano sul dispositivo; MRP, CRP, PIM e inventario usano Apri sul web (browser su questo host).",
+      nativeLinkNativeCi: "Strategia native e CI",
+      nativeLinkDemoRunbook: "Runbook host demo",
+      nativeLinkSmoke: "Superficie piattaforma native canonica \xA75.1",
+      nativeBulletOperators: "Operatori / contributor:",
+      nativeBulletSmokeLabel: "Checklist smoke su dispositivo:",
+      nativeBulletApk: "Build/installazione APK: percorso repo apps/native/EAS-DEMO-SETUP.md (monorepo umbraculum-dev su GitHub) oppure workflow native-eas-build con profilo preview."
     }
   }
 };

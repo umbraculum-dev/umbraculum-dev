@@ -50,7 +50,9 @@ Demo logins use the **E2E seed personas** (defaults; ship-safe — same on every
 
 **Active workspace (fixtures):** `e2e00000-0000-0000-0000-0000000000aa`.
 
-These credentials are **public by design** — they exist only on the demo host whose DB may be wiped at any time. They are intended for the header banner once added to the web shell. To override on a private install, set `E2E_ADMIN_PASSWORD` etc. in `/opt/umbraculum-hosting-demo/.env` and re-run `seed:e2e` (upsert hashes the new value into the same user row, no data loss).
+These credentials are **public by design** — they exist only on the demo host whose DB may be wiped at any time. They appear in the **web shell notice** on demo (summary + credential table always visible; platform/docs/native prose behind an expander). Copy defaults live in `@umbraculum/i18n` (`shellNotice.demo.*`); the banner is activated only when the demo VPS builds web with `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID=demo` (see **umbraculum-hosting-demo** `docker-compose.demo.yml`). Local `docker compose` does **not** set that flag.
+
+To override passwords on demo, set `E2E_ADMIN_PASSWORD` etc. in `/opt/umbraculum-hosting-demo/.env` and re-run `seed:e2e` (upsert hashes the new value into the same user row, no data loss). **Note:** the shell notice still shows i18n default passwords until copy is updated or a future env override lands — operators should keep runbook and banner in sync when rotating demo passwords.
 
 **Native login:** `POST /api/auth/login/native` with the same email/password as web.
 

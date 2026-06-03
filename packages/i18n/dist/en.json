@@ -1827,6 +1827,12 @@
       "toolCall": "Looking up: {tool}",
       "toolError": "Tool error: {message}"
     },
+    "proposals": {
+      "apply": "Apply",
+      "dismiss": "Dismiss",
+      "applied": "Applied",
+      "dismissed": "Dismissed"
+    },
     "errors": {
       "subscriptionRequired": "AI consultant is available on paid tiers.",
       "subscriptionRequiredCta": "Upgrade to unlock",
@@ -1845,7 +1851,7 @@
       "enableLabel": "Enable AI consultant",
       "enableHint": "When enabled, members can use the AI consultant in this workspace.",
       "providerLabel": "AI provider",
-      "providerHint": "Currently only Anthropic Claude is supported.",
+      "providerHint": "Anthropic (full tools) or OpenAI BYOK (chat without tools until adapter completes).",
       "apiKeyLabel": "Anthropic API key",
       "apiKeyHint": "Stored encrypted at rest. We never display the key back; clear by saving an empty value.",
       "apiKeyConfigured": "A key is currently configured.",
@@ -1931,6 +1937,49 @@
       "openSettings": "AI settings",
       "openUsage": "View usage",
       "tryAgain": "Try again"
+    }
+  },
+  "shellNotice": {
+    "demo": {
+      "ariaLabel": "Demo environment notice",
+      "summaryLine": "Public demonstration environment on demo.umbraculum.dev — illustrative data only; may be reset without notice.",
+      "dataLossWarning": "Do not store records you cannot afford to lose.",
+      "expanderLabel": "About this demo and Umbraculum",
+      "platformIntro": "Umbraculum is an open-source platform for workspace-shaped operational applications — shared backbone (auth, workspaces, billing, AI, rendering) plus canonical modules (PIM, MRP, CRP, automation, …) that vertical products compose.",
+      "referenceVertical": "This demo runs the brewery reference vertical: an example manufacturing product the Umbraculum core team ships in the monorepo to show how a team builds a specific vertical on the platform. It is a showcase, not proof that Umbraculum is brewery-only.",
+      "credentialsHeading": "Demo sign-in",
+      "roleAdmin": "Brewery admin (primary)",
+      "roleMember": "Member",
+      "roleViewer": "Viewer",
+      "roleMultiAdmin": "Multi-workspace admin",
+      "columnRole": "Role",
+      "columnEmail": "Email",
+      "columnPassword": "Password",
+      "emailAdmin": "e2e-admin@brewery.local",
+      "passwordAdmin": "e2e-admin-pw!",
+      "emailMember": "e2e-member@brewery.local",
+      "passwordMember": "e2e-member-pw!",
+      "emailViewer": "e2e-viewer@brewery.local",
+      "passwordViewer": "e2e-viewer-pw!",
+      "emailMultiAdmin": "e2e-multi-admin@brewery.local",
+      "passwordMultiAdmin": "e2e-multi-admin-pw!",
+      "fixtureWorkspace": "Fixture workspace: {workspaceId} (primary admin).",
+      "linkGettingStarted": "Getting started",
+      "linkGettingStartedDesc": "setup, vocabulary, first contribution path",
+      "linkBuildingVertical": "Building your vertical",
+      "linkBuildingVerticalDesc": "how ISVs/integrators build their own product on Umbraculum",
+      "linkGlossary": "Glossary",
+      "linkGlossaryDesc": "vertical vs canonical module (precise definitions)",
+      "unsurePrefix": "Unsure? Read the docs above, then ask on the ",
+      "unsureForumLink": "community forum",
+      "unsureSuffix": ".",
+      "nativeIntro": "Mobile (brewery native): Internal EAS preview builds point at this same origin (https://demo.umbraculum.dev). Sign in with the same demo accounts above. Brew-day flows run on device; MRP, CRP, PIM, and inventory use Open on web (browser on this host).",
+      "nativeLinkNativeCi": "Native strategy & CI",
+      "nativeLinkDemoRunbook": "Demo host runbook",
+      "nativeLinkSmoke": "Canonical native platform surface §5.1",
+      "nativeBulletOperators": "Operators / contributors:",
+      "nativeBulletSmokeLabel": "Device smoke checklist:",
+      "nativeBulletApk": "Build/install APK: repo path apps/native/EAS-DEMO-SETUP.md (GitHub: umbraculum-dev monorepo) or workflow native-eas-build with profile preview."
     }
   }
 }

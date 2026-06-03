@@ -744,6 +744,27 @@ function composeWebShellNavItems() {
     (a, b) => a.order - b.order || a.href.localeCompare(b.href)
   );
 }
+
+// src/resolveWebShellNotice.ts
+var WEB_SHELL_NOTICE_IDS = ["demo"];
+var DEMO_NOTICE_CONFIG = {
+  id: "demo",
+  variant: "notice",
+  dismissible: false
+};
+function isWebShellNoticeId(value) {
+  return WEB_SHELL_NOTICE_IDS.includes(value);
+}
+function resolveWebShellNotice(env = process.env) {
+  const raw = env["NEXT_PUBLIC_WEB_SHELL_NOTICE_ID"]?.trim();
+  if (!raw || !isWebShellNoticeId(raw)) {
+    return null;
+  }
+  if (raw === "demo") {
+    return DEMO_NOTICE_CONFIG;
+  }
+  return null;
+}
 export {
   AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
   AI_PROMPT_MODULE_MAX_LENGTH,
@@ -770,6 +791,7 @@ export {
   ReservedTierLimitKeyError,
   TierLimitKeyCollisionError,
   UrlSegmentAlreadyOwnedError,
+  WEB_SHELL_NOTICE_IDS,
   aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable,
   assertValidModuleCode,
@@ -803,6 +825,7 @@ export {
   resolveEnabledModuleCodes,
   resolveModuleProfile,
   resolveRoutePromptOverlay,
+  resolveWebShellNotice,
   snapshotAddonCodeOwnership,
   snapshotModule,
   snapshotSegmentOwnership
