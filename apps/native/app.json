@@ -6,7 +6,9 @@
     "version": "0.0.1",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "package": "dev.umbraculum.brewery"
     },
@@ -15,9 +17,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+        "projectId": "5b73b8c9-7650-4875-bea9-efdf1f26cddf"
       }
-    }
+    },
+    "owner": "umbraculum"
   }
 }
-
