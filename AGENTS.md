@@ -292,6 +292,20 @@ not the human contributor. Do not end a session with "before you push, run …".
    **`api-integration-tests-pre-push`** before push.
 4. **Only after** step 2 (and 3 when applicable) is green, push.
 
+**Native Expo config (`app.config.js`, `metro.config.js`) — agent-only lint gate:**
+When **you** add or edit these files (or touch their `eslint.config.mjs` override
+row), **you** run archive lint before push — same job as **`web-lint`** (~2 min):
+
+```bash
+./scripts/ci-parity-check.sh --archive run --jobs lint
+```
+
+(`npm run verify:pre-push` includes `lint` when the manifest runs the full T2
+set.) They use CommonJS `require()`; missing an eslint override fails
+**`web-lint`** on CI while host-only iteration can look green. **Do not** end the
+session with “before you push, run lint” for the operator — **you** run it.
+Incident: `8a05b6c` / fix `9c41400`.
+
 **During iteration (not the push gate):** `./scripts/ci-parity-check.sh run`
 (`--ci`, working tree + warm volumes) is fine for fast WIP feedback — but
 **never** treat `--ci` green alone as push proof if you have not yet run archive

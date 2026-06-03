@@ -4,6 +4,8 @@
 **Status:** **Do when resuming G1** — repo already pins `preview.env` to demo; you still need live demo host + steps below.  
 **See also:** [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md), [`docs/design/native-eas-demo-build-log.md`](../../docs/design/native-eas-demo-build-log.md) §“Where we are”
 
+**Agents:** Pre-push **`web-lint`** / ci-parity `lint` after edits to [`app.config.js`](app.config.js), [`metro.config.js`](metro.config.js), or [`eslint.config.mjs`](../../eslint.config.mjs) is **your** job — see [`AGENTS.md`](../../AGENTS.md) § “Native Expo config — agent-only lint gate”. Do not delegate that check to the operator.
+
 ---
 
 ## Prerequisites
