@@ -12,7 +12,7 @@ import { buildApp } from "../app.js";
 import {
   breweryBrewSessionProductionOrderId,
   breweryRecipeBomId,
-} from "../modules/mrp/services/breweryProjectionIds.js";
+} from "../platform/breweryProjectionIds.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
 describe("mrp brewery projections — Wave 2 read path", () => {

@@ -3,14 +3,12 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { buildApp } from "../../app.js";
 import {
-  breweryBrewSessionProductionOrderId,
-} from "../../modules/mrp/services/breweryProjectionIds.js";
-import {
   automationVesselResourceId,
+  breweryBrewSessionProductionOrderId,
   breweryCapacityConflictId,
   breweryScheduledOperationId,
   equipmentProfileWorkCenterId,
-} from "../../modules/crp/services/breweryProjectionIds.js";
+} from "../../platform/breweryProjectionIds.js";
 import {
   createMrpExplainMaterialRequirementsTool,
   createMrpGetProductionOrderTool,

@@ -12,11 +12,11 @@ import {
 import { buildApp } from "../app.js";
 import {
   automationVesselResourceId,
+  breweryBrewSessionProductionOrderId,
   breweryCapacityConflictId,
   breweryScheduledOperationId,
   equipmentProfileWorkCenterId,
-} from "../modules/crp/services/breweryProjectionIds.js";
-import { breweryBrewSessionProductionOrderId } from "../modules/mrp/services/breweryProjectionIds.js";
+} from "../platform/breweryProjectionIds.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
 describe("crp brewery projections — Wave 2 read path", () => {

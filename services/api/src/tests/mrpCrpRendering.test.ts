@@ -19,7 +19,7 @@ import {
 } from "@umbraculum/mrp-contracts";
 
 import { buildApp } from "../app.js";
-import { breweryBrewSessionProductionOrderId } from "../modules/mrp/services/breweryProjectionIds.js";
+import { breweryBrewSessionProductionOrderId } from "../platform/breweryProjectionIds.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
 async function waitForSucceeded(input: {

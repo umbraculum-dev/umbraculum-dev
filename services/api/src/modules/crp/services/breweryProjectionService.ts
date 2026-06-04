@@ -16,12 +16,12 @@ import {
 
 import {
   automationVesselResourceId,
+  breweryBrewSessionProductionOrderId,
   breweryCapacityConflictId,
   breweryScheduledOperationId,
   equipmentProfileWorkCenterId,
   parseAutomationVesselResourceId,
-} from "./breweryProjectionIds.js";
-import { breweryBrewSessionProductionOrderId } from "../../mrp/services/breweryProjectionIds.js";
+} from "../../../platform/breweryProjectionIds.js";
 
 type BrewSessionWithRecipeSteps = Prisma.BrewSessionGetPayload<{
   include: { recipe: true; steps: true };
@@ -43,6 +43,11 @@ const EquipmentSourceSchema = z.object({
   }).passthrough().optional(),
 }).passthrough();
 
+/** @arch-boundary — intentional coupling
+ * Reason: Wave 1 CRP brewery projection reads core Vessel/BrewSession schema in-process.
+ * Revisit: SOLID subplan B3 (BreweryScheduleProjection port)
+ * Owner: crp
+ */
 export class CrpBreweryProjectionService {
   constructor(private readonly prisma: PrismaClient) {}
 

@@ -13,13 +13,11 @@ import {
 import { buildApp } from "../app.js";
 import {
   automationVesselResourceId,
+  breweryBrewSessionProductionOrderId,
   breweryCapacityConflictId,
   breweryScheduledOperationId,
-} from "../modules/crp/services/breweryProjectionIds.js";
-import {
-  breweryBrewSessionProductionOrderId,
   breweryRecipeBomId,
-} from "../modules/mrp/services/breweryProjectionIds.js";
+} from "../platform/breweryProjectionIds.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
 describe("mrp/crp brewery projection integration — Wave 2 read path", () => {

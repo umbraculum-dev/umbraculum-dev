@@ -21,7 +21,7 @@ import {
   breweryRecipeBomId,
   parseBreweryBrewSessionProductionOrderId,
   parseBreweryRecipeBomId,
-} from "./breweryProjectionIds.js";
+} from "../../../platform/breweryProjectionIds.js";
 
 type RecipeRow = Prisma.RecipeGetPayload<Record<string, never>>;
 type BrewSessionRow = Prisma.BrewSessionGetPayload<{
@@ -78,6 +78,11 @@ type BeerJsonIngredient = {
   materialRefModule: string;
 };
 
+/** @arch-boundary — intentional coupling
+ * Reason: Wave 1 MRP brewery projection reads core Recipe/BrewSession schema in-process.
+ * Revisit: SOLID subplan B3 (BreweryScheduleProjection port)
+ * Owner: mrp
+ */
 export class MrpBreweryProjectionService {
   constructor(private readonly prisma: PrismaClient) {}
 

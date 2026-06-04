@@ -19,6 +19,10 @@ The API companion to [`@umbraculum/mrp-contracts`](../../../../../packages/mrp-c
 
 All routes require an authenticated session with an active workspace and scope reads by `workspaceId` through `WorkspacesService.assertMembership`.
 
+## Known couplings
+
+- `MrpBreweryProjectionService` reads core `Recipe` / `BrewSession` schema in-process (`@arch-boundary`; revisit SOLID B3 port).
+
 ## Cross-references
 
 - [`docs/design/mrp-crp-wave-1-build-log.md`](../../../../../docs/design/mrp-crp-wave-1-build-log.md)

@@ -20,6 +20,10 @@ The API companion to [`@umbraculum/crp-contracts`](../../../../../packages/crp-c
 
 All routes require an authenticated session with an active workspace and scope reads by `workspaceId` through `WorkspacesService.assertMembership`.
 
+## Known couplings
+
+- `CrpBreweryProjectionService` reads core `Vessel` / `BrewSession` schema in-process (`@arch-boundary`; revisit SOLID B3 port).
+
 ## Cross-references
 
 - [`docs/design/mrp-crp-wave-1-build-log.md`](../../../../../docs/design/mrp-crp-wave-1-build-log.md)
