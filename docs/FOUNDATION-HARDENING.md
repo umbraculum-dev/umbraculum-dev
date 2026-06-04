@@ -420,6 +420,19 @@ Total proposed plugin-pack delta: 3 new rules, 2 new subagents, 3 new skills, 3 
 
 The plugin-pack work is **not in the scope of this commit** — this doc is the *handoff document* for that work, not the implementation. The foundation-hardening pass closes here; the plugin-pack refinement is the next discrete piece, owned at the maintainer-pack-author level rather than at the project-foundation level.
 
+### 8.8 Coupling / SOLID slice (landed 2026-06-04)
+
+| Artifact | Type | Status | Pointer |
+|---|---|---|---|
+| `03-layering-and-coupling-discipline.mdc` | Rule | Landed (toolset) | `umbraculum-platform-tsjs-cursor-assistant`; See also in `02-foundation-hardening.mdc` |
+| [`solid-audit-charter.md`](design/solid-audit-charter.md) | Doc | Landed | Severity rubric + `@arch-boundary` convention |
+| [`solid-decoupling-audit.md`](design/solid-decoupling-audit.md) | Doc | Landed | Six skeptical tests → **SOUND**; Tier A/B/C backlog |
+| [`solid-audit-inventory.md`](design/solid-audit-inventory.md) | Doc | Generated | `npm run audit:solid-inventory` |
+| `scripts/audit/solid-inventory.ts` | Script | Landed | Report-only signal |
+| Tier A code refactors | Implementation | **Deferred** | Separate epic — audit recommends, does not implement |
+
+Install: merge/publish toolset rule, then Cursor reload. Audit milestone is **documentation + governance**, not production refactors.
+
 ---
 
 ## Appendix — versioning + sign-off
