@@ -388,11 +388,11 @@ Standards:
 
 ---
 
-## Architectural coupling (SOLID — repo-native)
+## Architectural coupling (SOLID — mandatory, repo-native)
 
-**Decision-of-record:** [solid-decoupling-audit.md](design/solid-decoupling-audit.md) (2026-06-04, SOUND). Charter: [solid-audit-charter.md](design/solid-audit-charter.md).
+**Decision-of-record:** [solid-decoupling-audit.md](design/solid-decoupling-audit.md) (2026-06-04, SOUND). Charter: [solid-audit-charter.md](design/solid-audit-charter.md). Implementation epic **landed 2026-06-04** (Tier A + B).
 
-SOLID is expressed as **concrete boundaries**, not abstract OOP dogma:
+SOLID is expressed as **concrete boundaries**, not abstract OOP dogma. Treat the rules below as **merge-blocking** for new code in the scoped surfaces — same bar as lint and types.
 
 | Principle | Rule of thumb |
 |-----------|---------------|
@@ -404,8 +404,8 @@ SOLID is expressed as **concrete boundaries**, not abstract OOP dogma:
 
 **Dependency direction:** [application-surfaces-vs-platform-backbone.md](design/application-surfaces-vs-platform-backbone.md), [DATA-ACCESS-BOUNDARIES.md](DATA-ACCESS-BOUNDARIES.md).
 
-**Must not:** sibling canonical module imports (P0); business logic in route handlers; `services/api` or `@prisma/*` from apps.
+**Must not:** sibling canonical module imports (P0 — enforced by `eslint-plugin-boundaries` at **`error`** on `services/api/src/modules/**`); business logic or raw `app.prisma` in route handlers; `services/api` or `@prisma/*` from apps.
 
 **When coupling is intentional**, use `@arch-boundary` at the site (Reason, Revisit, Owner) and mirror in module README § Known couplings. See charter for the full convention.
 
-**Inventory:** `npm run audit:solid-inventory` (report-only). **Agent rule:** `03-layering-and-coupling-discipline.mdc` (platform plugin).
+**Drift signals:** `npm run audit:solid-inventory` (report-only inventory). **CI enforcement:** `boundaries/element-types` — see [LINTING.md](LINTING.md) § Canonical module boundaries. **Agent rule:** `03-layering-and-coupling-discipline.mdc` (platform plugin).

@@ -27,6 +27,10 @@ translations, and thoughtful issue triage.
   monorepo; selected SDK packages may be MIT — see the licensing doc).
 - Read [`DEVELOPMENT.md`](./DEVELOPMENT.md), and if it exists in your
   checkout, the project-local addendum `DEVELOPMENT-LOCAL.md`.
+- Read [`docs/CODING-STANDARDS.md`](./docs/CODING-STANDARDS.md) §
+  **Architectural coupling** — mandatory dependency-direction and
+  route/service discipline (SOLID as repo-native boundaries; P0 sibling
+  module imports are CI-blocked).
 - **Public-surface hygiene (pre-flip):** before editing docs or module
   READMEs, read
   [`docs/design/public-surface-personal-identifier-hygiene.md`](./docs/design/public-surface-personal-identifier-hygiene.md).

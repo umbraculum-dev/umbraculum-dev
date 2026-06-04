@@ -428,10 +428,10 @@ The plugin-pack work is **not in the scope of this commit** — this doc is the 
 | [`solid-audit-charter.md`](design/solid-audit-charter.md) | Doc | Landed | Severity rubric + `@arch-boundary` convention |
 | [`solid-decoupling-audit.md`](design/solid-decoupling-audit.md) | Doc | Landed | Six skeptical tests → **SOUND**; Tier A/B/C backlog |
 | [`solid-audit-inventory.md`](design/solid-audit-inventory.md) | Doc | Generated | `npm run audit:solid-inventory` |
-| `scripts/audit/solid-inventory.ts` | Script | Landed | Report-only signal |
-| Tier A code refactors | Implementation | **Deferred** | Separate epic — audit recommends, does not implement |
+| `scripts/audit/solid-inventory.ts` | Script | Landed | Report-only drift signal |
+| Tier A + B implementation epic | Implementation | **Landed 2026-06-04** | A1–A4, B1–B5 on `master`; boundaries lint at `error` |
 
-Install: merge/publish toolset rule, then Cursor reload. Audit milestone is **documentation + governance**, not production refactors.
+Install: merge/publish toolset rule (`03-layering-and-coupling-discipline.mdc`), then Cursor reload. Audit + implementation epic **complete**; optional backlog = recipe-edit section splits, future `apps/**` boundaries lint.
 
 ---
 

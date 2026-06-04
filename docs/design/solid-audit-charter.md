@@ -99,7 +99,7 @@ npx tsx scripts/audit/solid-inventory.ts
 
 Output: [solid-audit-inventory.md](./solid-audit-inventory.md) (committed snapshot; script is source of regeneration).
 
-CI: report-only (non-blocking) until Tier A P0 items are cleared.
+**CI:** P0 sibling imports on canonical modules are **merge-blocking** via `eslint-plugin-boundaries` (`boundaries/element-types` at `error` on `services/api/src/modules/**` — SOLID B5, 2026-06-04). The inventory script remains **report-only** (fat-file and drift signal).
 
 ---
 

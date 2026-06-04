@@ -222,9 +222,9 @@ Would have **failed** SOUND if:
 
 ## 8. Recommended next actions
 
-1. **Done (this milestone):** Charter, inventory script, inventory snapshot, this audit, governance docs/rule.
-2. **Next (implementation epic):** Tier A code refactors — label `solid-audit` / tier-A.
-3. **Backlog (Tier B):** Remaining items — optional section splits for recipe-edit content components; `apps/**` boundaries lint (future epic).
+1. **Done (audit milestone):** Charter, inventory script, inventory snapshot, governance docs/rule.
+2. **Done (implementation epic, 2026-06-04):** Tier A + B — projection IDs, AuthService, WaterCalcService, boundaries spike + CI, god-service splits, recipe-edit shell refactor (web + native), projection port, thin routes.
+3. **Optional backlog:** Recipe-edit **section** component splits (`RecipeEditPageContent`, `RecipeEditScreenContent`); `apps/**` boundaries lint (future epic); water/brew-session god pages per B2 follow-ups.
 
 ---
 
