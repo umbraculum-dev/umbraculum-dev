@@ -1,5 +1,5 @@
+import type { BrewSessionStepStatus } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
-import type { BrewSessionStepStatus, IntegrationKind } from "@prisma/client";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
   BrewSessionCreateResponseSchema,
@@ -27,30 +27,18 @@ import {
 } from "@umbraculum/contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
+import {
+  assertIntegrationKind,
+  assertReadingsLimit,
+  BrewSessionIntegrationsService,
+} from "../../../services/brewSessionIntegrationsService.js";
 import { BrewSessionsService, type BrewSessionStepInput } from "../../../services/brewSessionsService.js";
-import { BadRequestError, NotFoundError } from "../../../errors.js";
-
-const SUPPORTED_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
-
-function assertIntegrationKind(v: unknown): IntegrationKind {
-  const raw = typeof v === "string" ? v.trim().toLowerCase() : "";
-  if (!raw) throw new BadRequestError("invalid_integration_kind", "Integration kind is required");
-  if (!SUPPORTED_KINDS.includes(raw as IntegrationKind)) {
-    throw new BadRequestError("invalid_integration_kind", "Integration kind is not supported");
-  }
-  return raw as IntegrationKind;
-}
-
-function assertLimit(v: unknown, fallback = 200, max = 500): number {
-  const raw = typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : "";
-  const n = raw ? Number.parseInt(raw, 10) : fallback;
-  if (!Number.isFinite(n) || Number.isNaN(n)) return fallback;
-  return Math.max(1, Math.min(max, n));
-}
+import { BadRequestError } from "../../../errors.js";
 
 export function brewSessionsRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new BrewSessionsService(app.prisma);
+  const integrations = new BrewSessionIntegrationsService(app.prisma);
 
   zodApp.post(
     "/recipes/:recipeId/brew-sessions",
@@ -130,46 +118,11 @@ export function brewSessionsRoutes(app: FastifyInstance) {
       const brewSessionId = req.params.brewSessionId;
       if (!brewSessionId) throw new BadRequestError("invalid_brew_session_id", "Params.brewSessionId is required");
 
-      const session = await app.prisma.brewSession.findFirst({
-        where: { id: brewSessionId, workspaceId: ctx.activeWorkspaceId },
-        select: { id: true },
-      });
-      if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
-
-      const attachments = await app.prisma.integrationDeviceAttachment.findMany({
-        where: { brewSessionId, detachedAt: null },
-        orderBy: [{ attachedAt: "desc" }, { id: "desc" }],
-        select: {
-          id: true,
-          attachedAt: true,
-          device: {
-            select: {
-              id: true,
-              deviceKey: true,
-              displayName: true,
-              lastSeenAt: true,
-              metadataJson: true,
-              integration: { select: { id: true, kind: true } },
-            },
-          },
-        },
-      });
+      const attachments = await integrations.listAttachments(ctx.activeWorkspaceId, brewSessionId);
 
       return IntegrationAttachmentsResponseSchema.parse({
         ok: true,
-        attachments: attachments.map((a) => ({
-          id: a.id,
-          attachedAt: a.attachedAt,
-          device: {
-            id: a.device.id,
-            deviceKey: a.device.deviceKey,
-            displayName: a.device.displayName,
-            lastSeenAt: a.device.lastSeenAt,
-            metadataJson: a.device.metadataJson ?? null,
-            integrationId: a.device.integration.id,
-            kind: a.device.integration.kind,
-          },
-        })),
+        attachments,
       });
     },
   );
@@ -197,35 +150,12 @@ export function brewSessionsRoutes(app: FastifyInstance) {
       const deviceId = body.deviceId.trim();
       if (!deviceId) throw new BadRequestError("invalid_device_id", "Body.deviceId is required");
 
-      const session = await app.prisma.brewSession.findFirst({
-        where: { id: brewSessionId, workspaceId: ctx.activeWorkspaceId },
-        select: { id: true },
-      });
-      if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
-
-      const integration = await app.prisma.integration.findFirst({
-        where: { workspaceId: ctx.activeWorkspaceId, kind, revokedAt: null },
-        select: { id: true },
-      });
-      if (!integration) {
-        throw new NotFoundError("missing_integration", "Integration not configured");
-      }
-
-      const device = await app.prisma.integrationDevice.findFirst({
-        where: { id: deviceId, integrationId: integration.id },
-        select: { id: true },
-      });
-      if (!device) throw new NotFoundError("missing_device", "Device not found");
-
-      const now = new Date();
-      await app.prisma.integrationDeviceAttachment.updateMany({
-        where: { deviceId, detachedAt: null },
-        data: { detachedAt: now },
-      });
-      const created = await app.prisma.integrationDeviceAttachment.create({
-        data: { deviceId, brewSessionId, attachedAt: now },
-        select: { id: true, attachedAt: true, brewSessionId: true },
-      });
+      const created = await integrations.attachDevice(
+        ctx.activeWorkspaceId,
+        brewSessionId,
+        kind,
+        deviceId,
+      );
 
       return IntegrationAttachResponseSchema.parse({ ok: true, attachment: created });
     },
@@ -252,16 +182,7 @@ export function brewSessionsRoutes(app: FastifyInstance) {
       const deviceId = req.body.deviceId.trim();
       if (!deviceId) throw new BadRequestError("invalid_device_id", "Body.deviceId is required");
 
-      const session = await app.prisma.brewSession.findFirst({
-        where: { id: brewSessionId, workspaceId: ctx.activeWorkspaceId },
-        select: { id: true },
-      });
-      if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
-
-      const res = await app.prisma.integrationDeviceAttachment.updateMany({
-        where: { deviceId, brewSessionId, detachedAt: null },
-        data: { detachedAt: new Date() },
-      });
+      const res = await integrations.detachDevice(ctx.activeWorkspaceId, brewSessionId, deviceId);
       return IntegrationDetachResponseSchema.parse({ ok: true, detachedCount: res.count });
     },
   );
@@ -285,30 +206,14 @@ export function brewSessionsRoutes(app: FastifyInstance) {
       if (!brewSessionId) throw new BadRequestError("invalid_brew_session_id", "Params.brewSessionId is required");
 
       const kind = assertIntegrationKind(req.query.kind);
-      const limit = assertLimit(req.query.limit);
+      const limit = assertReadingsLimit(req.query.limit);
 
-      const session = await app.prisma.brewSession.findFirst({
-        where: { id: brewSessionId, workspaceId: ctx.activeWorkspaceId },
-        select: { id: true },
-      });
-      if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
-
-      const readings = await app.prisma.integrationReading.findMany({
-        where: {
-          brewSessionId,
-          device: { integration: { workspaceId: ctx.activeWorkspaceId, kind } },
-        },
-        orderBy: [{ recordedAt: "desc" }, { receivedAt: "desc" }, { id: "desc" }],
-        take: limit,
-        select: {
-          id: true,
-          deviceId: true,
-          recordedAt: true,
-          receivedAt: true,
-          temperatureC: true,
-          gravitySg: true,
-        },
-      });
+      const readings = await integrations.listReadings(
+        ctx.activeWorkspaceId,
+        brewSessionId,
+        kind,
+        limit,
+      );
 
       return IntegrationReadingsResponseSchema.parse({ ok: true, readings });
     },

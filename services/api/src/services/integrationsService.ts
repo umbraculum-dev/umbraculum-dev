@@ -2,7 +2,7 @@ import type { IntegrationKind, PrismaClient } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { createHash, createHmac, randomUUID } from "node:crypto";
 
-import { BadRequestError, UnauthorizedError } from "../errors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../errors.js";
 
 function sha256Hex(value: string): string {
   return createHash("sha256").update(value).digest("hex");
@@ -147,6 +147,133 @@ export class IntegrationsService {
       where: { id: integrationId },
       data: { revokedAt: new Date() },
       select: { id: true },
+    });
+  }
+
+  async findWorkspaceIntegration(workspaceId: string, kind: IntegrationKind) {
+    return this.prisma.integration.findFirst({
+      where: { workspaceId, kind },
+      orderBy: [{ revokedAt: "asc" }, { createdAt: "desc" }, { id: "desc" }],
+      select: {
+        id: true,
+        workspaceId: true,
+        kind: true,
+        revokedAt: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async listIntegrationDevices(integrationId: string) {
+    return this.prisma.integrationDevice.findMany({
+      where: { integrationId },
+      orderBy: [{ lastSeenAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+      select: {
+        id: true,
+        deviceKey: true,
+        displayName: true,
+        metadataJson: true,
+        lastSeenAt: true,
+        createdAt: true,
+        attachments: {
+          where: { detachedAt: null },
+          orderBy: [{ attachedAt: "desc" }, { id: "desc" }],
+          take: 1,
+          select: {
+            id: true,
+            attachedAt: true,
+            brewSession: {
+              select: {
+                id: true,
+                code: true,
+                status: true,
+                createdAt: true,
+                startedAt: true,
+                recipe: { select: { id: true, name: true, version: true } },
+              },
+            },
+          },
+        },
+        readings: {
+          orderBy: [{ receivedAt: "desc" }, { id: "desc" }],
+          take: 1,
+          select: {
+            id: true,
+            brewSessionId: true,
+            recordedAt: true,
+            receivedAt: true,
+            temperatureC: true,
+            gravitySg: true,
+            rawJson: true,
+          },
+        },
+      },
+    });
+  }
+
+  async attachDeviceToBrewSession(deviceId: string, brewSessionId: string) {
+    const now = new Date();
+    await this.prisma.integrationDeviceAttachment.updateMany({
+      where: { deviceId, detachedAt: null },
+      data: { detachedAt: now },
+    });
+    return this.prisma.integrationDeviceAttachment.create({
+      data: { deviceId, brewSessionId, attachedAt: now },
+      select: { id: true, attachedAt: true, brewSessionId: true },
+    });
+  }
+
+  async detachDevice(deviceId: string) {
+    const now = new Date();
+    return this.prisma.integrationDeviceAttachment.updateMany({
+      where: { deviceId, detachedAt: null },
+      data: { detachedAt: now },
+    });
+  }
+
+  async detachDeviceFromBrewSession(deviceId: string, brewSessionId: string) {
+    return this.prisma.integrationDeviceAttachment.updateMany({
+      where: { deviceId, brewSessionId, detachedAt: null },
+      data: { detachedAt: new Date() },
+    });
+  }
+
+  async assertIntegrationDevice(integrationId: string, deviceId: string) {
+    const device = await this.prisma.integrationDevice.findFirst({
+      where: { id: deviceId, integrationId },
+      select: { id: true },
+    });
+    if (!device) throw new NotFoundError("missing_device", "Device not found");
+    return device;
+  }
+
+  async assertBrewSessionInWorkspace(workspaceId: string, brewSessionId: string) {
+    const session = await this.prisma.brewSession.findFirst({
+      where: { id: brewSessionId, workspaceId },
+      select: { id: true },
+    });
+    if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
+    return session;
+  }
+
+  async listRecentBrewSessions(workspaceId: string, limit: number) {
+    return this.prisma.brewSession.findMany({
+      where: { workspaceId },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: limit,
+      select: {
+        id: true,
+        recipeId: true,
+        code: true,
+        status: true,
+        startedAt: true,
+        pausedAt: true,
+        stoppedAt: true,
+        scheduledDate: true,
+        createdAt: true,
+        recipe: { select: { id: true, name: true, version: true } },
+      },
     });
   }
 

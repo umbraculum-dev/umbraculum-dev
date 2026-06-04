@@ -153,5 +153,5 @@
 |-------|-------|
 | Date | 2026-06-04 |
 | Subplan | A4 |
-| Verdict | **SOUND** (warn now; blocking CI in B5 with conditions above) |
-| Successor | [solid-impl-B5-boundaries-ci.plan.md](../../.cursor/plans/solid-impl-B5-boundaries-ci.plan.md) unblocked |
+| Verdict | **SOUND** (warn shipped A4; **error-level CI blocking** landed B5 2026-06-04) |
+| Successor | [solid-impl-B5-boundaries-ci.plan.md](../../.cursor/plans/solid-impl-B5-boundaries-ci.plan.md) — **landed 2026-06-04** (`boundaries/element-types` promoted to `error`) |

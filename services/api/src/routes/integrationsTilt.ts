@@ -39,21 +39,6 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     return { userId: ctx.userId, workspaceId };
   }
 
-  async function findTiltIntegrationForWorkspace(workspaceId: string) {
-    return app.prisma.integration.findFirst({
-      where: { workspaceId, kind: "tilt" },
-      orderBy: [{ revokedAt: "asc" }, { createdAt: "desc" }, { id: "desc" }],
-      select: {
-        id: true,
-        workspaceId: true,
-        kind: true,
-        revokedAt: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-  }
-
   zodApp.get(
     "/workspaces/:workspaceId/integrations/tilt",
     {
@@ -71,7 +56,7 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     async (req) => {
       const { workspaceId } = await requireActiveWorkspaceParam(req);
 
-      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
       return IntegrationGetResponseSchema.parse({
         ok: true,
         integration: integration
@@ -105,7 +90,7 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     async (req) => {
       const { workspaceId } = await requireActiveWorkspaceParam(req);
 
-      const existing = await findTiltIntegrationForWorkspace(workspaceId);
+      const existing = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
       if (existing && !existing.revokedAt) {
         const rotated = await integrations.rotateIntegrationToken(existing.id);
         return IntegrationCreateResponseSchema.parse({
@@ -143,7 +128,7 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const { workspaceId } = await requireActiveWorkspaceParam(req);
-      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
       if (!integration || integration.revokedAt) {
         throw new NotFoundError("missing_integration", "Tilt integration not configured");
       }
@@ -174,7 +159,7 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const { workspaceId } = await requireActiveWorkspaceParam(req);
-      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
       if (!integration || integration.revokedAt) {
         throw new NotFoundError("missing_integration", "Tilt integration not configured");
       }
@@ -199,55 +184,12 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const { workspaceId } = await requireActiveWorkspaceParam(req);
-      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
       if (!integration || integration.revokedAt) {
         return IntegrationDevicesListResponseSchema.parse({ ok: true, devices: [] });
       }
 
-      const devices = await app.prisma.integrationDevice.findMany({
-        where: { integrationId: integration.id },
-        orderBy: [{ lastSeenAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-        select: {
-          id: true,
-          deviceKey: true,
-          displayName: true,
-          metadataJson: true,
-          lastSeenAt: true,
-          createdAt: true,
-          attachments: {
-            where: { detachedAt: null },
-            orderBy: [{ attachedAt: "desc" }, { id: "desc" }],
-            take: 1,
-            select: {
-              id: true,
-              attachedAt: true,
-              brewSession: {
-                select: {
-                  id: true,
-                  code: true,
-                  status: true,
-                  createdAt: true,
-                  startedAt: true,
-                  recipe: { select: { id: true, name: true, version: true } },
-                },
-              },
-            },
-          },
-          readings: {
-            orderBy: [{ receivedAt: "desc" }, { id: "desc" }],
-            take: 1,
-            select: {
-              id: true,
-              brewSessionId: true,
-              recordedAt: true,
-              receivedAt: true,
-              temperatureC: true,
-              gravitySg: true,
-              rawJson: true,
-            },
-          },
-        },
-      });
+      const devices = await integrations.listIntegrationDevices(integration.id);
 
       return IntegrationDevicesListResponseSchema.parse({
         ok: true,
@@ -292,32 +234,14 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
       const { deviceId } = req.params;
       const { brewSessionId } = req.body;
 
-      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
       if (!integration || integration.revokedAt) {
         throw new NotFoundError("missing_integration", "Tilt integration not configured");
       }
 
-      const device = await app.prisma.integrationDevice.findFirst({
-        where: { id: deviceId, integrationId: integration.id },
-        select: { id: true },
-      });
-      if (!device) throw new NotFoundError("missing_device", "Device not found");
-
-      const session = await app.prisma.brewSession.findFirst({
-        where: { id: brewSessionId, workspaceId },
-        select: { id: true },
-      });
-      if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
-
-      const now = new Date();
-      await app.prisma.integrationDeviceAttachment.updateMany({
-        where: { deviceId, detachedAt: null },
-        data: { detachedAt: now },
-      });
-      const created = await app.prisma.integrationDeviceAttachment.create({
-        data: { deviceId, brewSessionId, attachedAt: now },
-        select: { id: true, attachedAt: true, brewSessionId: true },
-      });
+      await integrations.assertIntegrationDevice(integration.id, deviceId);
+      await integrations.assertBrewSessionInWorkspace(workspaceId, brewSessionId);
+      const created = await integrations.attachDeviceToBrewSession(deviceId, brewSessionId);
 
       return IntegrationDeviceAttachResponseSchema.parse({ ok: true, attachment: created });
     },
@@ -342,22 +266,13 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
       const { workspaceId } = await requireActiveWorkspaceParam(req);
       const { deviceId } = req.params;
 
-      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
       if (!integration || integration.revokedAt) {
         throw new NotFoundError("missing_integration", "Tilt integration not configured");
       }
 
-      const device = await app.prisma.integrationDevice.findFirst({
-        where: { id: deviceId, integrationId: integration.id },
-        select: { id: true },
-      });
-      if (!device) throw new NotFoundError("missing_device", "Device not found");
-
-      const now = new Date();
-      const res = await app.prisma.integrationDeviceAttachment.updateMany({
-        where: { deviceId, detachedAt: null },
-        data: { detachedAt: now },
-      });
+      await integrations.assertIntegrationDevice(integration.id, deviceId);
+      const res = await integrations.detachDevice(deviceId);
 
       return IntegrationDeviceDetachResponseSchema.parse({ ok: true, detachedCount: res.count });
     },
@@ -382,23 +297,7 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
       const { workspaceId } = await requireActiveWorkspaceParam(req);
       const limit = req.query.limit ?? 20;
 
-      const sessions = await app.prisma.brewSession.findMany({
-        where: { workspaceId },
-        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-        take: limit,
-        select: {
-          id: true,
-          recipeId: true,
-          code: true,
-          status: true,
-          startedAt: true,
-          pausedAt: true,
-          stoppedAt: true,
-          scheduledDate: true,
-          createdAt: true,
-          recipe: { select: { id: true, name: true, version: true } },
-        },
-      });
+      const sessions = await integrations.listRecentBrewSessions(workspaceId, limit);
 
       return BrewSessionsRecentResponseSchema.parse({ ok: true, brewSessions: sessions });
     },

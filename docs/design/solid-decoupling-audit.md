@@ -224,7 +224,7 @@ Would have **failed** SOUND if:
 
 1. **Done (this milestone):** Charter, inventory script, inventory snapshot, this audit, governance docs/rule.
 2. **Next (implementation epic):** Tier A code refactors — label `solid-audit` / tier-A.
-3. **Backlog (Tier B):** God-service splits, edit-page decompose, projection port, boundaries eslint pilot.
+3. **Backlog (Tier B):** Remaining items — optional section splits for recipe-edit content components; `apps/**` boundaries lint (future epic).
 
 ---
 

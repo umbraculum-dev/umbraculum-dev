@@ -13,12 +13,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Files scanned | 756 |
+| Files scanned | 761 |
 | Roots | `services/api/src`, `packages`, `apps/web/app`, `apps/native/src` |
 | P0 findings | 0 |
 | P1 findings | 23 |
-| P2 findings | 26 |
-| P3 findings | 26 |
+| P2 findings | 25 |
+| P3 findings | 25 |
 
 ---
 
@@ -62,10 +62,9 @@
 | `apps/native/src/modules/brewery/hooks/useRecipeEditScreen.ts` | 814 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/yeast/page.tsx` | 615 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/water/page.tsx` | 595 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
-| `services/api/src/modules/brewery/routes/brewSessions.ts` | 589 | Brewery vertical | S, D | P2 | app.prisma in route handler | Extract service layer; handler = parse → service → schema |
 | `services/api/src/modules/brewery/routes/recipeWaterSettings.ts` | 526 | Brewery vertical | S, D | P2 | route file 526 LoC | Extract service layer; handler = parse → service → schema |
+| `services/api/src/modules/brewery/routes/brewSessions.ts` | 494 | Brewery vertical | S, D | P2 | route file 494 LoC | Extract service layer; handler = parse → service → schema |
 | `apps/native/src/modules/brewery/screens/WaterHubScreen.tsx` | 416 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
-| `services/api/src/routes/integrationsTilt.ts` | 407 | Platform routes/services | S, D | P2 | route file 407 LoC | Extract service layer; handler = parse → service → schema |
 | `services/api/src/routes/platformRecipes.ts` | 368 | Platform routes/services | S, D | P2 | app.prisma in route handler | Extract service layer; handler = parse → service → schema |
 | `services/api/src/modules/brewery/routes/ingredients.ts` | 302 | Brewery vertical | S, D | P2 | app.prisma in route handler | Extract service layer; handler = parse → service → schema |
 | `services/api/src/modules/brewery/routes/recipes.ts` | 208 | Brewery vertical | S, D | P2 | app.prisma in route handler | Extract service layer; handler = parse → service → schema |
@@ -83,12 +82,12 @@
 | `apps/web/app/recipes/[id]/yeast/page.tsx` | 615 | Apps (web) | S, I | P3 | file size 615 LoC | Review logical cohesion |
 | `services/api/src/services/rendering/renderingJobService.ts` | 611 | Platform routes/services | S, I | P3 | file size 611 LoC | Review logical cohesion |
 | `apps/web/app/recipes/[id]/water/page.tsx` | 595 | Apps (web) | S, I | P3 | file size 595 LoC | Review logical cohesion |
-| `services/api/src/modules/brewery/routes/brewSessions.ts` | 589 | Brewery vertical | S, I | P3 | file size 589 LoC | Review logical cohesion |
 | `services/api/src/importers/beerxmlImporter.ts` | 582 | Other | S, I | P3 | file size 582 LoC | Review logical cohesion |
 | `services/api/src/services/brewSessionsLifecycleService.ts` | 576 | Platform routes/services | S, I | P3 | file size 576 LoC | Review logical cohesion |
 | `services/api/src/modules/brewery/routes/recipeWaterSettings.ts` | 526 | Brewery vertical | S, I | P3 | file size 526 LoC | Review logical cohesion |
 | `services/api/src/services/recipesService.ts` | 499 | Platform routes/services | S, I | P3 | file size 499 LoC | Review logical cohesion |
 | `apps/native/src/modules/brewery/screens/WaterProfilesScreen.tsx` | 497 | Apps (native) | S, I | P3 | file size 497 LoC | Review logical cohesion |
+| `services/api/src/modules/brewery/routes/brewSessions.ts` | 494 | Brewery vertical | S, I | P3 | file size 494 LoC | Review logical cohesion |
 | `services/api/src/services/brewdaySettingsService.ts` | 492 | Platform routes/services | S, I | P3 | file size 492 LoC | Review logical cohesion |
 | `services/api/src/cli/seedE2eFixture.ts` | 482 | Other | S, I | P3 | file size 482 LoC | Review logical cohesion |
 | `services/api/src/services/ai/orchestrator.ts` | 465 | Platform routes/services | S, I | P3 | file size 465 LoC | Review logical cohesion |
@@ -99,7 +98,6 @@
 | `services/api/src/services/brewSessionsRecipeStepSeeding.ts` | 427 | Platform routes/services | S, I | P3 | file size 427 LoC | Review logical cohesion |
 | `apps/native/src/modules/brewery/screens/WaterHubScreen.tsx` | 416 | Apps (native) | S, I | P3 | file size 416 LoC | Review logical cohesion |
 | `apps/web/app/[locale]/(brewery)/water-profiles/page.tsx` | 416 | Apps (web) | S, I | P3 | file size 416 LoC | Review logical cohesion |
-| `services/api/src/routes/integrationsTilt.ts` | 407 | Platform routes/services | S, I | P3 | file size 407 LoC | Review logical cohesion |
 | `packages/recipes-ui/src/mash/MashStepsEditor.tsx` | 402 | Packages | S, I | P3 | file size 402 LoC | Review logical cohesion |
 
 ---

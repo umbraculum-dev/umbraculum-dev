@@ -18,6 +18,7 @@
 | Strict-gate workflow | ✅ `npm run lint` is the single gate. The previous `lint:packages-strict --max-warnings 0` script was dropped in HIGH-full Phase 5d as redundant — with rules at `error` repo-wide, any new violation fails the main lint step. |
 | Editor-only ESLint config | ✅ `eslint.config.editor.mjs` strips the 12 type-aware rules + `parserOptions.projectService` for editor-extension use. Saves ~6× wall time (~42s → ~7s) and mechanically defeats the auto-fix-overreach failure mode. Copy `.vscode/settings.json.example` to `.vscode/settings.json` to opt in. See [Recommended editor configuration](#recommended-editor-configuration). |
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
+| Canonical module sibling-import guard | ✅ `eslint-plugin-boundaries` `boundaries/element-types` at **`error`** on `services/api/src/modules/**` (SOLID B5, 2026-06-04). See [Canonical module boundaries](#canonical-module-boundaries). |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ✅ **All 12 rules at `error`** — HIGH-full Phase 5c (2026-05-16). 7 promise-correctness rules (`**/*.{ts,tsx}`) + 5 `no-unsafe-*` rules (`services/api/**` + `apps/web/**`). Tests relaxed via the `**/{tests,e2e}/**` + `**/*.{test,spec}.*` glob block. `parserOptions.projectService` infrastructure live. |
 | Outstanding warnings | **0** (-80 from Phase 6c, -58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,127 cumulative; was 1,127 at HIGH-light landing). **`npm run lint` exits clean — zero warnings, zero errors.** |
@@ -47,6 +48,18 @@ This is exactly the kind of bug that:
 - Code review missed for two releases.
 
 It's the reason ESLint is worth its tooling overhead in this repo.
+
+### Canonical module boundaries (`eslint-plugin-boundaries`)
+
+RFC-0002 canonical modules under `services/api/src/modules/**` must not import sibling modules directly (e.g. `crp` → `mrp`). Allowed dependency directions:
+
+- Same module (`modules/brewery/**` → `modules/brewery/**`)
+- `platform/**`, `domain/**`, `plugins/**`
+- Package imports (`@umbraculum/*-contracts`, etc.)
+
+Configuration lives in [`eslint.config.mjs`](../eslint.config.mjs) (scoped `files` glob). Spike + verdict: [`docs/design/solid-boundaries-eslint-spike.md`](design/solid-boundaries-eslint-spike.md). **`boundaries/element-types` is `error`** (merge-blocking since SOLID B5, 2026-06-04). Complementary report-only drift signal: `npm run audit:solid-inventory`.
+
+Horizontal paths (`services/api/src/routes/**`, `services/api/src/services/ai/tools/**`) are outside this rule's scope by design.
 
 ---
 

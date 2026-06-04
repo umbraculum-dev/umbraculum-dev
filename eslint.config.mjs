@@ -437,11 +437,11 @@ export default [
   },
 
   // -------------------------------------------------------------------
-  // SOLID A4 — canonical module import boundaries (prototype, warn-only).
+  // SOLID B5 — canonical module import boundaries (error-level, CI-blocking).
   //
   // Scoped to services/api/src/modules/** per solid-boundaries-eslint-spike.md.
   // Blocks sibling imports (e.g. crp → mrp); allows platform/, domain/,
-  // plugins/, and same-module paths. Promotion to error + CI gate: Subplan B5.
+  // plugins/, and same-module paths. Promoted from warn (A4) 2026-06-04.
   // -------------------------------------------------------------------
   {
     files: ["services/api/src/modules/**/*.{ts,tsx}"],
@@ -480,7 +480,7 @@ export default [
     rules: {
       "boundaries/no-unknown-files": "off",
       "boundaries/element-types": [
-        "warn",
+        "error",
         {
           default: "allow",
           message:
