@@ -5,6 +5,7 @@ import {
 } from "@umbraculum/crp-contracts";
 
 import { NotFoundError } from "../../../errors.js";
+import { createPrismaBreweryScheduleProjection } from "../../../platform/prismaBreweryScheduleProjection.js";
 import { WorkspacesService } from "../../../services/workspacesService.js";
 import { CrpBreweryProjectionService } from "./breweryProjectionService.js";
 
@@ -14,7 +15,7 @@ export class CrpResourcesService {
 
   constructor(private readonly prisma: PrismaClient) {
     this.workspaces = new WorkspacesService(prisma);
-    this.breweryProjections = new CrpBreweryProjectionService(prisma);
+    this.breweryProjections = new CrpBreweryProjectionService(createPrismaBreweryScheduleProjection(prisma));
   }
 
   async listResources(userId: string, workspaceId: string, kind?: string): Promise<readonly Resource[]> {

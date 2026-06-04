@@ -1,4 +1,4 @@
-import type { BrewSessionStep, EquipmentProfile, Prisma, PrismaClient, Vessel } from "@prisma/client";
+import type { BrewSessionStep, EquipmentProfile, Vessel } from "@prisma/client";
 import { z } from "zod";
 import {
   CapacityBucketSchema,
@@ -22,10 +22,12 @@ import {
   equipmentProfileWorkCenterId,
   parseAutomationVesselResourceId,
 } from "../../../platform/breweryProjectionIds.js";
+import type {
+  BreweryScheduleProjection,
+  ProjectedBrewSession,
+} from "../../../platform/breweryScheduleProjection.js";
 
-type BrewSessionWithRecipeSteps = Prisma.BrewSessionGetPayload<{
-  include: { recipe: true; steps: true };
-}>;
+type BrewSessionWithRecipeSteps = ProjectedBrewSession;
 
 type ScheduledStep = {
   step: BrewSessionStep;
@@ -43,42 +45,26 @@ const EquipmentSourceSchema = z.object({
   }).passthrough().optional(),
 }).passthrough();
 
-/** @arch-boundary — intentional coupling
- * Reason: Wave 1 CRP brewery projection reads core Vessel/BrewSession schema in-process.
- * Revisit: SOLID subplan B3 (BreweryScheduleProjection port)
- * Owner: crp
- */
 export class CrpBreweryProjectionService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly schedule: BreweryScheduleProjection) {}
 
   async listProjectedResources(workspaceId: string, kind?: string): Promise<readonly Resource[]> {
     if (kind && kind !== "equipment") return [];
-    const vessels = await this.prisma.vessel.findMany({
-      where: { workspaceId },
-      orderBy: [{ code: "asc" }],
-    });
+    const vessels = await this.schedule.listVessels(workspaceId);
     return vessels.map((vessel) => toVesselResource(vessel));
   }
 
   async getProjectedResourceById(workspaceId: string, resourceId: string): Promise<Resource | null> {
     const vesselId = parseAutomationVesselResourceId(resourceId);
     if (!vesselId) return null;
-    const vessel = await this.prisma.vessel.findFirst({
-      where: { id: vesselId, workspaceId },
-    });
+    const vessel = await this.schedule.getVessel(workspaceId, vesselId);
     return vessel ? toVesselResource(vessel) : null;
   }
 
   async listProjectedWorkCenters(workspaceId: string): Promise<readonly WorkCenter[]> {
     const [profiles, vessels] = await Promise.all([
-      this.prisma.equipmentProfile.findMany({
-        where: { workspaceId },
-        orderBy: [{ name: "asc" }],
-      }),
-      this.prisma.vessel.findMany({
-        where: { workspaceId },
-        orderBy: [{ code: "asc" }],
-      }),
+      this.schedule.listEquipmentProfiles(workspaceId),
+      this.schedule.listVessels(workspaceId),
     ]);
     return profiles.map((profile) => toEquipmentProfileWorkCenter(profile, vessels));
   }
@@ -185,15 +171,8 @@ export class CrpBreweryProjectionService {
     workspaceId: string,
   ): Promise<[readonly BrewSessionWithRecipeSteps[], readonly Vessel[]]> {
     return Promise.all([
-      this.prisma.brewSession.findMany({
-        where: { workspaceId },
-        include: { recipe: true, steps: true },
-        orderBy: [{ code: "asc" }],
-      }),
-      this.prisma.vessel.findMany({
-        where: { workspaceId },
-        orderBy: [{ code: "asc" }],
-      }),
+      this.schedule.listBrewSessionsWithSteps(workspaceId),
+      this.schedule.listVessels(workspaceId),
     ]);
   }
 

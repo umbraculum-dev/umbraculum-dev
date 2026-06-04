@@ -22,7 +22,7 @@ All routes require an authenticated session with an active workspace and scope r
 
 ## Known couplings
 
-- `CrpBreweryProjectionService` reads core `Vessel` / `BrewSession` schema in-process (`@arch-boundary`; revisit SOLID B3 port).
+- MRP/CRP brewery schedule reads go through `BreweryScheduleProjection` (`services/api/src/platform/breweryScheduleProjection.ts`); `PrismaBreweryScheduleProjection` is the sole cross-schema adapter.
 
 ## Cross-references
 

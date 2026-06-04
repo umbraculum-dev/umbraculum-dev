@@ -12,6 +12,7 @@ import {
 } from "@umbraculum/mrp-contracts";
 
 import { NotFoundError } from "../../../errors.js";
+import { createPrismaBreweryScheduleProjection } from "../../../platform/prismaBreweryScheduleProjection.js";
 import { WorkspacesService } from "../../../services/workspacesService.js";
 import { MrpBreweryProjectionService } from "./breweryProjectionService.js";
 
@@ -33,7 +34,7 @@ export class MrpService {
 
   constructor(private readonly prisma: PrismaClient) {
     this.workspaces = new WorkspacesService(prisma);
-    this.breweryProjections = new MrpBreweryProjectionService(prisma);
+    this.breweryProjections = new MrpBreweryProjectionService(createPrismaBreweryScheduleProjection(prisma));
   }
 
   async listProductionOrders(

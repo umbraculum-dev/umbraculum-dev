@@ -1,4 +1,4 @@
-import type { BrewSessionStatus, Prisma, PrismaClient } from "@prisma/client";
+import type { BrewSessionStatus } from "@prisma/client";
 import { z } from "zod";
 import {
   BomSchema,
@@ -22,11 +22,14 @@ import {
   parseBreweryBrewSessionProductionOrderId,
   parseBreweryRecipeBomId,
 } from "../../../platform/breweryProjectionIds.js";
+import type {
+  BreweryScheduleProjection,
+  ProjectedBrewSession,
+  ProjectedRecipe,
+} from "../../../platform/breweryScheduleProjection.js";
 
-type RecipeRow = Prisma.RecipeGetPayload<Record<string, never>>;
-type BrewSessionRow = Prisma.BrewSessionGetPayload<{
-  include: { recipe: true; steps: true };
-}>;
+type RecipeRow = ProjectedRecipe;
+type BrewSessionRow = ProjectedBrewSession;
 
 type ProjectedStep = {
   id: string;
@@ -78,28 +81,18 @@ type BeerJsonIngredient = {
   materialRefModule: string;
 };
 
-/** @arch-boundary — intentional coupling
- * Reason: Wave 1 MRP brewery projection reads core Recipe/BrewSession schema in-process.
- * Revisit: SOLID subplan B3 (BreweryScheduleProjection port)
- * Owner: mrp
- */
 export class MrpBreweryProjectionService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly schedule: BreweryScheduleProjection) {}
 
   async listProjectedBoms(workspaceId: string): Promise<readonly Bom[]> {
-    const recipes = await this.prisma.recipe.findMany({
-      where: { workspaceId },
-      orderBy: [{ name: "asc" }, { version: "asc" }],
-    });
+    const recipes = await this.schedule.listRecipes(workspaceId);
     return recipes.map((recipe) => this.toBom(recipe));
   }
 
   async getProjectedBomById(workspaceId: string, bomId: string): Promise<Bom | null> {
     const recipeId = parseBreweryRecipeBomId(bomId);
     if (!recipeId) return null;
-    const recipe = await this.prisma.recipe.findFirst({
-      where: { id: recipeId, workspaceId },
-    });
+    const recipe = await this.schedule.getRecipe(workspaceId, recipeId);
     return recipe ? this.toBom(recipe) : null;
   }
 
@@ -144,21 +137,14 @@ export class MrpBreweryProjectionService {
   }
 
   private async findBrewSessions(workspaceId: string): Promise<readonly BrewSessionRow[]> {
-    return this.prisma.brewSession.findMany({
-      where: { workspaceId },
-      include: { recipe: true, steps: true },
-      orderBy: [{ code: "asc" }],
-    });
+    return this.schedule.listBrewSessionsWithSteps(workspaceId);
   }
 
   private async findBrewSession(
     workspaceId: string,
     sessionId: string,
   ): Promise<BrewSessionRow | null> {
-    return this.prisma.brewSession.findFirst({
-      where: { id: sessionId, workspaceId },
-      include: { recipe: true, steps: true },
-    });
+    return this.schedule.getBrewSessionWithSteps(workspaceId, sessionId);
   }
 
   private toBom(recipe: RecipeRow): Bom {
@@ -263,7 +249,7 @@ export class MrpBreweryProjectionService {
   }
 
   private async settingsFallbackSteps(workspaceId: string): Promise<readonly ProjectedStep[]> {
-    const settings = await this.prisma.brewdaySettings.findUnique({ where: { workspaceId } });
+    const settings = await this.schedule.getBrewdaySettings(workspaceId);
     if (!settings) return [];
     const defaultSteps = BrewdaySettingsStepSchema.array().safeParse(settings.defaultStepsJson);
     const customSteps = BrewdaySettingsStepSchema.array().safeParse(settings.customSectionsJson);
