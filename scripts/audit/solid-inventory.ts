@@ -29,12 +29,6 @@ const SCAN_ROOTS = [
 
 const EXT = new Set([".ts", ".tsx"]);
 
-const LOC_THRESHOLDS = [
-  { min: 1200, label: "critical" },
-  { min: 800, label: "high" },
-  { min: 400, label: "medium" },
-] as const;
-
 const MODULE_CODES = ["pim", "mrp", "crp", "automation", "brewery"] as const;
 
 type InventoryRow = {

@@ -1,0 +1,43 @@
+name: solid-audit-inventory
+
+# Report-only SOLID inventory regeneration (Subplan A4). Does not block merge.
+# See docs/design/solid-boundaries-eslint-spike.md
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "services/api/**"
+      - "scripts/audit/**"
+      - "docs/design/solid-audit-inventory.md"
+  workflow_dispatch:
+
+concurrency:
+  group: solid-audit-inventory-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inventory-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Regenerate SOLID inventory snapshot
+        run: npm run audit:solid-inventory
+
+      - name: Report snapshot drift (non-blocking)
+        run: |
+          if git diff --quiet docs/design/solid-audit-inventory.md; then
+            echo "solid-audit-inventory: snapshot matches committed file"
+          else
+            echo "::warning title=SOLID inventory drift::Run npm run audit:solid-inventory and commit docs/design/solid-audit-inventory.md if the delta is intentional."
+            git diff --stat docs/design/solid-audit-inventory.md || true
+          fi

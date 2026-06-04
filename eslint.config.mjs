@@ -25,6 +25,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import boundaries from "eslint-plugin-boundaries";
 import globals from "globals";
 
 export default [
@@ -149,6 +150,7 @@ export default [
             "packages/core/vitest.config.ts",
             "packages/core/src/index.d.ts",
             "scripts/check-web-url-segments.ts",
+            "scripts/audit/solid-inventory.ts",
           ],
         },
         tsconfigRootDir: import.meta.dirname,
@@ -431,6 +433,68 @@ export default [
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+
+  // -------------------------------------------------------------------
+  // SOLID A4 — canonical module import boundaries (prototype, warn-only).
+  //
+  // Scoped to services/api/src/modules/** per solid-boundaries-eslint-spike.md.
+  // Blocks sibling imports (e.g. crp → mrp); allows platform/, domain/,
+  // plugins/, and same-module paths. Promotion to error + CI gate: Subplan B5.
+  // -------------------------------------------------------------------
+  {
+    files: ["services/api/src/modules/**/*.{ts,tsx}"],
+    plugins: { boundaries },
+    settings: {
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+          project: ["services/api/tsconfig.json"],
+        },
+      },
+      "boundaries/elements": [
+        {
+          type: "platform",
+          pattern: "services/api/src/platform/**",
+          mode: "full",
+        },
+        {
+          type: "domain",
+          pattern: "services/api/src/domain/**",
+          mode: "full",
+        },
+        {
+          type: "plugins",
+          pattern: "services/api/src/plugins/**",
+          mode: "full",
+        },
+        {
+          type: "canonical-module",
+          pattern: "services/api/src/modules/*/**",
+          mode: "file",
+          capture: ["moduleCode"],
+        },
+      ],
+    },
+    rules: {
+      "boundaries/no-unknown-files": "off",
+      "boundaries/element-types": [
+        "warn",
+        {
+          default: "allow",
+          message:
+            "Canonical module ${file.moduleCode} must not import sibling module ${dependency.moduleCode} — use platform/ or *-contracts (SOLID charter).",
+          rules: [
+            {
+              from: [["canonical-module"]],
+              disallow: [
+                ["canonical-module", { moduleCode: "!${from.moduleCode}" }],
+              ],
+            },
+          ],
+        },
+      ],
     },
   },
 
