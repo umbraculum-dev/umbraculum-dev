@@ -13,11 +13,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Files scanned | 745 |
+| Files scanned | 750 |
 | Roots | `services/api/src`, `packages`, `apps/web/app`, `apps/native/src` |
 | P0 findings | 0 |
-| P1 findings | 21 |
-| P2 findings | 22 |
+| P1 findings | 22 |
+| P2 findings | 23 |
 | P3 findings | 26 |
 
 ---
@@ -28,13 +28,14 @@
 |------|-----|-------|------------|----------|--------|------------------|
 | `packages/api-client/src/generated/platform.openapi.ts` | 10161 | Packages | S, I | P1 | file size 10161 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `packages/api-client/src/generated/brewery.openapi.ts` | 4895 | Packages | S, I | P1 | file size 4895 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
-| `apps/web/app/recipes/[id]/edit/page.tsx` | 3851 | Apps (web) | S, I | P1 | file size 3851 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/page.tsx` | 2656 | Apps (web) | S, I | P1 | file size 2656 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
+| `apps/web/app/recipes/[id]/edit/_components/RecipeEditPageContent.tsx` | 2445 | Apps (web) | S, I | P1 | file size 2445 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/water/mash/page.tsx` | 2173 | Apps (web) | S, I | P1 | file size 2173 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/native/src/modules/brewery/screens/RecipeEditScreen.tsx` | 2125 | Apps (native) | S, I | P1 | file size 2125 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/water/sparge/page.tsx` | 1456 | Apps (web) | S, I | P1 | file size 1456 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/water/boil/page.tsx` | 1445 | Apps (web) | S, I | P1 | file size 1445 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/_components/YeastEditor.tsx` | 1430 | Apps (web) | S, I | P1 | file size 1430 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
+| `apps/web/app/recipes/[id]/edit/_hooks/useRecipeEditPage.ts` | 1324 | Apps (web) | S, I | P1 | file size 1324 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/native/src/modules/brewery/screens/WaterMashScreen.tsx` | 1259 | Apps (native) | S, I | P1 | file size 1259 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/[locale]/(brewery)/inventory/page.tsx` | 1258 | Apps (web) | S, I | P1 | file size 1258 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `services/api/src/modules/brewery/services/waterCalcService.ts` | 1251 | Brewery vertical | S, I | P1 | file size 1251 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
@@ -47,11 +48,12 @@
 | `apps/native/src/modules/brewery/screens/WaterBoilScreen.tsx` | 852 | Apps (native) | S, I | P1 | file size 852 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/native/src/modules/brewery/screens/WaterSpargeScreen.tsx` | 827 | Apps (native) | S, I | P1 | file size 827 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `services/api/src/services/recipesLegacyIngredientJsonValidation.ts` | 805 | Platform routes/services | S, I | P1 | file size 805 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
-| `apps/web/app/recipes/[id]/edit/page.tsx` | 3851 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
+| `apps/web/app/recipes/[id]/edit/_components/RecipeEditPageContent.tsx` | 2445 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/water/mash/page.tsx` | 2173 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/native/src/modules/brewery/screens/RecipeEditScreen.tsx` | 2125 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/water/sparge/page.tsx` | 1456 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/water/boil/page.tsx` | 1445 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
+| `apps/web/app/recipes/[id]/edit/_hooks/useRecipeEditPage.ts` | 1324 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/native/src/modules/brewery/screens/WaterMashScreen.tsx` | 1259 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/native/src/modules/brewery/screens/YeastScreen.tsx` | 927 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/native/src/modules/brewery/screens/WaterBoilScreen.tsx` | 852 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
