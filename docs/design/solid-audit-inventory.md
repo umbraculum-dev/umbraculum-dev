@@ -13,12 +13,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Files scanned | 942 |
+| Files scanned | 958 |
 | Roots | `services/api/src`, `packages`, `apps/web/app`, `apps/native/src` |
 | P0 findings | 0 |
-| P1 findings | 4 |
+| P1 findings | 3 |
 | P2 findings | 65 |
-| P3 findings | 39 |
+| P3 findings | 37 |
 
 ---
 
@@ -29,7 +29,6 @@
 | `packages/api-client/src/generated/platform.openapi.ts` | 10161 | Packages | S, I | P1 | file size 10161 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `packages/api-client/src/generated/brewery.openapi.ts` | 4895 | Packages | S, I | P1 | file size 4895 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `packages/beerjson/src/index.ts` | 1073 | Packages | S, I | P1 | file size 1073 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
-| `services/api/src/services/recipesLegacyIngredientJsonValidation.ts` | 805 | Platform routes/services | S, I | P1 | file size 805 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/native/src/modules/brewery/components/water/WaterMashScreenContent.tsx` | 669 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/yeast/page.tsx` | 615 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/water/page.tsx` | 595 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
@@ -82,7 +81,7 @@
 | `apps/native/src/modules/brewery/hooks/useRecipeEditScreenFermentables.ts` | 121 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/edit/_components/sections/RecipeEditMashingSection.tsx` | 118 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/native/src/modules/brewery/hooks/recipeEditScreen/useNativeRecipeEditYeast.ts` | 116 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
-| `apps/native/src/modules/brewery/hooks/yeastScreen/useNativeYeastScreenRows.ts` | 108 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
+| `apps/native/src/modules/brewery/hooks/yeastScreen/useNativeYeastScreenRows.ts` | 111 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/native/src/modules/brewery/hooks/useRecipeEditScreenHops.ts` | 102 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/native/src/modules/brewery/hooks/waterMash/useNativeWaterMashGrist.ts` | 102 | Apps (native) | D | P2 | review client-safe import "@umbraculum/brewery-beerjson" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
 | `apps/web/app/recipes/[id]/water/_lib/waterCalcTypes.ts` | 70 | Apps (web) | D | P2 | review client-safe import "@umbraculum/brewery-recipes-ui" | Confirm package is client-safe per DATA-ACCESS-BOUNDARIES.md |
@@ -98,9 +97,7 @@
 | `apps/web/app/_components/RecipeImportForm.tsx` | 756 | Apps (web) | S, I | P3 | file size 756 LoC | Review logical cohesion |
 | `apps/web/app/[locale]/(brewery)/ferm-data-integration/page.tsx` | 728 | Apps (web) | S, I | P3 | file size 728 LoC | Review logical cohesion |
 | `apps/web/app/recipes/[id]/edit/_components/sections/RecipeEditAnalysisSection.tsx` | 718 | Apps (web) | S, I | P3 | file size 718 LoC | Review logical cohesion |
-| `apps/native/src/modules/brewery/screens/BrewdayStepsSettingsScreen.tsx` | 678 | Apps (native) | S, I | P3 | file size 678 LoC | Review logical cohesion |
 | `apps/native/src/modules/brewery/components/water/WaterMashScreenContent.tsx` | 669 | Apps (native) | S, I | P3 | file size 669 LoC | Review logical cohesion |
-| `apps/native/src/modules/brewery/screens/EquipmentScreen.tsx` | 655 | Apps (native) | S, I | P3 | file size 655 LoC | Review logical cohesion |
 | `services/api/src/services/recipeWaterSettingsService.ts` | 629 | Platform routes/services | S, I | P3 | file size 629 LoC | Review logical cohesion |
 | `apps/web/app/recipes/[id]/yeast/page.tsx` | 615 | Apps (web) | S, I | P3 | file size 615 LoC | Review logical cohesion |
 | `services/api/src/services/rendering/renderingJobService.ts` | 611 | Platform routes/services | S, I | P3 | file size 611 LoC | Review logical cohesion |
