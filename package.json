@@ -25,6 +25,7 @@
     "check-web-url-segments": "tsx scripts/check-web-url-segments.ts",
     "audit:solid-inventory": "tsx scripts/audit/solid-inventory.ts",
     "smoke": "./scripts/smoke.sh",
+    "smoke:stack": "./scripts/dev-stack-smoke.sh",
     "verify:contracts": "./scripts/verify-slice.sh --tier T1 --slice contracts",
     "verify:openapi": "./scripts/verify-slice.sh --tier T1 --slice openapi",
     "verify:api-platform": "./scripts/verify-slice.sh --tier T1 --slice api-platform",

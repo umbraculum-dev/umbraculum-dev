@@ -107,7 +107,17 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
          ```
        - `packages/rendering/node_modules/` is gitignored, so this is a host-only, non-committed bootstrap. Re-run it any time that directory gets wiped (`git clean -fdx`, fresh clone, accidental delete).
        - Same pattern applies if you ever add another workspace package whose built `dist/` imports runtime deps not already in `services/api/package.json` — replace `packages/rendering` in the command above with the offending package path.
+    4. **`tsx` unlink / ci-parity archive disturbed bind mounts** (common after `./scripts/ci-parity-check.sh --archive run` or a long agent session that runs ci-parity then hits the dev stack):
+       ```text
+       tsx unlink in ./../packages/.../node_modules/... Rerunning...
+       Error [ERR_MODULE_NOT_FOUND]: Cannot find package '/packages/contracts/node_modules/zod/index.js'
+       ```
+       Root cause: the `api` dev runner (`tsx watch`) watches bind-mounted `packages/**`; ci-parity (or host-side npm) can unlink/relink files under those trees. tsx restarts mid-relink and Node module resolution breaks. Nginx still serves `/en/login` HTML (200) but every `/api/*` proxy returns **502**.
+       - Fix: `docker compose restart api` and wait for `Server listening at http://127.0.0.1:4000` in api logs. If boot still fails with `ERR_MODULE_NOT_FOUND`, run the package-local `npm install` one-off from item 3 for the package named in the error, then restart api again.
+       - **Prevent:** after ci-parity archive or any change under `services/api/**` / nginx config, run `./scripts/dev-stack-smoke.sh` (or `npm run smoke:stack`) before manual browser testing. See docs/TESTING.md E2E fixture identities if login returns 401.
   - Verify with:
+    - `./scripts/dev-stack-smoke.sh` (health + bearer login + cookie login + `/en/login` page)
+    - Or manually:
     - `curl -sS -o /dev/null -w '%{http_code}\n' http://localhost:18080/api/health` (expect `200`)
     - `curl -sS -o /dev/null -w '%{http_code}\n' -X POST -H 'content-type: application/json' -d '{}' http://localhost:18080/api/auth/login` (expect `400`/`401`, **not** `502`)
 - **Local ports** (repo-local `.env`, not committed; see also `.env.sample` for the discovery doc):

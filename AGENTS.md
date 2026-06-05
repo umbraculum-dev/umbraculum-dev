@@ -327,6 +327,62 @@ Manifest source of truth: `.umbraculum/ci-parity.json` — when adding or
 changing a GHA workflow's verify steps, **add the same commands as a ci-parity
 job** in the manifest; do not invent host-only verification scripts.
 
+## Dev stack health after ci-parity / API / nginx (agent-owned — do not delegate)
+
+When **you** run `./scripts/ci-parity-check.sh` (especially **`--archive`**),
+edit **`services/api/**`**, change **nginx** / **`docker-compose.yml`** api or
+nginx services, or otherwise touch the **live compose stack**, **you** must prove
+the dev stack is still reachable through nginx — **not** the human contributor.
+Do not end a session with “try restarting api” or “run smoke before you test in
+the browser” unless you have already run the sequence below yourself.
+
+**Why this gate exists:** ci-parity runs `npm ci` inside ephemeral Docker
+containers. The live **`api`** service bind-mounts `packages/**` and runs
+`tsx watch`. Archive/ci-parity runs can emit **`unlink`** events under those
+mounts; tsx restarts mid-relink and the api process crashes with
+`ERR_MODULE_NOT_FOUND` (e.g. `packages/contracts` → `zod`). **Nginx still serves
+`/en/login` HTML (200)** but **every `/api/*` proxy returns 502** — including
+`GET /api/auth/me` and `POST /api/auth/login` that the login page needs.
+
+**Triggers — run the mandatory sequence when any of these apply:**
+
+| Trigger | Examples |
+|---------|----------|
+| ci-parity while compose is up | `./scripts/ci-parity-check.sh --archive run`, `npm run verify:pre-push` |
+| API / nginx surface changed | `services/api/**`, nginx config, `docker-compose.yml` api/nginx |
+| User reports 502 on login or `/api/*` | `/en/login` loads but auth calls 502 |
+| You restarted api/web/nginx | Recovery after crash, rule 51 git-tree mutation |
+
+**Mandatory sequence (agent runs this — max ~30s after api is listening):**
+
+1. **`docker compose restart api`** — wait until api logs show
+   `Server listening at http://127.0.0.1:4000` (nginx restart usually **not**
+   required when only the api upstream died).
+2. **`npm run smoke:stack`** (alias for [`scripts/dev-stack-smoke.sh`](scripts/dev-stack-smoke.sh)) —
+   must exit **0**. This checks `/api/health`, **cookie-session**
+   `POST /api/auth/login` (browser UI path), bearer `POST /api/auth/login/native`,
+   `/api/auth/me`, catalog reads, and **`GET /en/login` → 200**.
+3. **If smoke fails on boot** with `ERR_MODULE_NOT_FOUND` from
+   `/packages/<name>/…`: follow [`DEVELOPMENT-LOCAL.md`](DEVELOPMENT-LOCAL.md)
+   § “502 Bad Gateway” items **3–4** (package-local bootstrap if needed), then
+   **`docker compose restart api`** again and re-run step 2.
+4. **If login returns 401** (not 502): seed E2E personas —
+   `docker compose exec api npm run seed:e2e` — then re-run step 2. Credentials:
+   [`docs/TESTING.md`](docs/TESTING.md) § “E2E fixture identities”
+   (`e2e-admin@brewery.local` / `e2e-admin-pw!` by default).
+
+**Relationship to other gates (none substitutes for `smoke:stack` here):**
+
+| Gate | When |
+|------|------|
+| **`api-integration-tests-pre-push`** | Pre-push vitest in api container — does **not** prove nginx → api proxy |
+| **`public-endpoint-verification`** skill | Spot-check a route **you changed** — use **in addition** when declaring UI/API work done |
+| **`smoke:stack`** | **After ci-parity or api/nginx drift** — proves login path through `:18080` |
+
+Optional full UI login (slower): Playwright
+[`apps/web/e2e/smoke/auth.spec.ts`](apps/web/e2e/smoke/auth.spec.ts)
+(`npm run test:smoke` in `apps/web/e2e` workspace).
+
 ## GHA workflow authoring
 
 When adding or editing `.github/workflows/*.yml`:
