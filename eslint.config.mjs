@@ -499,13 +499,14 @@ export default [
   },
 
   // -------------------------------------------------------------------
-  // SOLID WS5 — app import boundaries prototype (warn-level, non-blocking).
+  // SOLID WS5 — app import boundaries (error-level, CI-blocking).
   //
   // Mirrors the API spike structure with an app-scoped pilot:
   //  - forbid apps/* source imports from services/api/**
   //  - forbid sibling segment imports for selected app segment families
   //
-  // Explicitly kept at "warn" for telemetry; do not promote in WS5.
+  // web-water-shared includes water/_lib/** and water/_hooks/** (cross-segment
+  // helpers intentionally shared across mash/sparge/boil segments).
   // -------------------------------------------------------------------
   {
     files: ["apps/{web,native}/**/*.{ts,tsx}"],
@@ -530,7 +531,7 @@ export default [
         },
         {
           type: "web-water-shared",
-          pattern: "apps/web/app/recipes/[[]id[]]/water/_lib/**",
+          pattern: "apps/web/app/recipes/[[]id[]]/water/{_lib,_hooks}/**",
           mode: "full",
         },
         {
@@ -556,7 +557,7 @@ export default [
     rules: {
       "boundaries/no-unknown-files": "off",
       "boundaries/element-types": [
-        "warn",
+        "error",
         {
           default: "allow",
           message:

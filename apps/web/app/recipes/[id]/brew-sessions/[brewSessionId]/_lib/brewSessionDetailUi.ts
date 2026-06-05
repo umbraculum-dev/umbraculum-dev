@@ -139,6 +139,62 @@ export function isStepCompleteForSection(s: BrewSessionStep): boolean {
   return s.status === "done" || s.status === "not_applicable" || s.status === "skipped";
 }
 
+export type BrewSessionSectionStatus = "pending" | "in_progress" | "done" | "forced_finished";
+
+export function computeBrewSessionSectionStatus(params: {
+  steps: BrewSessionStep[];
+  sessionStatus: BrewSession["status"] | undefined;
+  stoppedBy: string;
+}): BrewSessionSectionStatus {
+  const { steps, sessionStatus, stoppedBy } = params;
+  const sectionDone = steps.length > 0 && steps.every(isStepCompleteForSection);
+  const sectionHasAnyDone = steps.some((s) => s.status === "done");
+  const sectionHasAnyTimerStarted = steps.some(
+    (s) => !!s.timerStartedAt || (s.timerAccumulatedSeconds ?? 0) > 0 || s.timerState !== "idle",
+  );
+  const sectionInProgress = !sectionDone && (sectionHasAnyDone || sectionHasAnyTimerStarted);
+  const sectionForcedFinished = sessionStatus === "stopped" && stoppedBy === "manual" && !sectionDone;
+  if (sectionDone) return "done";
+  if (sectionForcedFinished) return "forced_finished";
+  if (sectionInProgress) return "in_progress";
+  return "pending";
+}
+
+export function brewSessionSectionPillStyles(status: BrewSessionSectionStatus) {
+  if (status === "done") {
+    return {
+      bg: "color-mix(in srgb, var(--success) 18%, var(--surface))",
+      borderColor: "color-mix(in srgb, var(--success) 40%, var(--border))",
+      textColor: "var(--text)",
+    };
+  }
+  if (status === "forced_finished" || status === "in_progress") {
+    return {
+      bg: "color-mix(in srgb, var(--warning) 18%, var(--surface))",
+      borderColor: "color-mix(in srgb, var(--warning) 40%, var(--border))",
+      textColor: "var(--text)",
+    };
+  }
+  return {
+    bg: "color-mix(in srgb, var(--info) 14%, var(--surface))",
+    borderColor: "color-mix(in srgb, var(--info) 35%, var(--border))",
+    textColor: "var(--text)",
+  };
+}
+
+export function findSectionAnchorStep(
+  sectionId: string,
+  steps: BrewSessionStep[],
+  anchorName: string,
+): BrewSessionStep | null {
+  if (steps.length === 0) return null;
+  const first = steps.reduce((a, b) => (a.sortOrder < b.sortOrder ? a : b));
+  if (sectionId === "mash" || sectionId === "boil") {
+    return steps.find((s) => s.name === anchorName) ?? first;
+  }
+  return null;
+}
+
 export function isStepDirtyForLogs(s: BrewSessionStep, stepsBaselineById: Record<string, BrewSessionStepBaseline>): boolean {
   const baseline = stepsBaselineById[s.id];
   if (!baseline) return false;

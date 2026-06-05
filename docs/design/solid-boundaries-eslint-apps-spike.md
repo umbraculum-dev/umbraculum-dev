@@ -1,7 +1,7 @@
 # SOLID boundaries eslint spike — eslint-plugin-boundaries on apps/web + apps/native
 
 **Tier:** Internal  
-**Status:** Frozen (2026-06-05) — SOLID Phase 3 / WS5 deliverable  
+**Status:** Frozen (2026-06-05) — SOLID Phase 3 / WS5 deliverable (warn pilot → **error burn-in** 2026-06-05)  
 **Audience:** app maintainers, lint/CI maintainers  
 **Related:** [solid-boundaries-eslint-spike.md](./solid-boundaries-eslint-spike.md), [solid-decoupling-audit.md](./solid-decoupling-audit.md), [LINTING.md](../LINTING.md)
 
@@ -124,7 +124,9 @@
 
 ### Error-level / merge-blocking adoption
 
-**NOT SOUND (yet)** — this spike does not include a stabilization cycle proving warning volume and developer ergonomics over time; keep as warn until that evidence exists.
+**SOUND (2026-06-05 burn-in)** — promoted to `error` after extending `web-water-shared` to include
+`water/_hooks/**` (cross-segment mash/sparge/boil helpers). Zero remaining WS5 violations on
+`master` at promotion time; sibling-segment fence + app→API fence are CI-blocking.
 
 ---
 
@@ -139,9 +141,9 @@
 
 | Action | Owner | When |
 |--------|-------|------|
-| Keep WS5 scope at **warn** in root ESLint config | SOLID Phase 3 | now |
-| Observe warning telemetry on active app feature branches | app maintainers | next cycle |
-| Reassess warn -> error promotion with measured noise budget | SOLID follow-up | after telemetry |
+| Keep WS5 app boundaries at **error** in root ESLint config | SOLID Phase 3 | done (2026-06-05) |
+| Observe warning telemetry on active app feature branches | app maintainers | ongoing |
+| Expand web sibling boundaries beyond water segments when telemetry supports it | SOLID follow-up | deferred |
 
 ---
 
