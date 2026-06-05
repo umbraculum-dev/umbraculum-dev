@@ -11,8 +11,6 @@ import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipe
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { roundTo } from "../_lib/recipeEditHelpers";
-import { useRecipeEditActions } from "./useRecipeEditActions";
-import { useRecipeEditBrewSessions } from "./useRecipeEditBrewSessions";
 import { useRecipeEditCatalogs } from "./useRecipeEditCatalogs";
 import { useRecipeEditFermentables } from "./useRecipeEditFermentables";
 import { useRecipeEditHops } from "./useRecipeEditHops";
@@ -20,6 +18,7 @@ import { useRecipeEditLayout } from "./useRecipeEditLayout";
 import { useRecipeEditLoad } from "./useRecipeEditLoad";
 import { useRecipeEditMashing } from "./useRecipeEditMashing";
 import { useRecipeEditMisc } from "./useRecipeEditMisc";
+import { useRecipeEditSave } from "./useRecipeEditSave";
 import { useRecipeEditSections } from "./useRecipeEditSections";
 import { useRecipeEditYeast } from "./useRecipeEditYeast";
 import type { YeastSearchResult } from "../_lib/recipeEditTypes";
@@ -79,13 +78,7 @@ export function useRecipeEditPage() {
     setAnalysis,
   });
 
-  const brewSessions = useRecipeEditBrewSessions({
-    canCall: canCallAccountScoped,
-    recipeId,
-    routerPush: router.push,
-  });
-
-  const actions = useRecipeEditActions({
+  const save = useRecipeEditSave({
     t,
     tEquip,
     recipeId,
@@ -149,23 +142,23 @@ export function useRecipeEditPage() {
     setSurfaceMath,
     loading: load.loading,
     loadError: load.loadError,
-    saving: actions.saving,
-    saveError: actions.saveError,
-    saveStatus: actions.saveStatus,
-    setSaveStatus: actions.setSaveStatus,
+    saving: save.saving,
+    saveError: save.saveError,
+    saveStatus: save.saveStatus,
+    setSaveStatus: save.setSaveStatus,
     recipe: load.recipe,
     analysis,
     versions: load.versions,
     _versionsLoading: load._versionsLoading,
     versionsError: load.versionsError,
-    creatingVersion: actions.creatingVersion,
-    createVersionError: actions.createVersionError,
-    duplicatingRecipe: actions.duplicatingRecipe,
-    creatingBrewSession: brewSessions.creatingBrewSession,
-    brewSessionError: brewSessions.brewSessionError,
-    brewSessions: brewSessions.brewSessions,
-    brewSessionsLoading: brewSessions.brewSessionsLoading,
-    duplicateRecipeError: actions.duplicateRecipeError,
+    creatingVersion: save.creatingVersion,
+    createVersionError: save.createVersionError,
+    duplicatingRecipe: save.duplicatingRecipe,
+    creatingBrewSession: save.creatingBrewSession,
+    brewSessionError: save.brewSessionError,
+    brewSessions: save.brewSessions,
+    brewSessionsLoading: save.brewSessionsLoading,
+    duplicateRecipeError: save.duplicateRecipeError,
     name: load.name,
     setName: load.setName,
     styleKey: load.styleKey,
@@ -197,8 +190,8 @@ export function useRecipeEditPage() {
     equipmentProfilesError: catalogs.equipmentProfilesError,
     selectedEquipmentProfileId: catalogs.selectedEquipmentProfileId,
     setSelectedEquipmentProfileId: catalogs.setSelectedEquipmentProfileId,
-    equipmentApplyError: actions.equipmentApplyError,
-    equipmentApplying: actions.equipmentApplying,
+    equipmentApplyError: save.equipmentApplyError,
+    equipmentApplying: save.equipmentApplying,
     fermentableQuery: fermentables.fermentableQuery,
     setFermentableQuery: fermentables.setFermentableQuery,
     fermentableResults: fermentables.fermentableResults,
@@ -214,16 +207,16 @@ export function useRecipeEditPage() {
     waterVolumes: mashing.waterVolumes,
     spargeConfigured: mashing.spargeConfigured,
     mashRowsFiltered: mashing.mashRowsFiltered,
-    programmedSessions: brewSessions.programmedSessions,
-    brewingNowSessions: brewSessions.brewingNowSessions,
-    lastBrewSessions: brewSessions.lastBrewSessions,
+    programmedSessions: save.programmedSessions,
+    brewingNowSessions: save.brewingNowSessions,
+    lastBrewSessions: save.lastBrewSessions,
     spargeStepTempDisplay: mashing.spargeStepTempDisplay,
     spargeMethodLabel: mashing.spargeMethodLabel,
-    applyEquipmentProfileToRecipe: actions.applyEquipmentProfileToRecipe,
-    onSave: actions.onSave,
-    onCreateAnotherVersion: actions.onCreateAnotherVersion,
-    onDuplicateRecipe: actions.onDuplicateRecipe,
-    onBrewRecipe: brewSessions.onBrewRecipe,
+    applyEquipmentProfileToRecipe: save.applyEquipmentProfileToRecipe,
+    onSave: save.onSave,
+    onCreateAnotherVersion: save.onCreateAnotherVersion,
+    onDuplicateRecipe: save.onDuplicateRecipe,
+    onBrewRecipe: save.onBrewRecipe,
     addGristRow: fermentables.addGristRow,
     addFermentableFromDb: fermentables.addFermentableFromDb,
     addHopFromDb: hops.addHopFromDb,

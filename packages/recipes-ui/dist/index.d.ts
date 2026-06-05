@@ -77,6 +77,7 @@ interface MashStepsEditorProps {
     locale: string;
     formatFixed: (locale: string, value: number, decimals: number) => string;
 }
+
 declare function MashStepsEditor(props: MashStepsEditorProps): react_jsx_runtime.JSX.Element;
 
 interface SpargeStepReadOnlyRowProps {

@@ -185,13 +185,372 @@ function SaltAdditionsEditor(props) {
 
 // src/mash/MashStepsEditor.tsx
 import "react";
+import { YStack as YStack5 } from "tamagui";
+import { Text as Text6 } from "@umbraculum/ui";
+
+// src/mash/MashStepRow.tsx
+import "react";
+import { XStack as XStack3, YStack as YStack4 } from "tamagui";
+import { MASH_STEP_TYPE_OPTIONS } from "@umbraculum/brewery-beerjson";
+import { BrewCheckbox, Card as Card4, Input as Input3, ReadOnlyField, ReadOnlyFieldRow, SelectField as SelectField2, Text as Text5 } from "@umbraculum/ui";
+
+// src/mash/MashStepsToolbar.tsx
+import "react";
 import { XStack as XStack2, YStack as YStack3 } from "tamagui";
-import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@umbraculum/brewery-beerjson";
-import { BrewCheckbox, Button as Button2, Card as Card3, Input as Input2, ReadOnlyField, ReadOnlyFieldRow, SelectField as SelectField2, Text as Text4 } from "@umbraculum/ui";
+import { MASH_TEMPLATES } from "@umbraculum/brewery-beerjson";
+import { Button as Button2, Card as Card3, Input as Input2, Text as Text4 } from "@umbraculum/ui";
 import { Fragment, jsx as jsx3, jsxs as jsxs4 } from "react/jsx-runtime";
-function stepTypeOptions(hideSparge) {
-  return hideSparge ? MASH_STEP_TYPE_OPTIONS.filter((o) => o.value !== "sparge") : MASH_STEP_TYPE_OPTIONS;
+function MashProcedureEditor(props) {
+  const { mashProcedure, onUpdateProcedure, t } = props;
+  return /* @__PURE__ */ jsxs4(Card3, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
+    /* @__PURE__ */ jsx3(Text4, { fontSize: 12, fontWeight: "700", children: t("mashingProcedureName") }),
+    /* @__PURE__ */ jsx3(
+      Input2,
+      {
+        value: mashProcedure.name,
+        onChangeText: (text) => onUpdateProcedure({ name: text }),
+        size: "$3",
+        background: "$background",
+        borderWidth: 1,
+        borderColor: "$borderColor"
+      }
+    ),
+    /* @__PURE__ */ jsx3(Text4, { fontSize: 12, fontWeight: "700", marginTop: "$2", children: t("mashingGrainTemp") }),
+    /* @__PURE__ */ jsx3(
+      Input2,
+      {
+        keyboardType: "decimal-pad",
+        value: String(mashProcedure.grainTemperatureC),
+        onChangeText: (text) => {
+          const v = Number(text);
+          onUpdateProcedure({ grainTemperatureC: Number.isFinite(v) ? v : mashProcedure.grainTemperatureC });
+        },
+        size: "$3",
+        background: "$background",
+        borderWidth: 1,
+        borderColor: "$borderColor"
+      }
+    )
+  ] });
 }
+function MashStepRowActions(props) {
+  const { index: idx, rowId, move, onMoveStep, onDeleteStep, t } = props;
+  const { canReorder, disableMoveUp, disableMoveDown } = move;
+  return /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", alignItems: "center", children: [
+    canReorder ? /* @__PURE__ */ jsxs4(Fragment, { children: [
+      /* @__PURE__ */ jsx3(
+        Button2,
+        {
+          size: "$2",
+          chromeless: true,
+          disabled: disableMoveUp,
+          onPress: () => onMoveStep?.(rowId, "up"),
+          accessibilityLabel: t("moveUp"),
+          children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("moveUp") })
+        }
+      ),
+      /* @__PURE__ */ jsx3(
+        Button2,
+        {
+          size: "$2",
+          chromeless: true,
+          disabled: disableMoveDown,
+          onPress: () => onMoveStep?.(rowId, "down"),
+          accessibilityLabel: t("moveDown"),
+          children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("moveDown") })
+        }
+      )
+    ] }) : null,
+    idx > 0 && onDeleteStep ? /* @__PURE__ */ jsx3(Button2, { size: "$2", chromeless: true, onPress: () => onDeleteStep(rowId), children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
+  ] });
+}
+function MashStepsToolbar(props) {
+  const { onAddStep, onAddFromTemplate, onSave, canSave = false, saving = false, saveStatus = null, t } = props;
+  const hasAddControls = Boolean(onAddStep) || Boolean(onAddFromTemplate);
+  const hasSaveControls = Boolean(onSave);
+  if (!hasAddControls && !hasSaveControls) {
+    return null;
+  }
+  return /* @__PURE__ */ jsxs4(Fragment, { children: [
+    hasAddControls ? /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
+      onAddStep ? /* @__PURE__ */ jsx3(Button2, { size: "$3", onPress: onAddStep, children: /* @__PURE__ */ jsx3(Text4, { children: t("mashingAddStep") }) }) : null,
+      onAddFromTemplate ? /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
+        /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, opacity: 0.8, children: [
+          t("mashingAddFromTemplate"),
+          ":"
+        ] }),
+        MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ jsx3(Button2, { size: "$3", chromeless: true, onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
+      ] }) : null
+    ] }) : null,
+    hasSaveControls ? /* @__PURE__ */ jsxs4(YStack3, { gap: "$2", children: [
+      /* @__PURE__ */ jsx3(Button2, { size: "$3", onPress: onSave, disabled: !canSave || saving, children: /* @__PURE__ */ jsx3(Text4, { children: saving ? t("saving") : t("mashingSaveMashSteps") }) }),
+      saveStatus ? /* @__PURE__ */ jsx3(Card3, { gap: "$1", padding: "$2", background: "$color4", borderWidth: 1, borderColor: "$borderColor", children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: saveStatus }) }) : null
+    ] }) : null
+  ] });
+}
+
+// src/mash/MashStepRow.tsx
+import { Fragment as Fragment2, jsx as jsx4, jsxs as jsxs5 } from "react/jsx-runtime";
+function MashStepsReadOnlyView(props) {
+  const { mashRows, mashProcedure = null, waterVolumes, cardBackgroundColor, cardBorderColor, t, tUnits, locale, formatFixed } = props;
+  return /* @__PURE__ */ jsxs5(YStack4, { gap: "$2", children: [
+    mashProcedure ? /* @__PURE__ */ jsxs5(Text5, { fontSize: 12, opacity: 0.8, children: [
+      mashProcedure.name,
+      " \xB7 ",
+      t("mashingGrainTemp"),
+      ": ",
+      mashProcedure.grainTemperatureC,
+      " \xB0C"
+    ] }) : null,
+    mashRows.length ? mashRows.map((r, idx) => /* @__PURE__ */ jsx4(
+      MashStepRow,
+      {
+        readOnly: true,
+        row: r,
+        index: idx,
+        waterVolumes,
+        cardBackgroundColor,
+        cardBorderColor,
+        t,
+        tUnits,
+        locale,
+        formatFixed
+      },
+      r.id
+    )) : /* @__PURE__ */ jsx4(Text5, { fontSize: 12, opacity: 0.8, children: t("mashingEmpty") })
+  ] });
+}
+function MashStepRow(props) {
+  if (props.readOnly) {
+    const { row: r2, index: idx2, waterVolumes: waterVolumes2, cardBackgroundColor, cardBorderColor, t: t2, tUnits: tUnits2, locale: locale2, formatFixed: formatFixed2 } = props;
+    const isSpargeStep2 = r2.type === "sparge" && r2.name.trim().toLowerCase() === "sparge";
+    const amountDisplay = isSpargeStep2 && waterVolumes2 ? formatFixed2(locale2, waterVolumes2.spargeLiters, 2) : r2.amountL != null && Number.isFinite(r2.amountL) ? formatFixed2(locale2, r2.amountL, 2) : null;
+    const typeLabel = MASH_STEP_TYPE_OPTIONS.find((o) => o.value === r2.type)?.label ?? r2.type;
+    return /* @__PURE__ */ jsxs5(
+      Card4,
+      {
+        "data-mash-step-card": true,
+        ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
+        gap: "$2",
+        padding: "$3",
+        backgroundColor: cardBackgroundColor ?? "$background",
+        borderWidth: 1,
+        borderColor: cardBorderColor ?? "$borderColor",
+        children: [
+          /* @__PURE__ */ jsxs5(Text5, { fontSize: 12, fontWeight: "700", children: [
+            idx2 + 1,
+            ". ",
+            r2.name
+          ] }),
+          /* @__PURE__ */ jsxs5(ReadOnlyFieldRow, { children: [
+            /* @__PURE__ */ jsx4(ReadOnlyField, { label: t2("mashingStepType"), value: typeLabel, minWidth: 120, flex: 1 }),
+            /* @__PURE__ */ jsx4(
+              ReadOnlyField,
+              {
+                label: t2("mashingStepTemp", { unit: "\xB0C" }),
+                value: String(r2.stepTemperatureC),
+                minWidth: 90
+              }
+            ),
+            /* @__PURE__ */ jsx4(
+              ReadOnlyField,
+              {
+                label: t2("mashingStepTime", { unit: "min" }),
+                value: String(r2.stepTimeMin),
+                minWidth: 90
+              }
+            ),
+            /* @__PURE__ */ jsx4(
+              ReadOnlyField,
+              {
+                label: t2("mashingStepAmount", { unit: "L" }),
+                value: amountDisplay != null ? /* @__PURE__ */ jsxs5(Fragment2, { children: [
+                  amountDisplay,
+                  " ",
+                  tUnits2("L")
+                ] }) : "\u2014",
+                minWidth: 120
+              }
+            )
+          ] })
+        ]
+      },
+      r2.id
+    );
+  }
+  const {
+    row: r,
+    index: idx,
+    editState,
+    waterVolumes,
+    firstStepAmountComputed = null,
+    onUpdateStep,
+    onMoveStep,
+    onDeleteStep,
+    t,
+    tUnits,
+    locale,
+    formatFixed
+  } = props;
+  const { isSpargeStep, disableName, disableType, disableAmount, typeValue, typeOptions, move } = editState;
+  return /* @__PURE__ */ jsxs5(Card4, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
+    /* @__PURE__ */ jsxs5(XStack3, { justifyContent: "space-between", alignItems: "center", children: [
+      /* @__PURE__ */ jsxs5(Text5, { fontSize: 14, fontWeight: "700", children: [
+        idx + 1,
+        ". ",
+        r.name || t("mashingStepName")
+      ] }),
+      /* @__PURE__ */ jsx4(
+        MashStepRowActions,
+        {
+          index: idx,
+          rowId: r.id,
+          move,
+          onMoveStep,
+          onDeleteStep,
+          t
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxs5(YStack4, { gap: "$2", children: [
+      /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", children: [
+        /* @__PURE__ */ jsx4(Text5, { fontSize: 11, opacity: 0.8, children: t("mashingStepName") }),
+        disableName ? /* @__PURE__ */ jsx4(Text5, { fontSize: 12, opacity: 0.85, children: isSpargeStep ? "Sparge" : r.name || "Mash In" }) : /* @__PURE__ */ jsx4(
+          Input3,
+          {
+            value: r.name,
+            onChangeText: (text) => onUpdateStep?.(r.id, { name: text }),
+            size: "$3",
+            background: "$background",
+            borderWidth: 1,
+            borderColor: "$borderColor"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", children: [
+        /* @__PURE__ */ jsx4(Text5, { fontSize: 11, opacity: 0.8, children: t("mashingStepType") }),
+        disableType ? /* @__PURE__ */ jsx4(Text5, { fontSize: 12, opacity: 0.85, children: "Sparge" }) : /* @__PURE__ */ jsx4(
+          SelectField2,
+          {
+            value: typeValue,
+            onValueChange: (v) => onUpdateStep?.(r.id, { type: v }),
+            options: typeOptions,
+            width: "full",
+            "aria-label": t("mashingStepType")
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxs5(XStack3, { gap: "$2", flexWrap: "wrap", children: [
+        /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", flex: 1, minWidth: 120, children: [
+          /* @__PURE__ */ jsx4(Text5, { fontSize: 11, opacity: 0.8, children: t("mashingStepTemp", { unit: "\xB0C" }) }),
+          /* @__PURE__ */ jsx4(
+            Input3,
+            {
+              keyboardType: "decimal-pad",
+              value: String(r.stepTemperatureC),
+              onChangeText: (text) => onUpdateStep?.(r.id, { stepTemperatureC: Number(text) || 0 }),
+              size: "$3",
+              background: "$background",
+              borderWidth: 1,
+              borderColor: "$borderColor"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", flex: 1, minWidth: 120, children: [
+          /* @__PURE__ */ jsx4(Text5, { fontSize: 11, opacity: 0.8, children: t("mashingStepTime", { unit: "min" }) }),
+          /* @__PURE__ */ jsx4(
+            Input3,
+            {
+              keyboardType: "decimal-pad",
+              value: String(r.stepTimeMin),
+              onChangeText: (text) => onUpdateStep?.(r.id, { stepTimeMin: Math.max(0, Number(text) || 0) }),
+              size: "$3",
+              background: "$background",
+              borderWidth: 1,
+              borderColor: "$borderColor"
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", children: [
+        /* @__PURE__ */ jsx4(Text5, { fontSize: 11, opacity: 0.8, children: t("mashingStepAmount", { unit: tUnits("L") }) }),
+        isSpargeStep ? /* @__PURE__ */ jsx4(Text5, { fontSize: 12, opacity: 0.85, children: waterVolumes ? `${formatFixed(locale, waterVolumes.spargeLiters, 2)} ${tUnits("L")}` : "\u2014" }) : idx === 0 && firstStepAmountComputed != null ? /* @__PURE__ */ jsxs5(Text5, { fontSize: 12, opacity: 0.85, children: [
+          formatFixed(locale, firstStepAmountComputed, 2),
+          " ",
+          tUnits("L")
+        ] }) : /* @__PURE__ */ jsx4(
+          Input3,
+          {
+            keyboardType: "decimal-pad",
+            value: r.amountL != null ? String(r.amountL) : "",
+            onChangeText: (text) => onUpdateStep?.(r.id, { amountL: text.trim() ? Math.max(0, Number(text) || 0) : null }),
+            placeholder: "\u2014",
+            size: "$3",
+            background: "$background",
+            borderWidth: 1,
+            borderColor: "$borderColor",
+            disabled: disableAmount
+          }
+        )
+      ] }),
+      idx > 0 ? /* @__PURE__ */ jsxs5(XStack3, { gap: "$2", alignItems: "center", children: [
+        /* @__PURE__ */ jsx4(
+          BrewCheckbox,
+          {
+            id: `mash-step-deduce-${r.id}`,
+            checked: r.deduceFromMashIn === true,
+            onCheckedChange: (checked) => onUpdateStep?.(r.id, {
+              deduceFromMashIn: checked === true
+            }),
+            size: "$2",
+            accessibilityLabel: t("mashingDeduceFromMashIn"),
+            accessibilityRole: "checkbox"
+          }
+        ),
+        /* @__PURE__ */ jsx4(Text5, { fontSize: 12, opacity: 0.85, children: t("mashingDeduceFromMashIn") })
+      ] }) : null
+    ] })
+  ] }, r.id);
+}
+
+// src/mash/useMashStepsEditorState.ts
+import { MASH_STEP_TYPE_OPTIONS as MASH_STEP_TYPE_OPTIONS2 } from "@umbraculum/brewery-beerjson";
+function isSpargeRow(r) {
+  return r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+}
+function stepTypeOptions(hideSparge) {
+  return hideSparge ? MASH_STEP_TYPE_OPTIONS2.filter((o) => o.value !== "sparge") : MASH_STEP_TYPE_OPTIONS2;
+}
+function useMashStepsEditorState(mashRows, options) {
+  const { hideSpargeFromTypeOptions = false, onMoveStep, firstStepAmountComputed = null } = options;
+  const movableIndices = mashRows.map((r, idx) => ({ r, idx })).filter(({ r, idx }) => idx > 0 && !isSpargeRow(r)).map(({ idx }) => idx);
+  const firstMovableIdx = movableIndices.length ? movableIndices[0] : null;
+  const lastMovableIdx = movableIndices.length ? movableIndices[movableIndices.length - 1] : null;
+  function getRowEditState(r, idx) {
+    const isSpargeStep = isSpargeRow(r);
+    const disableName = isSpargeStep || idx === 0 && firstStepAmountComputed != null;
+    const disableType = isSpargeStep;
+    const disableAmount = isSpargeStep || idx === 0 && firstStepAmountComputed != null || idx > 0 && r.deduceFromMashIn !== true;
+    const typeOptions = stepTypeOptions(hideSpargeFromTypeOptions);
+    const typeValue = r.type;
+    const canReorder = Boolean(onMoveStep) && idx > 0 && !isSpargeStep;
+    const disableMoveUp = !canReorder || firstMovableIdx == null || idx === firstMovableIdx;
+    const disableMoveDown = !canReorder || lastMovableIdx == null || idx === lastMovableIdx;
+    return {
+      isSpargeStep,
+      disableName,
+      disableType,
+      disableAmount,
+      typeValue,
+      typeOptions,
+      move: { canReorder, disableMoveUp, disableMoveDown }
+    };
+  }
+  return { getRowEditState };
+}
+
+// src/mash/MashStepsEditor.tsx
+import { jsx as jsx5, jsxs as jsxs6 } from "react/jsx-runtime";
 function MashStepsEditor(props) {
   const {
     mashRows,
@@ -218,281 +577,72 @@ function MashStepsEditor(props) {
     locale,
     formatFixed
   } = props;
-  const isSpargeRow = (r) => r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
-  const movableIndices = mashRows.map((r, idx) => ({ r, idx })).filter(({ r, idx }) => idx > 0 && !isSpargeRow(r)).map(({ idx }) => idx);
-  const firstMovableIdx = movableIndices.length ? movableIndices[0] : null;
-  const lastMovableIdx = movableIndices.length ? movableIndices[movableIndices.length - 1] : null;
+  const { getRowEditState } = useMashStepsEditorState(mashRows, {
+    hideSpargeFromTypeOptions,
+    onMoveStep,
+    firstStepAmountComputed
+  });
   if (readOnly) {
-    return /* @__PURE__ */ jsxs4(YStack3, { gap: "$2", children: [
-      mashProcedure ? /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, opacity: 0.8, children: [
-        mashProcedure.name,
-        " \xB7 ",
-        t("mashingGrainTemp"),
-        ": ",
-        mashProcedure.grainTemperatureC,
-        " \xB0C"
-      ] }) : null,
-      mashRows.length ? mashRows.map((r, idx) => {
-        const isSpargeStep = r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
-        const amountDisplay = isSpargeStep && waterVolumes ? formatFixed(locale, waterVolumes.spargeLiters, 2) : r.amountL != null && Number.isFinite(r.amountL) ? formatFixed(locale, r.amountL, 2) : null;
-        const typeLabel = MASH_STEP_TYPE_OPTIONS.find((o) => o.value === r.type)?.label ?? r.type;
-        return /* @__PURE__ */ jsxs4(
-          Card3,
-          {
-            "data-mash-step-card": true,
-            ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
-            gap: "$2",
-            padding: "$3",
-            backgroundColor: cardBackgroundColor ?? "$background",
-            borderWidth: 1,
-            borderColor: cardBorderColor ?? "$borderColor",
-            children: [
-              /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, fontWeight: "700", children: [
-                idx + 1,
-                ". ",
-                r.name
-              ] }),
-              /* @__PURE__ */ jsxs4(ReadOnlyFieldRow, { children: [
-                /* @__PURE__ */ jsx3(ReadOnlyField, { label: t("mashingStepType"), value: typeLabel, minWidth: 120, flex: 1 }),
-                /* @__PURE__ */ jsx3(
-                  ReadOnlyField,
-                  {
-                    label: t("mashingStepTemp", { unit: "\xB0C" }),
-                    value: String(r.stepTemperatureC),
-                    minWidth: 90
-                  }
-                ),
-                /* @__PURE__ */ jsx3(
-                  ReadOnlyField,
-                  {
-                    label: t("mashingStepTime", { unit: "min" }),
-                    value: String(r.stepTimeMin),
-                    minWidth: 90
-                  }
-                ),
-                /* @__PURE__ */ jsx3(
-                  ReadOnlyField,
-                  {
-                    label: t("mashingStepAmount", { unit: "L" }),
-                    value: amountDisplay != null ? /* @__PURE__ */ jsxs4(Fragment, { children: [
-                      amountDisplay,
-                      " ",
-                      tUnits("L")
-                    ] }) : "\u2014",
-                    minWidth: 120
-                  }
-                )
-              ] })
-            ]
-          },
-          r.id
-        );
-      }) : /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.8, children: t("mashingEmpty") })
-    ] });
+    return /* @__PURE__ */ jsx5(
+      MashStepsReadOnlyView,
+      {
+        mashRows,
+        mashProcedure,
+        waterVolumes,
+        cardBackgroundColor,
+        cardBorderColor,
+        t,
+        tUnits,
+        locale,
+        formatFixed
+      }
+    );
   }
-  return /* @__PURE__ */ jsxs4(YStack3, { gap: "$3", children: [
-    mashWaterBudgetLiters != null ? /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.8, children: t("mashStepsWaterBudgetNote") }) : null,
-    mashProcedure && onUpdateProcedure ? /* @__PURE__ */ jsxs4(Card3, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
-      /* @__PURE__ */ jsx3(Text4, { fontSize: 12, fontWeight: "700", children: t("mashingProcedureName") }),
-      /* @__PURE__ */ jsx3(
-        Input2,
-        {
-          value: mashProcedure.name,
-          onChangeText: (text) => onUpdateProcedure({ name: text }),
-          size: "$3",
-          background: "$background",
-          borderWidth: 1,
-          borderColor: "$borderColor"
-        }
-      ),
-      /* @__PURE__ */ jsx3(Text4, { fontSize: 12, fontWeight: "700", marginTop: "$2", children: t("mashingGrainTemp") }),
-      /* @__PURE__ */ jsx3(
-        Input2,
-        {
-          keyboardType: "decimal-pad",
-          value: String(mashProcedure.grainTemperatureC),
-          onChangeText: (text) => {
-            const v = Number(text);
-            onUpdateProcedure({ grainTemperatureC: Number.isFinite(v) ? v : mashProcedure.grainTemperatureC });
-          },
-          size: "$3",
-          background: "$background",
-          borderWidth: 1,
-          borderColor: "$borderColor"
-        }
-      )
-    ] }) : null,
-    mashRows.map((r, idx) => {
-      const isSpargeStep = isSpargeRow(r);
-      const disableName = isSpargeStep || idx === 0 && firstStepAmountComputed != null;
-      const disableType = isSpargeStep;
-      const disableAmount = isSpargeStep || idx === 0 && firstStepAmountComputed != null || idx > 0 && r.deduceFromMashIn !== true;
-      const typeOptions = stepTypeOptions(hideSpargeFromTypeOptions);
-      const typeValue = r.type;
-      const canReorder = Boolean(onMoveStep) && idx > 0 && !isSpargeStep;
-      const disableMoveUp = !canReorder || firstMovableIdx == null || idx === firstMovableIdx;
-      const disableMoveDown = !canReorder || lastMovableIdx == null || idx === lastMovableIdx;
-      return /* @__PURE__ */ jsxs4(Card3, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
-        /* @__PURE__ */ jsxs4(XStack2, { justifyContent: "space-between", alignItems: "center", children: [
-          /* @__PURE__ */ jsxs4(Text4, { fontSize: 14, fontWeight: "700", children: [
-            idx + 1,
-            ". ",
-            r.name || t("mashingStepName")
-          ] }),
-          /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", alignItems: "center", children: [
-            canReorder ? /* @__PURE__ */ jsxs4(Fragment, { children: [
-              /* @__PURE__ */ jsx3(
-                Button2,
-                {
-                  size: "$2",
-                  chromeless: true,
-                  disabled: disableMoveUp,
-                  onPress: () => onMoveStep?.(r.id, "up"),
-                  accessibilityLabel: t("moveUp"),
-                  children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("moveUp") })
-                }
-              ),
-              /* @__PURE__ */ jsx3(
-                Button2,
-                {
-                  size: "$2",
-                  chromeless: true,
-                  disabled: disableMoveDown,
-                  onPress: () => onMoveStep?.(r.id, "down"),
-                  accessibilityLabel: t("moveDown"),
-                  children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("moveDown") })
-                }
-              )
-            ] }) : null,
-            idx > 0 && onDeleteStep ? /* @__PURE__ */ jsx3(Button2, { size: "$2", chromeless: true, onPress: () => onDeleteStep(r.id), children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs4(YStack3, { gap: "$2", children: [
-          /* @__PURE__ */ jsxs4(YStack3, { gap: "$1", children: [
-            /* @__PURE__ */ jsx3(Text4, { fontSize: 11, opacity: 0.8, children: t("mashingStepName") }),
-            disableName ? /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.85, children: isSpargeStep ? "Sparge" : r.name || "Mash In" }) : /* @__PURE__ */ jsx3(
-              Input2,
-              {
-                value: r.name,
-                onChangeText: (text) => onUpdateStep?.(r.id, { name: text }),
-                size: "$3",
-                background: "$background",
-                borderWidth: 1,
-                borderColor: "$borderColor"
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxs4(YStack3, { gap: "$1", children: [
-            /* @__PURE__ */ jsx3(Text4, { fontSize: 11, opacity: 0.8, children: t("mashingStepType") }),
-            disableType ? /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.85, children: "Sparge" }) : /* @__PURE__ */ jsx3(
-              SelectField2,
-              {
-                value: typeValue,
-                onValueChange: (v) => onUpdateStep?.(r.id, { type: v }),
-                options: typeOptions,
-                width: "full",
-                "aria-label": t("mashingStepType")
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", flexWrap: "wrap", children: [
-            /* @__PURE__ */ jsxs4(YStack3, { gap: "$1", flex: 1, minWidth: 120, children: [
-              /* @__PURE__ */ jsx3(Text4, { fontSize: 11, opacity: 0.8, children: t("mashingStepTemp", { unit: "\xB0C" }) }),
-              /* @__PURE__ */ jsx3(
-                Input2,
-                {
-                  keyboardType: "decimal-pad",
-                  value: String(r.stepTemperatureC),
-                  onChangeText: (text) => onUpdateStep?.(r.id, { stepTemperatureC: Number(text) || 0 }),
-                  size: "$3",
-                  background: "$background",
-                  borderWidth: 1,
-                  borderColor: "$borderColor"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxs4(YStack3, { gap: "$1", flex: 1, minWidth: 120, children: [
-              /* @__PURE__ */ jsx3(Text4, { fontSize: 11, opacity: 0.8, children: t("mashingStepTime", { unit: "min" }) }),
-              /* @__PURE__ */ jsx3(
-                Input2,
-                {
-                  keyboardType: "decimal-pad",
-                  value: String(r.stepTimeMin),
-                  onChangeText: (text) => onUpdateStep?.(r.id, { stepTimeMin: Math.max(0, Number(text) || 0) }),
-                  size: "$3",
-                  background: "$background",
-                  borderWidth: 1,
-                  borderColor: "$borderColor"
-                }
-              )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs4(YStack3, { gap: "$1", children: [
-            /* @__PURE__ */ jsx3(Text4, { fontSize: 11, opacity: 0.8, children: t("mashingStepAmount", { unit: tUnits("L") }) }),
-            isSpargeStep ? /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.85, children: waterVolumes ? `${formatFixed(locale, waterVolumes.spargeLiters, 2)} ${tUnits("L")}` : "\u2014" }) : idx === 0 && firstStepAmountComputed != null ? /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, opacity: 0.85, children: [
-              formatFixed(locale, firstStepAmountComputed, 2),
-              " ",
-              tUnits("L")
-            ] }) : /* @__PURE__ */ jsx3(
-              Input2,
-              {
-                keyboardType: "decimal-pad",
-                value: r.amountL != null ? String(r.amountL) : "",
-                onChangeText: (text) => onUpdateStep?.(r.id, { amountL: text.trim() ? Math.max(0, Number(text) || 0) : null }),
-                placeholder: "\u2014",
-                size: "$3",
-                background: "$background",
-                borderWidth: 1,
-                borderColor: "$borderColor",
-                disabled: disableAmount
-              }
-            )
-          ] }),
-          idx > 0 ? /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", alignItems: "center", children: [
-            /* @__PURE__ */ jsx3(
-              BrewCheckbox,
-              {
-                id: `mash-step-deduce-${r.id}`,
-                checked: r.deduceFromMashIn === true,
-                onCheckedChange: (checked) => onUpdateStep?.(r.id, {
-                  deduceFromMashIn: checked === true
-                }),
-                size: "$2",
-                accessibilityLabel: t("mashingDeduceFromMashIn"),
-                accessibilityRole: "checkbox"
-              }
-            ),
-            /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.85, children: t("mashingDeduceFromMashIn") })
-          ] }) : null
-        ] })
-      ] }, r.id);
-    }),
-    /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
-      onAddStep ? /* @__PURE__ */ jsx3(Button2, { size: "$3", onPress: onAddStep, children: /* @__PURE__ */ jsx3(Text4, { children: t("mashingAddStep") }) }) : null,
-      onAddFromTemplate ? /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
-        /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, opacity: 0.8, children: [
-          t("mashingAddFromTemplate"),
-          ":"
-        ] }),
-        MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ jsx3(Button2, { size: "$3", chromeless: true, onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
-      ] }) : null
-    ] }),
-    onSave ? /* @__PURE__ */ jsxs4(YStack3, { gap: "$2", children: [
-      /* @__PURE__ */ jsx3(Button2, { size: "$3", onPress: onSave, disabled: !canSave || saving, children: /* @__PURE__ */ jsx3(Text4, { children: saving ? t("saving") : t("mashingSaveMashSteps") }) }),
-      saveStatus ? /* @__PURE__ */ jsx3(Card3, { gap: "$1", padding: "$2", background: "$color4", borderWidth: 1, borderColor: "$borderColor", children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: saveStatus }) }) : null
-    ] }) : null
+  return /* @__PURE__ */ jsxs6(YStack5, { gap: "$3", children: [
+    mashWaterBudgetLiters != null ? /* @__PURE__ */ jsx5(Text6, { fontSize: 12, opacity: 0.8, children: t("mashStepsWaterBudgetNote") }) : null,
+    mashProcedure && onUpdateProcedure ? /* @__PURE__ */ jsx5(MashProcedureEditor, { mashProcedure, onUpdateProcedure, t }) : null,
+    mashRows.map((r, idx) => /* @__PURE__ */ jsx5(
+      MashStepRow,
+      {
+        row: r,
+        index: idx,
+        editState: getRowEditState(r, idx),
+        waterVolumes,
+        firstStepAmountComputed,
+        onUpdateStep,
+        onMoveStep,
+        onDeleteStep,
+        t,
+        tUnits,
+        locale,
+        formatFixed
+      },
+      r.id
+    )),
+    /* @__PURE__ */ jsx5(
+      MashStepsToolbar,
+      {
+        onAddStep,
+        onAddFromTemplate,
+        onSave,
+        canSave,
+        saving,
+        saveStatus,
+        t
+      }
+    )
   ] });
 }
 
 // src/mash/SpargeStepReadOnlyRow.tsx
 import "react";
-import { YStack as YStack4 } from "tamagui";
-import { Card as Card4, ReadOnlyField as ReadOnlyField2, ReadOnlyFieldRow as ReadOnlyFieldRow2, Text as Text5 } from "@umbraculum/ui";
-import { jsx as jsx4, jsxs as jsxs5 } from "react/jsx-runtime";
+import { YStack as YStack6 } from "tamagui";
+import { Card as Card5, ReadOnlyField as ReadOnlyField2, ReadOnlyFieldRow as ReadOnlyFieldRow2, Text as Text7 } from "@umbraculum/ui";
+import { jsx as jsx6, jsxs as jsxs7 } from "react/jsx-runtime";
 function SpargeStepReadOnlyRow(props) {
   const { cardBackgroundColor, cardBorderColor, labels, ...rest } = props;
-  return /* @__PURE__ */ jsxs5(
-    Card4,
+  return /* @__PURE__ */ jsxs7(
+    Card5,
     {
       "data-mash-step-card": true,
       ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
@@ -502,18 +652,18 @@ function SpargeStepReadOnlyRow(props) {
       padding: "$3",
       gap: "$2",
       children: [
-        /* @__PURE__ */ jsxs5(Text5, { fontSize: 12, fontWeight: "700", children: [
+        /* @__PURE__ */ jsxs7(Text7, { fontSize: 12, fontWeight: "700", children: [
           rest.stepNumber,
           ". ",
           rest.title
         ] }),
-        /* @__PURE__ */ jsx4(YStack4, { gap: "$2", children: /* @__PURE__ */ jsxs5(ReadOnlyFieldRow2, { children: [
-          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.name, value: rest.name, minWidth: 90 }),
-          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.type, value: rest.typeLabel, minWidth: 110 }),
-          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.temp, value: rest.tempDisplay, minWidth: 90 }),
-          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.time, value: rest.timeDisplay, minWidth: 90 }),
-          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.amount, value: rest.amountDisplay, minWidth: 120 }),
-          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.ramp, value: rest.rampDisplay, minWidth: 90 })
+        /* @__PURE__ */ jsx6(YStack6, { gap: "$2", children: /* @__PURE__ */ jsxs7(ReadOnlyFieldRow2, { children: [
+          /* @__PURE__ */ jsx6(ReadOnlyField2, { label: labels.name, value: rest.name, minWidth: 90 }),
+          /* @__PURE__ */ jsx6(ReadOnlyField2, { label: labels.type, value: rest.typeLabel, minWidth: 110 }),
+          /* @__PURE__ */ jsx6(ReadOnlyField2, { label: labels.temp, value: rest.tempDisplay, minWidth: 90 }),
+          /* @__PURE__ */ jsx6(ReadOnlyField2, { label: labels.time, value: rest.timeDisplay, minWidth: 90 }),
+          /* @__PURE__ */ jsx6(ReadOnlyField2, { label: labels.amount, value: rest.amountDisplay, minWidth: 120 }),
+          /* @__PURE__ */ jsx6(ReadOnlyField2, { label: labels.ramp, value: rest.rampDisplay, minWidth: 90 })
         ] }) })
       ]
     }
