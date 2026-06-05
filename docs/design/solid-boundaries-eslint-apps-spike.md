@@ -128,6 +128,10 @@
 `water/_hooks/**` (cross-segment mash/sparge/boil helpers). Zero remaining WS5 violations on
 `master` at promotion time; sibling-segment fence + app→API fence are CI-blocking.
 
+**2026-06-05 recipe-edit extension** — added `web-recipe-edit-shared` (`edit/{_lib,_hooks}/**`) and
+`web-recipe-edit-surface` with explicit allow for `web-water-shared` (mashing section imports
+`water/_lib/waterSettings`).
+
 ---
 
 ## 7. Open questions (non-blocking)
@@ -143,7 +147,7 @@
 |--------|-------|------|
 | Keep WS5 app boundaries at **error** in root ESLint config | SOLID Phase 3 | done (2026-06-05) |
 | Observe warning telemetry on active app feature branches | app maintainers | ongoing |
-| Expand web sibling boundaries beyond water segments when telemetry supports it | SOLID follow-up | deferred |
+| Expand web sibling boundaries beyond water segments when telemetry supports it | SOLID follow-up | **partial** (recipe-edit 2026-06-05) |
 
 ---
 

@@ -60,3 +60,8 @@ export function newRowId() {
     return `${Date.now()}-${Math.random()}`;
   }
 }
+
+export function roundTo(n: number, decimals: number) {
+  const f = 10 ** decimals;
+  return Math.round(n * f) / f;
+}

@@ -507,6 +507,7 @@ export default [
   //
   // web-water-shared includes water/_lib/** and water/_hooks/** (cross-segment
   // helpers intentionally shared across mash/sparge/boil segments).
+  // web-recipe-edit-shared mirrors that for edit/_lib + edit/_hooks.
   // -------------------------------------------------------------------
   {
     files: ["apps/{web,native}/**/*.{ts,tsx}"],
@@ -541,6 +542,16 @@ export default [
           capture: ["segmentCode"],
         },
         {
+          type: "web-recipe-edit-shared",
+          pattern: "apps/web/app/recipes/[[]id[]]/edit/{_lib,_hooks}/**",
+          mode: "full",
+        },
+        {
+          type: "web-recipe-edit-surface",
+          pattern: "apps/web/app/recipes/[[]id[]]/edit/**",
+          mode: "full",
+        },
+        {
           type: "native-app-shared",
           pattern:
             "apps/native/src/{auth,components,i18n,lib,media,navigation,screens,theme,types}/**",
@@ -567,6 +578,7 @@ export default [
               from: [
                 ["web-app-shared"],
                 ["web-water-segment"],
+                ["web-recipe-edit-surface"],
                 ["native-app-shared"],
                 ["native-module-segment"],
               ],
@@ -575,6 +587,14 @@ export default [
             {
               from: [["web-water-segment"]],
               allow: [["web-water-shared"], ["web-app-shared"]],
+            },
+            {
+              from: [["web-recipe-edit-surface"]],
+              allow: [
+                ["web-recipe-edit-shared"],
+                ["web-water-shared"],
+                ["web-app-shared"],
+              ],
             },
             {
               from: [["web-water-segment"]],
