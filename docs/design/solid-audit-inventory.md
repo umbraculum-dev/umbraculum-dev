@@ -13,7 +13,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Files scanned | 812 |
+| Files scanned | 822 |
 | Roots | `services/api/src`, `packages`, `apps/web/app`, `apps/native/src` |
 | P0 findings | 0 |
 | P1 findings | 21 |
@@ -28,7 +28,6 @@
 |------|-----|-------|------------|----------|--------|------------------|
 | `packages/api-client/src/generated/platform.openapi.ts` | 10161 | Packages | S, I | P1 | file size 10161 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `packages/api-client/src/generated/brewery.openapi.ts` | 4895 | Packages | S, I | P1 | file size 4895 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
-| `apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/_components/BrewSessionDetailPageContent.tsx` | 1657 | Apps (web) | S, I | P1 | file size 1657 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/_components/YeastEditor.tsx` | 1430 | Apps (web) | S, I | P1 | file size 1430 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/water/mash/_hooks/useWaterMashPage.tsx` | 1361 | Apps (web) | S, I | P1 | file size 1361 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/_hooks/useBrewSessionDetailPage.tsx` | 1273 | Apps (web) | S, I | P1 | file size 1273 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
@@ -41,6 +40,7 @@
 | `services/api/src/services/recipeWaterComputeAndSaveService.ts` | 965 | Platform routes/services | S, I | P1 | file size 965 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `services/api/src/domain/recipeAnalysis/gravityAnalysis.ts` | 934 | Brewery vertical (domain) | S, I | P1 | file size 934 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/native/src/modules/brewery/screens/YeastScreen.tsx` | 927 | Apps (native) | S, I | P1 | file size 927 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
+| `apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/_components/sections/BrewSessionGroupedStepsSection.tsx` | 918 | Apps (web) | S, I | P1 | file size 918 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/edit/_hooks/useRecipeEditPage.ts` | 917 | Apps (web) | S, I | P1 | file size 917 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/water/sparge/_components/WaterSpargePageContent.tsx` | 903 | Apps (web) | S, I | P1 | file size 903 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/[id]/water/boil/_hooks/useWaterBoilPage.tsx` | 868 | Apps (web) | S, I | P1 | file size 868 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
