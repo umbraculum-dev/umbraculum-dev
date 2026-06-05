@@ -5,7 +5,7 @@ import type { WaterProfile } from "@umbraculum/contracts";
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
 
-import { Input } from "../../../../../../../components/AppInput";
+import { Input } from "../../../../../../components/AppInput";
 import type { WaterBoilScreenModel } from "../../../../hooks/useWaterBoilScreen";
 import { PickerField } from "../../shared/PickerField";
 
