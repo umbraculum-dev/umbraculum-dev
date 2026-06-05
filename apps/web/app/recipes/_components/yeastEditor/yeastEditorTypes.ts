@@ -79,6 +79,27 @@ export type YeastEditorEditableProps = {
   lowViabilityWarning?: number | null;
 };
 
+export type YeastEditorRowContext = {
+  yeastAttenuationOverrides: Record<string, string>;
+  batchSizeForCells: number | null;
+  analysisOg: number | null | undefined;
+  surfaceMath?: boolean;
+  onRemoveRow: (id: string) => void;
+  onUpdateRow: (id: string, patch: Partial<EditorYeastRow>) => void;
+  onAttenuationOverrideChange: (id: string, value: string) => void;
+  onSave: () => void;
+  saving: boolean;
+  canCallAccountScoped: boolean;
+  t: (key: string, values?: Record<string, string | number>) => string;
+  tAnalysis: (key: string) => string;
+  tUnits: (key: string) => string;
+  formatAmount: (value: number, decimals: number) => string;
+  locale: string;
+  lowViabilityWarning?: number | null;
+  firstManualCountRowIdx: number;
+  requestAmountRecalc: () => void;
+};
+
 export type YeastEditorReadOnlyProps = {
   yeastRows: EditorYeastRow[];
   yeastAttenuationOverrides: Record<string, string>;
