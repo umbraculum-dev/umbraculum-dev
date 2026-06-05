@@ -1,12 +1,5 @@
 export { sgToPlato } from '@umbraculum/brewery-core';
 
-type BeerJsonRecipe = Record<string, unknown>;
-type BeerJsonDocument = {
-    beerjson: {
-        version: number;
-        recipes: BeerJsonRecipe[];
-    };
-};
 type GristPotential = {
     kind: "ppg";
     value: number;
@@ -81,20 +74,10 @@ type EditorYeastRow = {
     } | null | undefined;
 };
 type YeastSpeciesKey = EditorYeastRow["species"] extends infer S ? S extends string ? S : never : never;
-declare function computeEstimatedCellsB(batchSizeLiters: number | null | undefined, ogEstimatedSg: number | null | undefined, pitchRateKey: YeastPitchRateKey | string | null | undefined): number | null;
 declare const CELLS_PER_L_LIQUID = 2150;
 declare const CELLS_PER_L_SLURRY = 1200;
 declare const CELLS_PER_KG_DRY = 1500;
 type YeastFormat = "dry" | "liquid" | "slurry";
-declare function computeCellsPerLFromManualCount(manual: {
-    dilutionFactor: 200 | 2000;
-    aliveCells: number;
-    totalCells: number;
-}): number | null;
-declare function computeAmountFromCellsB(cellsB: number, format: YeastFormat, cellsPerLOverride?: number | null, cellsPerKGOverride?: number | null): {
-    amountL: number | null;
-    amountKg: number | null;
-};
 type EditorMiscRow = {
     id: string;
     ingredientId?: string | null | undefined;
@@ -117,7 +100,6 @@ declare const MASH_TEMPLATES: {
     labelKey: string;
     steps: Omit<EditorMashStep, "id">[];
 }[];
-declare function newMashRowId(): string;
 type EditorMashStep = {
     id: string;
     name: string;
@@ -137,13 +119,15 @@ type EditorMash = {
     steps: EditorMashStep[];
     notes?: string | null | undefined;
 } | null;
-declare function validateMashBeforeSave(mash: EditorMash): {
-    ok: true;
-} | {
-    ok: false;
-    errors: string;
+
+type BeerJsonRecipe = Record<string, unknown>;
+type BeerJsonDocument = {
+    beerjson: {
+        version: number;
+        recipes: BeerJsonRecipe[];
+    };
 };
-declare function replaceMashInBeerJsonDocument(doc: unknown, mash: EditorMash | null): BeerJsonDocument;
+
 declare function buildBeerJsonRecipeDocument(args: {
     name: string;
     notes: string | null;
@@ -162,7 +146,7 @@ declare function buildRecipeExtJsonFromEditorState(args: {
     miscRows: EditorMiscRow[];
     extBase?: unknown;
 }): unknown;
-declare function mergeMashDeduceFromExt(mash: EditorMash | null, recipeExtJson: unknown): EditorMash | null;
+
 declare function editorStateFromBeerJson(doc: unknown): {
     gristRows: EditorGristRow[];
     hopsRows: EditorHopRow[];
@@ -175,5 +159,26 @@ declare function editorStateFromBeerJson(doc: unknown): {
  * When the lab provides min/max, we persist them in recipeExtJson; this restores them on load.
  */
 declare function mergeYeastAttenuationRangeFromExt(yeastRows: EditorYeastRow[], recipeExtJson: unknown): EditorYeastRow[];
+
+declare function newMashRowId(): string;
+declare function validateMashBeforeSave(mash: EditorMash): {
+    ok: true;
+} | {
+    ok: false;
+    errors: string;
+};
+declare function replaceMashInBeerJsonDocument(doc: unknown, mash: EditorMash | null): BeerJsonDocument;
+declare function mergeMashDeduceFromExt(mash: EditorMash | null, recipeExtJson: unknown): EditorMash | null;
+
+declare function computeEstimatedCellsB(batchSizeLiters: number | null | undefined, ogEstimatedSg: number | null | undefined, pitchRateKey: YeastPitchRateKey | string | null | undefined): number | null;
+declare function computeCellsPerLFromManualCount(manual: {
+    dilutionFactor: 200 | 2000;
+    aliveCells: number;
+    totalCells: number;
+}): number | null;
+declare function computeAmountFromCellsB(cellsB: number, format: YeastFormat, cellsPerLOverride?: number | null, cellsPerKGOverride?: number | null): {
+    amountL: number | null;
+    amountKg: number | null;
+};
 
 export { CELLS_PER_KG_DRY, CELLS_PER_L_LIQUID, CELLS_PER_L_SLURRY, type EditorGristRow, type EditorHopRow, type EditorMash, type EditorMashStep, type EditorMashStepType, type EditorMiscRow, type EditorYeastRow, MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES, PITCH_RATE_TO_MILLION_CELLS_PER_ML_P, YEAST_PITCH_RATE_OPTIONS, type YeastFormat, type YeastPitchRateKey, type YeastSpeciesKey, buildBeerJsonRecipeDocument, buildRecipeExtJsonFromEditorState, computeAmountFromCellsB, computeCellsPerLFromManualCount, computeEstimatedCellsB, editorStateFromBeerJson, mergeMashDeduceFromExt, mergeYeastAttenuationRangeFromExt, newMashRowId, replaceMashInBeerJsonDocument, validateMashBeforeSave };

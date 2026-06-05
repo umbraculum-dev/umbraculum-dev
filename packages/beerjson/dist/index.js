@@ -1,5 +1,17 @@
 // src/index.ts
-import { platoToSg, sgToPlato } from "@umbraculum/brewery-core";
+import { sgToPlato as sgToPlato2 } from "@umbraculum/brewery-core";
+
+// src/beerJsonHelpers.ts
+import { platoToSg } from "@umbraculum/brewery-core";
+var VALID_MASH_STEP_TYPES = [
+  "infusion",
+  "temperature",
+  "decoction",
+  "souring mash",
+  "souring wort",
+  "drain mash tun",
+  "sparge"
+];
 function isObject(v) {
   return v != null && typeof v === "object" && !Array.isArray(v);
 }
@@ -11,112 +23,6 @@ function parseValueWithUnit(v) {
   const unit = typeof v["unit"] === "string" ? v["unit"] : null;
   const value = isFiniteNumber(v["value"]) ? v["value"] : null;
   return { unit, value };
-}
-var PITCH_RATE_TO_MILLION_CELLS_PER_ML_P = {
-  mfg_rec_0_35_ales: 0.35,
-  mfg_rec_0_5_ales: 0.5,
-  pro_0_75_ales: 0.75,
-  pro_1_0_ales: 1,
-  pro_1_25_ales: 1.25,
-  pro_1_5_lager: 1.5,
-  pro_1_75_lager: 1.75,
-  pro_2_0_lager: 2
-};
-var YEAST_PITCH_RATE_OPTIONS = [
-  { value: "mfg_rec_0_35_ales", labelKey: "yeastPitchRateMfgRec035Ales" },
-  { value: "mfg_rec_0_5_ales", labelKey: "yeastPitchRateMfgRec05Ales" },
-  { value: "pro_0_75_ales", labelKey: "yeastPitchRatePro075Ales" },
-  { value: "pro_1_0_ales", labelKey: "yeastPitchRatePro10Ales" },
-  { value: "pro_1_25_ales", labelKey: "yeastPitchRatePro125Ales" },
-  { value: "pro_1_5_lager", labelKey: "yeastPitchRatePro15Lager" },
-  { value: "pro_1_75_lager", labelKey: "yeastPitchRatePro175Lager" },
-  { value: "pro_2_0_lager", labelKey: "yeastPitchRatePro20Lager" }
-];
-function computeEstimatedCellsB(batchSizeLiters, ogEstimatedSg, pitchRateKey) {
-  if (typeof batchSizeLiters !== "number" || !Number.isFinite(batchSizeLiters) || batchSizeLiters <= 0)
-    return null;
-  if (typeof ogEstimatedSg !== "number" || !Number.isFinite(ogEstimatedSg) || ogEstimatedSg <= 1)
-    return null;
-  const plato = sgToPlato(ogEstimatedSg);
-  if (plato == null || plato <= 0) return null;
-  const rate = pitchRateKey && pitchRateKey in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P ? PITCH_RATE_TO_MILLION_CELLS_PER_ML_P[pitchRateKey] : null;
-  if (rate == null) return null;
-  const cellsB = batchSizeLiters * plato * rate;
-  return Number.isFinite(cellsB) && cellsB > 0 ? cellsB : null;
-}
-var CELLS_PER_L_LIQUID = 2150;
-var CELLS_PER_L_SLURRY = 1200;
-var CELLS_PER_KG_DRY = 1500;
-function computeCellsPerLFromManualCount(manual) {
-  const { dilutionFactor, aliveCells, totalCells } = manual;
-  if (!Number.isFinite(aliveCells) || aliveCells <= 0 || !Number.isFinite(totalCells) || totalCells <= 0 || aliveCells > totalCells)
-    return null;
-  if (dilutionFactor !== 200 && dilutionFactor !== 2e3) return null;
-  const cellsPerL = aliveCells * dilutionFactor * 0.05;
-  return Number.isFinite(cellsPerL) && cellsPerL > 0 ? cellsPerL : null;
-}
-function computeAmountFromCellsB(cellsB, format, cellsPerLOverride, cellsPerKGOverride) {
-  if (!Number.isFinite(cellsB) || cellsB <= 0) return { amountL: null, amountKg: null };
-  if (format === "dry") {
-    const cellsPerKg = cellsPerKGOverride != null && Number.isFinite(cellsPerKGOverride) && cellsPerKGOverride > 0 ? cellsPerKGOverride : CELLS_PER_KG_DRY;
-    const amountKg = cellsB / cellsPerKg;
-    return { amountL: null, amountKg: Number.isFinite(amountKg) && amountKg > 0 ? amountKg : null };
-  }
-  const cellsPerL = cellsPerLOverride != null && Number.isFinite(cellsPerLOverride) && cellsPerLOverride > 0 ? cellsPerLOverride : format === "liquid" ? CELLS_PER_L_LIQUID : CELLS_PER_L_SLURRY;
-  const amountL = cellsB / cellsPerL;
-  return { amountL: Number.isFinite(amountL) && amountL > 0 ? amountL : null, amountKg: null };
-}
-var MASH_STEP_TYPE_OPTIONS = [
-  { value: "infusion", label: "Infusion" },
-  { value: "temperature", label: "Temperature" },
-  { value: "decoction", label: "Decoction" },
-  { value: "souring mash", label: "Souring mash" },
-  { value: "souring wort", label: "Souring wort" },
-  { value: "drain mash tun", label: "Drain mash tun" },
-  { value: "sparge", label: "Sparge" }
-];
-var MASH_TEMPLATES = [
-  {
-    id: "single_infusion",
-    labelKey: "mashingTemplateSingleInfusion",
-    steps: [{ name: "Mash In", type: "infusion", stepTemperatureC: 67, stepTimeMin: 60 }]
-  },
-  {
-    id: "step_mash",
-    labelKey: "mashingTemplateStepMash",
-    steps: [
-      { name: "Protein rest", type: "infusion", stepTemperatureC: 52, stepTimeMin: 15 },
-      { name: "Saccharification", type: "temperature", stepTemperatureC: 65, stepTimeMin: 30 },
-      { name: "Mash out", type: "temperature", stepTemperatureC: 72, stepTimeMin: 20 }
-    ]
-  },
-  {
-    id: "temperature",
-    labelKey: "mashingTemplateTemperature",
-    steps: [{ name: "Single rest", type: "temperature", stepTemperatureC: 68, stepTimeMin: 60 }]
-  },
-  {
-    id: "decoction",
-    labelKey: "mashingTemplateDecoction",
-    steps: [
-      { name: "Dough in", type: "infusion", stepTemperatureC: 45, stepTimeMin: 15 },
-      { name: "Protein rest", type: "decoction", stepTemperatureC: 52, stepTimeMin: 20 },
-      { name: "Saccharification", type: "decoction", stepTemperatureC: 65, stepTimeMin: 30 },
-      { name: "Mash out", type: "decoction", stepTemperatureC: 76, stepTimeMin: 10 }
-    ]
-  },
-  {
-    id: "sparge",
-    labelKey: "mashingTemplateSparge",
-    steps: [{ name: "Sparge", type: "sparge", stepTemperatureC: 76, stepTimeMin: 0 }]
-  }
-];
-function newMashRowId() {
-  try {
-    return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
-  } catch {
-    return `${Date.now()}-${Math.random()}`;
-  }
 }
 function safeNum(v, fallback) {
   return typeof v === "number" && Number.isFinite(v) ? v : fallback;
@@ -240,15 +146,6 @@ function buildMiscAddition(row) {
   if (row.notes) out["notes"] = row.notes;
   return out;
 }
-var VALID_MASH_STEP_TYPES = [
-  "infusion",
-  "temperature",
-  "decoction",
-  "souring mash",
-  "souring wort",
-  "drain mash tun",
-  "sparge"
-];
 function buildMashStep(step) {
   const out = {
     name: step.name,
@@ -282,59 +179,58 @@ function buildMashProcedure(mash) {
     ...typeof mash.notes === "string" && mash.notes.trim() ? { notes: mash.notes.trim() } : {}
   };
 }
-function validateMashBeforeSave(mash) {
-  if (!mash) return { ok: true };
-  if (typeof mash.name !== "string" || !mash.name.trim()) {
-    return { ok: false, errors: "Mash procedure name is required" };
-  }
-  if (typeof mash.grainTemperatureC !== "number" || !Number.isFinite(mash.grainTemperatureC)) {
-    return { ok: false, errors: "Grain temperature must be a valid number" };
-  }
-  if (mash.grainTemperatureC < -20 || mash.grainTemperatureC > 100) {
-    return { ok: false, errors: "Grain temperature must be between -20 and 100 \xB0C" };
-  }
-  if (!Array.isArray(mash.steps)) {
-    return { ok: false, errors: "Mash steps must be an array" };
-  }
-  if (mash.steps.length === 0) {
-    return { ok: true };
-  }
-  const errs = [];
-  mash.steps.forEach((s, idx) => {
-    if (typeof s.name !== "string" || !s.name.trim()) {
-      errs.push(`Step ${idx + 1}: name is required`);
-    }
-    if (!VALID_MASH_STEP_TYPES.includes(s.type)) {
-      errs.push(`Step ${idx + 1}: invalid type "${s.type}"`);
-    }
-    if (typeof s.stepTemperatureC !== "number" || !Number.isFinite(s.stepTemperatureC)) {
-      errs.push(`Step ${idx + 1}: step temperature must be a valid number`);
-    } else if (s.stepTemperatureC < 0 || s.stepTemperatureC > 100) {
-      errs.push(`Step ${idx + 1}: step temperature must be between 0 and 100 \xB0C`);
-    }
-    if (typeof s.stepTimeMin !== "number" || !Number.isFinite(s.stepTimeMin)) {
-      errs.push(`Step ${idx + 1}: step time must be a valid number`);
-    } else if (s.stepTimeMin < 0) {
-      errs.push(`Step ${idx + 1}: step time must be >= 0`);
-    }
-  });
-  if (errs.length) return { ok: false, errors: errs.join("; ") };
-  return { ok: true };
+function parseMashFromBeerJson(r0) {
+  if (!isObject(r0)) return null;
+  if (!isObject(r0["mash"])) return null;
+  const mash = r0["mash"];
+  const name = typeof mash["name"] === "string" ? mash["name"].trim() : "";
+  const gt = parseValueWithUnit(mash["grain_temperature"]);
+  const grainTemp = gt.unit === "C" && gt.value != null ? gt.value : gt.unit === "F" && gt.value != null ? (gt.value - 32) * 5 / 9 : null;
+  if (!name || grainTemp == null) return null;
+  const stepsRaw = Array.isArray(mash["mash_steps"]) ? mash["mash_steps"] : [];
+  const steps = stepsRaw.map((sUnknown, idx) => {
+    if (!isObject(sUnknown)) return null;
+    const s = sUnknown;
+    const stepName = typeof s["name"] === "string" ? s["name"].trim() : "";
+    const typeRaw = typeof s["type"] === "string" ? s["type"] : "";
+    const type = VALID_MASH_STEP_TYPES.includes(typeRaw) ? typeRaw : "infusion";
+    const stTemp = parseValueWithUnit(s["step_temperature"]);
+    const stepTemp = stTemp.unit === "C" && stTemp.value != null ? stTemp.value : stTemp.unit === "F" && stTemp.value != null ? (stTemp.value - 32) * 5 / 9 : null;
+    const stTime = parseValueWithUnit(s["step_time"]);
+    const stepTime = stTime.unit === "min" && stTime.value != null ? stTime.value : null;
+    if (!stepName || stepTemp == null || stepTime == null) return null;
+    const amt = parseValueWithUnit(s["amount"]);
+    const amountL = amt.unit === "l" && amt.value != null ? amt.value : amt.unit === "ml" && amt.value != null ? amt.value / 1e3 : null;
+    const ramp = parseValueWithUnit(s["ramp_time"]);
+    const rampTimeMin = ramp.unit === "min" && ramp.value != null && ramp.value >= 0 ? ramp.value : null;
+    const endT = parseValueWithUnit(s["end_temperature"]);
+    const endTemp = endT.unit === "C" && endT.value != null ? endT.value : endT.unit === "F" && endT.value != null ? (endT.value - 32) * 5 / 9 : null;
+    const inf = parseValueWithUnit(s["infuse_temperature"]);
+    const infuseTemp = inf.unit === "C" && inf.value != null ? inf.value : inf.unit === "F" && inf.value != null ? (inf.value - 32) * 5 / 9 : null;
+    const description = typeof s["description"] === "string" ? s["description"].trim() || null : null;
+    return {
+      id: typeof s["id"] === "string" ? s["id"] : `mash-step-${idx}`,
+      name: stepName,
+      type,
+      stepTemperatureC: stepTemp,
+      stepTimeMin: Math.max(0, stepTime),
+      amountL: amountL ?? void 0,
+      rampTimeMin: rampTimeMin ?? void 0,
+      endTemperatureC: endTemp ?? void 0,
+      infuseTemperatureC: infuseTemp ?? void 0,
+      description: description ?? void 0
+    };
+  }).filter((s) => s !== null);
+  if (steps.length === 0) return null;
+  return {
+    name,
+    grainTemperatureC: grainTemp,
+    steps,
+    notes: typeof mash["notes"] === "string" ? mash["notes"].trim() || void 0 : void 0
+  };
 }
-function replaceMashInBeerJsonDocument(doc, mash) {
-  const cloned = JSON.parse(JSON.stringify(doc));
-  const r0 = cloned?.beerjson?.recipes?.[0];
-  if (!r0 || typeof r0 !== "object") {
-    return cloned;
-  }
-  const mashProc = buildMashProcedure(mash);
-  if (mashProc) {
-    r0["mash"] = mashProc;
-  } else {
-    delete r0["mash"];
-  }
-  return cloned;
-}
+
+// src/beerJsonBuild.ts
 function buildBeerJsonRecipeDocument(args) {
   const batchSizeLiters = typeof args.batchSizeLiters === "number" && Number.isFinite(args.batchSizeLiters) ? args.batchSizeLiters : 20;
   const efficiency = typeof args.brewhouseEfficiencyPercent === "number" && Number.isFinite(args.brewhouseEfficiencyPercent) ? args.brewhouseEfficiencyPercent : 75;
@@ -412,71 +308,8 @@ function buildRecipeExtJsonFromEditorState(args) {
     ...Object.keys(yeastAttenuationRange).length ? { yeastAttenuationRange } : {}
   };
 }
-function parseMashFromBeerJson(r0) {
-  if (!isObject(r0)) return null;
-  if (!isObject(r0["mash"])) return null;
-  const mash = r0["mash"];
-  const name = typeof mash["name"] === "string" ? mash["name"].trim() : "";
-  const gt = parseValueWithUnit(mash["grain_temperature"]);
-  const grainTemp = gt.unit === "C" && gt.value != null ? gt.value : gt.unit === "F" && gt.value != null ? (gt.value - 32) * 5 / 9 : null;
-  if (!name || grainTemp == null) return null;
-  const stepsRaw = Array.isArray(mash["mash_steps"]) ? mash["mash_steps"] : [];
-  const steps = stepsRaw.map((sUnknown, idx) => {
-    if (!isObject(sUnknown)) return null;
-    const s = sUnknown;
-    const stepName = typeof s["name"] === "string" ? s["name"].trim() : "";
-    const typeRaw = typeof s["type"] === "string" ? s["type"] : "";
-    const type = VALID_MASH_STEP_TYPES.includes(typeRaw) ? typeRaw : "infusion";
-    const stTemp = parseValueWithUnit(s["step_temperature"]);
-    const stepTemp = stTemp.unit === "C" && stTemp.value != null ? stTemp.value : stTemp.unit === "F" && stTemp.value != null ? (stTemp.value - 32) * 5 / 9 : null;
-    const stTime = parseValueWithUnit(s["step_time"]);
-    const stepTime = stTime.unit === "min" && stTime.value != null ? stTime.value : null;
-    if (!stepName || stepTemp == null || stepTime == null) return null;
-    const amt = parseValueWithUnit(s["amount"]);
-    const amountL = amt.unit === "l" && amt.value != null ? amt.value : amt.unit === "ml" && amt.value != null ? amt.value / 1e3 : null;
-    const ramp = parseValueWithUnit(s["ramp_time"]);
-    const rampTimeMin = ramp.unit === "min" && ramp.value != null && ramp.value >= 0 ? ramp.value : null;
-    const endT = parseValueWithUnit(s["end_temperature"]);
-    const endTemp = endT.unit === "C" && endT.value != null ? endT.value : endT.unit === "F" && endT.value != null ? (endT.value - 32) * 5 / 9 : null;
-    const inf = parseValueWithUnit(s["infuse_temperature"]);
-    const infuseTemp = inf.unit === "C" && inf.value != null ? inf.value : inf.unit === "F" && inf.value != null ? (inf.value - 32) * 5 / 9 : null;
-    const description = typeof s["description"] === "string" ? s["description"].trim() || null : null;
-    return {
-      id: typeof s["id"] === "string" ? s["id"] : `mash-step-${idx}`,
-      name: stepName,
-      type,
-      stepTemperatureC: stepTemp,
-      stepTimeMin: Math.max(0, stepTime),
-      amountL: amountL ?? void 0,
-      rampTimeMin: rampTimeMin ?? void 0,
-      endTemperatureC: endTemp ?? void 0,
-      infuseTemperatureC: infuseTemp ?? void 0,
-      description: description ?? void 0
-    };
-  }).filter((s) => s !== null);
-  if (steps.length === 0) return null;
-  return {
-    name,
-    grainTemperatureC: grainTemp,
-    steps,
-    notes: typeof mash["notes"] === "string" ? mash["notes"].trim() || void 0 : void 0
-  };
-}
-function mergeMashDeduceFromExt(mash, recipeExtJson) {
-  if (!mash || !mash.steps.length) return mash;
-  const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? recipeExtJson : null;
-  const map = ext?.["mashStepDeduceFromMashIn"] && typeof ext["mashStepDeduceFromMashIn"] === "object" && !Array.isArray(ext["mashStepDeduceFromMashIn"]) ? ext["mashStepDeduceFromMashIn"] : null;
-  if (!map) return mash;
-  const steps = mash.steps.map((s, idx) => {
-    const deduceByIndex = map[String(idx)] === true;
-    const deduceById = map[s.id] === true;
-    return {
-      ...s,
-      deduceFromMashIn: deduceByIndex || deduceById
-    };
-  });
-  return { ...mash, steps };
-}
+
+// src/beerJsonParse.ts
 function editorStateFromBeerJson(doc) {
   const d = isObject(doc) ? doc : {};
   const beerjson = isObject(d["beerjson"]) ? d["beerjson"] : {};
@@ -633,6 +466,187 @@ function mergeYeastAttenuationRangeFromExt(yeastRows, recipeExtJson) {
     };
   });
 }
+
+// src/editorTypes.ts
+var PITCH_RATE_TO_MILLION_CELLS_PER_ML_P = {
+  mfg_rec_0_35_ales: 0.35,
+  mfg_rec_0_5_ales: 0.5,
+  pro_0_75_ales: 0.75,
+  pro_1_0_ales: 1,
+  pro_1_25_ales: 1.25,
+  pro_1_5_lager: 1.5,
+  pro_1_75_lager: 1.75,
+  pro_2_0_lager: 2
+};
+var YEAST_PITCH_RATE_OPTIONS = [
+  { value: "mfg_rec_0_35_ales", labelKey: "yeastPitchRateMfgRec035Ales" },
+  { value: "mfg_rec_0_5_ales", labelKey: "yeastPitchRateMfgRec05Ales" },
+  { value: "pro_0_75_ales", labelKey: "yeastPitchRatePro075Ales" },
+  { value: "pro_1_0_ales", labelKey: "yeastPitchRatePro10Ales" },
+  { value: "pro_1_25_ales", labelKey: "yeastPitchRatePro125Ales" },
+  { value: "pro_1_5_lager", labelKey: "yeastPitchRatePro15Lager" },
+  { value: "pro_1_75_lager", labelKey: "yeastPitchRatePro175Lager" },
+  { value: "pro_2_0_lager", labelKey: "yeastPitchRatePro20Lager" }
+];
+var CELLS_PER_L_LIQUID = 2150;
+var CELLS_PER_L_SLURRY = 1200;
+var CELLS_PER_KG_DRY = 1500;
+var MASH_STEP_TYPE_OPTIONS = [
+  { value: "infusion", label: "Infusion" },
+  { value: "temperature", label: "Temperature" },
+  { value: "decoction", label: "Decoction" },
+  { value: "souring mash", label: "Souring mash" },
+  { value: "souring wort", label: "Souring wort" },
+  { value: "drain mash tun", label: "Drain mash tun" },
+  { value: "sparge", label: "Sparge" }
+];
+var MASH_TEMPLATES = [
+  {
+    id: "single_infusion",
+    labelKey: "mashingTemplateSingleInfusion",
+    steps: [{ name: "Mash In", type: "infusion", stepTemperatureC: 67, stepTimeMin: 60 }]
+  },
+  {
+    id: "step_mash",
+    labelKey: "mashingTemplateStepMash",
+    steps: [
+      { name: "Protein rest", type: "infusion", stepTemperatureC: 52, stepTimeMin: 15 },
+      { name: "Saccharification", type: "temperature", stepTemperatureC: 65, stepTimeMin: 30 },
+      { name: "Mash out", type: "temperature", stepTemperatureC: 72, stepTimeMin: 20 }
+    ]
+  },
+  {
+    id: "temperature",
+    labelKey: "mashingTemplateTemperature",
+    steps: [{ name: "Single rest", type: "temperature", stepTemperatureC: 68, stepTimeMin: 60 }]
+  },
+  {
+    id: "decoction",
+    labelKey: "mashingTemplateDecoction",
+    steps: [
+      { name: "Dough in", type: "infusion", stepTemperatureC: 45, stepTimeMin: 15 },
+      { name: "Protein rest", type: "decoction", stepTemperatureC: 52, stepTimeMin: 20 },
+      { name: "Saccharification", type: "decoction", stepTemperatureC: 65, stepTimeMin: 30 },
+      { name: "Mash out", type: "decoction", stepTemperatureC: 76, stepTimeMin: 10 }
+    ]
+  },
+  {
+    id: "sparge",
+    labelKey: "mashingTemplateSparge",
+    steps: [{ name: "Sparge", type: "sparge", stepTemperatureC: 76, stepTimeMin: 0 }]
+  }
+];
+
+// src/mashOps.ts
+function newMashRowId() {
+  try {
+    return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  } catch {
+    return `${Date.now()}-${Math.random()}`;
+  }
+}
+function validateMashBeforeSave(mash) {
+  if (!mash) return { ok: true };
+  if (typeof mash.name !== "string" || !mash.name.trim()) {
+    return { ok: false, errors: "Mash procedure name is required" };
+  }
+  if (typeof mash.grainTemperatureC !== "number" || !Number.isFinite(mash.grainTemperatureC)) {
+    return { ok: false, errors: "Grain temperature must be a valid number" };
+  }
+  if (mash.grainTemperatureC < -20 || mash.grainTemperatureC > 100) {
+    return { ok: false, errors: "Grain temperature must be between -20 and 100 \xB0C" };
+  }
+  if (!Array.isArray(mash.steps)) {
+    return { ok: false, errors: "Mash steps must be an array" };
+  }
+  if (mash.steps.length === 0) {
+    return { ok: true };
+  }
+  const errs = [];
+  mash.steps.forEach((s, idx) => {
+    if (typeof s.name !== "string" || !s.name.trim()) {
+      errs.push(`Step ${idx + 1}: name is required`);
+    }
+    if (!VALID_MASH_STEP_TYPES.includes(s.type)) {
+      errs.push(`Step ${idx + 1}: invalid type "${s.type}"`);
+    }
+    if (typeof s.stepTemperatureC !== "number" || !Number.isFinite(s.stepTemperatureC)) {
+      errs.push(`Step ${idx + 1}: step temperature must be a valid number`);
+    } else if (s.stepTemperatureC < 0 || s.stepTemperatureC > 100) {
+      errs.push(`Step ${idx + 1}: step temperature must be between 0 and 100 \xB0C`);
+    }
+    if (typeof s.stepTimeMin !== "number" || !Number.isFinite(s.stepTimeMin)) {
+      errs.push(`Step ${idx + 1}: step time must be a valid number`);
+    } else if (s.stepTimeMin < 0) {
+      errs.push(`Step ${idx + 1}: step time must be >= 0`);
+    }
+  });
+  if (errs.length) return { ok: false, errors: errs.join("; ") };
+  return { ok: true };
+}
+function replaceMashInBeerJsonDocument(doc, mash) {
+  const cloned = JSON.parse(JSON.stringify(doc));
+  const r0 = cloned?.beerjson?.recipes?.[0];
+  if (!r0 || typeof r0 !== "object") {
+    return cloned;
+  }
+  const mashProc = buildMashProcedure(mash);
+  if (mashProc) {
+    r0["mash"] = mashProc;
+  } else {
+    delete r0["mash"];
+  }
+  return cloned;
+}
+function mergeMashDeduceFromExt(mash, recipeExtJson) {
+  if (!mash || !mash.steps.length) return mash;
+  const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? recipeExtJson : null;
+  const map = ext?.["mashStepDeduceFromMashIn"] && typeof ext["mashStepDeduceFromMashIn"] === "object" && !Array.isArray(ext["mashStepDeduceFromMashIn"]) ? ext["mashStepDeduceFromMashIn"] : null;
+  if (!map) return mash;
+  const steps = mash.steps.map((s, idx) => {
+    const deduceByIndex = map[String(idx)] === true;
+    const deduceById = map[s.id] === true;
+    return {
+      ...s,
+      deduceFromMashIn: deduceByIndex || deduceById
+    };
+  });
+  return { ...mash, steps };
+}
+
+// src/yeastCalculations.ts
+import { sgToPlato } from "@umbraculum/brewery-core";
+function computeEstimatedCellsB(batchSizeLiters, ogEstimatedSg, pitchRateKey) {
+  if (typeof batchSizeLiters !== "number" || !Number.isFinite(batchSizeLiters) || batchSizeLiters <= 0)
+    return null;
+  if (typeof ogEstimatedSg !== "number" || !Number.isFinite(ogEstimatedSg) || ogEstimatedSg <= 1)
+    return null;
+  const plato = sgToPlato(ogEstimatedSg);
+  if (plato == null || plato <= 0) return null;
+  const rate = pitchRateKey && pitchRateKey in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P ? PITCH_RATE_TO_MILLION_CELLS_PER_ML_P[pitchRateKey] : null;
+  if (rate == null) return null;
+  const cellsB = batchSizeLiters * plato * rate;
+  return Number.isFinite(cellsB) && cellsB > 0 ? cellsB : null;
+}
+function computeCellsPerLFromManualCount(manual) {
+  const { dilutionFactor, aliveCells, totalCells } = manual;
+  if (!Number.isFinite(aliveCells) || aliveCells <= 0 || !Number.isFinite(totalCells) || totalCells <= 0 || aliveCells > totalCells)
+    return null;
+  if (dilutionFactor !== 200 && dilutionFactor !== 2e3) return null;
+  const cellsPerL = aliveCells * dilutionFactor * 0.05;
+  return Number.isFinite(cellsPerL) && cellsPerL > 0 ? cellsPerL : null;
+}
+function computeAmountFromCellsB(cellsB, format, cellsPerLOverride, cellsPerKGOverride) {
+  if (!Number.isFinite(cellsB) || cellsB <= 0) return { amountL: null, amountKg: null };
+  if (format === "dry") {
+    const cellsPerKg = cellsPerKGOverride != null && Number.isFinite(cellsPerKGOverride) && cellsPerKGOverride > 0 ? cellsPerKGOverride : CELLS_PER_KG_DRY;
+    const amountKg = cellsB / cellsPerKg;
+    return { amountL: null, amountKg: Number.isFinite(amountKg) && amountKg > 0 ? amountKg : null };
+  }
+  const cellsPerL = cellsPerLOverride != null && Number.isFinite(cellsPerLOverride) && cellsPerLOverride > 0 ? cellsPerLOverride : format === "liquid" ? CELLS_PER_L_LIQUID : CELLS_PER_L_SLURRY;
+  const amountL = cellsB / cellsPerL;
+  return { amountL: Number.isFinite(amountL) && amountL > 0 ? amountL : null, amountKg: null };
+}
 export {
   CELLS_PER_KG_DRY,
   CELLS_PER_L_LIQUID,
@@ -651,6 +665,6 @@ export {
   mergeYeastAttenuationRangeFromExt,
   newMashRowId,
   replaceMashInBeerJsonDocument,
-  sgToPlato,
+  sgToPlato2 as sgToPlato,
   validateMashBeforeSave
 };
