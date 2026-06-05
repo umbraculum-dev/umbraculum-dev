@@ -1,7 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
-  BrewSessionDetailResponseSchema,
   BrewSessionIdParamsSchema,
   BrewSessionStepLogRequestSchema,
   BrewSessionStepParamsSchema,

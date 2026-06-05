@@ -1,7 +1,7 @@
 import { Input, View, XStack, YStack } from "tamagui";
 
 import { RecipeEditFieldLabel } from "../../../../../../_components/recipe-edit";
-import { WaterAcidificationModeFields } from "../../../_components/acidification/WaterAcidificationModeFields";
+import { WaterAcidificationModeFields } from "../../../_lib/acidification/WaterAcidificationModeFields";
 
 import type { WaterBoilPageModel } from "../../_hooks/useWaterBoilPage";
 

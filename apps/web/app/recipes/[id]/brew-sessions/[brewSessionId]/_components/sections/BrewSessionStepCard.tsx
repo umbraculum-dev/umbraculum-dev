@@ -8,17 +8,17 @@ import {
   formatElapsedSeconds,
   hasPresetStepTimer,
   type BrewSessionStep,
-} from "../../../_lib/brewSessionDetailUi";
-import { BrewSessionStepCardActions } from "./BrewSessionStepCardActions";
-import { BrewSessionStepCardHeader } from "./BrewSessionStepCardHeader";
-import { BrewSessionStepCardScheduleFields } from "./BrewSessionStepCardScheduleFields";
+} from "../../_lib/brewSessionDetailUi";
+import { BrewSessionStepCardActions } from "./brewSessionStep/BrewSessionStepCardActions";
+import { BrewSessionStepCardHeader } from "./brewSessionStep/BrewSessionStepCardHeader";
+import { BrewSessionStepCardScheduleFields } from "./brewSessionStep/BrewSessionStepCardScheduleFields";
 import {
   BrewSessionStepCardLogFields,
   BrewSessionStepCardTimerBlock,
-} from "./BrewSessionStepCardTimerBlock";
-import type { BrewSessionStepCardContext, BrewSessionStepCardDerived } from "./brewSessionStepCardTypes";
+} from "./brewSessionStep/BrewSessionStepCardTimerBlock";
+import type { BrewSessionStepCardContext, BrewSessionStepCardDerived } from "./brewSessionStep/brewSessionStepCardTypes";
 
-export type { BrewSessionStepCardContext } from "./brewSessionStepCardTypes";
+export type { BrewSessionStepCardContext } from "./brewSessionStep/brewSessionStepCardTypes";
 
 function deriveStepCardState(
   step: BrewSessionStep,

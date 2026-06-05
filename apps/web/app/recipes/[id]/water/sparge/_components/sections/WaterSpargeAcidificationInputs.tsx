@@ -1,6 +1,6 @@
 import { BrewSelect } from "../../../../../../_components/BrewSelect";
 import { RecipeEditFieldLabel } from "../../../../../../_components/recipe-edit";
-import { WaterAcidificationModeFields } from "../../../_components/acidification/WaterAcidificationModeFields";
+import { WaterAcidificationModeFields } from "../../../_lib/acidification/WaterAcidificationModeFields";
 import { Input, View, XStack, YStack } from "tamagui";
 
 import type { WaterSpargePageModel } from "../../_hooks/useWaterSpargePage";

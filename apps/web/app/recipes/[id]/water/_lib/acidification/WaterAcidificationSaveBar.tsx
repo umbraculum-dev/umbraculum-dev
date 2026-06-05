@@ -1,7 +1,7 @@
 import { MessageBox } from "../../../../../_components/recipe-edit";
 import { Button, SizableText, XStack, YStack } from "tamagui";
 
-import type { WaterAcidificationMode } from "../../_lib/waterCalcTypes";
+import type { WaterAcidificationMode } from "../waterCalcTypes";
 
 export function WaterAcidificationSaveBar(props: {
   canCall: boolean;

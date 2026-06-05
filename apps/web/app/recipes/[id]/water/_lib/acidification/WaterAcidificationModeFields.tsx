@@ -3,7 +3,7 @@ import { RecipeEditFieldLabel } from "../../../../../_components/recipe-edit";
 import { ModeFieldset } from "@umbraculum/ui";
 import { Input, View, YStack } from "tamagui";
 
-import type { WaterAcidificationMode } from "../../_lib/waterCalcTypes";
+import type { WaterAcidificationMode } from "../waterCalcTypes";
 
 const ACID_TYPE_OPTIONS = [
   { value: "phosphoric", label: "Phosphoric" },

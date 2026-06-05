@@ -1,6 +1,5 @@
 import type { MutableRefObject } from "react";
 
-import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import type { WaterCalcDerivation } from "@umbraculum/contracts";
 
 import type { IonProfilePpm } from "../../_lib/waterChem";

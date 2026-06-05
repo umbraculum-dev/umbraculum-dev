@@ -5,8 +5,8 @@ import { BrewAccordionHeader } from "../../../../../../_components/BrewAccordion
 import {
   WaterAcidificationManualResultPanel,
   WaterAcidificationTargetPhResultPanel,
-} from "../../../_components/acidification/WaterAcidificationResultPanel";
-import { WaterAcidificationSaveBar } from "../../../_components/acidification/WaterAcidificationSaveBar";
+} from "../../../_lib/acidification/WaterAcidificationResultPanel";
+import { WaterAcidificationSaveBar } from "../../../_lib/acidification/WaterAcidificationSaveBar";
 
 import type { WaterSpargePageModel } from "../../_hooks/useWaterSpargePage";
 import { WaterSpargeAcidificationInputs } from "./WaterSpargeAcidificationInputs";
@@ -68,7 +68,9 @@ export function WaterSpargeAcidificationSection({ model }: { model: WaterSpargeP
               saving={savingSparge}
               acidificationMode={spargeAcidificationMode}
               saveDraftLabel="Save sparge draft"
-              onSave={onSaveSpargeInputs}
+              onSave={() => {
+                void onSaveSpargeInputs();
+              }}
               saveStatus={spargeSaveStatus}
               calcSaveStatus={calcSaveStatus}
               onDismissStatus={() => {

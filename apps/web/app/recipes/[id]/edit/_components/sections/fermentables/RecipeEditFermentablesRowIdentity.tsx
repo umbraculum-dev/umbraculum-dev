@@ -2,7 +2,6 @@ import {Button, Input, SizableText, View, XStack, YStack} from "tamagui";
 
 import {
   RecipeEditFieldLabel,
-  RecipeEditIngredientCard,
   RecipeEditReadOnlyValue,
 } from "../../../../../../_components/recipe-edit";
 import type {GristRow} from "../../../_lib/recipeEditTypes";

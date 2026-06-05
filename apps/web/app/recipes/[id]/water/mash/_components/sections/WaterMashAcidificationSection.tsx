@@ -6,8 +6,8 @@ import { BrewAccordionHeader } from "../../../../../../_components/BrewAccordion
 import {
   WaterAcidificationManualResultPanel,
   WaterAcidificationTargetPhResultPanel,
-} from "../../../_components/acidification/WaterAcidificationResultPanel";
-import { WaterAcidificationSaveBar } from "../../../_components/acidification/WaterAcidificationSaveBar";
+} from "../../../_lib/acidification/WaterAcidificationResultPanel";
+import { WaterAcidificationSaveBar } from "../../../_lib/acidification/WaterAcidificationSaveBar";
 
 import type { WaterMashPageModel } from "../../_hooks/useWaterMashPage";
 import { WaterMashAcidificationInputs } from "./WaterMashAcidificationInputs";
@@ -73,7 +73,9 @@ export function WaterMashAcidificationSection({ model }: { model: WaterMashPageM
               saving={savingMash}
               acidificationMode={mashAcidificationMode}
               saveDraftLabel="Save mash draft"
-              onSave={onSaveMashInputs}
+              onSave={() => {
+                void onSaveMashInputs();
+              }}
               saveStatus={mashSaveStatus}
               calcSaveStatus={mashCalcSaveStatus}
               onDismissStatus={() => {

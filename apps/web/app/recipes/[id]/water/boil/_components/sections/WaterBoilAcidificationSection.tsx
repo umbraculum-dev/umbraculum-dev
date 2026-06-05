@@ -4,8 +4,8 @@ import { ErrorBox } from "../../../../../../_components/recipe-edit";
 import {
   WaterAcidificationManualResultPanel,
   WaterAcidificationTargetPhResultPanel,
-} from "../../../_components/acidification/WaterAcidificationResultPanel";
-import { WaterAcidificationSaveBar } from "../../../_components/acidification/WaterAcidificationSaveBar";
+} from "../../../_lib/acidification/WaterAcidificationResultPanel";
+import { WaterAcidificationSaveBar } from "../../../_lib/acidification/WaterAcidificationSaveBar";
 
 import type { WaterBoilPageModel } from "../../_hooks/useWaterBoilPage";
 import { WaterBoilAcidificationInputs } from "./WaterBoilAcidificationInputs";
@@ -56,7 +56,9 @@ export function WaterBoilAcidificationSection({ model }: { model: WaterBoilPageM
             saving={savingInputs}
             acidificationMode={acidificationMode}
             saveDraftLabel="Save boil draft"
-            onSave={onSaveInputs}
+            onSave={() => {
+              void onSaveInputs();
+            }}
             saveStatus={boilSaveStatus}
             calcSaveStatus={calcSaveStatus}
             onDismissStatus={() => {

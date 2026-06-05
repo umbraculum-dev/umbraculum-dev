@@ -5,9 +5,9 @@ import { H3, SizableText, View } from "tamagui";
 
 import { FieldBadge } from "../../../../../_components/recipe-edit";
 import { MathHelpPopover } from "../../../../../_components/MathHelpPopover";
-import { mathExplain } from "../../_lib/mathExplain";
-import { buildWaterMathBody } from "../../_lib/mathBodies";
-import type { WaterAcidResult, WaterManualCalcResult } from "../../_lib/waterCalcTypes";
+import { mathExplain } from "../mathExplain";
+import { buildWaterMathBody } from "../mathBodies";
+import type { WaterAcidResult, WaterManualCalcResult } from "../waterCalcTypes";
 
 type MathStreamKey = "mash" | "sparge" | "boil";
 

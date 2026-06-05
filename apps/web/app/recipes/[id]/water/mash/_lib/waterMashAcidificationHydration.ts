@@ -1,6 +1,5 @@
 import type { MutableRefObject } from "react";
 
-import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
 
 import type { GristRow } from "../../../../../_lib/grist";
