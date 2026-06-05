@@ -1,42 +1,27 @@
 "use client";
 
-import { useCallback, useState, type MutableRefObject } from "react";
+import { useCallback, useState } from "react";
 
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
-import { calcBoilOverall, computeAndSaveBoil } from "@umbraculum/api-client/brewery";
 import type { WaterCalcDerivation } from "@umbraculum/contracts";
 
-import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
-import type { IonProfilePpm } from "../../_lib/waterChem";
-import {
-  parseWaterStrengthKind,
-  type BoilOverallResultV0,
-  type SaltAdditionsResult,
-  type WaterAcidResult,
-  type WaterAcidificationMode,
-  type WaterManualCalcResult,
+import type {
+  BoilOverallResultV0,
+  WaterAcidResult,
+  WaterAcidificationMode,
+  WaterManualCalcResult,
 } from "../../_lib/waterCalcTypes";
 import type { RecipeWaterSettingsResponse } from "../../_lib/waterSettings";
+import {
+  applyBoilAcidificationHydrationState,
+  createWaterBoilAcidificationHandlers,
+  deriveBoilAcidificationHydrationState,
+  displayAlkalinityPpmCaCO3,
+  type BoilAdjustmentFieldsRef,
+  type BoilSaltsBridgeRef,
+} from "../_lib/waterBoilAcidificationHelpers";
 
-type MixedSourceProfile = {
-  name: string;
-  totalVolumeLiters: number;
-} & IonProfilePpm;
-
-export type BoilAdjustmentFieldsRef = MutableRefObject<{
-  sourceProfileId: string;
-  targetProfileId: string;
-  dilutionProfileId: string;
-  tapVolumeLiters: number;
-  dilutionVolumeLiters: number;
-  mixedSourceProfile: MixedSourceProfile | null;
-  derivedBoilWaterVolumeLiters: number;
-}>;
-
-export type BoilSaltsBridgeRef = MutableRefObject<{
-  applySaltsFromCompute: (result: SaltAdditionsResult, derivation: WaterCalcDerivation | null) => void;
-  ensureZeroSaltsSnapshotIfMissing: () => Promise<void>;
-}>;
+export type { BoilAdjustmentFieldsRef, BoilSaltsBridgeRef };
 
 export function useWaterBoilAcidification(params: {
   canCall: boolean;
@@ -85,258 +70,58 @@ export function useWaterBoilAcidification(params: {
   const [overallResult, setOverallResult] = useState<BoilOverallResultV0 | null>(null);
   const [overallDerivation, setOverallDerivation] = useState<WaterCalcDerivation | null>(null);
 
-  const displayAlkalinityPpmCaCO3 = (v: number) => {
-    if (v < 0 && v > -1) return 0;
-    return v;
-  };
-
   const hydrateBoilAcidification = useCallback((s: NonNullable<RecipeWaterSettingsResponse["settings"]>) => {
-    const savedStartingAlk = s.boilStartingAlkalinityPpmCaCO3;
-    if (typeof savedStartingAlk === "number" && Number.isFinite(savedStartingAlk)) {
-      setStartingAlk(savedStartingAlk);
-      setStartingAlkTouched(savedStartingAlk !== 0);
-    } else {
-      setStartingAlk(0);
-      setStartingAlkTouched(false);
-    }
-    setStartingPh(String(s.boilStartingPh ?? 7.0));
-    setTargetPh(s.boilTargetPh ?? 5.6);
-    setAcidType(s.boilAcidType ?? "phosphoric");
-    const savedKind = parseWaterStrengthKind(s.boilStrengthKind);
-    setStrengthKind(savedKind);
-    setStrengthValue(s.boilStrengthValue ?? 10);
-    setAcidificationMode(s.boilAcidificationMode === "manual" ? "manual" : "targetPh");
-    setManualAcidAdded(savedKind === "solid" ? (s.boilManualAcidAddedGrams ?? 0) : (s.boilManualAcidAddedMl ?? 0));
-
-    if (s.boilLastCalculatedAt) {
-      setAcidResult({
-        acidRequiredMl: s.boilLastAcidRequiredMl ?? null,
-        acidRequiredTsp: s.boilLastAcidRequiredTsp ?? null,
-        acidRequiredGrams: s.boilLastAcidRequiredGrams ?? null,
-        acidRequiredKg: s.boilLastAcidRequiredKg ?? null,
-        finalAlkalinityPpmCaCO3: s.boilLastFinalAlkalinityPpmCaCO3 ?? 0,
-        sulfateAddedPpm: s.boilLastSulfateAddedPpm ?? 0,
-        chlorideAddedPpm: s.boilLastChlorideAddedPpm ?? 0,
-      });
-      setBoilStatus(`Last calculated: ${new Date(s.boilLastCalculatedAt).toLocaleString()}`);
-    }
-
-    if (s.boilManualLastCalculatedAt) {
-      setManualResult({
-        achievedPh: s.boilManualLastAchievedPh ?? 0,
-        predicted: {
-          acidRequiredMl: null,
-          acidRequiredTsp: null,
-          acidRequiredGrams: null,
-          acidRequiredKg: null,
-          finalAlkalinityPpmCaCO3: s.boilManualLastFinalAlkalinityPpmCaCO3 ?? 0,
-          sulfateAddedPpm: s.boilManualLastSulfateAddedPpm ?? 0,
-          chlorideAddedPpm: s.boilManualLastChlorideAddedPpm ?? 0,
-        },
-        clamped: "none",
-        iterations: 0,
-        targetAmount: Number.NaN,
-        predictedAmount: Number.NaN,
-      });
-    }
-
-    if (s.boilOverallLastResultJson && typeof s.boilOverallLastResultJson === "object") {
-      setOverallResult(s.boilOverallLastResultJson as BoilOverallResultV0);
-    }
-    if (s.boilOverallLastCalculatedAt) {
-      setOverallStatus(`Last calculated: ${new Date(s.boilOverallLastCalculatedAt).toLocaleString()}`);
-    }
+    applyBoilAcidificationHydrationState(deriveBoilAcidificationHydrationState(s), {
+      setStartingAlk,
+      setStartingAlkTouched,
+      setStartingPh,
+      setTargetPh,
+      setAcidType,
+      setStrengthKind,
+      setStrengthValue,
+      setAcidificationMode,
+      setManualAcidAdded,
+      setAcidResult,
+      setBoilStatus,
+      setManualResult,
+      setOverallResult,
+      setOverallStatus,
+    });
   }, []);
 
-  const onSaveInputs = async () => {
-    const {
-      sourceProfileId,
-      targetProfileId,
-      dilutionProfileId,
-      tapVolumeLiters,
-      dilutionVolumeLiters,
-    } = adjustmentFieldsRef.current;
-    setSavingError(null);
-    setBoilSaveStatus(null);
-    setSavingInputs(true);
-    try {
-      await saveSettings({
-        boilSourceWaterProfileId: sourceProfileId || null,
-        boilTargetWaterProfileId: targetProfileId || null,
-        boilDilutionWaterProfileId: dilutionProfileId || null,
-        boilTapWaterVolumeLiters: tapVolumeLiters,
-        boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
-        boilStartingAlkalinityPpmCaCO3: startingAlk,
-        ...(startingPh.trim() === "" ? {} : { boilStartingPh: Number(startingPh) }),
-        boilTargetPh: targetPh,
-        boilAcidType: acidType,
-        boilStrengthKind: strengthKind,
-        boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
-        boilAcidificationMode: acidificationMode,
-        boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
-        boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
-        boilSaltAdditionsJson: saltAdditions,
-      });
-      setBoilSaveStatus("Saved boil draft.");
-    } catch (err) {
-      setSavingError(String(err));
-    } finally {
-      setSavingInputs(false);
-    }
-  };
-
-  const computeAndSaveBoilSnapshots = async () => {
-    const { sourceProfileId, dilutionProfileId, tapVolumeLiters, dilutionVolumeLiters } =
-      adjustmentFieldsRef.current;
-    if (!canCall) throw new Error("Not ready to call API.");
-    if (!recipeId) throw new Error("Missing recipe id.");
-    if (!sourceProfileId) throw new Error("Select a Source water profile.");
-
-    const payload: Record<string, unknown> = {
-      boilSourceWaterProfileId: sourceProfileId,
-      boilDilutionWaterProfileId: dilutionProfileId || null,
-      boilTapWaterVolumeLiters: tapVolumeLiters,
-      boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
-      boilStartingAlkalinityPpmCaCO3: startingAlk,
-      boilStartingPh: Number(startingPh),
-      boilTargetPh: targetPh,
-      boilAcidType: acidType,
-      boilStrengthKind: strengthKind,
-      boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
-      boilAcidificationMode: acidificationMode,
-      boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
-      boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
-      boilSaltAdditionsJson: saltAdditions,
-    };
-
-    return computeAndSaveBoil(webBreweryApiClient(), recipeId, payload);
-  };
-
-  const computeOverallBoil = async (): Promise<BoilOverallResultV0> => {
-    const { mixedSourceProfile, derivedBoilWaterVolumeLiters } = adjustmentFieldsRef.current;
-    if (!mixedSourceProfile) throw new Error("Set Source profile + Source volume first (Dilution optional).");
-    if (!Number.isFinite(derivedBoilWaterVolumeLiters) || !(derivedBoilWaterVolumeLiters > 0)) {
-      throw new Error("Boil water volume must be > 0 (set Water adjustment volumes).");
-    }
-
-    const baseProfile: IonProfilePpm = {
-      calcium: mixedSourceProfile.calcium,
-      magnesium: mixedSourceProfile.magnesium,
-      sodium: mixedSourceProfile.sodium,
-      sulfate: mixedSourceProfile.sulfate,
-      chloride: mixedSourceProfile.chloride,
-      bicarbonate: mixedSourceProfile.bicarbonate,
-    };
-
-    const payload: Record<string, unknown> = {
-      boilMode: acidificationMode,
-      startingAlkalinityPpmCaCO3: startingAlk,
-      startingPh: Number(startingPh),
-      targetPh,
-      volumeLiters: derivedBoilWaterVolumeLiters,
-      baseProfile,
-      additions: saltAdditions,
-      acidType,
-      strengthKind,
-    };
-    if (strengthKind !== "solid") payload["strengthValue"] = strengthValue;
-    if (acidificationMode === "manual") {
-      Object.assign(
-        payload,
-        strengthKind === "solid" ? { acidAddedGrams: manualAcidAdded } : { acidAddedMl: manualAcidAdded },
-      );
-    }
-
-    const data = await calcBoilOverall(webBreweryApiClient(), payload);
-    setOverallDerivation(data.derivation as WaterCalcDerivation);
-    return data.result as BoilOverallResultV0;
-  };
-
-  const onSubmitAcid = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { derivedBoilWaterVolumeLiters } = adjustmentFieldsRef.current;
-    if (!canCall) return;
-    if (startingPh.trim() === "" || !Number.isFinite(Number(startingPh))) {
-      setBoilError("Starting pH is required (select a profile with pH or enter it manually).");
-      return;
-    }
-    if (!Number.isFinite(derivedBoilWaterVolumeLiters) || !(derivedBoilWaterVolumeLiters > 0)) {
-      setBoilError("Boil water volume must be > 0 (set Water adjustment volumes).");
-      return;
-    }
-    try {
-      await saltsBridgeRef.current.ensureZeroSaltsSnapshotIfMissing();
-    } catch (err) {
-      setBoilError(String(err));
-      return;
-    }
-    setBoilError(null);
-    setBoilStatus(null);
-    setCalcSaveStatus(null);
-    setAcidResult(null);
-    setManualResult(null);
-    setAcidDerivation(null);
-    setSubmitting(true);
-    try {
-      const computed = await computeAndSaveBoilSnapshots();
-      setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
-      saltsBridgeRef.current.applySaltsFromCompute(
-        computed.salts.result as unknown as SaltAdditionsResult,
-        computed.salts.derivation as WaterCalcDerivation,
-      );
-      setAcidDerivation(computed.acid.derivation);
-      setOverallDerivation(computed.overall.derivation);
-      setOverallResult(computed.overall.result as unknown as BoilOverallResultV0);
-      setOverallStatus("Calculated.");
-
-      if (computed.acid.kind === "boil_acidification_manual") {
-        setManualResult(computed.acid.result);
-        setAcidResult(computed.acid.result.predicted ?? null);
-        setBoilStatus("Estimated (manual mode).");
-        setCalcSaveStatus("Estimated & saved snapshot.");
-      } else {
-        setManualResult(null);
-        setAcidResult(computed.acid.result);
-        setBoilStatus("Calculated.");
-        setCalcSaveStatus("Calculated & saved snapshot.");
-      }
-    } catch (err) {
-      setBoilError(String(err));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const onCalculateOverall = async (saveAlso: boolean) => {
-    setOverallError(null);
-    setOverallStatus(null);
-    setOverallSaveStatus(null);
-    setSavingOverall(true);
-    try {
-      if (saveAlso) {
-        const computed = await computeAndSaveBoilSnapshots();
-        setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
-        saltsBridgeRef.current.applySaltsFromCompute(
-          computed.salts.result as unknown as SaltAdditionsResult,
-          computed.salts.derivation as WaterCalcDerivation,
-        );
-        setAcidDerivation(computed.acid.derivation);
-        setOverallDerivation(computed.overall.derivation);
-        setOverallResult(computed.overall.result as unknown as BoilOverallResultV0);
-        setOverallStatus("Calculated.");
-        setOverallSaveStatus("Calculated & saved overall snapshot.");
-      } else {
-        await saltsBridgeRef.current.ensureZeroSaltsSnapshotIfMissing();
-        const overall = await computeOverallBoil();
-        setOverallResult(overall);
-        setOverallStatus("Calculated.");
-      }
-    } catch (err) {
-      setOverallError(String(err));
-    } finally {
-      setSavingOverall(false);
-    }
-  };
+  const handlers = createWaterBoilAcidificationHandlers({
+    canCall,
+    recipeId,
+    saveSettings,
+    setSavingError,
+    setFormatHints,
+    saltsBridgeRef,
+    adjustmentFieldsRef,
+    startingAlk,
+    startingPh,
+    targetPh,
+    acidType,
+    strengthKind,
+    strengthValue,
+    acidificationMode,
+    manualAcidAdded,
+    saltAdditions,
+    setBoilSaveStatus,
+    setSavingInputs,
+    setBoilError,
+    setBoilStatus,
+    setCalcSaveStatus,
+    setAcidResult,
+    setManualResult,
+    setAcidDerivation,
+    setSubmitting,
+    setOverallError,
+    setOverallStatus,
+    setOverallSaveStatus,
+    setSavingOverall,
+    setOverallResult,
+    setOverallDerivation,
+  });
 
   return {
     startingAlk,
@@ -388,10 +173,10 @@ export function useWaterBoilAcidification(params: {
     setOverallDerivation,
     displayAlkalinityPpmCaCO3,
     hydrateBoilAcidification,
-    onSaveInputs,
-    computeAndSaveBoilSnapshots,
-    onSubmitAcid,
-    computeOverallBoil,
-    onCalculateOverall,
+    onSaveInputs: handlers.onSaveInputs,
+    computeAndSaveBoilSnapshots: handlers.computeAndSaveBoilSnapshots,
+    onSubmitAcid: handlers.onSubmitAcid,
+    computeOverallBoil: handlers.computeOverallBoil,
+    onCalculateOverall: handlers.onCalculateOverall,
   };
 }
