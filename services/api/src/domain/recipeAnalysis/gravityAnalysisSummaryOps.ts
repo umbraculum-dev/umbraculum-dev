@@ -40,7 +40,7 @@ export function computeGravitySummaryMetrics(args: {
   warnings: GravityAnalysisWarning[];
 }): GravitySummaryMetrics {
   const { yieldMetrics, warnings } = args;
-  const { kettleVolumeLiters, preBoilVolumeLiters, ogEstimatedSg, pbgEstimatedSg, boilTimeHours } = yieldMetrics;
+  const { kettleVolumeLiters, ogEstimatedSg, pbgEstimatedSg, boilTimeHours } = yieldMetrics;
 
   const hops = extractHopAdditions(args.beerJsonRecipeJson, args.recipeExtJson);
 

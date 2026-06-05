@@ -1,8 +1,6 @@
 import React from "react";
 import { YStack } from "tamagui";
 
-import type { EditorMashStep } from "@umbraculum/brewery-beerjson";
-
 import { Text } from "@umbraculum/ui";
 
 import { MashStepRow, MashStepsReadOnlyView } from "./MashStepRow";

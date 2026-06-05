@@ -10,7 +10,6 @@ import {
   YEAST_PITCH_RATE_OPTIONS,
 } from "@umbraculum/brewery-beerjson";
 import { Text } from "@umbraculum/ui";
-import type { TranslationValues } from "@umbraculum/i18n-react";
 
 import { ReadOnlyField } from "../../../../../components/ReadOnlyField";
 import { Input } from "../../../../../components/AppInput";
