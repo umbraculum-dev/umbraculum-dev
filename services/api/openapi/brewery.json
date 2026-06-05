@@ -6343,905 +6343,6 @@
         }
       }
     },
-    "/brew-sessions/{brewSessionId}/integrations/attachments": {
-      "get": {
-        "tags": [
-          "brewery"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            },
-            "in": "path",
-            "name": "brewSessionId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "attachments": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "attachedAt": {
-                            "type": "string"
-                          },
-                          "device": {
-                            "type": "object",
-                            "additionalProperties": {}
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "attachedAt",
-                          "device"
-                        ],
-                        "additionalProperties": false
-                      }
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "attachments"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        false
-                      ]
-                    },
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "message": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "details": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "message"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/brew-sessions/{brewSessionId}/integrations/attach": {
-      "post": {
-        "tags": [
-          "brewery"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "kind": {
-                    "type": "string",
-                    "enum": [
-                      "tilt",
-                      "ispindel",
-                      "rapt"
-                    ]
-                  },
-                  "deviceId": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "required": [
-                  "kind",
-                  "deviceId"
-                ]
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            },
-            "in": "path",
-            "name": "brewSessionId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "attachment": {
-                      "type": "object",
-                      "additionalProperties": {}
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "attachment"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        false
-                      ]
-                    },
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "message": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "details": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "message"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/brew-sessions/{brewSessionId}/integrations/detach": {
-      "post": {
-        "tags": [
-          "brewery"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "deviceId": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "required": [
-                  "deviceId"
-                ]
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            },
-            "in": "path",
-            "name": "brewSessionId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "detachedCount": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "detachedCount"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        false
-                      ]
-                    },
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "message": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "details": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "message"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/brew-sessions/{brewSessionId}/integrations/readings": {
-      "get": {
-        "tags": [
-          "brewery"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "enum": [
-                "tilt",
-                "ispindel",
-                "rapt"
-              ]
-            },
-            "in": "query",
-            "name": "kind",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "exclusiveMinimum": true,
-              "maximum": 9007199254740991
-            },
-            "in": "query",
-            "name": "limit",
-            "required": false
-          },
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            },
-            "in": "path",
-            "name": "brewSessionId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "readings": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "additionalProperties": {}
-                      }
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "readings"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        false
-                      ]
-                    },
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "message": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "details": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "message"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/brew-sessions/{brewSessionId}/steps": {
-      "patch": {
-        "tags": [
-          "brewery"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "steps": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": {}
-                    }
-                  }
-                },
-                "required": [
-                  "steps"
-                ]
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            },
-            "in": "path",
-            "name": "brewSessionId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "steps": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "brewSessionId": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "status": {
-                            "type": "string"
-                          },
-                          "sortOrder": {
-                            "type": "integer",
-                            "minimum": -9007199254740991,
-                            "maximum": 9007199254740991
-                          },
-                          "sectionId": {
-                            "type": "string"
-                          },
-                          "sectionName": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "createdAt": {
-                            "type": "string"
-                          },
-                          "updatedAt": {
-                            "type": "string"
-                          },
-                          "isDisabled": {
-                            "type": "boolean"
-                          },
-                          "customTimerEnabled": {
-                            "type": "boolean"
-                          },
-                          "note": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "minutesPlanned": {
-                            "nullable": true,
-                            "type": "number"
-                          },
-                          "offsetMinutesFromEnd": {
-                            "nullable": true,
-                            "type": "number"
-                          },
-                          "relativeToStepId": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "timerAccumulatedSeconds": {
-                            "type": "number"
-                          },
-                          "timerLastStartedAt": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "timerPausedAt": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "timerStartedAt": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "timerState": {
-                            "type": "string"
-                          },
-                          "timerStoppedAt": {
-                            "nullable": true,
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "brewSessionId",
-                          "name",
-                          "status",
-                          "sortOrder",
-                          "sectionId",
-                          "sectionName",
-                          "createdAt",
-                          "updatedAt",
-                          "isDisabled",
-                          "customTimerEnabled",
-                          "note",
-                          "minutesPlanned",
-                          "offsetMinutesFromEnd",
-                          "relativeToStepId",
-                          "timerAccumulatedSeconds",
-                          "timerLastStartedAt",
-                          "timerPausedAt",
-                          "timerStartedAt",
-                          "timerState",
-                          "timerStoppedAt"
-                        ],
-                        "additionalProperties": {}
-                      }
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "steps"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        false
-                      ]
-                    },
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "message": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "details": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "message"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/brew-sessions/{brewSessionId}/steps/{stepId}": {
-      "patch": {
-        "tags": [
-          "brewery"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "customTimerEnabled": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "customTimerEnabled"
-                ]
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            },
-            "in": "path",
-            "name": "brewSessionId",
-            "required": true
-          },
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1
-            },
-            "in": "path",
-            "name": "stepId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "step": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "brewSessionId": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "string"
-                        },
-                        "sortOrder": {
-                          "type": "integer",
-                          "minimum": -9007199254740991,
-                          "maximum": 9007199254740991
-                        },
-                        "sectionId": {
-                          "type": "string"
-                        },
-                        "sectionName": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "string"
-                        },
-                        "updatedAt": {
-                          "type": "string"
-                        },
-                        "isDisabled": {
-                          "type": "boolean"
-                        },
-                        "customTimerEnabled": {
-                          "type": "boolean"
-                        },
-                        "note": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "minutesPlanned": {
-                          "nullable": true,
-                          "type": "number"
-                        },
-                        "offsetMinutesFromEnd": {
-                          "nullable": true,
-                          "type": "number"
-                        },
-                        "relativeToStepId": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "timerAccumulatedSeconds": {
-                          "type": "number"
-                        },
-                        "timerLastStartedAt": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "timerPausedAt": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "timerStartedAt": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "timerState": {
-                          "type": "string"
-                        },
-                        "timerStoppedAt": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "brewSessionId",
-                        "name",
-                        "status",
-                        "sortOrder",
-                        "sectionId",
-                        "sectionName",
-                        "createdAt",
-                        "updatedAt",
-                        "isDisabled",
-                        "customTimerEnabled",
-                        "note",
-                        "minutesPlanned",
-                        "offsetMinutesFromEnd",
-                        "relativeToStepId",
-                        "timerAccumulatedSeconds",
-                        "timerLastStartedAt",
-                        "timerPausedAt",
-                        "timerStartedAt",
-                        "timerState",
-                        "timerStoppedAt"
-                      ],
-                      "additionalProperties": {}
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "step"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ok": {
-                      "type": "boolean",
-                      "enum": [
-                        false
-                      ]
-                    },
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "message": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "details": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "message"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "ok",
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/brew-sessions/{brewSessionId}/start": {
       "post": {
         "tags": [
@@ -8227,6 +7328,444 @@
         }
       }
     },
+    "/brew-sessions/{brewSessionId}/steps": {
+      "patch": {
+        "tags": [
+          "brewery"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "steps": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    }
+                  }
+                },
+                "required": [
+                  "steps"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "path",
+            "name": "brewSessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "brewSessionId": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "sortOrder": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "sectionId": {
+                            "type": "string"
+                          },
+                          "sectionName": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          },
+                          "isDisabled": {
+                            "type": "boolean"
+                          },
+                          "customTimerEnabled": {
+                            "type": "boolean"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "minutesPlanned": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "offsetMinutesFromEnd": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "relativeToStepId": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerAccumulatedSeconds": {
+                            "type": "number"
+                          },
+                          "timerLastStartedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerPausedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerStartedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerState": {
+                            "type": "string"
+                          },
+                          "timerStoppedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "brewSessionId",
+                          "name",
+                          "status",
+                          "sortOrder",
+                          "sectionId",
+                          "sectionName",
+                          "createdAt",
+                          "updatedAt",
+                          "isDisabled",
+                          "customTimerEnabled",
+                          "note",
+                          "minutesPlanned",
+                          "offsetMinutesFromEnd",
+                          "relativeToStepId",
+                          "timerAccumulatedSeconds",
+                          "timerLastStartedAt",
+                          "timerPausedAt",
+                          "timerStartedAt",
+                          "timerState",
+                          "timerStoppedAt"
+                        ],
+                        "additionalProperties": {}
+                      }
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "steps"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/brew-sessions/{brewSessionId}/steps/{stepId}": {
+      "patch": {
+        "tags": [
+          "brewery"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customTimerEnabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "customTimerEnabled"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "path",
+            "name": "brewSessionId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "path",
+            "name": "stepId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "step": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "brewSessionId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "sectionId": {
+                          "type": "string"
+                        },
+                        "sectionName": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "isDisabled": {
+                          "type": "boolean"
+                        },
+                        "customTimerEnabled": {
+                          "type": "boolean"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "minutesPlanned": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "offsetMinutesFromEnd": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "relativeToStepId": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerAccumulatedSeconds": {
+                          "type": "number"
+                        },
+                        "timerLastStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerPausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerState": {
+                          "type": "string"
+                        },
+                        "timerStoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brewSessionId",
+                        "name",
+                        "status",
+                        "sortOrder",
+                        "sectionId",
+                        "sectionName",
+                        "createdAt",
+                        "updatedAt",
+                        "isDisabled",
+                        "customTimerEnabled",
+                        "note",
+                        "minutesPlanned",
+                        "offsetMinutesFromEnd",
+                        "relativeToStepId",
+                        "timerAccumulatedSeconds",
+                        "timerLastStartedAt",
+                        "timerPausedAt",
+                        "timerStartedAt",
+                        "timerState",
+                        "timerStoppedAt"
+                      ],
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "step"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/brew-sessions/{brewSessionId}/steps/{stepId}/log": {
       "post": {
         "tags": [
@@ -9016,6 +8555,467 @@
                   "required": [
                     "ok",
                     "step"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/brew-sessions/{brewSessionId}/integrations/attachments": {
+      "get": {
+        "tags": [
+          "brewery"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "path",
+            "name": "brewSessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "attachments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "attachedAt": {
+                            "type": "string"
+                          },
+                          "device": {
+                            "type": "object",
+                            "additionalProperties": {}
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "attachedAt",
+                          "device"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "attachments"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/brew-sessions/{brewSessionId}/integrations/attach": {
+      "post": {
+        "tags": [
+          "brewery"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "tilt",
+                      "ispindel",
+                      "rapt"
+                    ]
+                  },
+                  "deviceId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "kind",
+                  "deviceId"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "path",
+            "name": "brewSessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "attachment": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "attachment"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/brew-sessions/{brewSessionId}/integrations/detach": {
+      "post": {
+        "tags": [
+          "brewery"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deviceId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "deviceId"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "path",
+            "name": "brewSessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "detachedCount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "detachedCount"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "message": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/brew-sessions/{brewSessionId}/integrations/readings": {
+      "get": {
+        "tags": [
+          "brewery"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "tilt",
+                "ispindel",
+                "rapt"
+              ]
+            },
+            "in": "query",
+            "name": "kind",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "in": "path",
+            "name": "brewSessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "readings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": {}
+                      }
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "readings"
                   ],
                   "additionalProperties": false
                 }
