@@ -1,7 +1,7 @@
 # Ecosystem case studies — index
 
 **Tier:** Public  
-**Status:** v1.5 — custom vertical code case study (2026-05-30)  
+**Status:** v1.6 — custom vertical code §4.4 SOLID/SRP + yeastEditor example (2026-06-05)  
 **Audience:** **young community members first**, then contributors, platform evaluators, vertical builders, learners repositioning in hard times  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.3, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §2.1–§2.2
 
@@ -51,7 +51,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | [Odoo](ecosystem-case-study-odoo.md) | Odoo Community | **Partial positive** — CE learnability; we skip cert/partner ladder; **§4.1** platform-shape comparison (not feature scorecard) | Copy ladder, not badges |
 | [Adobe → Magento](ecosystem-case-study-adobe-magento.md) | Magento Open Source / Adobe stewardship | **Community lost through stewardship** — dev docs scattered/404, cert churn, **cloud integration pipelines failing**, trademark; **Mage-OS** as fork counter-case | AGPL + DCO; fork rights; no cert gate; **CI by default**; doc redirects |
 | [Drupal + WordPress](ecosystem-case-study-drupal-wordpress.md) | Drupal, WordPress | **Partial positive** — stewardship + community; **WordPress plugin hell** (auth); **Drupal core-scale debate unsettled** | RFC-0001 Decision F; canonical modules; community proposals; no junior contempt |
-| [Custom vertical code](ecosystem-case-study-custom-vertical-code.md) | **Unnamed platforms** (agency delivery) | **Delivery vs craft split**; priesthood unmaintainability; **custom code ~90% of upgrade pain**; client quality blind spot | Apparatus + CI; ongoing public discussion; solidarity guardrail; supplier-quality questions |
+| [Custom vertical code](ecosystem-case-study-custom-vertical-code.md) | **Unnamed platforms** (agency delivery) | **Delivery vs craft split**; priesthood unmaintainability; **custom code ~90% of upgrade pain**; Shopify contrast §4.3; **SOLID/SRP code shape** §4.4 | Apparatus + CI + [`CODING-STANDARDS.md`](../CODING-STANDARDS.md) SOLID; yeastEditor worked example |
 
 **Pairings that help:**
 
@@ -61,7 +61,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 - **Adobe → Magento + Omnis** — docs treated as disposable; Adobe also lost community through stewardship; Mage-OS proves fork path.  
 - **Drupal + WordPress + Adobe → Magento** — stewardship contrast: WP/Drupal longevity vs Adobe collapse; shared PHP-era lessons.  
 - **Drupal + WordPress (RFC-0001)** — modularity yes; parallel auth hell no.  
-- **Adobe → Magento + Custom vertical code** — **two independent causes**: stewardship/CI (**indirect**) and integrator custom code (**direct**); not one consequence of the other; Shopify contrast (§4.3).  
+- **Adobe → Magento + Custom vertical code** — **two independent causes**: stewardship/CI (**indirect**) and integrator custom code (**direct**); not one consequence of the other; Shopify contrast (§4.3); **SOLID/SRP** as the code-shape mechanism (§4.4).  
 - **Custom vertical code + Drupal §3.2** — priesthood contempt vs **common ground** via apparatus.
 
 ---

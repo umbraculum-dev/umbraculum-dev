@@ -1,7 +1,7 @@
 # Ecosystem case study — custom code in vertical delivery (unnamed platforms)
 
 **Tier:** Public  
-**Status:** v1.1 — clarify two-failure framing vs Adobe pairing (2026-05-31)  
+**Status:** v1.2 — §4.4 SOLID/SRP as code-shape mechanism; yeastEditor worked example (2026-06-05)  
 **Audience:** **young community members first**, agency integrators, vertical builders, clients evaluating software suppliers, maintainers reasoning about **code consistency as a solidarity commitment**  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.1–§2.2, [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §"CI must pass", [`design/ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.5, [`design/ecosystem-case-study-drupal-wordpress.md`](ecosystem-case-study-drupal-wordpress.md) §3.2, [`design/ecosystem-case-studies.md`](ecosystem-case-studies.md)
 
@@ -113,6 +113,24 @@ Adobe failed integrators on **tools and governance**; integrators often failed *
 
 Quality literature on supplier relationships and total cost is **clear**; **software purchasing** has not caught up. We say that plainly to **clients and employers**, not only to developers.
 
+### 4.4 SOLID as the mechanism — debuggable core and modules, not slogans
+
+"Code shape" is not a vibe. In this repo it is **SOLID expressed as repo-native boundaries** — merge-blocking in scoped surfaces per [`CODING-STANDARDS.md`](../CODING-STANDARDS.md) §"Architectural coupling (SOLID — mandatory, repo-native)".
+
+**Single Responsibility (S)** is the principle we name first because it directly answers the priesthood failure in §3: thousand-line classes with one reason to change — *everything*. When each unit owns **one concern**, the codebase becomes **easier to read, debug, maintain, and refactor** — for a newcomer, a student, or a rescue integrator who did not write the original sprint.
+
+| Layer | S in practice (canonical / core) | Why it helps the next developer |
+|-------|----------------------------------|--------------------------------|
+| **API module** | Thin routes; logic in services; wire in `@umbraculum/*-contracts` | Change vessel listing without opening unrelated MRP code — e.g. [`services/api/src/modules/automation/routes/automationVesselsRoutes.ts`](../../services/api/src/modules/automation/routes/automationVesselsRoutes.ts) + [`services/api/src/modules/automation/services/vesselsService.ts`](../../services/api/src/modules/automation/services/vesselsService.ts) |
+| **Module ownership** | One URL segment, one Prisma schema, one `code` per canonical module | Boundaries tell you **where** to look before you edit |
+| **Web UI (vertical or platform)** | Parent composes; child files own one row, panel, or field group | Tweak pitch-rate UI without touching identity or attenuation fields |
+
+**Worked example (UI — brewery vertical, illustrative).** The yeast editor under [`apps/web/app/recipes/_components/yeastEditor/`](../../apps/web/app/recipes/_components/yeastEditor/) splits one editor into focused components — `YeastEditorRow` composes row parts; `YeastEditorRowIdentity`, `YeastEditorRowAttenuation`, `YeastEditorRowPitch`, `YeastEditorRowManualCount`, plus `YeastEditorEditable` / `YeastEditorReadOnly` and shared `yeastEditorTypes.ts`. A developer who only needs to adjust **attenuation** or **pitch amount** opens **one small file** instead of a monolith parent. That is the opposite of Shopify's blast-radius containment: we **invest in structure** so custom and vertical work stays **understandable inside the platform**, not isolated behind a sandbox wall.
+
+We would prefer every public doc example to live on a **canonical module** surface first; **`automation` API** above is that counterpart. The yeast editor remains the clearest **visual** proof that the same discipline applies to **vertical UI** — the layer where agency estates usually accumulated unmaintainable mega-components.
+
+**Contrast retained:** Shopify keeps the **store up** when an extension fails. Umbraculum keeps the **estate legible** when *your* module or vertical code changes — via apparatus, CI, contracts, module layout, **and** SOLID decomposition so the next person is not locked out.
+
 ---
 
 ## 5. Clients should ask — Toyota supplier logic, not insult
@@ -141,7 +159,7 @@ That is **not an anti-pattern**. It is a **guardrail** and a **solidarity** norm
 | Failure mode | What we saw (unnamed verticals) | Umbraculum commitment | Mechanism |
 |--------------|--------------------------------|----------------------|-----------|
 | Delivery vs craft split with contempt | Agency culture, many stacks | **Common ground via shared apparatus** — not priesthood, not sneering | [`CURSOR-PLUGINS.md`](../CURSOR-PLUGINS.md); [`GETTING-STARTED.md`](../GETTING-STARTED.md); forum |
-| Unmaintainable mega-classes by seniors | Rescue projects | **Structural similarity enforced** before merge | Rules, skills, [`MODULES.md`](../MODULES.md), RFC-0002 layout |
+| Unmaintainable mega-classes by seniors | Rescue projects | **Structural similarity enforced** before merge | Rules, skills, [`MODULES.md`](../MODULES.md), RFC-0002 layout; SOLID/SRP — [`CODING-STANDARDS.md`](../CODING-STANDARDS.md) §"Architectural coupling"; §4.4 yeastEditor example |
 | Platform blamed; custom code ignored | Upgrade/rescue audits | **Honest public case study** — custom layer named | This document; [`ecosystem-case-studies.md`](ecosystem-case-studies.md) |
 | No ongoing code-shape discussion | Silent agency norms | **Core keeps this discussion ongoing forever** | Public RFCs ([`LICENSING.md`](../LICENSING.md) §10); [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4 |
 | Vertical modules exempt from discipline | Tier 3/6 "just ship it" | **Same advice for verticals** — continuous teaching + supervision | [`MODULES.md`](../MODULES.md); module README gates; CI patterns |

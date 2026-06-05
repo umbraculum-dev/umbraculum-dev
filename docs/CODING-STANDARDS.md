@@ -402,6 +402,19 @@ SOLID is expressed as **concrete boundaries**, not abstract OOP dogma. Treat the
 | **I** — Segregation | Import `*-contracts` / narrow hooks — not server services from apps |
 | **D** — Inversion | Dependency direction: backbone → module → app (never reverse) |
 
+### Worked example — Single Responsibility in UI (debuggable vertical surface)
+
+Shopify optimises for **store uptime when an extension fails**; Umbraculum optimises for **legible, maintainable code shape** on core and modules — including vertical UI. **S** is the first lever: one file, one concern, one obvious place to debug.
+
+The brewery yeast editor [`apps/web/app/recipes/_components/yeastEditor/`](../../apps/web/app/recipes/_components/yeastEditor/) demonstrates the pattern:
+
+- **`YeastEditorRow`** — composes one ingredient row from parts; no single mega-render function.
+- **`YeastEditorRowIdentity`**, **`YeastEditorRowAttenuation`**, **`YeastEditorRowPitch`**, **`YeastEditorRowManualCount`** — each owns one field group; a newcomer adjusts pitch or attenuation without reading the whole editor.
+- **`YeastEditorEditable`** / **`YeastEditorReadOnly`** — mode split at the container boundary.
+- **`yeastEditorTypes.ts`** — shared props/context types only.
+
+Canonical modules follow the same **S** at the API layer (routes thin, services own logic, contracts wire-only) — e.g. [`services/api/src/modules/automation/`](../../services/api/src/modules/automation/). Narrative context (Shopify contrast, priesthood failure): [`design/ecosystem-case-study-custom-vertical-code.md`](design/ecosystem-case-study-custom-vertical-code.md) §4.3–§4.4.
+
 **Dependency direction:** [application-surfaces-vs-platform-backbone.md](design/application-surfaces-vs-platform-backbone.md), [DATA-ACCESS-BOUNDARIES.md](DATA-ACCESS-BOUNDARIES.md).
 
 **Must not:** sibling canonical module imports (P0 — enforced by `eslint-plugin-boundaries` at **`error`** on `services/api/src/modules/**`); business logic or raw `app.prisma` in route handlers; `services/api` or `@prisma/*` from apps.
