@@ -21,7 +21,7 @@ SECTION_EXPORTS = {
 
 
 def extract_accordion_items(text: str) -> list[tuple[str, str]]:
-    start = text.find("<Accordion type=")
+    start = text.find("<Accordion")
     if start < 0:
         raise SystemExit("Accordion not found")
     inner_start = text.find(">", start) + 1
