@@ -11,9 +11,9 @@ import {
 import type { AuthMeResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 
-import { useAuth } from "../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
+import { useAuth } from "../../../../auth/AuthProvider";
+import { getApiBaseUrl } from "../../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
 import type { EquipmentProfile } from "../../lib/equipmentTypes";
 import { parseNullableNumber } from "../../lib/equipmentTypes";
 
