@@ -17,6 +17,8 @@ import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { isAllowedAppImport } from "../eslint/appClientPackageAllowlist.mjs";
+
 const REPO_ROOT = join(fileURLToPath(import.meta.url), "..", "..", "..");
 const OUTPUT = join(REPO_ROOT, "docs/design/solid-audit-inventory.md");
 
@@ -156,26 +158,6 @@ function detectLargeFiles(files: string[]): InventoryRow[] {
     });
   }
   return rows;
-}
-
-const APP_CLIENT_PACKAGE_PREFIXES = [
-  "@umbraculum/api-client",
-  "@umbraculum/contracts",
-  "@umbraculum/ui",
-  "@umbraculum/navigation",
-  "@umbraculum/i18n",
-  "@umbraculum/i18n-react",
-  "@umbraculum/i18n-keys",
-  "@umbraculum/media",
-  "@umbraculum/brewery-core",
-  "@umbraculum/beerjson",
-  "@umbraculum/recipes-ui",
-  "@umbraculum/module-sdk",
-] as const;
-
-function isAllowedAppImport(specifier: string): boolean {
-  if (specifier.endsWith("-contracts") && specifier.startsWith("@umbraculum/")) return true;
-  return APP_CLIENT_PACKAGE_PREFIXES.some((p) => specifier === p || specifier.startsWith(`${p}/`));
 }
 
 function detectAppServerImports(files: string[]): InventoryRow[] {

@@ -1,6 +1,7 @@
 import type { BillingTier, PrismaClient } from "@prisma/client";
 
 import { BadRequestError, NotFoundError } from "../../errors.js";
+import { computeRecipeGravityAnalysis } from "../../domain/recipeAnalysis/gravityAnalysis.js";
 import type { WorkspacesService } from "../workspacesService.js";
 
 export async function getWorkspaceTier(prisma: PrismaClient, workspaceId: string): Promise<BillingTier> {
@@ -69,6 +70,25 @@ export async function getRecipe(
   });
   if (!recipe) throw new NotFoundError("recipe_not_found", "Recipe not found");
   return recipe;
+}
+
+export async function getRecipeWithAnalysis(
+  prisma: PrismaClient,
+  workspaces: WorkspacesService,
+  userId: string,
+  workspaceId: string,
+  recipeId: string,
+) {
+  const recipe = await getRecipe(prisma, workspaces, userId, workspaceId, recipeId);
+  const waterSettings = await prisma.recipeWaterSettings.findUnique({
+    where: { recipeId: recipe.id },
+  });
+  const analysis = computeRecipeGravityAnalysis({
+    beerJsonRecipeJson: recipe.beerJsonRecipeJson,
+    recipeExtJson: recipe.recipeExtJson,
+    recipeWaterSettings: waterSettings,
+  });
+  return { ...recipe, analysis };
 }
 
 export async function listRecipeVersions(

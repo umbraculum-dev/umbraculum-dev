@@ -61,6 +61,10 @@ Configuration lives in [`eslint.config.mjs`](../eslint.config.mjs) (scoped `file
 
 Horizontal paths (`services/api/src/routes/**`, `services/api/src/services/ai/tools/**`) are outside this rule's scope by design.
 
+### Client-safe package imports (WS6)
+
+Apps must not import `@prisma/*` or `services/api/**` source (belt-and-suspenders alongside WS5 `eslint-plugin-boundaries`). Burn-in rule: `no-restricted-imports` at **`warn`** on `apps/{web,native}/**` — see [`docs/design/solid-client-safe-imports-spike.md`](design/solid-client-safe-imports-spike.md). Allowlist: [`scripts/eslint/appClientPackageAllowlist.mjs`](../scripts/eslint/appClientPackageAllowlist.mjs).
+
 ---
 
 ## Scope tiers — value/cost analysis

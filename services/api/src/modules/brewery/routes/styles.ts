@@ -3,9 +3,11 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { ErrorResponseSchema, StylesListResponseSchema } from "@umbraculum/contracts";
 
 import { requireUser } from "../../../plugins/requestContext.js";
+import { StylesService } from "../services/stylesService.js";
 
 export function stylesRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
+  const styles = new StylesService(app.prisma);
 
   zodApp.get(
     "/styles",
@@ -20,23 +22,8 @@ export function stylesRoutes(app: FastifyInstance) {
     },
     async (req) => {
       requireUser(req);
-
-      const styles = await app.prisma.beerStyle.findMany({
-        where: { isActive: true },
-        orderBy: [{ sortOrder: "asc" }, { key: "asc" }],
-        select: {
-          key: true,
-          name: true,
-          source: true,
-          version: true,
-          code: true,
-          category: true,
-          categoryId: true,
-          sortOrder: true,
-        },
-      });
-
-      return StylesListResponseSchema.parse({ ok: true, styles });
+      const styleList = await styles.listActiveStyles();
+      return StylesListResponseSchema.parse({ ok: true, styles: styleList });
     },
   );
 }

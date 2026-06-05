@@ -89,6 +89,17 @@ Brew-day reliability targets **write locally first**, sync when online ([`module
 | `packages/api-client` | **No** | Yes (implements fetch) |
 | Third-party npm module | **No** | Yes |
 
+### Client-safe vertical packages (apps/web, apps/native)
+
+These brewery-vertical packages contain **no Prisma, no `services/api` imports, and no server-only deps**. Apps may import them directly (HTTP + contracts remain the persistence boundary):
+
+| Package | Role |
+|---|---|
+| `@umbraculum/brewery-beerjson` | BeerJSON adaptation helpers (`packages/beerjson`) |
+| `@umbraculum/brewery-recipes-ui` | Cross-platform recipe/water UI (`packages/recipes-ui`) |
+
+Allowlist source of truth: [`scripts/eslint/appClientPackageAllowlist.mjs`](../scripts/eslint/appClientPackageAllowlist.mjs). ESLint burn-in: [`docs/design/solid-client-safe-imports-spike.md`](design/solid-client-safe-imports-spike.md) (WS6).
+
 ---
 
 ## 7. Module author checklist

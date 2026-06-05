@@ -11,7 +11,6 @@ import {
   RecipeVersionsResponseSchema,
 } from "@umbraculum/contracts";
 
-import { computeRecipeGravityAnalysis } from "../../../domain/recipeAnalysis/gravityAnalysis.js";
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { RecipesService } from "../../../services/recipesService.js";
 
@@ -77,16 +76,12 @@ export function recipesRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const recipe = await recipes.getRecipe(ctx.userId, ctx.activeWorkspaceId, req.params.id);
-      const waterSettings = await app.prisma.recipeWaterSettings.findUnique({
-        where: { recipeId: recipe.id },
-      });
-      const analysis = computeRecipeGravityAnalysis({
-        beerJsonRecipeJson: recipe.beerJsonRecipeJson,
-        recipeExtJson: recipe.recipeExtJson,
-        recipeWaterSettings: waterSettings,
-      });
-      return RecipeResponseSchema.parse({ ok: true, recipe: { ...recipe, analysis } });
+      const recipe = await recipes.getRecipeWithAnalysis(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.id,
+      );
+      return RecipeResponseSchema.parse({ ok: true, recipe });
     },
   );
 

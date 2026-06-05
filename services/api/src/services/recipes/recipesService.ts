@@ -4,6 +4,7 @@ import { WorkspacesService } from "../workspacesService.js";
 import {
   getRecipe,
   getRecipeForWorkspace,
+  getRecipeWithAnalysis,
   listRecipeVersions,
   listRecipes,
   listRecipesForWorkspace,
@@ -32,6 +33,10 @@ export class RecipesService {
 
   async getRecipe(userId: string, workspaceId: string, recipeId: string) {
     return getRecipe(this.prisma, this.workspaces, userId, workspaceId, recipeId);
+  }
+
+  async getRecipeWithAnalysis(userId: string, workspaceId: string, recipeId: string) {
+    return getRecipeWithAnalysis(this.prisma, this.workspaces, userId, workspaceId, recipeId);
   }
 
   async listRecipeVersions(userId: string, workspaceId: string, recipeId: string) {

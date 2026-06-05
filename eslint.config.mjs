@@ -615,6 +615,39 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // SOLID WS6 — client-safe import burn-in (warn-level).
+  //
+  // Belt-and-suspenders alongside WS5 boundaries: forbid @prisma and
+  // services/api source imports from apps. Verified client-safe packages
+  // are allowlisted in scripts/eslint/appClientPackageAllowlist.mjs.
+  // Promote to error after burn-in cycle — see solid-client-safe-imports-spike.md.
+  // -------------------------------------------------------------------
+  {
+    files: ["apps/{web,native}/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          paths: [
+            {
+              name: "@prisma/client",
+              message:
+                "Apps must not import Prisma — use @umbraculum/api-client + *-contracts. See docs/DATA-ACCESS-BOUNDARIES.md.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["**/services/api/**", "@prisma/*"],
+              message:
+                "Apps must not import server/API source or Prisma — use HTTP client + contracts. See docs/DATA-ACCESS-BOUNDARIES.md.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // -------------------------------------------------------------------
   // Test files: relax a few rules.
   //
   // `no-explicit-any` and `no-unused-expressions` were relaxed during
