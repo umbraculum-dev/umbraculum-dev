@@ -86,27 +86,6 @@ export function extractKettleHopMassGrams(beerJsonRecipeJson: unknown): number {
   }
   return Math.max(0, totalGrams);
 }
-
-function extractTotalGrainKg(beerJsonRecipeJson: unknown): number {
-  const r0 = extractFirstRecipe(beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
-  const ferms = ingredients?.['fermentable_additions'];
-  const list = Array.isArray(ferms) ? ferms : [];
-  let totalKg = 0;
-  for (const f of list) {
-    if (!isObject(f)) continue;
-    const type = typeof f['type'] === "string" ? f['type'].trim().toLowerCase() : "";
-    if (type !== "grain") continue;
-    const amount = isObject(f['amount']) ? f['amount'] : null;
-    const unit = typeof amount?.['unit'] === "string" ? amount['unit'] : "";
-    const value = safeNum(amount?.['value']);
-    if (value == null || !(value > 0)) continue;
-    if (unit === "kg") totalKg += value;
-    if (unit === "g") totalKg += value / 1000;
-  }
-  return Math.max(0, totalKg);
-}
-
 export function extractFermentablesPpgAndPounds(beerJsonRecipeJson: unknown): Array<{ ppg: number; pounds: number }> {
   const r0 = extractFirstRecipe(beerJsonRecipeJson);
   const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;

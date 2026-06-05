@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 import {
   computeAmountFromCellsB,
@@ -51,8 +51,11 @@ export function useNativeYeastScreenRows(params: {
     });
   };
 
-  const updateYeastRow = (id: string, patch: Partial<EditorYeastRow>) =>
-    setYeastRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  const updateYeastRow = useCallback(
+    (id: string, patch: Partial<EditorYeastRow>) =>
+      setYeastRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r))),
+    [setYeastRows],
+  );
 
   const onAttenuationOverrideChange = (id: string, value: string) =>
     setYeastAttenuationOverrides((prev) => ({ ...prev, [id]: value }));
@@ -92,7 +95,7 @@ export function useNativeYeastScreenRows(params: {
         if (curr == null || Math.abs(curr - amountL) > 0.0001) updateYeastRow(r.id, { amountL });
       }
     }
-  }, [yeastRows, batchSizeForCellsVal, analysisOg]);
+  }, [yeastRows, batchSizeForCellsVal, analysisOg, updateYeastRow]);
 
   return {
     openAdvancedSections,

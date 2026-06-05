@@ -1,17 +1,15 @@
 "use client";
 
-import { Button, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, Input, SizableText, XStack, YStack } from "tamagui";
 
 import { RecipeEditFieldLabel, RecipeEditSection } from "../../../../../_components/recipe-edit";
-import { StripedRow } from "../../../../../_components/StripedRow";
-import { PUBLIC_DB_PAGE_SIZE } from "../../_lib/inventoryTypes";
 import type { InventorySectionProps } from "./inventorySectionTypes";
 import { renderInventoryItemRow } from "./renderInventoryItemRow";
 
 export function InventorySpecialitiesSection(props: InventorySectionProps) {
   const { model: m } = props;
   const {
-    t, tUnits, canCall, openSections, setSectionOpen,
+    t, tUnits, openSections, setSectionOpen,
     customName, setCustomName, customQty, setCustomQty,
     itemsByCategory, addCustom,
   } = m;

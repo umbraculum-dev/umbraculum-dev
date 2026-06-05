@@ -1,5 +1,4 @@
 import type { GravityAnalysisWarningCode } from "@umbraculum/contracts";
-import { isFiniteNumber, isObject } from "../../lib/typeGuards.js";
 
 export interface GravityAnalysisWarning {
   code: GravityAnalysisWarningCode;
