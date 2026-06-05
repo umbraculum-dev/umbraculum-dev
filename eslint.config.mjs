@@ -499,6 +499,101 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // SOLID WS5 — app import boundaries prototype (warn-level, non-blocking).
+  //
+  // Mirrors the API spike structure with an app-scoped pilot:
+  //  - forbid apps/* source imports from services/api/**
+  //  - forbid sibling segment imports for selected app segment families
+  //
+  // Explicitly kept at "warn" for telemetry; do not promote in WS5.
+  // -------------------------------------------------------------------
+  {
+    files: ["apps/{web,native}/**/*.{ts,tsx}"],
+    plugins: { boundaries },
+    settings: {
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+          project: ["apps/web/tsconfig.json", "apps/native/tsconfig.json"],
+        },
+      },
+      "boundaries/elements": [
+        {
+          type: "api-service",
+          pattern: "services/api/**",
+          mode: "full",
+        },
+        {
+          type: "web-app-shared",
+          pattern: "apps/web/{src,app/_components,app/_lib}/**",
+          mode: "full",
+        },
+        {
+          type: "web-water-shared",
+          pattern: "apps/web/app/recipes/[[]id[]]/water/_lib/**",
+          mode: "full",
+        },
+        {
+          type: "web-water-segment",
+          pattern: "apps/web/app/recipes/[[]id[]]/water/*/**",
+          mode: "file",
+          capture: ["segmentCode"],
+        },
+        {
+          type: "native-app-shared",
+          pattern:
+            "apps/native/src/{auth,components,i18n,lib,media,navigation,screens,theme,types}/**",
+          mode: "full",
+        },
+        {
+          type: "native-module-segment",
+          pattern: "apps/native/src/modules/*/**",
+          mode: "file",
+          capture: ["moduleCode"],
+        },
+      ],
+    },
+    rules: {
+      "boundaries/no-unknown-files": "off",
+      "boundaries/element-types": [
+        "warn",
+        {
+          default: "allow",
+          message:
+            "SOLID WS5: disallowed cross-layer import (${file.type} -> ${dependency.type}) in app boundaries prototype.",
+          rules: [
+            {
+              from: [
+                ["web-app-shared"],
+                ["web-water-segment"],
+                ["native-app-shared"],
+                ["native-module-segment"],
+              ],
+              disallow: [["api-service"]],
+            },
+            {
+              from: [["web-water-segment"]],
+              allow: [["web-water-shared"], ["web-app-shared"]],
+            },
+            {
+              from: [["web-water-segment"]],
+              disallow: [
+                ["web-water-segment", { segmentCode: "!${from.segmentCode}" }],
+              ],
+            },
+            {
+              from: [["native-module-segment"]],
+              disallow: [
+                ["native-module-segment", { moduleCode: "!${from.moduleCode}" }],
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // -------------------------------------------------------------------
   // Test files: relax a few rules.
   //
   // `no-explicit-any` and `no-unused-expressions` were relaxed during

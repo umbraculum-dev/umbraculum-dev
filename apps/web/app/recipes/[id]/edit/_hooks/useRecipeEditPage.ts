@@ -1,7 +1,7 @@
 import { useRouter } from "../../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   createBrewSession,
@@ -13,8 +13,6 @@ import {
   listRecipeVersions,
   listStyles,
   patchRecipe,
-  searchFermentables,
-  searchHops,
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
@@ -23,33 +21,20 @@ import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
   editorStateFromBeerJson,
-  mergeMashDeduceFromExt,
-  mergeYeastAttenuationRangeFromExt,
   validateMashBeforeSave,
-  type EditorGristRow,
-  type EditorHopRow,
   type EditorMash,
-  type EditorMashStep,
   type EditorMiscRow,
-  type EditorYeastRow,
 } from "../../../_lib/beerjsonRecipe";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
-import {
-  fetchRecipeWaterSettings,
-  type RecipeWaterSettingsResponse,
-} from "../../water/_lib/waterSettings";
-import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
 import { parseGristJson } from "../../../../_lib/grist";
 import { COLLAPSIBLE_SECTION_IDS, DESKTOP_RAIL_REQUIRED_GUTTER_PX } from "../_lib/recipeEditConstants";
 import { newRowId } from "../_lib/recipeEditHelpers";
+import { useRecipeEditFermentables } from "./useRecipeEditFermentables";
+import { useRecipeEditHops } from "./useRecipeEditHops";
+import { useRecipeEditMashing } from "./useRecipeEditMashing";
+import { useRecipeEditYeast } from "./useRecipeEditYeast";
 import type {
   EquipmentProfile,
-  FermentableSearchResult,
-  GristMaltClass,
-  GristPotential,
-  GristRow,
-  HopRow,
-  HopSearchResult,
   MiscRow,
   Recipe,
   RecipeVersionListItem,
@@ -215,14 +200,7 @@ export function useRecipeEditPage() {
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
   const [notes, setNotes] = useState("");
-  const [gristRows, setGristRows] = useState<EditorGristRow[]>([]);
-  const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
-  const [yeastRows, setYeastRows] = useState<EditorYeastRow[]>([]);
   const [miscRows, setMiscRows] = useState<EditorMiscRow[]>([]);
-  const [mashProcedure, setMashProcedure] = useState<{ name: string; grainTemperatureC: number } | null>(null);
-  const [mashRows, setMashRows] = useState<EditorMashStep[]>([]);
-  const [waterSettings, setWaterSettings] = useState<RecipeWaterSettingsResponse["settings"]>(null);
-  const [yeastAttenuationOverrides, setYeastAttenuationOverrides] = useState<Record<string, string>>({});
   const [boilTimeMinutes, setBoilTimeMinutes] = useState<string>("");
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
@@ -236,63 +214,72 @@ export function useRecipeEditPage() {
   const [equipmentApplyError, setEquipmentApplyError] = useState<string | null>(null);
   const [equipmentApplying, setEquipmentApplying] = useState(false);
 
-  // Ingredient DB searches (v0)
-  const [fermentableQuery, setFermentableQuery] = useState("");
-  const [fermentableResults, setFermentableResults] = useState<FermentableSearchResult[]>([]);
-  const [fermentableSearching, setFermentableSearching] = useState(false);
-  const [fermentableSearchError, setFermentableSearchError] = useState<string | null>(null);
-  const [fermentableAddMessage, setFermentableAddMessage] = useState<string | null>(null);
-  const fermentableAddMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const [hopQuery, setHopQuery] = useState("");
-  const [hopResults, setHopResults] = useState<HopSearchResult[]>([]);
-  const [hopSearching, setHopSearching] = useState(false);
-  const [hopSearchError, setHopSearchError] = useState<string | null>(null);
-
   const canCallAccountScoped =
     authState.status === "ready" && Boolean(recipeId);
+  const fermentables = useRecipeEditFermentables({ t, roundTo });
+  const hops = useRecipeEditHops({ roundTo });
+  const yeast = useRecipeEditYeast();
+  const mashing = useRecipeEditMashing({ analysis, tSparge, canCallAccountScoped, recipeId });
 
-  const waterVolumes = useMemo(() => {
-    if (!analysis) return null;
-    try {
-      const parsed = parseGravityAnalysisResponseV1(analysis);
-      const preBoil = parsed?.derivations?.["analysis.pre_boil_volume"];
-      if (!preBoil?.inputs) return null;
-      const mashIn = preBoil.inputs.find((i) => i.id === "mashWaterVolumeLiters")?.value;
-      const spargeIn = preBoil.inputs.find((i) => i.id === "spargeVolumeLiters")?.value;
-      const mashL = mashIn?.kind === "number" ? mashIn.value : null;
-      const spargeL = spargeIn?.kind === "number" ? spargeIn.value : null;
-      return mashL != null && spargeL != null ? { mashLiters: mashL, spargeLiters: spargeL } : null;
-    } catch {
-      return null;
-    }
-  }, [analysis]);
-
-  const spargeConfigured = waterVolumes != null && waterVolumes.spargeLiters > 0;
-
-  const mashRowsFiltered = useMemo(() => {
-    if (!spargeConfigured) return mashRows;
-    return mashRows.filter(
-      (r) => !(r.type === "sparge" && r.name.trim().toLowerCase() === "sparge"),
-    );
-  }, [mashRows, spargeConfigured]);
-
-  useEffect(() => {
-    if (!canCallAccountScoped || !recipeId) return;
-    let cancelled = false;
-    void (async () => {
-      try {
-        const data = await fetchRecipeWaterSettings(recipeId);
-        if (cancelled) return;
-        setWaterSettings(data.settings as RecipeWaterSettingsResponse["settings"]);
-      } catch {
-        if (!cancelled) setWaterSettings(null);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [canCallAccountScoped, recipeId]);
+  const {
+    gristRows,
+    setGristRows,
+    fermentableQuery,
+    setFermentableQuery,
+    fermentableResults,
+    fermentableSearching,
+    fermentableSearchError,
+    fermentableAddMessage,
+    addGristRow,
+    addFermentableFromDb,
+    removeGristRow,
+    updateGristRow,
+    onSearchFermentables,
+    clearFermentableSearchResults,
+    hydrateGristRows,
+    inferMaltClass,
+    isRoastedLike,
+    inferDehuskedFromName,
+    gristTotals,
+  } = fermentables;
+  const {
+    hopsRows,
+    setHopsRows,
+    hopQuery,
+    setHopQuery,
+    hopResults,
+    hopSearching,
+    hopSearchError,
+    hydrateHopsRows,
+    addHopRow,
+    removeHopRow,
+    updateHopRow,
+    addHopFromDb,
+    onSearchHops,
+    clearHopSearchResults,
+  } = hops;
+  const {
+    yeastRows,
+    setYeastRows,
+    yeastAttenuationOverrides,
+    setYeastAttenuationOverrides,
+    hydrateYeast,
+    hydrateYeastAttenuationOverrides,
+    buildYeastOverrides,
+  } = yeast;
+  const {
+    mashProcedure,
+    setMashProcedure,
+    mashRows,
+    setMashRows,
+    waterSettings,
+    waterVolumes,
+    spargeConfigured,
+    mashRowsFiltered,
+    spargeStepTempDisplay,
+    spargeMethodLabel,
+    hydrateMash,
+  } = mashing;
 
   useEffect(() => {
     if (!canCallAccountScoped || !recipeId) return;
@@ -342,12 +329,6 @@ export function useRecipeEditPage() {
     () => brewSessions.filter((s) => s.startedAt != null && s.stoppedAt != null),
     [brewSessions]
   );
-
-  const spargeStepTempDisplay = waterSettings?.spargeStepTemperatureC ?? 75;
-  const spargeMethodLabel =
-    waterSettings?.spargeMethodType === "batch_sparge"
-      ? tSparge("spargeMethodBatchSparge")
-      : tSparge("spargeMethodFlySparge");
 
   const [visibilityRefreshTrigger, setVisibilityRefreshTrigger] = useState(0);
 
@@ -402,17 +383,7 @@ export function useRecipeEditPage() {
         const linksMisc = links ? asRecord(links['misc']) : null;
         const mashPhModel = ext ? asRecord(ext['mashPhModel']) : null;
         const yeastOverridesRaw = ext ? asRecord(ext['yeastAttenuationOverridesPercent']) : null;
-        if (yeastOverridesRaw) {
-          const out: Record<string, string> = {};
-          for (const [k, v] of Object.entries(yeastOverridesRaw)) {
-            if (typeof k !== "string") continue;
-            if (typeof v !== "number" || !Number.isFinite(v)) continue;
-            out[k] = String(v);
-          }
-          setYeastAttenuationOverrides(out);
-        } else {
-          setYeastAttenuationOverrides({});
-        }
+        hydrateYeastAttenuationOverrides(yeastOverridesRaw);
 
         const yeastPitchRateRaw = ext ? asRecord(ext['yeastPitchRateOverrides']) : null;
         const yeastFermentationTempRaw = ext ? asRecord(ext['yeastFermentationTempOverrides']) : null;
@@ -459,136 +430,40 @@ export function useRecipeEditPage() {
           setBoilTimeMinutes(maxMin > 0 ? String(Math.round(maxMin)) : "60");
         }
 
-        const grist = s.gristRows.map((row) => {
-          const ingredientId =
-            linksGrist && typeof linksGrist[row.id] === "string" ? (linksGrist[row.id] as string) : null;
-          const m = row.id && mashPhModel ? asRecord(mashPhModel[row.id]) : null;
-          return {
-            ...row,
-            ingredientId,
-            mashDiPh: typeof m?.['mashDiPh'] === "number" ? m['mashDiPh'] : row.mashDiPh ?? null,
-            mashTaToPh57_mEqPerKg:
-              typeof m?.['mashTaToPh57_mEqPerKg'] === "number"
-                ? (m['mashTaToPh57_mEqPerKg'])
-                : row.mashTaToPh57_mEqPerKg ?? null,
-            mashRoastDehuskedOverride:
-              m && "roastDehuskedOverride" in m
-                ? (m['roastDehuskedOverride'] as boolean | null)
-                : row.mashRoastDehuskedOverride ?? null,
-          };
-        });
         const hopFormOverrides = ext ? asRecord(ext['hopFormOverrides']) : null;
-        const hops = s.hopsRows.map((row) => {
-          const override = hopFormOverrides
-            ? hopFormOverrides[row.id] === "debittered_leaf" || hopFormOverrides[row.id] === "hop_extract"
-              ? (hopFormOverrides[row.id] as "debittered_leaf" | "hop_extract")
-              : null
-            : null;
-          return {
-            ...row,
-            ingredientId:
-              linksHops && typeof linksHops[row.id] === "string" ? (linksHops[row.id] as string) : null,
-            form: override ?? (row.form ?? "pellet"),
-          };
-        }) as EditorHopRow[];
-        const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
-        const yeast = baseYeast.map((row) => {
-          const pitchRateVal = yeastPitchRateRaw?.[row.id];
-          const pitchRate = typeof pitchRateVal === "string" ? pitchRateVal : null;
-
-          const fermentationTempVal = yeastFermentationTempRaw?.[row.id];
-          const fermentationTempC =
-            typeof fermentationTempVal === "number" && Number.isFinite(fermentationTempVal)
-              ? fermentationTempVal
-              : null;
-
-          const oxygenationVal = yeastOxygenationRaw?.[row.id];
-          const oxygenation =
-            oxygenationVal === "yes" || oxygenationVal === "no" ? (oxygenationVal) : null;
-
-          const diacetylRestVal = yeastDiacetylRestRaw?.[row.id];
-          const diacetylRest =
-            diacetylRestVal === "yes" || diacetylRestVal === "no" ? (diacetylRestVal) : null;
-
-          const formatVal = yeastFormatRaw?.[row.id];
-          const format =
-            formatVal === "dry" || formatVal === "liquid" || formatVal === "slurry"
-              ? (formatVal)
-              : null;
-
-          const speciesRaw = yeastSpeciesRaw?.[row.id] ?? null;
-          const validSpecies = [
-            "saccharomyces_cerevisiae",
-            "saccharomyces_pastorianus",
-            "brettanomyces",
-            "diastaticus",
-            "other",
-          ] as const;
-          type YeastSpecies = (typeof validSpecies)[number];
-          const species =
-            typeof speciesRaw === "string" && (validSpecies as ReadonlyArray<string>).includes(speciesRaw)
-              ? (speciesRaw as YeastSpecies)
-              : null;
-
-          const needsPropagationVal = yeastNeedsPropagationRaw?.[row.id];
-          const needsPropagation =
-            needsPropagationVal === "yes" || needsPropagationVal === "no"
-              ? (needsPropagationVal)
-              : null;
-
-          const cellsPerLVal = yeastCellsPerLRaw?.[row.id];
-          const cellsPerLOverride =
-            typeof cellsPerLVal === "number" && Number.isFinite(cellsPerLVal) && cellsPerLVal > 0
-              ? cellsPerLVal
-              : null;
-
-          const cellsPerKGVal = yeastCellsPerKGRaw?.[row.id];
-          const cellsPerKGFromKG =
-            typeof cellsPerKGVal === "number" && Number.isFinite(cellsPerKGVal) && cellsPerKGVal > 0
-              ? cellsPerKGVal
-              : null;
-
-          const cellsPerGVal = yeastCellsPerGRaw?.[row.id];
-          const cellsPerKGFromG =
-            typeof cellsPerGVal === "number" && Number.isFinite(cellsPerGVal) && cellsPerGVal > 0
-              ? cellsPerGVal * 1000
-              : null;
-
-          const cellsPerKGOverride = cellsPerKGFromKG ?? cellsPerKGFromG ?? null;
-
-          return {
-            ...row,
-            ingredientId:
-              linksYeast && typeof linksYeast[row.id] === "string" ? (linksYeast[row.id] as string) : null,
-            pitchRate: pitchRate ?? undefined,
-            fermentationTempC: fermentationTempC ?? undefined,
-            oxygenation: oxygenation ?? undefined,
-            diacetylRest: diacetylRest ?? undefined,
-            format: format ?? undefined,
-            species: species ?? undefined,
-            needsPropagation: needsPropagation ?? undefined,
-            cellsPerLOverride: cellsPerLOverride ?? undefined,
-            cellsPerKGOverride: cellsPerKGOverride ?? undefined,
-          };
-        }) as EditorYeastRow[];
         const misc = s.miscRows.map((row) => ({
           ...row,
           ingredientId:
             linksMisc && typeof linksMisc[row.id] === "string" ? (linksMisc[row.id] as string) : null,
         })) as EditorMiscRow[];
 
-        setGristRows(grist);
-        setHopsRows(hops);
-        setYeastRows(yeast);
+        hydrateGristRows({
+          gristRows: s.gristRows,
+          linksGrist,
+          mashPhModel,
+        });
+        hydrateHopsRows({
+          hopsRows: s.hopsRows,
+          linksHops,
+          hopFormOverrides,
+        });
+        hydrateYeast({
+          yeastRows: s.yeastRows,
+          ext,
+          linksYeast,
+          yeastPitchRateRaw,
+          yeastFermentationTempRaw,
+          yeastOxygenationRaw,
+          yeastDiacetylRestRaw,
+          yeastFormatRaw,
+          yeastSpeciesRaw,
+          yeastNeedsPropagationRaw,
+          yeastCellsPerLRaw,
+          yeastCellsPerKGRaw,
+          yeastCellsPerGRaw,
+        });
         setMiscRows(misc);
-        const mashMerged = mergeMashDeduceFromExt(s.mash, ext);
-        if (mashMerged) {
-          setMashProcedure({ name: mashMerged.name, grainTemperatureC: mashMerged.grainTemperatureC });
-          setMashRows(mashMerged.steps);
-        } else {
-          setMashProcedure(null);
-          setMashRows([]);
-        }
+        hydrateMash({ mash: s.mash, ext });
       } catch (err) {
         if (cancelled) return;
         setLoadError(String(err));
@@ -600,7 +475,16 @@ export function useRecipeEditPage() {
     return () => {
       cancelled = true;
     };
-  }, [canCallAccountScoped, recipeId, visibilityRefreshTrigger]);
+  }, [
+    canCallAccountScoped,
+    recipeId,
+    visibilityRefreshTrigger,
+    hydrateGristRows,
+    hydrateHopsRows,
+    hydrateMash,
+    hydrateYeast,
+    hydrateYeastAttenuationOverrides,
+  ]);
 
   useEffect(() => {
     if (!canCallAccountScoped) return;
@@ -718,86 +602,23 @@ export function useRecipeEditPage() {
         delete extBaseForSave['boilTimeMinutesOverride'];
       }
 
-      const yeastAttenuationOverridesPercent = Object.fromEntries(
-        Object.entries(yeastAttenuationOverrides)
-          .map(([k, v]) => {
-            const trimmed = v.trim();
-            if (!trimmed) return null;
-            const n = Number(trimmed);
-            if (!Number.isFinite(n)) return null;
-            return [k, n] as const;
-          })
-          .filter(Boolean) as Array<readonly [string, number]>,
-      );
+      const {
+        yeastAttenuationOverridesPercent,
+        yeastPitchRateOverrides,
+        yeastFermentationTempOverrides,
+        yeastOxygenationOverrides,
+        yeastDiacetylRestOverrides,
+        yeastFormatOverrides,
+        yeastSpeciesOverrides,
+        yeastNeedsPropagationOverrides,
+        yeastCellsPerLOverrides,
+        yeastCellsPerKGOverrides,
+      } = buildYeastOverrides();
       if (Object.keys(yeastAttenuationOverridesPercent).length) {
         extBaseForSave['yeastAttenuationOverridesPercent'] = yeastAttenuationOverridesPercent;
       } else {
         delete extBaseForSave['yeastAttenuationOverridesPercent'];
       }
-      const yeastPitchRateOverrides = Object.fromEntries(
-        yeastRows
-          .filter((r) => r.pitchRate != null && String(r.pitchRate).trim())
-          .map((r) => [r.id, String(r.pitchRate).trim()]),
-      );
-      const yeastFermentationTempOverrides = Object.fromEntries(
-        yeastRows
-          .filter(
-            (r) =>
-              r.fermentationTempC != null &&
-              Number.isFinite(r.fermentationTempC) &&
-              r.fermentationTempC >= -10 &&
-              r.fermentationTempC <= 50,
-          )
-          .map((r) => [r.id, r.fermentationTempC as number]),
-      );
-      const yeastOxygenationOverrides = Object.fromEntries(
-        yeastRows
-          .filter((r) => r.oxygenation === "yes" || r.oxygenation === "no")
-          .map((r) => [r.id, r.oxygenation as "yes" | "no"]),
-      );
-      const yeastDiacetylRestOverrides = Object.fromEntries(
-        yeastRows
-          .filter((r) => r.diacetylRest === "yes" || r.diacetylRest === "no")
-          .map((r) => [r.id, r.diacetylRest as "yes" | "no"]),
-      );
-      const yeastFormatOverrides = Object.fromEntries(
-        yeastRows
-          .filter((r) => r.format === "dry" || r.format === "liquid" || r.format === "slurry")
-          .map((r) => [r.id, r.format as "dry" | "liquid" | "slurry"]),
-      );
-      const yeastSpeciesOverrides = Object.fromEntries(
-        yeastRows
-          .filter(
-            (r) =>
-              r.species === "saccharomyces_cerevisiae" ||
-              r.species === "saccharomyces_pastorianus" ||
-              r.species === "brettanomyces" ||
-              r.species === "diastaticus" ||
-              r.species === "other",
-          )
-          .map((r) => [r.id, r.species!]),
-      );
-      const yeastNeedsPropagationOverrides = Object.fromEntries(
-        yeastRows
-          .filter((r) => r.needsPropagation === "yes" || r.needsPropagation === "no")
-          .map((r) => [r.id, r.needsPropagation as "yes" | "no"]),
-      );
-      const yeastCellsPerLOverrides = Object.fromEntries(
-        yeastRows
-          .filter(
-            (r) =>
-              r.cellsPerLOverride != null && Number.isFinite(r.cellsPerLOverride) && r.cellsPerLOverride > 0,
-          )
-          .map((r) => [r.id, r.cellsPerLOverride as number]),
-      );
-      const yeastCellsPerKGOverrides = Object.fromEntries(
-        yeastRows
-          .filter(
-            (r) =>
-              r.cellsPerKGOverride != null && Number.isFinite(r.cellsPerKGOverride) && r.cellsPerKGOverride > 0,
-          )
-          .map((r) => [r.id, r.cellsPerKGOverride as number]),
-      );
       if (Object.keys(yeastPitchRateOverrides).length) {
         extBaseForSave['yeastPitchRateOverrides'] = yeastPitchRateOverrides;
       } else {
@@ -986,123 +807,6 @@ export function useRecipeEditPage() {
     }
   };
 
-  const addGristRow = () => {
-    setGristRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        ingredientId: null,
-        name: "",
-        producer: null,
-        group: null,
-        mashDiPh: null,
-        mashTaToPh57_mEqPerKg: null,
-        mashRoastDehuskedOverride: null,
-        mashRoastDehuskedSource: "unknown",
-        mashPhModelSource: "unknown",
-        amountKg: 0,
-        colorLovibond: null,
-        potential: null,
-        maltClass: "base",
-        timingUse: "add_to_mash",
-        lateAddition: false,
-      },
-    ]);
-  };
-
-  const addFermentableFromDb = (item: FermentableSearchResult) => {
-    const id = typeof item.id === "string" ? item.id : null;
-    const itemName = typeof item.name === "string" ? item.name : "";
-    if (!id || !itemName) return;
-    const producer = typeof item.producer === "string" ? item.producer : null;
-    const group = typeof item.group === "string" ? item.group : null;
-    const mashDiPh = typeof item.mashDiPh === "number" && Number.isFinite(item.mashDiPh) ? item.mashDiPh : null;
-    const mashTaToPh57_mEqPerKg =
-      typeof item.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(item.mashTaToPh57_mEqPerKg)
-        ? item.mashTaToPh57_mEqPerKg
-        : null;
-    const mashPhModelSource =
-      mashDiPh !== null || mashTaToPh57_mEqPerKg !== null ? ("default" as const) : ("unknown" as const);
-    const name = itemName;
-    const colorLovibond =
-      typeof item.colorLovibond === "number" && Number.isFinite(item.colorLovibond)
-        ? roundTo(item.colorLovibond, 3)
-        : null;
-    const ppg =
-      typeof item.ppg === "number" && Number.isFinite(item.ppg) ? roundTo(item.ppg, 3) : null;
-    const yieldPercent =
-      typeof item.yieldPercent === "number" && Number.isFinite(item.yieldPercent)
-        ? roundTo(item.yieldPercent, 3)
-        : null;
-
-    const potential: GristPotential =
-      ppg !== null ? { kind: "ppg", value: ppg } : yieldPercent !== null ? { kind: "yieldPercent", value: yieldPercent } : null;
-
-    const maltClass = inferMaltClass(typeof item.group === "string" ? item.group : null, itemName);
-
-    setGristRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        ingredientId: id,
-        name,
-        producer,
-        group,
-        mashDiPh,
-        mashTaToPh57_mEqPerKg,
-        mashRoastDehuskedOverride: null,
-        mashRoastDehuskedSource: "unknown",
-        mashPhModelSource,
-        amountKg: 0,
-        colorLovibond,
-        potential,
-        maltClass,
-        timingUse: "add_to_mash",
-        lateAddition: false,
-      },
-    ]);
-    const msg = t("fermentableAddedSaveHint");
-    setFermentableAddMessage(msg);
-    if (fermentableAddMessageTimeoutRef.current) {
-      clearTimeout(fermentableAddMessageTimeoutRef.current);
-    }
-    fermentableAddMessageTimeoutRef.current = setTimeout(() => {
-      setFermentableAddMessage(null);
-      fermentableAddMessageTimeoutRef.current = null;
-    }, 5000);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (fermentableAddMessageTimeoutRef.current) {
-        clearTimeout(fermentableAddMessageTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const addHopFromDb = (item: HopSearchResult) => {
-    const id = typeof item.id === "string" ? item.id : null;
-    const name = typeof item.name === "string" ? item.name : "";
-    if (!id || !name) return;
-    const country = typeof item.country === "string" ? item.country : null;
-    const alphaMin = typeof item.alphaMin === "number" && Number.isFinite(item.alphaMin) ? item.alphaMin : null;
-    const alphaMax = typeof item.alphaMax === "number" && Number.isFinite(item.alphaMax) ? item.alphaMax : null;
-    const alphaAcidPercent =
-      alphaMin !== null && alphaMax !== null ? (alphaMin + alphaMax) / 2 : alphaMin !== null ? alphaMin : alphaMax;
-    addHopRow({
-      ingredientId: id,
-      name,
-      country,
-      alphaAcidPercent:
-        typeof alphaAcidPercent === "number" && Number.isFinite(alphaAcidPercent)
-          ? roundTo(alphaAcidPercent, 3)
-          : null,
-      use: "boil",
-      timeMinutes: 60,
-      amountGrams: 0,
-    });
-  };
-
   // Dead-code helper. Underscore-prefixed because intentionally unused;
   // the `addYeastRow` callee was never wired up. The corresponding
   // `Cannot find name 'addYeastRow'` (TS2552) lives in the apps/web
@@ -1133,34 +837,6 @@ export function useRecipeEditPage() {
     };
     _addYeastRow({ ingredientId: id, name: nameRaw, lab, productId, attenuationMin, attenuationMax });
   };
-  const removeGristRow = (id: string) => {
-    setGristRows((prev) => prev.filter((r) => r.id !== id));
-  };
-  const updateGristRow = (id: string, patch: Partial<GristRow>) => {
-    setGristRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-  };
-
-  const addHopRow = (row?: Partial<HopRow>) => {
-    setHopsRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        ingredientId: null,
-        name: "",
-        country: null,
-        form: "pellet",
-        amountGrams: 0,
-        alphaAcidPercent: null,
-        use: "boil",
-        timeMinutes: 60,
-        ...row,
-      },
-    ]);
-  };
-  const removeHopRow = (id: string) => setHopsRows((prev) => prev.filter((r) => r.id !== id));
-  const updateHopRow = (id: string, patch: Partial<HopRow>) =>
-    setHopsRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-
   const addMiscRow = () => {
     setMiscRows((prev) => [
       ...prev,
@@ -1181,97 +857,6 @@ export function useRecipeEditPage() {
   const removeMiscRow = (id: string) => setMiscRows((prev) => prev.filter((r) => r.id !== id));
   const updateMiscRow = (id: string, patch: Partial<MiscRow>) =>
     setMiscRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-
-  const inferMaltClass = (group: string | null | undefined, fermentableName: string): GristMaltClass => {
-    const g = (group ?? "").toLowerCase();
-    const n = fermentableName.toLowerCase();
-    if (g.includes("caramel") || g.includes("crystal")) return "crystal";
-    if (g.includes("roast") || g.includes("roasted")) return "roast";
-    if (n.includes("acid")) return "acid";
-    return "base";
-  };
-
-  const isRoastedLike = (row: Pick<GristRow, "group" | "name">) => {
-    const g = (row.group ?? "").toLowerCase();
-    const n = (row.name ?? "").toLowerCase();
-    return (
-      g.includes("roast") ||
-      g.includes("roasted") ||
-      g.includes("black") ||
-      g.includes("chocolate") ||
-      n.includes("roast") ||
-      n.includes("black malt") ||
-      n.includes("chocolate") ||
-      n.includes("carafa") ||
-      n.includes("patent") ||
-      n.includes("brown malt")
-    );
-  };
-
-  const inferDehuskedFromName = (name: string) => {
-    const n = (name ?? "").toLowerCase();
-    if (!n) return false;
-    if (n.includes("dehusked") || n.includes("de-husked")) return true;
-    if (n.includes("debittered") || n.includes("de-bittered")) return true;
-    if (n.includes("carafa") && n.includes("special")) return true;
-    if (n.includes("de bittered") || n.includes("de bitter")) return true;
-    return false;
-  };
-
-  const onSearchFermentables = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFermentableSearchError(null);
-    setFermentableSearching(true);
-    try {
-      const data = await searchFermentables(webBreweryApiClient(), { query: fermentableQuery });
-      setFermentableResults(data.items as unknown as FermentableSearchResult[]);
-    } catch (err) {
-      setFermentableSearchError(String(err));
-      setFermentableResults([]);
-    } finally {
-      setFermentableSearching(false);
-    }
-  };
-
-  const clearFermentableSearchResults = () => {
-    setFermentableSearchError(null);
-    setFermentableResults([]);
-  };
-
-  const onSearchHops = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setHopSearchError(null);
-    setHopSearching(true);
-    try {
-      const data = await searchHops(webBreweryApiClient(), { query: hopQuery });
-      setHopResults(data.items as unknown as HopSearchResult[]);
-    } catch (err) {
-      setHopSearchError(String(err));
-      setHopResults([]);
-    } finally {
-      setHopSearching(false);
-    }
-  };
-
-  const clearHopSearchResults = () => {
-    setHopSearchError(null);
-    setHopResults([]);
-  };
-
-  const gristTotals = useMemo(() => {
-    const totalKg = gristRows.reduce((acc, r) => acc + (Number.isFinite(r.amountKg) ? r.amountKg : 0), 0);
-    let colorSum = 0;
-    let colorWeight = 0;
-    for (const r of gristRows) {
-      if (r.colorLovibond === null) continue;
-      const w = Number.isFinite(r.amountKg) ? r.amountKg : 0;
-      if (w <= 0) continue;
-      colorSum += w * r.colorLovibond;
-      colorWeight += w;
-    }
-    const weightedAvgLovibond = colorWeight > 0 ? colorSum / colorWeight : null;
-    return { totalKg, weightedAvgLovibond };
-  }, [gristRows]);
 
   const gristWaterConsistency = useMemo(() => {
     const recipeMashTotalKg = gristRows

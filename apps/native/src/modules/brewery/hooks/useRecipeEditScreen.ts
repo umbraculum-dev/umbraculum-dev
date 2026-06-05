@@ -8,8 +8,6 @@ import {
   listEquipmentProfiles,
   listStyles,
   patchRecipe,
-  searchFermentables as apiSearchFermentables,
-  searchHops as apiSearchHops,
   searchYeasts as apiSearchYeasts,
   getRecipeWaterSettings,
 } from "@umbraculum/api-client/brewery";
@@ -19,8 +17,6 @@ import {
   editorStateFromBeerJson,
   mergeMashDeduceFromExt,
   mergeYeastAttenuationRangeFromExt,
-  type EditorGristRow,
-  type EditorHopRow,
   type EditorMashStep,
   type EditorYeastRow,
 } from "@umbraculum/brewery-beerjson";
@@ -34,11 +30,11 @@ import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import { useLocaleController } from "../../../i18n/I18nProvider";
 import { asRecord } from "../../../lib/typeGuards";
 import type { RootStackParamList } from "../../../navigation/types";
-import { formatFixed, inferMaltClass, newRowId } from "../lib/recipeEditHelpers";
+import { formatFixed, newRowId } from "../lib/recipeEditHelpers";
+import { useRecipeEditScreenFermentables } from "./useRecipeEditScreenFermentables";
+import { useRecipeEditScreenHops } from "./useRecipeEditScreenHops";
 import type {
   EquipmentProfile,
-  FermentableSearchItem,
-  HopSearchItem,
   Recipe,
   StyleListItem,
   YeastSearchItem,
@@ -77,24 +73,10 @@ export function useRecipeEditScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const [boilTimeMinutes, setBoilTimeMinutes] = useState("");
   const [openSections, setOpenSections] = useState<string[]>(["basics"]);
-  const [openFermentableIds, setOpenFermentableIds] = useState<string[]>([]);
-  const [openHopIds, setOpenHopIds] = useState<string[]>([]);
   const [openYeastIds, setOpenYeastIds] = useState<string[]>([]);
 
-  const [gristRows, setGristRows] = useState<EditorGristRow[]>([]);
-  const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
   const [yeastRows, setYeastRows] = useState<EditorYeastRow[]>([]);
   const [yeastAttenuationOverrides, setYeastAttenuationOverrides] = useState<Record<string, string>>({});
-
-  const [fermentableQuery, setFermentableQuery] = useState("");
-  const [fermentableResults, setFermentableResults] = useState<FermentableSearchItem[]>([]);
-  const [fermentableSearching, setFermentableSearching] = useState(false);
-  const [fermentableSearchError, setFermentableSearchError] = useState<string | null>(null);
-
-  const [hopQuery, setHopQuery] = useState("");
-  const [hopResults, setHopResults] = useState<HopSearchItem[]>([]);
-  const [hopSearching, setHopSearching] = useState(false);
-  const [hopSearchError, setHopSearchError] = useState<string | null>(null);
 
   const [yeastQuery, _setYeastQuery] = useState("");
   const [_yeastResults, setYeastResults] = useState<YeastSearchItem[]>([]);
@@ -131,6 +113,44 @@ export function useRecipeEditScreen() {
     if (!baseUrl || !token) return null;
     return nativePlatformApiClient(token);
   }, [baseUrl, token]);
+
+  const fermentables = useRecipeEditScreenFermentables({ api });
+  const hops = useRecipeEditScreenHops({ api });
+  const {
+    gristRows,
+    setGristRows,
+    fermentableQuery,
+    setFermentableQuery,
+    fermentableResults,
+    setFermentableResults,
+    fermentableSearching,
+    fermentableSearchError,
+    searchFermentables,
+    addFermentableFromDb,
+    addGristRow,
+    updateGristRow,
+    removeGristRow,
+    gristTotals,
+    openFermentableIds,
+    setOpenFermentableIds,
+  } = fermentables;
+  const {
+    hopsRows,
+    setHopsRows,
+    hopQuery,
+    setHopQuery,
+    hopResults,
+    setHopResults,
+    hopSearching,
+    hopSearchError,
+    searchHops,
+    addHopFromDb,
+    addHopRow,
+    updateHopRow,
+    removeHopRow,
+    openHopIds,
+    setOpenHopIds,
+  } = hops;
 
   const analysis = (recipe as { analysis?: unknown })?.analysis;
   const waterVolumes = useMemo((): WaterVolumes | null => {
@@ -294,7 +314,7 @@ export function useRecipeEditScreen() {
     } finally {
       setLoading(false);
     }
-  }, [api, recipeId, locale]);
+  }, [api, recipeId, locale, setGristRows, setHopsRows, setYeastRows, setMashProcedure, setMashRows]);
 
   const loadStyles = useCallback(async () => {
     if (!api) return;
@@ -360,44 +380,6 @@ export function useRecipeEditScreen() {
     }, [canCall, recipeId, recipe, loadRecipe]),
   );
 
-  const searchFermentables = useCallback(async () => {
-    if (!api) return;
-    setFermentableSearching(true);
-    setFermentableSearchError(null);
-    try {
-      const parsed = await apiSearchFermentables(
-        api,
-        fermentableQuery.trim() ? { query: fermentableQuery.trim(), limit: 20 } : { limit: 20 },
-      );
-      const items = parsed.items;
-      setFermentableResults(Array.isArray(items) ? (items as FermentableSearchItem[]) : []);
-    } catch (err) {
-      setFermentableSearchError(String(err));
-      setFermentableResults([]);
-    } finally {
-      setFermentableSearching(false);
-    }
-  }, [api, fermentableQuery]);
-
-  const searchHops = useCallback(async () => {
-    if (!api) return;
-    setHopSearching(true);
-    setHopSearchError(null);
-    try {
-      const parsed = await apiSearchHops(
-        api,
-        hopQuery.trim() ? { query: hopQuery.trim(), limit: 20 } : { limit: 20 },
-      );
-      const items = parsed.items;
-      setHopResults(Array.isArray(items) ? (items as HopSearchItem[]) : []);
-    } catch (err) {
-      setHopSearchError(String(err));
-      setHopResults([]);
-    } finally {
-      setHopSearching(false);
-    }
-  }, [api, hopQuery]);
-
   const _searchYeasts = useCallback(async () => {
     if (!api) return;
     setYeastSearching(true);
@@ -411,100 +393,6 @@ export function useRecipeEditScreen() {
       setYeastSearching(false);
     }
   }, [api, yeastQuery]);
-
-  const addGristRow = useCallback(() => {
-    setGristRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        name: "",
-        amountKg: 0,
-        colorLovibond: null,
-        potential: null,
-        maltClass: "base",
-        timingUse: "add_to_mash",
-        lateAddition: false,
-      },
-    ]);
-  }, []);
-
-  const addFermentableFromDb = useCallback((item: FermentableSearchItem) => {
-    const yieldPct = typeof item.yieldPercent === "number" && Number.isFinite(item.yieldPercent) ? item.yieldPercent : null;
-    const ppg = typeof item.ppg === "number" && Number.isFinite(item.ppg) ? item.ppg : null;
-    const potential = yieldPct != null ? { kind: "yieldPercent" as const, value: yieldPct } : ppg != null ? { kind: "ppg" as const, value: ppg } : null;
-    const group = typeof item.group === "string" ? item.group : null;
-    const maltClass = inferMaltClass(group, item.name);
-    setGristRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        ingredientId: item.id,
-        name: item.name,
-        producer: item.producer ?? null,
-        group,
-        amountKg: 0,
-        colorLovibond: typeof item.colorLovibond === "number" ? item.colorLovibond : null,
-        potential,
-        maltClass,
-        timingUse: "add_to_mash",
-        lateAddition: false,
-      },
-    ]);
-  }, []);
-
-  const updateGristRow = useCallback((id: string, patch: Partial<EditorGristRow>) => {
-    setGristRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-  }, []);
-
-  const removeGristRow = useCallback((id: string) => {
-    setGristRows((prev) => prev.filter((r) => r.id !== id));
-  }, []);
-
-  const addHopRow = useCallback(() => {
-    setHopsRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        ingredientId: null,
-        name: "",
-        amountGrams: 0,
-        alphaAcidPercent: null,
-        use: "boil",
-        timeMinutes: 60,
-        form: "pellet",
-      },
-    ]);
-  }, []);
-
-  const addHopFromDb = useCallback((item: HopSearchItem) => {
-    const alpha = typeof item.alphaMin === "number" && Number.isFinite(item.alphaMin)
-      ? item.alphaMin
-      : typeof item.alphaMax === "number" && Number.isFinite(item.alphaMax)
-        ? item.alphaMax
-        : null;
-    setHopsRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        ingredientId: item.id,
-        name: item.name,
-        country: item.country ?? null,
-        amountGrams: 0,
-        alphaAcidPercent: alpha,
-        use: "boil",
-        timeMinutes: 60,
-        form: "pellet",
-      },
-    ]);
-  }, []);
-
-  const updateHopRow = useCallback((id: string, patch: Partial<EditorHopRow>) => {
-    setHopsRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-  }, []);
-
-  const removeHopRow = useCallback((id: string) => {
-    setHopsRows((prev) => prev.filter((r) => r.id !== id));
-  }, []);
 
   const _addYeastRow = useCallback(() => {
     setYeastRows((prev) => [
@@ -581,22 +469,6 @@ export function useRecipeEditScreen() {
     },
     [api, recipeId, equipmentProfiles, selectedEquipmentProfileId, recipe, loadRecipe, t],
   );
-
-  const gristTotals = useMemo(() => {
-    const totalKg = gristRows.reduce((sum, r) => sum + (typeof r.amountKg === "number" && Number.isFinite(r.amountKg) ? r.amountKg : 0), 0);
-    let weightedSum = 0;
-    let weightSum = 0;
-    for (const r of gristRows) {
-      const kg = typeof r.amountKg === "number" && Number.isFinite(r.amountKg) ? r.amountKg : 0;
-      const lov = typeof r.colorLovibond === "number" && Number.isFinite(r.colorLovibond) ? r.colorLovibond : null;
-      if (kg > 0 && lov != null) {
-        weightedSum += kg * lov;
-        weightSum += kg;
-      }
-    }
-    const weightedAvgLovibond = weightSum > 0 ? weightedSum / weightSum : null;
-    return { totalKg, weightedAvgLovibond };
-  }, [gristRows]);
 
   const save = useCallback(async () => {
     if (!api || !recipeId || !recipe) return;

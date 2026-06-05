@@ -1,4 +1,3 @@
-import type { BrewSessionStepStatus } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
@@ -27,18 +26,12 @@ import {
 } from "@umbraculum/contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import {
-  assertIntegrationKind,
-  assertReadingsLimit,
-  BrewSessionIntegrationsService,
-} from "../../../services/brewSessionIntegrationsService.js";
-import { BrewSessionsService, type BrewSessionStepInput } from "../../../services/brewSessionsService.js";
-import { BadRequestError } from "../../../errors.js";
+import { BrewSessionsRouteService } from "../../../services/brewSessionsRouteService.js";
+import type { BrewSessionStepInput } from "../../../services/brewSessionsService.js";
 
 export function brewSessionsRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
-  const svc = new BrewSessionsService(app.prisma);
-  const integrations = new BrewSessionIntegrationsService(app.prisma);
+  const svc = new BrewSessionsRouteService(app.prisma);
 
   zodApp.post(
     "/recipes/:recipeId/brew-sessions",
@@ -115,10 +108,7 @@ export function brewSessionsRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const brewSessionId = req.params.brewSessionId;
-      if (!brewSessionId) throw new BadRequestError("invalid_brew_session_id", "Params.brewSessionId is required");
-
-      const attachments = await integrations.listAttachments(ctx.activeWorkspaceId, brewSessionId);
+      const attachments = await svc.listAttachments(ctx.activeWorkspaceId, req.params.brewSessionId);
 
       return IntegrationAttachmentsResponseSchema.parse({
         ok: true,
@@ -142,19 +132,10 @@ export function brewSessionsRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const brewSessionId = req.params.brewSessionId;
-      if (!brewSessionId) throw new BadRequestError("invalid_brew_session_id", "Params.brewSessionId is required");
-
-      const body = req.body;
-      const kind = assertIntegrationKind(body.kind);
-      const deviceId = body.deviceId.trim();
-      if (!deviceId) throw new BadRequestError("invalid_device_id", "Body.deviceId is required");
-
-      const created = await integrations.attachDevice(
+      const created = await svc.attachDevice(
         ctx.activeWorkspaceId,
-        brewSessionId,
-        kind,
-        deviceId,
+        req.params.brewSessionId,
+        req.body,
       );
 
       return IntegrationAttachResponseSchema.parse({ ok: true, attachment: created });
@@ -176,13 +157,7 @@ export function brewSessionsRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const brewSessionId = req.params.brewSessionId;
-      if (!brewSessionId) throw new BadRequestError("invalid_brew_session_id", "Params.brewSessionId is required");
-
-      const deviceId = req.body.deviceId.trim();
-      if (!deviceId) throw new BadRequestError("invalid_device_id", "Body.deviceId is required");
-
-      const res = await integrations.detachDevice(ctx.activeWorkspaceId, brewSessionId, deviceId);
+      const res = await svc.detachDevice(ctx.activeWorkspaceId, req.params.brewSessionId, req.body.deviceId);
       return IntegrationDetachResponseSchema.parse({ ok: true, detachedCount: res.count });
     },
   );
@@ -202,18 +177,7 @@ export function brewSessionsRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const brewSessionId = req.params.brewSessionId;
-      if (!brewSessionId) throw new BadRequestError("invalid_brew_session_id", "Params.brewSessionId is required");
-
-      const kind = assertIntegrationKind(req.query.kind);
-      const limit = assertReadingsLimit(req.query.limit);
-
-      const readings = await integrations.listReadings(
-        ctx.activeWorkspaceId,
-        brewSessionId,
-        kind,
-        limit,
-      );
+      const readings = await svc.listReadings(ctx.activeWorkspaceId, req.params.brewSessionId, req.query);
 
       return IntegrationReadingsResponseSchema.parse({ ok: true, readings });
     },
@@ -253,21 +217,11 @@ export function brewSessionsRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const raw = req.body.scheduledDate;
-      const scheduledDate =
-        raw === null || raw === undefined
-          ? null
-          : typeof raw === "string" && raw.trim()
-            ? new Date(raw.trim())
-            : null;
-      if (scheduledDate !== null && Number.isNaN(scheduledDate.getTime())) {
-        throw new BadRequestError("invalid_scheduled_date", "scheduledDate must be a valid ISO date string");
-      }
       const updated = await svc.updateSessionDate(
         ctx.userId,
         ctx.activeWorkspaceId,
         req.params.brewSessionId,
-        scheduledDate,
+        req.body.scheduledDate,
       );
       return BrewSessionDetailResponseSchema.parse({ ok: true, brewSession: updated });
     },
@@ -377,9 +331,12 @@ export function brewSessionsRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const reasonRaw = req.body.reason ?? "";
-      const reason = reasonRaw === "auto" || reasonRaw === "manual" ? reasonRaw : null;
-      const updated = await svc.stopSession(ctx.userId, ctx.activeWorkspaceId, req.params.brewSessionId, { reason });
+      const updated = await svc.stopSession(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.brewSessionId,
+        req.body.reason,
+      );
       return BrewSessionDetailResponseSchema.parse({ ok: true, brewSession: updated });
     },
   );
@@ -399,21 +356,12 @@ export function brewSessionsRoutes(app: FastifyInstance) {
     },
     async (req) => {
       const ctx = requireActiveWorkspace(req);
-      const body = req.body;
-      const note = body.note === null ? null : typeof body.note === "string" ? body.note : null;
-      const name = typeof body.name === "string" ? body.name.trim() : null;
-      const isDisabled = body.isDisabled === true ? true : body.isDisabled === false ? false : null;
       const updated = await svc.saveStepLog(
         ctx.userId,
         ctx.activeWorkspaceId,
         req.params.brewSessionId,
         req.params.stepId,
-        {
-          status: body.status as BrewSessionStepStatus,
-          note,
-          name,
-          isDisabled,
-        },
+        req.body,
       );
       return BrewSessionStepResponseSchema.parse({ ok: true, step: updated });
     },
