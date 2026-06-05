@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 
 import { searchHops } from "@umbraculum/api-client/brewery";
 
@@ -18,7 +18,7 @@ export function useRecipeEditHops(params: { roundTo: (n: number, d: number) => n
   const [hopSearching, setHopSearching] = useState(false);
   const [hopSearchError, setHopSearchError] = useState<string | null>(null);
 
-  const hydrateHopsRows = (params: {
+  const hydrateHopsRows = useCallback((params: {
     hopsRows: EditorHopRow[];
     linksHops: Record<string, unknown> | null;
     hopFormOverrides: Record<string, unknown> | null;
@@ -37,7 +37,7 @@ export function useRecipeEditHops(params: { roundTo: (n: number, d: number) => n
       };
     }) as EditorHopRow[];
     setHopsRows(hops);
-  };
+  }, []);
 
   const addHopRow = (row?: Partial<HopRow>) => {
     setHopsRows((prev) => [

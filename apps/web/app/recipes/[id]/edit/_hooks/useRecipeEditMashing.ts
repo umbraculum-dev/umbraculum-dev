@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
 
@@ -59,7 +59,7 @@ export function useRecipeEditMashing(params: {
     };
   }, [canCallAccountScoped, recipeId]);
 
-  const hydrateMash = (params: {
+  const hydrateMash = useCallback((params: {
     mash: { name: string; grainTemperatureC: number; steps: EditorMashStep[] } | null;
     ext: Record<string, unknown> | null;
   }) => {
@@ -71,7 +71,7 @@ export function useRecipeEditMashing(params: {
     }
     setMashProcedure(null);
     setMashRows([]);
-  };
+  }, []);
 
   const spargeStepTempDisplay = waterSettings?.spargeStepTemperatureC ?? 75;
   const spargeMethodLabel =

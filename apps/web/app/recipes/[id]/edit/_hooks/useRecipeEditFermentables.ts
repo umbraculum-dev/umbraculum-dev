@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import { searchFermentables } from "@umbraculum/api-client/brewery";
 
@@ -62,7 +62,7 @@ export function useRecipeEditFermentables(params: { t: (key: string) => string; 
     return false;
   };
 
-  const hydrateGristRows = (params: {
+  const hydrateGristRows = useCallback((params: {
     gristRows: EditorGristRow[];
     linksGrist: Record<string, unknown> | null;
     mashPhModel: Record<string, unknown> | null;
@@ -87,7 +87,7 @@ export function useRecipeEditFermentables(params: { t: (key: string) => string; 
       };
     });
     setGristRows(grist);
-  };
+  }, []);
 
   const addGristRow = () => {
     setGristRows((prev) => [

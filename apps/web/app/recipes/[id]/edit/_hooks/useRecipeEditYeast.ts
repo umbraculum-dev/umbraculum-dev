@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { mergeYeastAttenuationRangeFromExt, type EditorYeastRow } from "../../../_lib/beerjsonRecipe";
 
@@ -8,7 +8,7 @@ export function useRecipeEditYeast() {
   const [yeastRows, setYeastRows] = useState<EditorYeastRow[]>([]);
   const [yeastAttenuationOverrides, setYeastAttenuationOverrides] = useState<Record<string, string>>({});
 
-  const hydrateYeast = (params: {
+  const hydrateYeast = useCallback((params: {
     yeastRows: EditorYeastRow[];
     ext: Record<string, unknown> | null;
     linksYeast: Record<string, unknown> | null;
@@ -109,9 +109,9 @@ export function useRecipeEditYeast() {
       };
     }) as EditorYeastRow[];
     setYeastRows(yeast);
-  };
+  }, []);
 
-  const hydrateYeastAttenuationOverrides = (raw: Record<string, unknown> | null) => {
+  const hydrateYeastAttenuationOverrides = useCallback((raw: Record<string, unknown> | null) => {
     if (!raw) {
       setYeastAttenuationOverrides({});
       return;
@@ -123,7 +123,7 @@ export function useRecipeEditYeast() {
       out[k] = String(v);
     }
     setYeastAttenuationOverrides(out);
-  };
+  }, []);
 
   const buildYeastOverrides = () => {
     const yeastAttenuationOverridesPercent = Object.fromEntries(
