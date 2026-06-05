@@ -43,6 +43,21 @@ export type BoilOverallResultV0 = {
   };
 };
 
+export type MashOverallResult = {
+  calculatedAt: string;
+  ionsPpm: IonProfilePpm;
+  finalAlkalinityPpmCaCO3: number;
+  ph: { kind: "target" | "estimated"; value: number };
+  debug: {
+    startingAlkalinityPpmCaCO3: number;
+    startingAlkalinityAfterSaltsPpmCaCO3: number;
+    saltsDeltaBicarbonatePpm: number;
+    acidSulfateAddedPpm: number;
+    acidChlorideAddedPpm: number;
+    mashMode: "targetPh" | "manual";
+  };
+};
+
 export type WaterStrengthKind = "percent" | "normality" | "molarity" | "solid";
 
 export type WaterAcidificationMode = "targetPh" | "manual";
