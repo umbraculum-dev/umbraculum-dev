@@ -127,7 +127,6 @@ export function useWaterMashSteps(params: {
       setMashProcedure(null);
       setMashRows([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mashRows.length is intentional guard
   }, [recipe, derivedMashWaterVolumeLiters, mashRows.length, mashStepsDirty]);
 
   const computeFirstStepAmountL = useMemo(() => {

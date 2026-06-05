@@ -13,12 +13,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Files scanned | 843 |
+| Files scanned | 851 |
 | Roots | `services/api/src`, `packages`, `apps/web/app`, `apps/native/src` |
 | P0 findings | 0 |
-| P1 findings | 17 |
+| P1 findings | 16 |
 | P2 findings | 50 |
-| P3 findings | 36 |
+| P3 findings | 37 |
 
 ---
 
@@ -29,7 +29,6 @@
 | `packages/api-client/src/generated/platform.openapi.ts` | 10161 | Packages | S, I | P1 | file size 10161 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `packages/api-client/src/generated/brewery.openapi.ts` | 4895 | Packages | S, I | P1 | file size 4895 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/recipes/_components/YeastEditor.tsx` | 1430 | Apps (web) | S, I | P1 | file size 1430 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
-| `apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/_hooks/useBrewSessionDetailPage.tsx` | 1273 | Apps (web) | S, I | P1 | file size 1273 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/[locale]/(brewery)/inventory/page.tsx` | 1258 | Apps (web) | S, I | P1 | file size 1258 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `services/api/src/modules/brewery/services/waterCalcService.ts` | 1251 | Brewery vertical | S, I | P1 | file size 1251 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `apps/web/app/[locale]/(brewery)/brewday-steps-settings/page.tsx` | 1150 | Apps (web) | S, I | P1 | file size 1150 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
@@ -125,6 +124,7 @@
 | `apps/web/app/recipes/[id]/water/mash/_hooks/useWaterMashAcidification.ts` | 434 | Apps (web) | S, I | P3 | file size 434 LoC | Review logical cohesion |
 | `apps/native/src/modules/brewery/screens/RecipesListScreen.tsx` | 433 | Apps (native) | S, I | P3 | file size 433 LoC | Review logical cohesion |
 | `services/api/src/services/brewSessionsRecipeStepSeeding.ts` | 427 | Platform routes/services | S, I | P3 | file size 427 LoC | Review logical cohesion |
+| `apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/_hooks/useBrewSessionSteps.ts` | 418 | Apps (web) | S, I | P3 | file size 418 LoC | Review logical cohesion |
 | `apps/native/src/modules/brewery/screens/WaterHubScreen.tsx` | 416 | Apps (native) | S, I | P3 | file size 416 LoC | Review logical cohesion |
 | `apps/web/app/[locale]/(brewery)/water-profiles/page.tsx` | 416 | Apps (web) | S, I | P3 | file size 416 LoC | Review logical cohesion |
 | `apps/web/app/recipes/[id]/water/sparge/_hooks/useWaterSpargeAcidification.tsx` | 411 | Apps (web) | S, I | P3 | file size 411 LoC | Review logical cohesion |
