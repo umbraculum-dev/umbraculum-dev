@@ -50,3 +50,15 @@ Notes:
 - Tail parity (220–249 LoC web/native), CRP/MRP projection finish, API leftovers + near-threshold splits, packages/ui, Tier A route thinning (AuthService + WaterCalcRouteService), test file hygiene (400+ LoC vitest barrels).
 - API vitest **332/332** with no unhandled errors.
 - WS6 burn-in: lint OK; boundaries B5 **0** violations on `services/api/src/modules`; **defer** warn→error (operator gate unchanged).
+
+## S closure epic @ 4bbe132 (2026-06-06)
+
+```
+T2-PR acceptance @ 4bbe132 (SOLID S closure): jobs=docs-readmes,lint,typecheck,dogfood-npm-smoke ci-parity=OK
+```
+
+Notes:
+
+- Post–Wave 17 program closure doc (`solid-post-wave17-closure.md`), agent verification cross-links, WS6 **promoted to error**.
+- Recipe-edit composer thinning (web + native mashing parity), water/brew-session/equipment tail S splits.
+- Inventory P2/P3=0 unchanged; API not re-run (UI/docs/eslint only).
