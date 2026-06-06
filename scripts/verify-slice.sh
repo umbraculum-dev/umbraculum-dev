@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Path-aware T2 pre-push: npm run verify:pre-push  (NOT bare ci-parity-check.sh --archive run).
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -22,8 +23,11 @@ Options:
 Examples:
   ./scripts/verify-slice.sh --tier T0 --slice openapi
   ./scripts/verify-slice.sh --tier T1 --from-diff origin/master
-  ./scripts/verify-slice.sh --tier T2
-  ./scripts/verify-slice.sh --tier T2 --full
+  ./scripts/verify-slice.sh --tier T2              # same as npm run verify:pre-push
+  ./scripts/verify-slice.sh --tier T2 --full       # same as npm run verify:pre-push:release
+
+Agent pre-push: always prefer npm run verify:pre-push — do not substitute
+  ./scripts/ci-parity-check.sh --archive run  (no --jobs; sequential full manifest).
 EOF
 }
 
@@ -150,6 +154,7 @@ run_t2() {
     native_steps="$(python3 -c "import json,sys; print(','.join(json.loads(sys.argv[1])['nativeSteps']))" "$resolved_json")"
     parity_args+=(--parallel --isolated-install --jobs "$ci_jobs")
     parallel_count="$(echo "$ci_jobs" | tr ',' '\n' | grep -c . || true)"
+    echo "verify-slice T2-PR: ci-parity jobs=${ci_jobs} parallel=${parallel_count} native=${native_steps:-none}" >&2
   fi
 
   local parity_summary="ci-parity=OK"

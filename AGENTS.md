@@ -327,7 +327,7 @@ not the human contributor. Do not end a session with "before you push, run …".
 2. With a **clean working tree**, run the pre-push gate (same commands for agents and human contributors):
 
 ```bash
-npm run verify:pre-push              # T2-PR — default
+npm run verify:pre-push              # T2-PR — default (path-aware + parallel)
 npm run verify:pre-push:release      # T2-release — manifest / SDK tags / ci-parity pins
 npm run validate:gha-triggers        # optional: drift check for trigger-map editors
 python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master
@@ -336,6 +336,15 @@ python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base or
    `verify:pre-push` selects `--archive` automatically when the tree is clean.
    On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@<same-version-as-CI_PARITY_PKG_VERSION> -- run --archive` (read `CI_PARITY_PKG_VERSION` from [`scripts/ci-parity-check.sh`](scripts/ci-parity-check.sh)).
    Skill: **`path-aware-pre-push`**. Full table: [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § Pre-push commands reference.
+
+   **Agent anti-pattern (do not repeat):** `./scripts/ci-parity-check.sh --archive run`
+   **with no `--jobs`** runs the **entire manifest sequentially** (~8–15 min) and **skips**
+   path-aware job selection, **parallel** execution, and **native companions** (API vitest,
+   `packages-dist-check`, etc.). That is **not** T2-PR and is **not** equivalent to
+   `npm run verify:pre-push`. For pre-push, **always** use `npm run verify:pre-push` unless
+   you are intentionally running a **named subset** with explicit `--jobs` (and usually
+   `--parallel --isolated-install`). Incident: Wave 3b push prep, 2026-06-06.
+
    **SOLID program:** closed post–Wave 17 — see [`docs/design/solid-post-wave17-closure.md`](docs/design/solid-post-wave17-closure.md) §6 (verification gates; do not treat pre-push as a new SOLID initiative).
 3. T2-PR **auto-runs API vitest** when the diff matches `.github/workflows/api.yml`
    paths (via `.umbraculum/gha-trigger-map.json`). For manifest-only work outside

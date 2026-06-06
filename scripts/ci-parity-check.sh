@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Thin wrapper — canonical implementation: @umbraculum/ci-parity + .umbraculum/ci-parity.json
 # See docs/CI-PARITY.md § "Snapshot modes"
+#
+# Pre-push (agents): npm run verify:pre-push — NOT bare "--archive run" without --jobs.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -50,6 +52,27 @@ done
 
 if [[ "${CI_PARITY_SNAPSHOT:-}" == "archive" ]]; then
   use_checkout=0
+fi
+
+# Agents: bare --archive run (no --jobs) = full sequential manifest (~8–15 min), not T2-PR.
+if [[ "$use_checkout" -eq 0 ]]; then
+  has_run=0
+  has_jobs=0
+  for arg in "${forward_args[@]}"; do
+    [[ "$arg" == "run" ]] && has_run=1
+    [[ "$arg" == "--jobs" || "$arg" == --jobs=* ]] && has_jobs=1
+  done
+  if [[ "$has_run" -eq 1 && "$has_jobs" -eq 0 ]]; then
+    cat >&2 <<'EOF'
+ci-parity-check: WARNING — archive run without --jobs runs ALL manifest jobs sequentially
+  (~8–15 min) and skips path-aware selection, parallel execution, and native companions
+  (API vitest, packages-dist-check, …).
+
+  For pre-push, use:  npm run verify:pre-push
+
+  See AGENTS.md § Pre-push CI parity and docs/CI-PARITY.md § Common agent mistakes.
+EOF
+  fi
 fi
 
 if [[ "$use_checkout" -eq 1 ]]; then

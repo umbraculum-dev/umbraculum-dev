@@ -47,13 +47,16 @@ Other commands:
 
 | Mode | Command | What gets tested | When to use |
 |------|---------|------------------|-------------|
-| **Git archive (pre-push gate)** | `npm run verify:pre-push` or `./scripts/ci-parity-check.sh --archive run` | Committed tree at `HEAD` — cold `npm ci`, no warm-volume drift | **Agent mandatory before push** — after commit, clean working tree |
+| **Git archive (T2-PR pre-push)** | **`npm run verify:pre-push`** (via [`scripts/verify-slice.sh`](../../scripts/verify-slice.sh) — path-aware `--jobs` + `--parallel --isolated-install` + native companions) | Committed tree at `HEAD` | **Agent mandatory before push** — after commit, clean working tree |
+| **Git archive (low-level / subset only)** | `./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,…` | Committed tree; **only** listed jobs | Manual subset when you already know job ids — **not** the default pre-push entry point |
+| **Git archive (anti-pattern for pre-push)** | `./scripts/ci-parity-check.sh --archive run` **without `--jobs`** | All manifest jobs **sequentially** (~8–15 min); no API vitest / dist-check companions | **Do not use for pre-push** — use `npm run verify:pre-push` instead (incident 2026-06-06) |
 | **Working tree (WIP only)** | `./scripts/ci-parity-check.sh run` or `… run --ci` | Checkout on disk — **includes uncommitted edits** | Fast iteration during edits — **not** sufficient push proof alone |
 | **Replay a ref** | `… run --sha <ref>` or `--archive` at a specific SHA | Tracked files at `<ref>` | Reproducing a historical CI failure |
 | **GHA checkout** | `npx @umbraculum/ci-parity run --ci` in Actions | Checked-out branch (fresh runner, cold install) | CI job body |
 
 **Common agent mistakes:**
 
+- **Using `./scripts/ci-parity-check.sh --archive run` without `--jobs` as the pre-push gate** — runs the full manifest sequentially and omits path-aware selection, parallel execution, and native companions (`api-integration`, `packages-dist-check`, …). **Use `npm run verify:pre-push`.**
 - Pushing without running **`--archive`** (or `verify:pre-push` on a clean tree) after commit.
 - Treating `--ci` green as push proof while fixes are still uncommitted — GHA runs committed code.
 - Delegating pre-push to the operator ("run this before you push") — agents run T2 themselves per [`AGENTS.md`](../AGENTS.md) §Pre-push CI parity.
