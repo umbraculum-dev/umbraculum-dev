@@ -9,7 +9,7 @@ import {
   RecipeEditReadOnlyValue,
   WarningBox,
 } from "../../../../_components/recipe-edit";
-import { mathExplain } from "../../../[id]/edit/_lib/mathExplain";
+import { mathExplain } from "../../[id]/edit/_lib/mathExplain";
 import { YeastEditorRowManualCountFields } from "./rowManualCount/YeastEditorRowManualCountFields";
 import {
   computeLiveCellsPerGram,
