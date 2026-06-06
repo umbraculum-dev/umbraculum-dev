@@ -1,4 +1,4 @@
-import type { IonProfilePpm } from "@umbraculum/contracts";
+import type { IonProfilePpm } from "@umbraculum/brewery-contracts";
 
 export type DisplayStream = {
   key: "mash" | "sparge" | "boil";

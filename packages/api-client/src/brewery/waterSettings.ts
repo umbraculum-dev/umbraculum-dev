@@ -1,7 +1,4 @@
-import {
-  RecipeWaterSettingsGetResponseSchema,
-  RecipeWaterSettingsPutResponseSchema,
-} from "@umbraculum/contracts";
+import { RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

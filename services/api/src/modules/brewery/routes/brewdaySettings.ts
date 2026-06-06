@@ -1,10 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  BrewdaySettingsPatchRequestSchema,
-  BrewdaySettingsResponseSchema,
-  ErrorResponseSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { BrewdaySettingsPatchRequestSchema, BrewdaySettingsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import {

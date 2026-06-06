@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Alert } from "react-native";
 
 import { listRecipes, listStyles, createRecipe, deleteRecipe } from "@umbraculum/api-client/brewery";
-import { type RecipeListItem } from "@umbraculum/contracts";
+import type { RecipeListItem } from "@umbraculum/brewery-contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { useFocusEffect, useNavigation, type NavigationProp } from "@react-navigation/native";
 

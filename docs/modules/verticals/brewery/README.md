@@ -80,6 +80,7 @@ Brewery screens live under `apps/native/src/modules/brewery/screens/` (`RecipesL
 
 | Package | Sub-plan #9 slot | Role |
 |---|---|---|
+| `@umbraculum/brewery-contracts` ([`packages/brewery-contracts/`](../../../../packages/brewery-contracts/)) | RFC-0002 β contracts slice (Wave 3b, [RFC-0011](../../../rfcs/0011-application-surface-shell-layering.md)) | Recipe/brew-session/water/gravity wire schemas and parsers — the only brewery slice third-party vertical authors pin. |
 | `@umbraculum/brewery-core` ([`packages/core/`](../../../../packages/core/)) | slot 6 (done) | Brewing math: gravity, water chemistry, unit conversions. |
 | `@umbraculum/brewery-beerjson` ([`packages/beerjson/`](../../../../packages/beerjson/README.md)) | slot 12 (done) | BeerJSON spec layer. |
 | `@umbraculum/brewery-recipes-ui` ([`packages/recipes-ui/`](../../../../packages/recipes-ui/README.md)) | slot 13 (done) | Recipe / mash / water / yeast UI components. |

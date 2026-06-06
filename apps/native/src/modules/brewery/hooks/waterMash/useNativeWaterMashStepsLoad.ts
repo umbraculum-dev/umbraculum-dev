@@ -6,7 +6,7 @@ import {
   newMashRowId,
   type EditorMashStep,
 } from "@umbraculum/brewery-beerjson";
-import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/brewery-contracts";
 import type { WaterVolumes } from "@umbraculum/brewery-recipes-ui";
 
 export type NativeWaterMashStepsRecipe = {

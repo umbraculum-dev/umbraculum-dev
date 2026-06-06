@@ -1,5 +1,5 @@
 import { computeAndSaveBoil } from "@umbraculum/api-client/brewery";
-import type { WaterCalcDerivation } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import type {
   BoilOverallResultV0,

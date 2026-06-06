@@ -1,11 +1,4 @@
-import {
-  RecipeBulkImportPreviewResponseSchema,
-  RecipeBulkImportRequestSchema,
-  RecipeBulkImportResponseSchema,
-  RecipeImportPreviewResponseSchema,
-  RecipeImportRequestSchema,
-  RecipeImportResponseSchema,
-} from "@umbraculum/contracts";
+import { RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, RecipeBulkImportResponseSchema, RecipeImportPreviewResponseSchema, RecipeImportRequestSchema, RecipeImportResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

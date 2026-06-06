@@ -9,15 +9,7 @@ import {
 } from "../chunk-EHQ6NO7O.js";
 
 // src/brewery/recipes.ts
-import {
-  OkResponseSchema,
-  parseBrewSessionCreateResponse,
-  parseBrewSessionsListResponse,
-  parseRecipesListResponse,
-  RecipeCreateRequestSchema,
-  RecipeResponseSchema,
-  RecipeVersionsResponseSchema
-} from "@umbraculum/contracts";
+import { OkResponseSchema, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseRecipesListResponse, RecipeCreateRequestSchema, RecipeResponseSchema, RecipeVersionsResponseSchema } from "@umbraculum/brewery-contracts";
 async function listRecipes(client) {
   return getParsed(client, toClientPath("/recipes"), parseRecipesListResponse);
 }
@@ -93,7 +85,7 @@ async function duplicateRecipe(client, recipeId) {
 }
 
 // src/brewery/recipeExport.ts
-import { BeerJsonExportResponseSchema } from "@umbraculum/contracts";
+import { BeerJsonExportResponseSchema } from "@umbraculum/brewery-contracts";
 function recipeBeerJsonExportPath(recipeId) {
   return toClientPath(`/recipes/${encodeURIComponent(recipeId)}/export/beerjson`);
 }
@@ -113,10 +105,7 @@ async function exportAllRecipesBeerJson(client) {
 }
 
 // src/brewery/ingredientAdmin.ts
-import {
-  IngredientSyncResponseSchema,
-  IngredientSyncRunsResponseSchema
-} from "@umbraculum/contracts";
+import { IngredientSyncResponseSchema, IngredientSyncRunsResponseSchema } from "@umbraculum/brewery-contracts";
 async function listIngredientSyncRuns(client) {
   return getParsed(
     client,
@@ -134,18 +123,13 @@ async function runIngredientSync(client) {
 }
 
 // src/brewery/styles.ts
-import { StylesListResponseSchema } from "@umbraculum/contracts";
+import { StylesListResponseSchema } from "@umbraculum/brewery-contracts";
 async function listStyles(client) {
   return getParsed(client, toClientPath("/styles"), (data) => StylesListResponseSchema.parse(data));
 }
 
 // src/brewery/ingredients.ts
-import {
-  FermentablesListResponseSchema,
-  HopsListResponseSchema,
-  IngredientsSearchQuerySchema,
-  YeastsListResponseSchema
-} from "@umbraculum/contracts";
+import { FermentablesListResponseSchema, HopsListResponseSchema, IngredientsSearchQuerySchema, YeastsListResponseSchema } from "@umbraculum/brewery-contracts";
 function ingredientsQueryString(params) {
   if (!params) return "";
   const parsed = IngredientsSearchQuerySchema.parse(params);
@@ -179,14 +163,7 @@ async function searchYeasts(client, params) {
 }
 
 // src/brewery/recipeImport.ts
-import {
-  RecipeBulkImportPreviewResponseSchema,
-  RecipeBulkImportRequestSchema,
-  RecipeBulkImportResponseSchema,
-  RecipeImportPreviewResponseSchema,
-  RecipeImportRequestSchema,
-  RecipeImportResponseSchema
-} from "@umbraculum/contracts";
+import { RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, RecipeBulkImportResponseSchema, RecipeImportPreviewResponseSchema, RecipeImportRequestSchema, RecipeImportResponseSchema } from "@umbraculum/brewery-contracts";
 async function previewRecipeImport(client, body) {
   const parsedBody = RecipeImportRequestSchema.parse(body);
   return postParsed(
@@ -225,22 +202,7 @@ async function importRecipesBulk(client, body) {
 }
 
 // src/brewery/brewSessions.ts
-import {
-  BrewSessionDetailResponseSchema,
-  BrewSessionStepLogRequestSchema,
-  BrewSessionStepResponseSchema,
-  BrewSessionStepsPatchRequestSchema,
-  BrewSessionStepsResponseSchema,
-  BrewSessionStopRequestSchema,
-  IntegrationAttachRequestSchema,
-  IntegrationAttachResponseSchema,
-  IntegrationAttachmentsResponseSchema,
-  IntegrationDetachRequestSchema,
-  IntegrationDetachResponseSchema,
-  IntegrationReadingsQuerySchema,
-  IntegrationReadingsResponseSchema,
-  OkResponseSchema as OkResponseSchema2
-} from "@umbraculum/contracts";
+import { BrewSessionDetailResponseSchema, BrewSessionStepLogRequestSchema, BrewSessionStepResponseSchema, BrewSessionStepsPatchRequestSchema, BrewSessionStepsResponseSchema, BrewSessionStopRequestSchema, IntegrationAttachRequestSchema, IntegrationAttachResponseSchema, IntegrationAttachmentsResponseSchema, IntegrationDetachRequestSchema, IntegrationDetachResponseSchema, IntegrationReadingsQuerySchema, IntegrationReadingsResponseSchema, OkResponseSchema as OkResponseSchema2 } from "@umbraculum/brewery-contracts";
 function brewSessionPath(brewSessionId) {
   return toClientPath(`/brew-sessions/${encodeURIComponent(brewSessionId)}`);
 }
@@ -367,13 +329,7 @@ async function detachBrewSessionIntegration(client, brewSessionId, body) {
 }
 
 // src/brewery/inventory.ts
-import {
-  InventoryCreateRequestSchema,
-  InventoryItemResponseSchema,
-  InventoryListResponseSchema,
-  InventoryPatchRequestSchema,
-  OkResponseSchema as OkResponseSchema3
-} from "@umbraculum/contracts";
+import { InventoryCreateRequestSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, OkResponseSchema as OkResponseSchema3 } from "@umbraculum/brewery-contracts";
 async function listInventory(client) {
   return getParsed(
     client,
@@ -408,13 +364,7 @@ async function deleteInventoryItem(client, itemId) {
 }
 
 // src/brewery/equipmentProfiles.ts
-import {
-  EquipmentProfileCreateRequestSchema,
-  EquipmentProfilePatchRequestSchema,
-  EquipmentProfileResponseSchema,
-  EquipmentProfilesListResponseSchema,
-  OkResponseSchema as OkResponseSchema4
-} from "@umbraculum/contracts";
+import { EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, OkResponseSchema as OkResponseSchema4 } from "@umbraculum/brewery-contracts";
 async function listEquipmentProfiles(client) {
   return getParsed(
     client,
@@ -449,10 +399,7 @@ async function deleteEquipmentProfile(client, profileId) {
 }
 
 // src/brewery/brewdaySettings.ts
-import {
-  BrewdaySettingsPatchRequestSchema,
-  BrewdaySettingsResponseSchema
-} from "@umbraculum/contracts";
+import { BrewdaySettingsPatchRequestSchema, BrewdaySettingsResponseSchema } from "@umbraculum/brewery-contracts";
 async function getBrewdaySettings(client) {
   return getParsed(
     client,
@@ -471,7 +418,7 @@ async function patchBrewdaySettings(client, body) {
 }
 
 // src/brewery/water.ts
-import { parseRecipeWaterHubSummaryResponse } from "@umbraculum/contracts";
+import { parseRecipeWaterHubSummaryResponse } from "@umbraculum/brewery-contracts";
 async function getRecipeWaterHubSummary(client, recipeId) {
   return getParsed(
     client,
@@ -481,10 +428,7 @@ async function getRecipeWaterHubSummary(client, recipeId) {
 }
 
 // src/brewery/waterCalc.ts
-import {
-  WaterCalcResultOnlyResponseSchema,
-  WaterCalcWithDerivationResponseSchema
-} from "@umbraculum/contracts";
+import { WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema } from "@umbraculum/brewery-contracts";
 function postWithDerivation(client, path, payload) {
   return postParsed(
     client,
@@ -533,11 +477,7 @@ async function calcMashAcidificationTargetMashPh(client, payload) {
 }
 
 // src/brewery/waterCompute.ts
-import {
-  parseBoilComputeAndSaveResponse,
-  parseMashComputeAndSaveResponse,
-  parseSpargeComputeAndSaveResponse
-} from "@umbraculum/contracts";
+import { parseBoilComputeAndSaveResponse, parseMashComputeAndSaveResponse, parseSpargeComputeAndSaveResponse } from "@umbraculum/brewery-contracts";
 async function computeAndSaveMash(client, recipeId, payload) {
   return postParsed(
     client,
@@ -564,12 +504,7 @@ async function computeAndSaveBoil(client, recipeId, payload) {
 }
 
 // src/brewery/waterProfiles.ts
-import {
-  OkResponseSchema as OkResponseSchema5,
-  parseWaterProfilesResponse,
-  WaterProfileCreateRequestSchema,
-  WaterProfileResponseSchema
-} from "@umbraculum/contracts";
+import { OkResponseSchema as OkResponseSchema5, parseWaterProfilesResponse, WaterProfileCreateRequestSchema, WaterProfileResponseSchema } from "@umbraculum/brewery-contracts";
 async function listWaterProfiles(client) {
   return getParsed(client, toClientPath("/water-profiles"), parseWaterProfilesResponse);
 }
@@ -607,10 +542,7 @@ async function deleteWaterProfile(client, profileId) {
 }
 
 // src/brewery/waterSettings.ts
-import {
-  RecipeWaterSettingsGetResponseSchema,
-  RecipeWaterSettingsPutResponseSchema
-} from "@umbraculum/contracts";
+import { RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSchema } from "@umbraculum/brewery-contracts";
 async function getRecipeWaterSettings(client, recipeId) {
   return getParsed(
     client,

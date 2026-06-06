@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/brewery-contracts";
 import type { EditorMashStep } from "@umbraculum/brewery-beerjson";
 import type { WaterVolumes } from "@umbraculum/brewery-recipes-ui";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
-import type { WaterCalcDerivation } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import type { IonProfilePpm } from "../../_lib/waterChem";
 import type { SaltAdditionsResult } from "../../_lib/waterCalcTypes";

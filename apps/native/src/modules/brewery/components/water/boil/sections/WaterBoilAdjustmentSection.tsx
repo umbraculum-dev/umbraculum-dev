@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
 

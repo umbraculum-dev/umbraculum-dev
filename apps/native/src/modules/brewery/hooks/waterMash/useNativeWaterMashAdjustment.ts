@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 
 import { mixIonProfilesByVolume } from "./waterMashHelpers";
 

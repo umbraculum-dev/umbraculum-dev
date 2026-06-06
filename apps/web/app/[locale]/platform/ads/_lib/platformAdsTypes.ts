@@ -1,4 +1,4 @@
-import type { PlatformAdRow } from "@umbraculum/contracts";
+import { PlatformAdRow } from "@umbraculum/contracts";
 
 export type Placement =
   | "global_top"

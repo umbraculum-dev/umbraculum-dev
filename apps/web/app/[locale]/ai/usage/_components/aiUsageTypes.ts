@@ -1,4 +1,4 @@
-import type { WorkspaceAiUsageResponse } from "@umbraculum/contracts";
+import { WorkspaceAiUsageResponse } from "@umbraculum/contracts";
 
 export interface ByUserRow {
   userId: string;

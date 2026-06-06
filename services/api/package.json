@@ -46,6 +46,7 @@
     "@readme/openapi-parser": "^5.5.0",
     "@umbraculum/ai-tool-sdk": "^0.1.1",
     "@umbraculum/automation-contracts": "^0.0.2",
+    "@umbraculum/brewery-contracts": "file:../../packages/brewery-contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",
     "@umbraculum/contracts": "^0.0.1",
     "@umbraculum/crp-contracts": "^0.0.2",

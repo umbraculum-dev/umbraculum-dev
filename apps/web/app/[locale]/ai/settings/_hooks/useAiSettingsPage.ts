@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { WorkspaceAiSettings } from "@umbraculum/contracts";
+import { WorkspaceAiSettings } from "@umbraculum/contracts";
 import {
   ApiClientError,
   getWorkspaceAiSettings,

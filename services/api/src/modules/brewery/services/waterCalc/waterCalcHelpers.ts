@@ -1,7 +1,4 @@
-import {
-  WaterCalcResultOnlyResponseSchema,
-  WaterCalcWithDerivationResponseSchema,
-} from "@umbraculum/contracts";
+import { WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { BadRequestError } from "../../../../errors.js";
 import type { AcidStrength, SpargeAcidType } from "../../../../domain/waterCalc/spargeAcidification.js";

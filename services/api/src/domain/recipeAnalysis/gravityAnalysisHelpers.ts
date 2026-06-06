@@ -1,4 +1,4 @@
-import type { GravityAnalysisWarningCode } from "@umbraculum/contracts";
+import type { GravityAnalysisWarningCode } from "@umbraculum/brewery-contracts";
 
 export interface GravityAnalysisWarning {
   code: GravityAnalysisWarningCode;

@@ -3,7 +3,7 @@ import type {
   MashAcidComputeBlock,
   SpargeAcidComputeBlock,
 } from "./computeAndSave";
-import type { NumberFormatHintV1, NumberFormatUnit } from "../format/numberFormat";
+import type { NumberFormatHintV1, NumberFormatUnit } from "@umbraculum/contracts";
 
 import { parseDerivation } from "./parseComputeAndSaveDerivation.js";
 import {

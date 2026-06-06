@@ -1,16 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  BoilComputeAndSaveRequestSchema,
-  BoilComputeAndSaveResponseSchema,
-  ErrorResponseSchema,
-  IdParamsSchema,
-  MashComputeAndSaveRequestSchema,
-  MashComputeAndSaveResponseSchema,
-  SpargeComputeAndSaveRequestSchema,
-  SpargeComputeAndSaveResponseSchema,
-  waterFormatHints,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { BoilComputeAndSaveRequestSchema, BoilComputeAndSaveResponseSchema, IdParamsSchema, MashComputeAndSaveRequestSchema, MashComputeAndSaveResponseSchema, SpargeComputeAndSaveRequestSchema, SpargeComputeAndSaveResponseSchema } from "@umbraculum/brewery-contracts";
+import { waterFormatHints } from "@umbraculum/contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { RecipeWaterComputeAndSaveService } from "../../../services/recipeWaterComputeAndSaveService.js";

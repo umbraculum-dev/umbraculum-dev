@@ -1,15 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { Recipe } from "@prisma/client";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  ErrorResponseSchema,
-  RecipeBulkImportPreviewResponseSchema,
-  RecipeBulkImportRequestSchema,
-  RecipeBulkImportResponseSchema,
-  RecipeImportPreviewResponseSchema,
-  RecipeImportRequestSchema,
-  RecipeImportResponseSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, RecipeBulkImportResponseSchema, RecipeImportPreviewResponseSchema, RecipeImportRequestSchema, RecipeImportResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { BadRequestError } from "../../../errors.js";

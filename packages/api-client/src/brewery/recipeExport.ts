@@ -1,4 +1,4 @@
-import { BeerJsonExportResponseSchema } from "@umbraculum/contracts";
+import { BeerJsonExportResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

@@ -60,7 +60,7 @@ Every workspace in the monorepo, grouped by layer. The npm name and the on-disk 
 
 | Path | npm name | What it is | Notable consumes |
 |---|---|---|---|
-| `services/api/` | `@umbraculum/api` | Fastify + Prisma API — auth, workspace, billing, AI consultant, brewery routes, canonical-module slices (`automation`, `pim`). | `@umbraculum/{module-sdk, contracts, automation-contracts, pim-contracts, brewery-core, brewery-beerjson}` |
+| `services/api/` | `@umbraculum/api` | Fastify + Prisma API — auth, workspace, billing, AI consultant, brewery routes, canonical-module slices (`automation`, `pim`). | `@umbraculum/{module-sdk, contracts, brewery-contracts, automation-contracts, pim-contracts, brewery-core, brewery-beerjson}` |
 
 ### 3.2.1 Distribution adapters (`packaging/*`)
 
@@ -94,7 +94,8 @@ One per module. Typed DTOs, Zod schemas (per [RFC-0003](rfcs/0003-validation-lib
 
 | Path | npm name | Module | Role |
 |---|---|---|---|
-| `packages/contracts/` | `@umbraculum/contracts` | Platform-wide | Auth payloads, water-chemistry compute responses, gravity-analysis results, AI-tool I/O shapes, format hints. Predates the canonical-module scheme; not module-scoped. |
+| `packages/contracts/` | `@umbraculum/contracts` | Platform-wide | Auth, workspaces, billing, ads, AI, integrations, webhooks, rendering job shapes, shared format hints. Cross-cutting only — brewery/water/gravity wire types live in `@umbraculum/brewery-contracts` (RFC-0011 Wave 3b). |
+| `packages/brewery-contracts/` | `@umbraculum/brewery-contracts` | `brewery` vertical (tier 6) | Recipe, brew-session, water-chemistry, and gravity-analysis schemas + parsers. RFC-0002 β fourth slice; extracted from platform contracts per RFC-0011 Decision F. |
 | `packages/automation-contracts/` | `@umbraculum/automation-contracts` | `automation` canonical | Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. |
 | `packages/pim-contracts/` | `@umbraculum/pim-contracts` | `pim` canonical | Products, variants, attribute sets, attributes, categories, media asset refs, contract-version handshake. RFC-0004. |
 

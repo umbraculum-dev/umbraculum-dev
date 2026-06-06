@@ -1,15 +1,8 @@
 import type { EquipmentProfile } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  EquipmentProfileCreateRequestSchema,
-  EquipmentProfilePatchRequestSchema,
-  EquipmentProfileResponseSchema,
-  EquipmentProfilesListResponseSchema,
-  ErrorResponseSchema,
-  IdParamsSchema,
-  OkResponseSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, IdParamsSchema, OkResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { EquipmentProfilesService } from "../../../services/equipmentProfilesService.js";

@@ -73,6 +73,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@umbraculum/automation-contracts": "file:../automation-contracts",
+    "@umbraculum/brewery-contracts": "file:../brewery-contracts",
     "@umbraculum/contracts": "file:../contracts",
     "@umbraculum/crp-contracts": "file:../crp-contracts",
     "@umbraculum/mrp-contracts": "file:../mrp-contracts",

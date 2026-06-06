@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
-import type { WaterProfilesResponse } from "@umbraculum/contracts";
+import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 
 import { getRecipe, listWaterProfiles } from "@umbraculum/api-client/brewery";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";

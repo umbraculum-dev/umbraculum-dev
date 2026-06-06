@@ -1,5 +1,5 @@
 import type { IonProfilePpm } from "./ionProfile";
-import type { NumberFormatHintV1 } from "../format/numberFormat";
+import type { NumberFormatHintV1 } from "@umbraculum/contracts";
 
 export type WaterHubFormatHintKeys = "L" | "pH" | "ppm_as_CaCO3" | "g" | "mL";
 

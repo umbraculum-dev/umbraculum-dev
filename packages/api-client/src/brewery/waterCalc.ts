@@ -1,7 +1,4 @@
-import {
-  WaterCalcResultOnlyResponseSchema,
-  WaterCalcWithDerivationResponseSchema,
-} from "@umbraculum/contracts";
+import { WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

@@ -1,4 +1,4 @@
-import type { ExpectedRaRange } from "@umbraculum/contracts";
+import type { ExpectedRaRange } from "@umbraculum/brewery-contracts";
 import type { IonProfilePpm } from "../../domain/waterCalc/saltAdditions.js";
 import { isObject, isFiniteNumber } from "../../lib/typeGuards.js";
 

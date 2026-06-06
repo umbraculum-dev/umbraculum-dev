@@ -1,4 +1,4 @@
-import type { GravityAnalysisDerivationKind, GravityAnalysisResponseV1, WaterCalcDerivation } from "@umbraculum/contracts";
+import type { GravityAnalysisDerivationKind, GravityAnalysisResponseV1, WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 import { analysisFormatHints } from "@umbraculum/contracts";
 import {
   appendEfficiencyDerivations,

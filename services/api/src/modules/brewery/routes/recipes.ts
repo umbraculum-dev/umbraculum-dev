@@ -1,15 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  ErrorResponseSchema,
-  IdParamsSchema,
-  OkResponseSchema,
-  RecipeCreateRequestSchema,
-  RecipeListResponseSchema,
-  RecipePatchRequestSchema,
-  RecipeResponseSchema,
-  RecipeVersionsResponseSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { IdParamsSchema, OkResponseSchema, RecipeCreateRequestSchema, RecipeListResponseSchema, RecipePatchRequestSchema, RecipeResponseSchema, RecipeVersionsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { RecipesService } from "../../../services/recipesService.js";

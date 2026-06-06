@@ -1,7 +1,4 @@
-import {
-  IngredientSyncResponseSchema,
-  IngredientSyncRunsResponseSchema,
-} from "@umbraculum/contracts";
+import { IngredientSyncResponseSchema, IngredientSyncRunsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

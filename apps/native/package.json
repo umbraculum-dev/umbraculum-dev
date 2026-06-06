@@ -16,6 +16,7 @@
   "dependencies": {
     "@umbraculum/api-client": "^0.0.1",
     "@umbraculum/module-sdk": "^0.0.2",
+    "@umbraculum/brewery-contracts": "file:../../packages/brewery-contracts",
     "@umbraculum/brewery-beerjson": "file:../../packages/beerjson",
     "@umbraculum/contracts": "^0.0.1",
     "@umbraculum/i18n": "file:../../packages/i18n",

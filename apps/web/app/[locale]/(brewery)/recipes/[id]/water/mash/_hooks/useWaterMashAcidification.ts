@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
-import type { WaterCalcDerivation } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
 
 import {

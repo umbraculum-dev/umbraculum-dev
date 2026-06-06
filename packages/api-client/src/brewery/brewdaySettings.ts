@@ -1,7 +1,4 @@
-import {
-  BrewdaySettingsPatchRequestSchema,
-  BrewdaySettingsResponseSchema,
-} from "@umbraculum/contracts";
+import { BrewdaySettingsPatchRequestSchema, BrewdaySettingsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

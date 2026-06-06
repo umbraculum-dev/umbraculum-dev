@@ -1,7 +1,7 @@
 "use client";
 
 import { formatFixed } from "../../../../../../../src/i18n/format";
-import type { WaterCalcDerivation, WaterCalcDerivationLine, WaterCalcDerivationValue } from "@umbraculum/contracts";
+import type { WaterCalcDerivation, WaterCalcDerivationLine, WaterCalcDerivationValue } from "@umbraculum/brewery-contracts";
 
 type TValues = Record<string, string | number | Date>;
 type T = (key: string, values?: TValues) => string;

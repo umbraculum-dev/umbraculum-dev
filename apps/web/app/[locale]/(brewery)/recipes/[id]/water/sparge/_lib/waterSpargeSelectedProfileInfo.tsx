@@ -1,4 +1,4 @@
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 import { Button, SizableText, View, XStack } from "tamagui";
 
 import { FieldBadge } from "../../../../../../../_components/recipe-edit";

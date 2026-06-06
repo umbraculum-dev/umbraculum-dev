@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 
-import type { IonProfilePpm } from "@umbraculum/contracts";
+import type { IonProfilePpm } from "@umbraculum/brewery-contracts";
 import { Heading, Text } from "@umbraculum/ui";
 
 import type { NativeWaterHubScreenModel } from "../../../hooks/waterHub/useNativeWaterHubScreen";

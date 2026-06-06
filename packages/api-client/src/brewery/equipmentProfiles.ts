@@ -1,10 +1,4 @@
-import {
-  EquipmentProfileCreateRequestSchema,
-  EquipmentProfilePatchRequestSchema,
-  EquipmentProfileResponseSchema,
-  EquipmentProfilesListResponseSchema,
-  OkResponseSchema,
-} from "@umbraculum/contracts";
+import { EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, OkResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

@@ -4,7 +4,7 @@ import type {
   GravityAnalysisResultV1,
   GravityAnalysisWarningCode,
 } from "./gravityAnalysis";
-import type { NumberFormatHintV1, NumberFormatUnit } from "../format/numberFormat";
+import type { NumberFormatHintV1, NumberFormatUnit } from "@umbraculum/contracts";
 import type {
   WaterCalcDerivation,
   WaterCalcDerivationKind,

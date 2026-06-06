@@ -1,10 +1,4 @@
-import {
-  InventoryCreateRequestSchema,
-  InventoryItemResponseSchema,
-  InventoryListResponseSchema,
-  InventoryPatchRequestSchema,
-  OkResponseSchema,
-} from "@umbraculum/contracts";
+import { InventoryCreateRequestSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, OkResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

@@ -1,4 +1,4 @@
-import type { RecipeWaterHubStreamSummary } from "@umbraculum/contracts";
+import type { RecipeWaterHubStreamSummary } from "@umbraculum/brewery-contracts";
 import type { Prisma } from "@prisma/client";
 import {
   parseMashOverallLastResultJson,

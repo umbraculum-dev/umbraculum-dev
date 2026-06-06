@@ -1,9 +1,4 @@
-import {
-  FermentablesListResponseSchema,
-  HopsListResponseSchema,
-  IngredientsSearchQuerySchema,
-  YeastsListResponseSchema,
-} from "@umbraculum/contracts";
+import { FermentablesListResponseSchema, HopsListResponseSchema, IngredientsSearchQuerySchema, YeastsListResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

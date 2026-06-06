@@ -1,7 +1,7 @@
 "use client";
 
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 
 import { hasNonZeroSaltAdditions, useWaterSpargeSaltsLoad } from "./useWaterSpargeSaltsLoad";
 import { useWaterSpargeSaltsPatch } from "./useWaterSpargeSaltsPatch";

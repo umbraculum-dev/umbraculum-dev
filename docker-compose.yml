@@ -172,6 +172,7 @@ services:
       - api_node_modules:/app/node_modules
       - npm_cache:/root/.npm
       - ./packages/contracts:/packages/contracts:ro
+      - ./packages/brewery-contracts:/packages/brewery-contracts:ro
       - ./packages/core:/packages/core:ro
       - ./packages/media:/packages/media:ro
       # Phase B-1: api consumes @umbraculum/module-sdk via registerModule()

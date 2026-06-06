@@ -1,6 +1,6 @@
 import type React from "react";
 
-import type { WaterCalcDerivation } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 import { H3, SizableText, View } from "tamagui";
 
 import { FieldBadge } from "../../../../../../../_components/recipe-edit";

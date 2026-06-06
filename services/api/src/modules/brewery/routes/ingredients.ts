@@ -1,14 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  ErrorResponseSchema,
-  FermentablesListResponseSchema,
-  HopsListResponseSchema,
-  IngredientSyncResponseSchema,
-  IngredientSyncRunsResponseSchema,
-  IngredientsSearchQuerySchema,
-  YeastsListResponseSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { FermentablesListResponseSchema, HopsListResponseSchema, IngredientSyncResponseSchema, IngredientSyncRunsResponseSchema, IngredientsSearchQuerySchema, YeastsListResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { ForbiddenError } from "../../../errors.js";
 import { requireActiveWorkspace, requireUser } from "../../../plugins/requestContext.js";

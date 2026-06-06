@@ -3,7 +3,7 @@ import { ScrollView, View } from "react-native";
 import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
 import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
-import { type BrewSessionListItem } from "@umbraculum/contracts";
+import type { BrewSessionListItem } from "@umbraculum/brewery-contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 

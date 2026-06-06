@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/brewery-contracts";
 
 import { mergeMashDeduceFromExt, type EditorMashStep } from "../../../_lib/beerjsonRecipe";
 import { fetchRecipeWaterSettings, type RecipeWaterSettingsResponse } from "../../water/_lib/waterSettings";

@@ -22,6 +22,7 @@
     "@umbraculum/api-client": "^0.0.1",
     "@umbraculum/automation-contracts": "^0.0.2",
     "@umbraculum/brewery-beerjson": "file:../../packages/beerjson",
+    "@umbraculum/brewery-contracts": "file:../../packages/brewery-contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",
     "@umbraculum/brewery-recipes-ui": "file:../../packages/recipes-ui",
     "@umbraculum/contracts": "^0.0.1",

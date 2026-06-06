@@ -1,5 +1,5 @@
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 
 import type { IonProfilePpm } from "../../_lib/waterChem";
 import type { WaterAcidificationMode } from "../../_lib/waterCalcTypes";

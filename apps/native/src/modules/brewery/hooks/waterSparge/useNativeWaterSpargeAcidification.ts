@@ -1,4 +1,4 @@
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 
 import {

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import type { WaterAcidificationManualResult, WaterAcidificationResult } from "@umbraculum/contracts";
+import type { WaterAcidificationManualResult, WaterAcidificationResult } from "@umbraculum/brewery-contracts";
 
 export function useNativeWaterMashAcidificationState() {
   const [mashStartingAlk, setMashStartingAlk] = useState(0);

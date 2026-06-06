@@ -1,4 +1,4 @@
-import type { NumberFormatHintV1 } from "../format/numberFormat";
+import type { NumberFormatHintV1 } from "@umbraculum/contracts";
 import type { WaterCalcDerivation } from "../water/derivation";
 
 export type GravityAnalysisWarningCode =

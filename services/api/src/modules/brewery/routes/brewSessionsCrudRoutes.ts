@@ -1,16 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  BrewSessionCreateResponseSchema,
-  BrewSessionDetailResponseSchema,
-  BrewSessionIdParamsSchema,
-  BrewSessionPatchRequestSchema,
-  BrewSessionStopRequestSchema,
-  BrewSessionsListResponseSchema,
-  ErrorResponseSchema,
-  OkResponseSchema,
-  RecipeIdParamsSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { BrewSessionCreateResponseSchema, BrewSessionDetailResponseSchema, BrewSessionIdParamsSchema, BrewSessionPatchRequestSchema, BrewSessionStopRequestSchema, BrewSessionsListResponseSchema, OkResponseSchema, RecipeIdParamsSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import type { BrewSessionsRouteService } from "../../../services/brewSessionsRouteService.js";

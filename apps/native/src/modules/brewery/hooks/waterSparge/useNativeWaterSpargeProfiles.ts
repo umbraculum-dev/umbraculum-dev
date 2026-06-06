@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
+import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 
 export function useNativeWaterSpargeProfiles(profiles: WaterProfilesResponse | null) {
   const allProfiles = useMemo(() => {

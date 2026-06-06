@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { getRecipe, getRecipeWaterSettings, listWaterProfiles, updateRecipeWaterSettings } from "@umbraculum/api-client/brewery";
-import type { WaterProfilesResponse } from "@umbraculum/contracts";
+import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";

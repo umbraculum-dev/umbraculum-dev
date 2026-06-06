@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 
 import { bicarbonatePpmToAlkalinityPpmCaCO3 } from "./waterSpargeHelpers";
 import type {

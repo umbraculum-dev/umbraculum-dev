@@ -1,4 +1,4 @@
-import type { GravityAnalysisDerivationKind, WaterCalcDerivation } from "@umbraculum/contracts";
+import type { GravityAnalysisDerivationKind, WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 import type { YieldEfficiencyMetrics } from "./gravityAnalysisEfficiencyOps.js";
 
 export function appendEfficiencyDerivations(

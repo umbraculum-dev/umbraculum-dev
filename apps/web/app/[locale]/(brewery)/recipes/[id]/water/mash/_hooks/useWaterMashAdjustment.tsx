@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { WaterProfile } from "@umbraculum/contracts";
+import type { WaterProfile } from "@umbraculum/brewery-contracts";
 import { SizableText } from "tamagui";
 
 import { bicarbonatePpmToAlkalinityPpmCaCO3, mixIonProfilesByVolume } from "../../_lib/waterChem";

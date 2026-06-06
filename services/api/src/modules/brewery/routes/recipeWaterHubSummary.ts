@@ -1,11 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  ErrorResponseSchema,
-  IdParamsSchema,
-  RecipeWaterHubSummaryResponseSchema,
-  waterFormatHints,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { IdParamsSchema, RecipeWaterHubSummaryResponseSchema } from "@umbraculum/brewery-contracts";
+import { waterFormatHints } from "@umbraculum/contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { RecipeWaterHubSummaryService } from "../../../services/recipeWaterHubSummaryService.js";

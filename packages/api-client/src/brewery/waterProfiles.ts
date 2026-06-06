@@ -1,11 +1,5 @@
-import {
-  OkResponseSchema,
-  parseWaterProfilesResponse,
-  WaterProfileCreateRequestSchema,
-  WaterProfileResponseSchema,
-  type WaterProfile,
-  type WaterProfilesResponse,
-} from "@umbraculum/contracts";
+import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/brewery-contracts";
+import { OkResponseSchema, parseWaterProfilesResponse, WaterProfileCreateRequestSchema, WaterProfileResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

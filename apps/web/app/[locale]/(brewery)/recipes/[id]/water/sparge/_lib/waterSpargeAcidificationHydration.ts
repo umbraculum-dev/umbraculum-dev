@@ -1,6 +1,6 @@
 import type { MutableRefObject } from "react";
 
-import type { WaterCalcDerivation } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import {
   parseWaterStrengthKind,

@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 
-import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
+import type { AuthMeResponse } from "@umbraculum/contracts";
+import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 import {
   createWaterProfile,
   deleteWaterProfile,

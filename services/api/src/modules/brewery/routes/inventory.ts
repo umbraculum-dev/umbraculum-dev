@@ -1,16 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { InventoryItem } from "@prisma/client";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  ErrorResponseSchema,
-  IdParamsSchema,
-  InventoryCategoryQuerySchema,
-  InventoryCreateRequestSchema,
-  InventoryItemResponseSchema,
-  InventoryListResponseSchema,
-  InventoryPatchRequestSchema,
-  OkResponseSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { IdParamsSchema, InventoryCategoryQuerySchema, InventoryCreateRequestSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, OkResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { InventoryService } from "../../../services/inventoryService.js";

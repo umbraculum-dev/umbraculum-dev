@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { ErrorResponseSchema, StylesListResponseSchema } from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { StylesListResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireUser } from "../../../plugins/requestContext.js";
 import { StylesService } from "../services/stylesService.js";

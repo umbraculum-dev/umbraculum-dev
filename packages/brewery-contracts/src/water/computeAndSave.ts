@@ -1,6 +1,6 @@
 import type { IonProfilePpm } from "./ionProfile";
 import type { WaterCalcDerivation } from "./derivation";
-import type { NumberFormatHintV1 } from "../format/numberFormat";
+import type { NumberFormatHintV1 } from "@umbraculum/contracts";
 
 export interface RecipeWaterSettingsSavedRef {
   recipeId: string;

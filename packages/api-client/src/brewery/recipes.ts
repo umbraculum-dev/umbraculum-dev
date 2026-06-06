@@ -1,16 +1,5 @@
-import {
-  OkResponseSchema,
-  parseBrewSessionCreateResponse,
-  parseBrewSessionsListResponse,
-  parseRecipesListResponse,
-  RecipeCreateRequestSchema,
-  RecipeResponseSchema,
-  RecipeVersionsResponseSchema,
-  type BrewSessionListItem,
-  type BrewSessionsListResponse,
-  type RecipeListItem,
-  type RecipesListResponse,
-} from "@umbraculum/contracts";
+import type { BrewSessionListItem, BrewSessionsListResponse, RecipeListItem, RecipesListResponse } from "@umbraculum/brewery-contracts";
+import { OkResponseSchema, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseRecipesListResponse, RecipeCreateRequestSchema, RecipeResponseSchema, RecipeVersionsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { formatFixed } from "../../../../../../../../../src/i18n/format";
 import { MathHelpPopover } from "../../../../../../../../_components/MathHelpPopover";
-import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/brewery-contracts";
 import { renderDerivationBody } from "../../../../water/_lib/mathBodies";
 import { asRecord } from "../../../../../../../../_lib/typeGuards";
 import { mathExplain } from "../../../_lib/mathExplain";

@@ -1,4 +1,4 @@
-import { StylesListResponseSchema } from "@umbraculum/contracts";
+import { StylesListResponseSchema } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

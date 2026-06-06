@@ -11,7 +11,7 @@ import { fetchAuthMe } from "../../../_lib/fetchAuthMe";
 import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { ApiClientError, setActiveWorkspace } from "@umbraculum/api-client";
 import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";
-import type { AuthMeResponseWorkspace } from "@umbraculum/contracts";
+import { AuthMeResponseWorkspace } from "@umbraculum/contracts";
 
 type WorkspaceListItem = AuthMeResponseWorkspace;
 

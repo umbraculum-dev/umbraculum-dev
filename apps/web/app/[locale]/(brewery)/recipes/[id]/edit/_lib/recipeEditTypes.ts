@@ -4,7 +4,8 @@ import type {
   EditorMiscRow,
   EditorYeastRow,
 } from "../../../_lib/beerjsonRecipe";
-import type { NumberFormatHintV1, WaterCalcDerivation } from "@umbraculum/contracts";
+import type { NumberFormatHintV1 } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 export interface Recipe {
   id: string;

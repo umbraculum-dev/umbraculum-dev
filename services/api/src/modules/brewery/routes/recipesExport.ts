@@ -1,10 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  BeerJsonExportResponseSchema,
-  ErrorResponseSchema,
-  IdParamsSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { BeerJsonExportResponseSchema, IdParamsSchema } from "@umbraculum/brewery-contracts";
 
 import { exportRecipeStrict } from "../../../beerjson/strictExport.js";
 import { BadRequestError } from "../../../errors.js";

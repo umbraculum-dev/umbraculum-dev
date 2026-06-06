@@ -1,16 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  BrewSessionIdParamsSchema,
-  ErrorResponseSchema,
-  IntegrationAttachRequestSchema,
-  IntegrationAttachResponseSchema,
-  IntegrationAttachmentsResponseSchema,
-  IntegrationDetachRequestSchema,
-  IntegrationDetachResponseSchema,
-  IntegrationReadingsQuerySchema,
-  IntegrationReadingsResponseSchema,
-} from "@umbraculum/contracts";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
+import { BrewSessionIdParamsSchema, IntegrationAttachRequestSchema, IntegrationAttachResponseSchema, IntegrationAttachmentsResponseSchema, IntegrationDetachRequestSchema, IntegrationDetachResponseSchema, IntegrationReadingsQuerySchema, IntegrationReadingsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import type { BrewSessionsRouteService } from "../../../services/brewSessionsRouteService.js";

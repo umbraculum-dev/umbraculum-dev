@@ -1,6 +1,6 @@
 "use client";
 
-import type { WaterCalcDerivation } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import { capLines, fmt, renderDerivationBody } from "./mathBodiesRender";
 import type { MathExplainKey } from "./mathExplain";

@@ -1,11 +1,5 @@
-import {
-  parseBoilComputeAndSaveResponse,
-  parseMashComputeAndSaveResponse,
-  parseSpargeComputeAndSaveResponse,
-  type BoilComputeAndSaveResponseV1,
-  type MashComputeAndSaveResponseV1,
-  type SpargeComputeAndSaveResponseV1,
-} from "@umbraculum/contracts";
+import type { BoilComputeAndSaveResponseV1, MashComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1 } from "@umbraculum/brewery-contracts";
+import { parseBoilComputeAndSaveResponse, parseMashComputeAndSaveResponse, parseSpargeComputeAndSaveResponse } from "@umbraculum/brewery-contracts";
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";

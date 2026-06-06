@@ -1,4 +1,4 @@
-import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
+import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 
 export function isAdmin(role: string | null) {
   return role === "brewery_admin";

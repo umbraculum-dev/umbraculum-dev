@@ -1,6 +1,6 @@
-import * as _umbraculum_contracts from '@umbraculum/contracts';
-import { BrewSessionsListResponse, RecipesListResponse, WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema, BoilComputeAndSaveResponseV1, MashComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSchema } from '@umbraculum/contracts';
-export { BoilComputeAndSaveResponseV1, BrewSessionListItem, MashComputeAndSaveResponseV1, RecipeListItem, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse } from '@umbraculum/contracts';
+import * as _umbraculum_brewery_contracts from '@umbraculum/brewery-contracts';
+import { BrewSessionsListResponse, RecipesListResponse, WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema, BoilComputeAndSaveResponseV1, MashComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSchema } from '@umbraculum/brewery-contracts';
+export { BoilComputeAndSaveResponseV1, BrewSessionListItem, MashComputeAndSaveResponseV1, RecipeListItem, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse } from '@umbraculum/brewery-contracts';
 import { a as ApiClient } from '../client-Dia82S7S.cjs';
 import { p as paths } from '../brewery.openapi-CXYEPddO.cjs';
 
@@ -717,7 +717,7 @@ type WaterHubSummaryPath = "/recipes/{id}/water-hub-summary";
 type WaterHubSummaryGet = paths[WaterHubSummaryPath]["get"];
 
 /** Recipe water hub summary for native/web water hub screens. */
-declare function getRecipeWaterHubSummary(client: ApiClient, recipeId: string): Promise<_umbraculum_contracts.RecipeWaterHubSummaryResponse>;
+declare function getRecipeWaterHubSummary(client: ApiClient, recipeId: string): Promise<_umbraculum_brewery_contracts.RecipeWaterHubSummaryResponse>;
 
 type SaltAdditionsPath = "/water-calc/salt-additions";
 type SaltAdditionsPost = paths[SaltAdditionsPath]["post"];
