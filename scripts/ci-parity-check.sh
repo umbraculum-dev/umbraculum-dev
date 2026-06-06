@@ -60,13 +60,21 @@ else
 fi
 
 # Keep in sync with ci_parity_version on every .github/workflows/* caller of ci-parity-reusable.yml
-CI_PARITY_PKG_VERSION="${CI_PARITY_PKG_VERSION:-1.0.9}"
+CI_PARITY_PKG_VERSION="${CI_PARITY_PKG_VERSION:-1.0.10}"
 
 run_ci_parity() {
-  if [[ -x "$REPO_ROOT/node_modules/.bin/ci-parity" ]]; then
+  local cli=""
+  if [[ -n "${CI_PARITY_CLI:-}" && -f "${CI_PARITY_CLI}" ]]; then
+    cli="node ${CI_PARITY_CLI}"
+  elif [[ -f "${REPO_ROOT}/../umbraculum-toolset/packages/ci-parity/dist/cli.js" ]]; then
+    cli="node ${REPO_ROOT}/../umbraculum-toolset/packages/ci-parity/dist/cli.js"
+  elif [[ -x "$REPO_ROOT/node_modules/.bin/ci-parity" ]]; then
     exec "$REPO_ROOT/node_modules/.bin/ci-parity" "${extra_args[@]}" "${forward_args[@]}"
+  else
+    exec npx @umbraculum/ci-parity@"${CI_PARITY_PKG_VERSION}" "${extra_args[@]}" "${forward_args[@]}"
   fi
-  exec npx @umbraculum/ci-parity@"${CI_PARITY_PKG_VERSION}" "${extra_args[@]}" "${forward_args[@]}"
+  # shellcheck disable=SC2086
+  exec ${cli} "${extra_args[@]}" "${forward_args[@]}"
 }
 
 run_ci_parity

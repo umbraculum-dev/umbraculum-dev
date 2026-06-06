@@ -73,7 +73,37 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 |------|------|---------|
 | **T0 — scoped** | Tight edit loop | `docker compose exec api npm run test:unit`, scoped L1 installs — see [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md) |
 | **T1 — slice** | Before commit / agent handoff | `npm run verify:from-diff` or a named `npm run verify:*` script |
-| **T2 — parity** | Agent runs before every push with non-trivial CI surface | `npm run verify:pre-push` (archive on clean tree) or `./scripts/ci-parity-check.sh --archive run` |
+| **T2 — parity (PR)** | Agent runs before every push with non-trivial CI surface | `npm run verify:pre-push` — **T2-PR**: path-aware jobs + parallel ci-parity + native companions |
+| **T2 — release** | Manifest / SDK tag / ci-parity pin changes | `npm run verify:pre-push:release` — full sequential manifest (all 5 jobs) |
+
+## T2-PR vs T2-release (path-aware pre-push)
+
+| Aspect | T2-PR (`verify:pre-push`) | T2-release (`verify:pre-push:release`) |
+|--------|---------------------------|----------------------------------------|
+| Job selection | Only jobs whose GHA workflow would trigger on the diff | All manifest jobs (`docs-readmes`, `lint`, `typecheck`, `sdk-publish-prep`, `dogfood-npm-smoke`) |
+| Execution | Parallel containers (`--parallel --isolated-install`) | Sequential in one container (warm shared volumes) |
+| API vitest | Auto-runs when `api.yml` paths match | Not auto-run — use `api-integration-tests-pre-push` when needed |
+| Typical wall clock | ~max(job times) + archive overhead (~3–5 min) | ~sum(job times) (~8–15 min) |
+
+**Resolver:** `.umbraculum/gha-trigger-map.json` mirrors GHA `paths:` filters. Inspect resolved jobs:
+
+```bash
+python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master
+npm run validate:gha-triggers   # CI + local drift check vs workflow YAML
+```
+
+**Parallel + isolated install:** concurrent ci-parity jobs must not share `umbraculum_root_node_modules` — parallel T2-PR skips that volume (each container gets ephemeral `/repo/node_modules`) but keeps warm `umbraculum_npm_cache`.
+
+```bash
+./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,docs-readmes
+```
+
+Stable agent output lines:
+
+```
+VERIFY-SLICE T2-PR @ abc1234: ci-parity=OK jobs=lint,typecheck,docs-readmes parallel=3 api=OK
+VERIFY-SLICE T2-release @ abc1234: ci-parity=OK jobs=docs-readmes,lint,typecheck,sdk-publish-prep,dogfood-npm-smoke
+```
 
 Dev-container checks use a different `node_modules` layout than CI (hoisting splits). **Never treat dev-container green as proof CI will pass.**
 
@@ -178,7 +208,7 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 **Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** follow **[`AGENTS.md`](../AGENTS.md) § ci-parity manifest / version changes** (agent-owned checklist — not optional). Summary: toolset tag publish first → bump **every** `ci_parity_version` + `CI_PARITY_PKG_VERSION` in one commit → `./scripts/ci-parity-check.sh --archive run --jobs lint,typecheck` before push.
 
-**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.9`) — do not use bare `@^1` or a built toolset `dist/cli.js` as pre-push proof. When you publish a new `@umbraculum/ci-parity`, bump **every** pin in the AGENTS.md table **and** `CI_PARITY_PKG_VERSION` in the **same commit** as manifest job-id changes.
+**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.10`) — do not use bare `@^1` or a built toolset `dist/cli.js` as pre-push proof unless `CI_PARITY_CLI` is set during local toolset development before npm publish. When you publish a new `@umbraculum/ci-parity`, bump **every** pin in the AGENTS.md table **and** `CI_PARITY_PKG_VERSION` in the **same commit** as manifest job-id changes.
 
 **Before `sdk-batch-v*` or `sdk-contracts-v*` tag push:** `./scripts/ci-parity-check.sh run --jobs docs-readmes,sdk-publish-prep,dogfood-npm-smoke` (or full ci-parity).
 

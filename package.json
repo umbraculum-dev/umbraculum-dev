@@ -31,6 +31,8 @@
     "verify:api-platform": "./scripts/verify-slice.sh --tier T1 --slice api-platform",
     "verify:from-diff": "./scripts/verify-slice.sh --tier T1 --from-diff main",
     "verify:pre-push": "./scripts/verify-slice.sh --tier T2",
+    "verify:pre-push:release": "./scripts/verify-slice.sh --tier T2 --full",
+    "validate:gha-triggers": "python3 scripts/docs/validate-gha-trigger-map.py --repo-root .",
     "seed:e2e": "docker compose exec -T api npm run seed:e2e",
     "dev": "docker compose up --build",
     "down": "docker compose down",

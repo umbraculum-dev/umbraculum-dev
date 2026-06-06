@@ -13,6 +13,13 @@ on:
       - ".github/workflows/typecheck.yml"
       - ".github/workflows/web-lint.yml"
       - ".github/workflows/docs-readmes.yml"
+      - ".umbraculum/gha-trigger-map.json"
+      - "scripts/docs/validate-gha-trigger-map.py"
+      - ".github/workflows/api.yml"
+      - ".github/workflows/dogfood-npm-smoke.yml"
+      - ".github/workflows/packages-dist-check.yml"
+      - ".github/workflows/docs-site-build.yml"
+      - ".github/workflows/check-web-url-segments.yml"
       - ".github/workflows/publish-sdk-batch.yml"
   pull_request:
     branches: [master]
@@ -23,6 +30,13 @@ on:
       - ".github/workflows/typecheck.yml"
       - ".github/workflows/web-lint.yml"
       - ".github/workflows/docs-readmes.yml"
+      - ".umbraculum/gha-trigger-map.json"
+      - "scripts/docs/validate-gha-trigger-map.py"
+      - ".github/workflows/api.yml"
+      - ".github/workflows/dogfood-npm-smoke.yml"
+      - ".github/workflows/packages-dist-check.yml"
+      - ".github/workflows/docs-site-build.yml"
+      - ".github/workflows/check-web-url-segments.yml"
       - ".github/workflows/publish-sdk-batch.yml"
   workflow_dispatch:
 
@@ -46,6 +60,9 @@ jobs:
 
       - name: Validate ci-parity manifest (strict)
         run: |
-          npx @umbraculum/ci-parity@1.0.9 validate --strict \
+          npx @umbraculum/ci-parity@1.0.10 validate --strict \
             --manifest .umbraculum/ci-parity.json \
             --repo "${{ github.workspace }}"
+
+      - name: Validate gha-trigger-map sync
+        run: python3 scripts/docs/validate-gha-trigger-map.py --repo-root .

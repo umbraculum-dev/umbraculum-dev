@@ -25,7 +25,9 @@ From repo root:
 | `npm run verify:openapi` | T1 | OpenAPI artifact + scoped API tests |
 | `npm run verify:api-platform` | T1 | Auth/workspaces routes + health check |
 | `npm run verify:from-diff` | T1 | Auto-select slice(s) from diff vs `main` |
-| `npm run verify:pre-push` | T2 | Full ci-parity (`--archive` when tree is clean) + API integration reminder — **agents run before push** |
+| `npm run verify:pre-push` | T2-PR | Path-aware ci-parity (parallel + archive on clean tree) + auto native companions (API vitest when triggered) — **default before push** |
+| `npm run verify:pre-push:release` | T2-release | Full sequential ci-parity manifest — SDK tags, manifest/pin changes |
+| `npm run validate:gha-triggers` | — | Drift check: `.umbraculum/gha-trigger-map.json` vs GHA workflow `paths:` |
 
 Lower-level drivers:
 
@@ -47,9 +49,9 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 | API routes + OpenAPI | `docker compose exec api npm run test:unit` | `npm run verify:openapi` | ci-parity (`--ci`) + **`api-integration-tests-pre-push`** skill |
 | `services/api/src/routes/auth.ts`, `workspaces.ts` | scoped vitest | `npm run verify:api-platform` | T2 row above |
 | Brewery batch routes | scoped vitest files | `./scripts/verify-slice.sh --tier T1 --slice api-brewery-batch1` | T2 row above |
-| Docs / README only | — | `./scripts/ci-parity-check.sh run --jobs docs-readmes` | `npm run verify:pre-push` |
-| `docs-site/**` (pages, sidebars, static OpenAPI mirror) | — | `./scripts/verify-slice.sh --tier T1 --slice docs-site` (`npm run build -w @umbraculum/docs-site`) | GHA `docs-site-build` (same command) |
-| SDK / multi-package dist | — | `./scripts/check-packages-dist-up-to-date.sh` | ci-parity `sdk-publish-prep` job |
+| Docs / README only | — | `./scripts/ci-parity-check.sh run --jobs docs-readmes` | `npm run verify:pre-push` (typically `docs-readmes` only) |
+| `docs-site/**` (pages, sidebars, static OpenAPI mirror) | — | `./scripts/verify-slice.sh --tier T1 --slice docs-site` | `npm run verify:pre-push` when `docs-site-build` paths match |
+| SDK / multi-package dist | — | `./scripts/check-packages-dist-up-to-date.sh` | `npm run verify:pre-push:release` (`sdk-publish-prep` job) |
 | Unknown mixed diff | — | `npm run verify:from-diff` | `npm run verify:pre-push` |
 
 **Hard rule:** T0/T1 never run root `npm ci` unless the lockfile changed or you pass `--fresh` to `build-package-in-docker.sh`.
@@ -87,8 +89,9 @@ docker compose exec api npm test                  # alias for test:integration
 | `docker-npm-volumes-runbook` | Warm cache + named volumes for one-shots |
 | `scoped-package-build-in-docker` | Package `dist/` rebuild |
 | `build-workspace-packages-dist-in-container` | Legacy full build fallback |
-| `ci-parity-local-reproduction` | T2 static analysis |
-| `api-integration-tests-pre-push` | T2 API vitest (separate from ci-parity) |
+| `ci-parity-local-reproduction` | T2 static analysis (T2-PR / T2-release) |
+| `path-aware-pre-push` | T2-PR default pre-push procedure |
+| `api-integration-tests-pre-push` | T2 API vitest (auto-run from T2-PR when `api.yml` paths match) |
 
 See [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) for install paths.
 
@@ -97,5 +100,5 @@ See [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) for install paths.
 - Running bare `npx @umbraculum/ci-parity` before push without `--ci` — tests **committed HEAD only** and skips uncommitted edits. Use `./scripts/ci-parity-check.sh run` instead ([`CI-PARITY.md`](CI-PARITY.md) §Snapshot modes).
 - Running `./scripts/build-packages-in-docker.sh` for a single-package edit — use `./scripts/build-package-in-docker.sh @umbraculum/<name>` instead.
 - Treating `docker compose exec api npm run typecheck` as pre-push proof — use ci-parity (T2).
-- Skipping T2 before push because T1 passed — T1 is scoped; CI runs broader gates.
+- Running full sequential ci-parity on every UI-only push — use **`npm run verify:pre-push`** (T2-PR) instead of `./scripts/ci-parity-check.sh --archive run` without `--jobs`.
 - Running bare `docker run … npm install` without cache/root volumes — use [`./scripts/docker-npm-run.sh`](../scripts/docker-npm-run.sh) (see [`DEVELOPMENT-NPM-VOLUMES.md`](DEVELOPMENT-NPM-VOLUMES.md)).

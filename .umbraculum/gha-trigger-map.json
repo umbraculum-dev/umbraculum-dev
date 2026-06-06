@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "description": "Local mirror of GHA workflow path filters for T2-PR job resolution. Keep in sync with .github/workflows/*.yml — validated by scripts/docs/validate-gha-trigger-map.py",
+  "defaultT2PrCiParityJobs": ["docs-readmes", "lint", "typecheck"],
+  "workflows": [
+    {
+      "id": "web-lint",
+      "workflowFile": ".github/workflows/web-lint.yml",
+      "kind": "ci-parity",
+      "ciParityJob": "lint",
+      "pathPatterns": [
+        "apps/web/**",
+        "apps/native/**",
+        "packages/**",
+        "services/api/src/**",
+        "eslint.config.mjs",
+        "package.json",
+        "package-lock.json",
+        ".umbraculum/ci-parity.json",
+        ".github/workflows/ci-parity-reusable.yml",
+        ".github/workflows/web-lint.yml"
+      ]
+    },
+    {
+      "id": "typecheck",
+      "workflowFile": ".github/workflows/typecheck.yml",
+      "kind": "ci-parity",
+      "ciParityJob": "typecheck",
+      "pathPatterns": [
+        "apps/native/**",
+        "apps/web/e2e/**",
+        "services/api/**",
+        "packages/**",
+        "**/tsconfig*.json",
+        "package.json",
+        "package-lock.json",
+        ".umbraculum/ci-parity.json",
+        ".github/workflows/ci-parity-reusable.yml",
+        ".github/workflows/typecheck.yml"
+      ]
+    },
+    {
+      "id": "docs-readmes",
+      "workflowFile": ".github/workflows/docs-readmes.yml",
+      "kind": "ci-parity",
+      "ciParityJob": "docs-readmes",
+      "pathPatterns": [
+        "**/README.md",
+        "docs/**",
+        "scripts/docs/**",
+        ".umbraculum/ci-parity.json",
+        ".github/workflows/ci-parity-reusable.yml",
+        ".github/workflows/docs-readmes.yml"
+      ]
+    },
+    {
+      "id": "dogfood-npm-smoke",
+      "workflowFile": ".github/workflows/dogfood-npm-smoke.yml",
+      "kind": "ci-parity",
+      "ciParityJob": "dogfood-npm-smoke",
+      "t2ReleaseOnly": false,
+      "pathPatterns": [
+        "packages/contracts/**",
+        "packages/api-client/**",
+        "packages/ai-tool-sdk/**",
+        "packages/i18n-keys/**",
+        "packages/module-sdk/**",
+        "packages/*-contracts/**",
+        "apps/web/package.json",
+        "apps/native/package.json",
+        "services/api/package.json",
+        "packages/rendering/package.json",
+        "scripts/dogfood-npm-smoke.sh",
+        ".umbraculum/ci-parity.json",
+        ".github/workflows/dogfood-npm-smoke.yml",
+        ".github/workflows/ci-parity-reusable.yml"
+      ]
+    },
+    {
+      "id": "publish-sdk-batch",
+      "workflowFile": ".github/workflows/publish-sdk-batch.yml",
+      "kind": "ci-parity",
+      "ciParityJob": "sdk-publish-prep",
+      "t2ReleaseOnly": true,
+      "pathPatterns": []
+    },
+    {
+      "id": "api",
+      "workflowFile": ".github/workflows/api.yml",
+      "kind": "native",
+      "nativeStep": "api-integration",
+      "pathPatterns": [
+        "services/api/**",
+        "packages/contracts/**",
+        "packages/core/**",
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/api.yml"
+      ]
+    },
+    {
+      "id": "packages-dist-check",
+      "workflowFile": ".github/workflows/packages-dist-check.yml",
+      "kind": "native",
+      "nativeStep": "packages-dist-check",
+      "pathPatterns": [
+        "packages/**/src/**",
+        ".umbraculum/package-build-graph.json",
+        "scripts/build-package-in-docker.sh",
+        "scripts/check-packages-dist-up-to-date.sh",
+        "scripts/lib/package-build-graph.py"
+      ]
+    },
+    {
+      "id": "docs-site-build",
+      "workflowFile": ".github/workflows/docs-site-build.yml",
+      "kind": "native",
+      "nativeStep": "docs-site-build",
+      "pathPatterns": [
+        "docs/**",
+        "docs-site/**",
+        "**/README.md",
+        ".github/workflows/docs-site-build.yml"
+      ]
+    },
+    {
+      "id": "check-web-url-segments",
+      "workflowFile": ".github/workflows/check-web-url-segments.yml",
+      "kind": "native",
+      "nativeStep": "check-web-url-segments",
+      "pathPatterns": [
+        "apps/web/app/**",
+        "packages/module-sdk/**",
+        "scripts/check-web-url-segments.ts",
+        ".github/workflows/check-web-url-segments.yml",
+        "package.json",
+        "package-lock.json"
+      ]
+    }
+  ]
+}

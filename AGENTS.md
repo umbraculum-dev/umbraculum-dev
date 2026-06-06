@@ -283,13 +283,15 @@ not the human contributor. Do not end a session with "before you push, run …".
 
 1. **Commit** all intended changes (ci-parity archive mode tests **committed**
    tree only — uncommitted fixes can hide broken `HEAD`).
-2. With a **clean working tree**, run **`npm run verify:pre-push`** or
-   **`./scripts/ci-parity-check.sh --archive run`** (see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)).
+2. With a **clean working tree**, run **`npm run verify:pre-push`** (T2-PR: path-aware
+   parallel ci-parity + native companions) or **`npm run verify:pre-push:release`**
+   (T2-release: full sequential manifest) when manifest/ci-parity pins or SDK tags
+   change (see [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § T2-PR vs T2-release).
    `verify:pre-push` selects `--archive` automatically when the tree is clean.
    On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@<same-version-as-CI_PARITY_PKG_VERSION> -- run --archive` (read `CI_PARITY_PKG_VERSION` from [`scripts/ci-parity-check.sh`](scripts/ci-parity-check.sh)).
-3. If the change set touches **`services/api/**`** (or other paths in
-   `.github/workflows/api.yml` filters), also run skill
-   **`api-integration-tests-pre-push`** before push.
+3. T2-PR **auto-runs API vitest** when the diff matches `.github/workflows/api.yml`
+   paths (via `.umbraculum/gha-trigger-map.json`). For manifest-only work outside
+   the resolver, still run skill **`api-integration-tests-pre-push`** when applicable.
 4. **Only after** step 2 (and 3 when applicable) is green, push.
 
 **Native Expo config (`app.config.js`, `metro.config.js`) — agent-only lint gate:**
