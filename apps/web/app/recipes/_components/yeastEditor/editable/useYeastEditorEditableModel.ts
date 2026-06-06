@@ -8,7 +8,7 @@ import {
   computeEstimatedCellsB,
   PITCH_RATE_TO_MILLION_CELLS_PER_ML_P,
   type EditorYeastRow,
-} from "../../_lib/beerjsonRecipe";
+} from "../../../_lib/beerjsonRecipe";
 import type { YeastEditorEditableProps, YeastEditorRowContext } from "../yeastEditorTypes";
 
 export function useYeastEditorAmountRecalc(params: {
