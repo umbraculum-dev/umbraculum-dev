@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getRecipe } from "@umbraculum/api-client/brewery";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import { fetchRecipeWaterSettings } from "../../_lib/waterSettings";
 import type { useWaterMashAcidification } from "./useWaterMashAcidification";
 import type { useWaterMashAdjustment } from "./useWaterMashAdjustment";

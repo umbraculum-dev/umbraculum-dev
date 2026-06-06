@@ -10,10 +10,10 @@ import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
-import { AsyncExportButton } from "../../../_components/AsyncExportButton";
-import { ErrorBox } from "../../../_components/recipe-edit";
-import { useRequireAuth } from "../../../_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../_lib/webApiClient";
+import { AsyncExportButton } from "../../../_shell/_components/AsyncExportButton";
+import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
+import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
 import {
   ConflictSummary,
   RefreshButton,

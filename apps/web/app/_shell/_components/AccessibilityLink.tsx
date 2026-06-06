@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "../../src/i18n/navigation";
+import { Link } from "../../../src/i18n/navigation";
 import { SizableText, XStack } from "tamagui";
 
 export function AccessibilityLink() {

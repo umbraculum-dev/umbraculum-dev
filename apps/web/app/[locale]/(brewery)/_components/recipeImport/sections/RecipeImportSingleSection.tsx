@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "../../../../src/i18n/navigation";
+import { Link } from "../../../../../../src/i18n/navigation";
 import { Button, H3, SizableText, View, XStack, YStack } from "tamagui";
 
 import { BrewSelect } from "../../BrewSelect";

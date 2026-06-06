@@ -2,7 +2,7 @@
 
 import { SizableText, View, XStack } from "tamagui";
 
-import { Link } from "../../src/i18n/navigation";
+import { Link } from "../../../src/i18n/navigation";
 
 export function Footer() {
   return (
@@ -21,7 +21,7 @@ export function Footer() {
         gap="$3"
       >
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
-          Brewery App
+          Umbraculum
         </SizableText>
         <XStack gap="$3" flexWrap="wrap">
           <Link href="/contact" className="brew-link-contents">

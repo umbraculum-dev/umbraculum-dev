@@ -10,8 +10,8 @@ import {
   patchPlatformAd,
 } from "@umbraculum/api-client";
 
-import { useRequireAuth } from "../../../../_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../../_lib/webApiClient";
+import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_shell/_lib/webApiClient";
 import type { Placement, PlatformAd } from "../_lib/platformAdsTypes";
 
 export function usePlatformAdsPage() {

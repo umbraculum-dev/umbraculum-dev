@@ -11,7 +11,7 @@ import {
   rotateIntegrationToken,
 } from "@umbraculum/api-client";
 
-import { webPlatformApiClient } from "../../../../_lib/webApiClient";
+import { webPlatformApiClient } from "../../../../_shell/_lib/webApiClient";
 import type { IntegrationKind } from "../_lib/fermIntegrationTypes";
 import type { FermDataIntegrationPageLoadModel } from "./useFermDataIntegrationPageLoad";
 

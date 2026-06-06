@@ -1,7 +1,7 @@
 import { Input, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../../../../_components/BrewSelect";
-import { RecipeEditFieldLabel } from "../../../../../../../../../_components/recipe-edit";
+import { BrewSelect } from "../../../../../../../_components/BrewSelect";
+import { RecipeEditFieldLabel } from "../../../../../../../_components/recipe-edit";
 import { formatFixed } from "../../../../../../../../../../src/i18n/format";
 import type { WaterSpargePageModel } from "../../../_hooks/useWaterSpargePage";
 

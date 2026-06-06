@@ -4,8 +4,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { YStack } from "tamagui";
 
-import { BrewSelect } from "../../../_components/BrewSelect";
-import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+import { BrewSelect } from "../../(brewery)/_components/BrewSelect";
+import { RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
 
 export function LocaleSelect({ id = "auth-locale" }: { id?: string }) {
   const t = useTranslations("auth");

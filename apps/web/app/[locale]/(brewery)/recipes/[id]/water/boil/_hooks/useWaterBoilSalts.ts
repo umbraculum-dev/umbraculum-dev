@@ -6,8 +6,8 @@ import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import { calcSaltAdditions } from "@umbraculum/api-client/brewery";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../../_lib/typeGuards";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
+import { asRecord } from "../../../../../../../_shell/_lib/typeGuards";
 import type { IonProfilePpm } from "../../_lib/waterChem";
 import type { SaltAdditionsResult } from "../../_lib/waterCalcTypes";
 import type { RecipeWaterSettingsResponse } from "../../_lib/waterSettings";

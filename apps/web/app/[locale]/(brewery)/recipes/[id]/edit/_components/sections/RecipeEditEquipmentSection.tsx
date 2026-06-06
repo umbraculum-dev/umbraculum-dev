@@ -1,8 +1,8 @@
 import {Link} from "../../../../../../../../src/i18n/navigation";
 import {Button, SizableText, View, XStack} from "tamagui";
 
-import {BrewSelect} from "../../../../../../../_components/BrewSelect";
-import {ErrorBox, RecipeEditField, RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {BrewSelect} from "../../../../../_components/BrewSelect";
+import {ErrorBox, RecipeEditField, RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 
 export function RecipeEditEquipmentSection({ model }: { model: RecipeEditPageModel }) {

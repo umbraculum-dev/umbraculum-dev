@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 
 import { SizableText } from "tamagui";
 
-import { MessageBox, type MessageBoxVariant } from "./recipe-edit/MessageBox";
+import { MessageBox, type MessageBoxVariant } from "./MessageBox";
 
 const DEMO_FIXTURE_WORKSPACE_ID = "e2e00000-0000-0000-0000-0000000000aa";
 

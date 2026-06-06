@@ -3,7 +3,7 @@
 import { SizableText } from "tamagui";
 
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
-import { CodeInline } from "../../../../../../../../../_components/CodeInline";
+import { CodeInline } from "../../../../../../../../../_shell/_components/CodeInline";
 import type { BrewSessionDetailPageModel } from "../../../_hooks/useBrewSessionDetailPage";
 
 export function BrewSessionHydrometerReadingBlock({ model }: { model: BrewSessionDetailPageModel }) {

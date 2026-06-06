@@ -4,7 +4,7 @@ import Link from "next/link";
 import { H1, SizableText, View, XStack, YStack } from "tamagui";
 import { useTranslations } from "next-intl";
 
-import { useRequireAuth } from "../../_lib/useRequireAuth";
+import { useRequireAuth } from "../../_shell/_lib/useRequireAuth";
 import { DashboardClient } from "../../DashboardClient";
 
 import { AiChatPanel } from "./_components/AiChatPanel";

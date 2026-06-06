@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Button, H1, Input, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
-import { ErrorBox } from "../../../_components/recipe-edit";
+import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
 import { PimProductCreateForm } from "./PimProductCreateForm";
 import { PimProductsTable } from "./PimProductsTable";
 import { usePimProductsPage } from "./usePimProductsPage";

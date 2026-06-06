@@ -2,8 +2,8 @@ import {Link} from "../../../../../../../../src/i18n/navigation";
 import {SizableText, View} from "tamagui";
 
 import {formatFixed} from "../../../../../../../../src/i18n/format";
-import {CodeInline} from "../../../../../../../_components/CodeInline";
-import {RecipeEditFieldBlock, RecipeEditList, RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {CodeInline} from "../../../../../../../_shell/_components/CodeInline";
+import {RecipeEditFieldBlock, RecipeEditList, RecipeEditSection} from "../../../../../_components/recipe-edit";
 import {MashStepsEditor, SpargeStepReadOnlyRow} from "@umbraculum/brewery-recipes-ui";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 

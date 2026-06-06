@@ -5,8 +5,8 @@ import { useCallback } from "react";
 import { getRecipe } from "@umbraculum/api-client/brewery";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
-import { useRequireAuth } from "../../../../../../_lib/useRequireAuth";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { useRequireAuth } from "../../../../../../_shell/_lib/useRequireAuth";
 import { roundTo } from "../_lib/recipeEditHelpers";
 import { buildRecipeEditPageReturn } from "./buildRecipeEditPageReturn";
 import { useRecipeEditAnalysis } from "./useRecipeEditAnalysis";

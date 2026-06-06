@@ -2,8 +2,8 @@
 
 import { Button, Input, View, XStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../_components/BrewSelect";
-import { RecipeEditFieldLabel } from "../../../../../../_components/recipe-edit";
+import { BrewSelect } from "../../../../_components/BrewSelect";
+import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import type { useBrewdayStepsSettingsPage } from "../../../_hooks/useBrewdayStepsSettingsPage";
 
 type Model = ReturnType<typeof useBrewdayStepsSettingsPage>;

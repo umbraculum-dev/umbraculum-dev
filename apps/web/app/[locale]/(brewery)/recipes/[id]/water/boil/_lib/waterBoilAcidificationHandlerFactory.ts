@@ -4,7 +4,7 @@ import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import { calcBoilOverall, computeAndSaveBoil } from "@umbraculum/api-client/brewery";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import type {
   BoilOverallResultV0,
   SaltAdditionsResult,

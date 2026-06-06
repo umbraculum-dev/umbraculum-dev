@@ -6,11 +6,11 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox } from "../../../_components/recipe-edit";
-import { fetchAuthMe } from "../../../_lib/fetchAuthMe";
-import { webPlatformApiClient } from "../../../_lib/webApiClient";
+import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
+import { fetchAuthMe } from "../../../_shell/_lib/fetchAuthMe";
+import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
 import { ApiClientError, setActiveWorkspace } from "@umbraculum/api-client";
-import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";
+import { AuthExpiredNotice } from "../../../_shell/_components/AuthExpiredNotice";
 import { AuthMeResponseWorkspace } from "@umbraculum/contracts";
 
 type WorkspaceListItem = AuthMeResponseWorkspace;

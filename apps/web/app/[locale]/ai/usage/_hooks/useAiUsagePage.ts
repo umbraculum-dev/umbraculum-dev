@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 
 import { ApiClientError, getWorkspaceAiUsage } from "@umbraculum/api-client";
 
-import { webPlatformApiClient } from "../../../../_lib/webApiClient";
-import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_shell/_lib/webApiClient";
+import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
 
 import type { UsageResponse } from "../_components/aiUsageTypes";
 

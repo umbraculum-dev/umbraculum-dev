@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getBrewSession } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../../_lib/typeGuards";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
+import { asRecord } from "../../../../../../../_shell/_lib/typeGuards";
 import {
   type BrewSession,
   type BrewSessionLog,

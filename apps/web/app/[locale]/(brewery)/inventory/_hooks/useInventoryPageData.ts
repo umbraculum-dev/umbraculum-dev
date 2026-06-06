@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { listInventory, searchFermentables, searchHops } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import {
   PUBLIC_DB_PAGE_SIZE,
   type FermentableSearchItem,

@@ -2,7 +2,7 @@
 
 import { Button, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel, RecipeEditSummary } from "../../../../../../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel, RecipeEditSummary } from "../../../../../../../_components/recipe-edit";
 
 import { formatElapsedSeconds, type BrewSessionStep } from "../../../_lib/brewSessionDetailUi";
 import type { BrewSessionStepCardContext, BrewSessionStepCardDerived } from "./brewSessionStepCardTypes";

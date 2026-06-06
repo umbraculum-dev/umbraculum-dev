@@ -1,7 +1,7 @@
 import {Button, Input, SizableText, View, XStack, YStack} from "tamagui";
 
-import {BrewSelect} from "../../../../../../../_components/BrewSelect";
-import {RecipeEditFieldLabel, RecipeEditIngredientCard, RecipeEditReadOnlyValue} from "../../../../../../../_components/recipe-edit";
+import {BrewSelect} from "../../../../../_components/BrewSelect";
+import {RecipeEditFieldLabel, RecipeEditIngredientCard, RecipeEditReadOnlyValue} from "../../../../../_components/recipe-edit";
 import type {HopRow, HopUse} from "../../_lib/recipeEditTypes";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 

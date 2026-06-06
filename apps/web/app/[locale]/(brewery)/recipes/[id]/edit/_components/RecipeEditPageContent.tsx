@@ -1,9 +1,9 @@
 import { SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox, MessageBox } from "../../../../../../_components/recipe-edit";
-import { SurfaceMathToggleRow } from "../../../../../../_components/SurfaceMathToggleRow";
+import { ErrorBox, MessageBox } from "../../../../_components/recipe-edit";
+import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { RecipeEditSectionsNav } from "../../../_components/RecipeEditSectionsNav";
-import { RecipeTitleWithMeta } from "../../../../../../_components/RecipeTitleWithMeta";
+import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
 import type { RecipeEditPageModel } from "../_hooks/useRecipeEditPage";
 import {
   RecipeEditAnalysisSection,

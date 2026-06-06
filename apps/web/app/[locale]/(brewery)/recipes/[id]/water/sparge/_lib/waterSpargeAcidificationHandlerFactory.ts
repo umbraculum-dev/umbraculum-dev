@@ -4,8 +4,8 @@ import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import { calcSpargeOverall, computeAndSaveSparge } from "@umbraculum/api-client/brewery";
 import type { WaterCalcDerivation, WaterOverallResult, WaterProfile } from "@umbraculum/brewery-contracts";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../../_lib/typeGuards";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
+import { asRecord } from "../../../../../../../_shell/_lib/typeGuards";
 import type {
   SaltAdditionsResult,
   WaterAcidResult,

@@ -3,8 +3,8 @@
 import { Link } from "../../../../../../../src/i18n/navigation";
 import { Accordion, H1, SizableText, YStack } from "tamagui";
 
-import { SurfaceMathToggleRow } from "../../../../../../_components/SurfaceMathToggleRow";
-import { ErrorBox } from "../../../../../../_components/recipe-edit";
+import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
+import { ErrorBox } from "../../../../_components/recipe-edit";
 import { RecipeMetaLine } from "@umbraculum/brewery-recipes-ui";
 import type { UseWaterHubPageModel } from "../_hooks/useWaterHubPage";
 import { WaterHubLinksSection } from "./sections/WaterHubLinksSection";

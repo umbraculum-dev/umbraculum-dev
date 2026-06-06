@@ -1,4 +1,4 @@
-import type { useRequireAuth } from "../../../../../../../_lib/useRequireAuth";
+import type { useRequireAuth } from "../../../../../../../_shell/_lib/useRequireAuth";
 import type { useWaterMashAcidification } from "./useWaterMashAcidification";
 import type { useWaterMashAdjustment } from "./useWaterMashAdjustment";
 import type { useWaterMashGrist } from "./useWaterMashGrist";

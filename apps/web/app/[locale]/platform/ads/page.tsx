@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { H1, SizableText, View, YStack } from "tamagui";
 
-import { ErrorBox } from "../../../_components/recipe-edit";
+import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
 import { PlatformAdForm } from "./_components/PlatformAdForm";
 import { PlatformAdsTable } from "./_components/PlatformAdsTable";
 import { usePlatformAdsPage } from "./_hooks/usePlatformAdsPage";

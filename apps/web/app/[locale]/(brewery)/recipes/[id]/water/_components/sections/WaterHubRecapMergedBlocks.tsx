@@ -2,7 +2,7 @@
 
 import { H3, H4, SizableText, View, XStack } from "tamagui";
 
-import { MathHelpPopover } from "../../../../../../../_components/MathHelpPopover";
+import { MathHelpPopover } from "../../../../../_components/MathHelpPopover";
 import { mathExplain } from "../../_lib/mathExplain";
 import { buildWaterMathBody } from "../../_lib/mathBodies";
 import type { UseWaterHubPageModel } from "../../_hooks/useWaterHubPage";

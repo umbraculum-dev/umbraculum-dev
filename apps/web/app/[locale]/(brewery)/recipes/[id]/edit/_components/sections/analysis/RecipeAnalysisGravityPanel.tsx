@@ -2,8 +2,8 @@ import type {ReactNode} from "react";
 import {SizableText, View, XStack} from "tamagui";
 
 import {formatFixed} from "../../../../../../../../../src/i18n/format";
-import {CodeInline} from "../../../../../../../../_components/CodeInline";
-import {formatSgWithPlato} from "../../../../../../../../_lib/gravity";
+import {CodeInline} from "../../../../../../../../_shell/_components/CodeInline";
+import {formatSgWithPlato} from "../../../../../../_lib/gravity";
 import type {RecipeEditPageModel} from "../../../_hooks/useRecipeEditPage";
 import {buildRecipeAnalysisContext} from "./recipeAnalysisShared";
 

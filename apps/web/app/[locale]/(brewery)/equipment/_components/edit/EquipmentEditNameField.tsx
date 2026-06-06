@@ -4,7 +4,7 @@ import { type Dispatch, type SetStateAction } from "react";
 
 import { Input, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel } from "../../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 
 export function EquipmentEditNameField(props: {
   t: (key: string) => string;

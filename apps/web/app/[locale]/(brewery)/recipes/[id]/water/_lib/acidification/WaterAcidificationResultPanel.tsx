@@ -3,8 +3,8 @@ import type React from "react";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 import { H3, SizableText, View } from "tamagui";
 
-import { FieldBadge } from "../../../../../../../_components/recipe-edit";
-import { MathHelpPopover } from "../../../../../../../_components/MathHelpPopover";
+import { FieldBadge } from "../../../../../_components/recipe-edit";
+import { MathHelpPopover } from "../../../../../_components/MathHelpPopover";
 import { mathExplain } from "../mathExplain";
 import { buildWaterMathBody } from "../mathBodies";
 import type { WaterAcidResult, WaterManualCalcResult } from "../waterCalcTypes";

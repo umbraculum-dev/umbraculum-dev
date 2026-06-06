@@ -2,7 +2,7 @@
 
 import { Accordion, Button, SizableText, View, XStack } from "tamagui";
 
-import { BrewAccordionSection } from "../../../../_components/BrewAccordionSection";
+import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import type { useEquipmentPage } from "../_hooks/useEquipmentPage";
 
 type Model = ReturnType<typeof useEquipmentPage>;

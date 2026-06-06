@@ -6,8 +6,8 @@ import { listWaterProfiles } from "@umbraculum/api-client/brewery";
 import type { AuthMeResponse } from "@umbraculum/contracts";
 import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
-import { fetchAuthMe } from "../../../../../../../_lib/fetchAuthMe";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
+import { fetchAuthMe } from "../../../../../../../_shell/_lib/fetchAuthMe";
 
 function isAdmin(role: string | null) {
   return role === "brewery_admin";

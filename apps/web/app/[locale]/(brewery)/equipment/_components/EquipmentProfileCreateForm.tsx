@@ -2,8 +2,8 @@
 
 import { Accordion, Button, View, XStack, YStack } from "tamagui";
 
-import { BrewAccordionSection } from "../../../../_components/BrewAccordionSection";
-import { ErrorBox } from "../../../../_components/recipe-edit";
+import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
+import { ErrorBox } from "../../_components/recipe-edit";
 import type { useEquipmentPage } from "../_hooks/useEquipmentPage";
 import { EquipmentCreateKettleFields } from "./create/EquipmentCreateKettleFields";
 import { EquipmentCreateMashFields } from "./create/EquipmentCreateMashFields";

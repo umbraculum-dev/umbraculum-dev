@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
 import { type InventoryUnit } from "../_lib/inventoryTypes";
 import { useInventoryPageData } from "./useInventoryPageData";
 import { useInventoryPageFilters } from "./useInventoryPageFilters";

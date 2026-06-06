@@ -7,8 +7,8 @@ import {
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../../../src/i18n/navigation";
-import { AsyncExportButton } from "../../../../../_components/AsyncExportButton";
-import { ErrorBox } from "../../../../../_components/recipe-edit";
+import { AsyncExportButton } from "../../../../../_shell/_components/AsyncExportButton";
+import { ErrorBox } from "../../../../(brewery)/_components/recipe-edit";
 import {
   DetailRow,
   formatDateTime,

@@ -14,8 +14,8 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useRequireAuth } from "../../../../../_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../../../_lib/webApiClient";
+import { useRequireAuth } from "../../../../../_shell/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../../_shell/_lib/webApiClient";
 import { sourceLabel } from "../../../_components/MrpReadOnly";
 
 export type DetailedProductionOrder = ProductionOrder & {

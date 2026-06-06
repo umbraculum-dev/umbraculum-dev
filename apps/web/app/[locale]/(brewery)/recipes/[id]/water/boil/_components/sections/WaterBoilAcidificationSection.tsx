@@ -1,6 +1,6 @@
 import { H2, View } from "tamagui";
 
-import { ErrorBox } from "../../../../../../../../_components/recipe-edit";
+import { ErrorBox } from "../../../../../../_components/recipe-edit";
 import {
   WaterAcidificationManualResultPanel,
   WaterAcidificationTargetPhResultPanel,

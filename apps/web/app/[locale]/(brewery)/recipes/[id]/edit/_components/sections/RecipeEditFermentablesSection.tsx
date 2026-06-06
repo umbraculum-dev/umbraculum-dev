@@ -1,7 +1,7 @@
 import {Link} from "../../../../../../../../src/i18n/navigation";
 import {Button, SizableText, View, XStack} from "tamagui";
 
-import {RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 import {RecipeEditFermentablesList} from "./fermentables/RecipeEditFermentablesList";
 import {RecipeEditFermentablesToolbar} from "./fermentables/RecipeEditFermentablesToolbar";

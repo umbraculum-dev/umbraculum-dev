@@ -7,9 +7,9 @@ import { listCategories } from "@umbraculum/api-client/pim";
 import { type CategoryTreeNode } from "@umbraculum/pim-contracts";
 
 import { Link } from "../../../../src/i18n/navigation";
-import { ErrorBox } from "../../../_components/recipe-edit";
-import { useRequireAuth } from "../../../_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../_lib/webApiClient";
+import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
+import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
 
 /**
  * PIM categories — Week 1 audit shape.

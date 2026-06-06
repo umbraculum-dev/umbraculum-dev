@@ -2,7 +2,7 @@
 
 import { SizableText, YStack } from "tamagui";
 
-import { CodeInline } from "../../../../../_components/CodeInline";
+import { CodeInline } from "../../../../../_shell/_components/CodeInline";
 import type { UseFermDataIntegrationPageModel } from "../../_hooks/useFermDataIntegrationPage";
 import { FermIntegrationChartSection } from "./FermIntegrationChartSection";
 import { FermIntegrationSessionsSection } from "./FermIntegrationSessionsSection";

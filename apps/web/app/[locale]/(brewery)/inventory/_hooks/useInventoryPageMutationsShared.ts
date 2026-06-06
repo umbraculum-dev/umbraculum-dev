@@ -2,7 +2,7 @@
 
 import { createInventoryItem, deleteInventoryItem, patchInventoryItem } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import { DEFAULT_UNIT, type InventoryCategory } from "../_lib/inventoryTypes";
 import type { InventoryPageFiltersModel } from "./useInventoryPageFilters";
 

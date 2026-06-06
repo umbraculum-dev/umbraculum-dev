@@ -1,4 +1,4 @@
-import {RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 import {RecipeEditOtherFooterBlock} from "./other/RecipeEditOtherFooterBlock";
 import {RecipeEditOtherHeaderBlock} from "./other/RecipeEditOtherHeaderBlock";

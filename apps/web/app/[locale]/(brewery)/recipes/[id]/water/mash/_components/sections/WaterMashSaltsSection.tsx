@@ -1,6 +1,6 @@
 import { Accordion, View } from "tamagui";
 
-import { BrewAccordionHeader } from "../../../../../../../../_components/BrewAccordionHeader";
+import { BrewAccordionHeader } from "../../../../../../_components/BrewAccordionHeader";
 
 import type { WaterMashPageModel } from "../../_hooks/useWaterMashPage";
 import {

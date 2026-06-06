@@ -6,7 +6,7 @@ import {
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
   RecipeEditSection,
-} from "../../../../../_components/recipe-edit";
+} from "../../../_components/recipe-edit";
 import { PRESET_KEYS } from "../../_lib/brewdayStepsTypes";
 import type { useBrewdayStepsSettingsPage } from "../../_hooks/useBrewdayStepsSettingsPage";
 

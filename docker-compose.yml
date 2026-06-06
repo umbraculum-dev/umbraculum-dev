@@ -80,12 +80,13 @@ services:
       - web_node_modules:/app/node_modules
       - npm_cache:/root/.npm
       - ./packages/beerjson:/packages/beerjson:ro
+      - ./packages/brewery-contracts:/packages/brewery-contracts:ro
       - ./packages/contracts:/packages/contracts:ro
       - ./packages/core:/packages/core:ro
       - ./packages/i18n:/packages/i18n:ro
       - ./packages/i18n-react:/packages/i18n-react:ro
       - ./packages/media:/packages/media:ro
-      # Week 1 audit (RFC-0006) wires apps/web/app/_lib/registerPlatformSegments.ts
+      # Week 1 audit (RFC-0006) wires apps/web/app/_shell/_lib/registerPlatformSegments.ts
       # into apps/web/app/layout.tsx; the layout imports @umbraculum/module-sdk
       # to register platform-owned URL segments with the same web registry that
       # canonical modules (automation/brewery/pim) write to from the api side.

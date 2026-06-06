@@ -1,7 +1,7 @@
 import {Link} from "../../../../../../../../src/i18n/navigation";
 import {SizableText, YStack} from "tamagui";
 
-import {RecipeEditFieldBlock, RecipeEditList, RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {RecipeEditFieldBlock, RecipeEditList, RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 
 export function RecipeEditBrewingHistorySection({ model }: { model: RecipeEditPageModel }) {

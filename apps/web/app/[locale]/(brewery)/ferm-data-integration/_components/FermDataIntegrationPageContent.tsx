@@ -4,7 +4,7 @@ import { Accordion, H1, SizableText, YStack } from "tamagui";
 
 import { DashboardClient } from "../../../../DashboardClient";
 import { Link } from "../../../../../src/i18n/navigation";
-import { BrewAccordionSection } from "../../../../_components/BrewAccordionSection";
+import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import type { UseFermDataIntegrationPageModel } from "../_hooks/useFermDataIntegrationPage";
 import { FermIntegrationSetupSection } from "./sections/FermIntegrationSetupSection";
 

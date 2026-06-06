@@ -4,9 +4,9 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { H1, SizableText, YStack } from "tamagui";
 
-import { ErrorBox } from "../../../../_components/recipe-edit";
-import { useRequireAuth } from "../../../../_lib/useRequireAuth";
-import { RecipeImportForm } from "../../../../_components/RecipeImportForm";
+import { ErrorBox } from "../../_components/recipe-edit";
+import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
+import { RecipeImportForm } from "../../_components/RecipeImportForm";
 
 export default function RecipesImportPage() {
   const t = useTranslations("recipes.import");

@@ -8,7 +8,7 @@ import {
   postBrewSessionStepTimerAction,
 } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import { isStepDirtyForLogs } from "../_lib/brewSessionDetailUi";
 import { deriveStepLogStatus } from "../_lib/brewSessionStepsPatchHelpers";
 import type { BrewSessionStepsHookParams } from "../_lib/brewSessionStepsTypes";

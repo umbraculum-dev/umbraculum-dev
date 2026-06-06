@@ -3,12 +3,12 @@
 import { useTranslations } from "next-intl";
 import { Button, SizableText, View, XStack, YStack } from "tamagui";
 
-import { MathHelpPopover } from "../../../../../_components/MathHelpPopover";
+import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import {
   RecipeEditFieldLabel,
   RecipeEditReadOnlyValue,
   WarningBox,
-} from "../../../../../_components/recipe-edit";
+} from "../../../_components/recipe-edit";
 import { mathExplain } from "../../[id]/edit/_lib/mathExplain";
 import { YeastEditorRowManualCountFields } from "./rowManualCount/YeastEditorRowManualCountFields";
 import {

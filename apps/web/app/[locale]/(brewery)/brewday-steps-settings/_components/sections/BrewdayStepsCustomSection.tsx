@@ -2,7 +2,7 @@
 
 import { Button, SizableText, XStack } from "tamagui";
 
-import { RecipeEditSection } from "../../../../../_components/recipe-edit";
+import { RecipeEditSection } from "../../../_components/recipe-edit";
 import type { useBrewdayStepsSettingsPage } from "../../_hooks/useBrewdayStepsSettingsPage";
 import { BrewdayStepsCustomAddForm } from "./custom/BrewdayStepsCustomAddForm";
 import { BrewdayStepsCustomStepRows } from "./custom/BrewdayStepsCustomStepRows";

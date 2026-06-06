@@ -2,8 +2,8 @@
 
 import { Button, SizableText, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../../../../_components/BrewSelect";
-import { MessageBox, RecipeEditFieldLabel } from "../../../../../../../../../_components/recipe-edit";
+import { BrewSelect } from "../../../../../../../_components/BrewSelect";
+import { MessageBox, RecipeEditFieldLabel } from "../../../../../../../_components/recipe-edit";
 import type { IntegrationKind } from "../../../_lib/brewSessionDetailUi";
 import type { BrewSessionDetailPageModel } from "../../../_hooks/useBrewSessionDetailPage";
 

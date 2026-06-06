@@ -4,9 +4,9 @@ import { useCallback, useMemo, useState } from "react";
 
 import { getRecipe } from "@umbraculum/api-client/brewery";
 
-import { parseGristJson, type GristRow } from "../../../../../../../_lib/grist";
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../../_lib/typeGuards";
+import { parseGristJson, type GristRow } from "../../../../../_lib/grist";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
+import { asRecord } from "../../../../../../../_shell/_lib/typeGuards";
 import { editorStateFromBeerJson } from "../../../../_lib/beerjsonRecipe";
 import type { RecipeWaterSettings } from "../../_lib/waterSettings";
 

@@ -1,4 +1,4 @@
-import { MessageBox } from "../../../../../../../../../_components/recipe-edit";
+import { MessageBox } from "../../../../../../../_components/recipe-edit";
 import { Button, XStack, YStack } from "tamagui";
 
 import type { WaterBoilAdjustmentActionsModel } from "./waterBoilAdjustmentTypes";

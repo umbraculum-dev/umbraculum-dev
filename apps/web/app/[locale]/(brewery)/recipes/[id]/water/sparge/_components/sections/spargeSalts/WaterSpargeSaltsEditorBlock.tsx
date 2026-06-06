@@ -1,6 +1,6 @@
 import { SaltAdditionsEditor } from "@umbraculum/brewery-recipes-ui";
 
-import { ErrorBox, MessageBox } from "../../../../../../../../../_components/recipe-edit";
+import { ErrorBox, MessageBox } from "../../../../../../../_components/recipe-edit";
 import { Button, SizableText, XStack, YStack } from "tamagui";
 
 import type { WaterSpargeSaltsEditorModel } from "./waterSpargeSaltsTypes";

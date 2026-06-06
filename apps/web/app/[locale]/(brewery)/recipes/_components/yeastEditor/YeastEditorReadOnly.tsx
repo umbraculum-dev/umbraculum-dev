@@ -8,7 +8,7 @@ import {
   RecipeEditIngredientCard,
   RecipeEditReadOnlyValue,
   RecipeEditSummary,
-} from "../../../../../_components/recipe-edit";
+} from "../../../_components/recipe-edit";
 import { YEAST_PITCH_RATE_OPTIONS } from "../../_lib/beerjsonRecipe";
 import { roundTo, type YeastEditorReadOnlyProps } from "./yeastEditorTypes";
 

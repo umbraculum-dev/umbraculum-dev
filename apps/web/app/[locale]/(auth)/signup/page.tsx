@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { Button, H1, Input, SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
-import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
-import { webPlatformApiClient } from "../../../_lib/webApiClient";
+import { ErrorBox, RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
+import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
 import { ApiClientError, signup } from "@umbraculum/api-client";
 import { LocaleSelect } from "../_components/LocaleSelect";
 

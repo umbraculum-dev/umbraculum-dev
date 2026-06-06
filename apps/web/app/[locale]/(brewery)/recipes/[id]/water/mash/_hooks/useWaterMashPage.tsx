@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
-import { useRequireAuth } from "../../../../../../../_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../../../../_shell/_lib/useRequireAuth";
 import { formatWithHint } from "../../../../../../../../src/i18n/format";
 import { useWaterSurfaceMath } from "../../_hooks/useWaterSurfaceMath";
 import { saveRecipeWaterSettings } from "../../_lib/waterSettings";

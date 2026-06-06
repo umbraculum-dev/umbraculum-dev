@@ -2,8 +2,8 @@
 
 import { Button, Input, SizableText, View, XStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../../../../_components/BrewSelect";
-import { RecipeEditFieldLabel, RecipeEditReadOnlyValue } from "../../../../../../../../../_components/recipe-edit";
+import { BrewSelect } from "../../../../../../../_components/BrewSelect";
+import { RecipeEditFieldLabel, RecipeEditReadOnlyValue } from "../../../../../../../_components/recipe-edit";
 
 import { hasPresetStepTimer, type BrewSessionStep } from "../../../_lib/brewSessionDetailUi";
 import type { BrewSessionStepCardContext, BrewSessionStepCardDerived } from "./brewSessionStepCardTypes";

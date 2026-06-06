@@ -9,7 +9,7 @@ import {
   stopBrewSession,
 } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import type { BrewSession } from "../_lib/brewSessionDetailUi";
 
 export function useBrewSessionSessionActions(params: {

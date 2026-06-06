@@ -2,7 +2,7 @@
 
 import { H2, SizableText, View } from "tamagui";
 
-import { ErrorBox } from "../../../../../../../../_components/recipe-edit";
+import { ErrorBox } from "../../../../../../_components/recipe-edit";
 import type { BrewSessionDetailPageModel } from "../../_hooks/useBrewSessionDetailPage";
 import { BrewSessionHydrometerControlsBlock } from "./hydrometer/BrewSessionHydrometerControlsBlock";
 import { BrewSessionHydrometerReadingBlock } from "./hydrometer/BrewSessionHydrometerReadingBlock";

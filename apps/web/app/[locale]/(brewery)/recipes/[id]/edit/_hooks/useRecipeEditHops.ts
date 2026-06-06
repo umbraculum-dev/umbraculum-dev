@@ -4,7 +4,7 @@ import { useCallback, useState, type FormEvent } from "react";
 
 import { searchHops } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { newRowId } from "../_lib/recipeEditHelpers";
 import type { HopRow, HopSearchResult } from "../_lib/recipeEditTypes";
 import type { EditorHopRow } from "../../../_lib/beerjsonRecipe";

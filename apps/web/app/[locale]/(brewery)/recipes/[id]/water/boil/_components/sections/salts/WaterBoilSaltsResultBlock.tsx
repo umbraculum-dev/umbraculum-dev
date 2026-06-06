@@ -1,5 +1,5 @@
-import { MathHelpPopover } from "../../../../../../../../../_components/MathHelpPopover";
-import { FieldBadge } from "../../../../../../../../../_components/recipe-edit";
+import { MathHelpPopover } from "../../../../../../../_components/MathHelpPopover";
+import { FieldBadge } from "../../../../../../../_components/recipe-edit";
 import { SizableText, View } from "tamagui";
 
 import { mathExplain } from "../../../../_lib/mathExplain";

@@ -3,7 +3,7 @@ import {Button, Input, SizableText, View, XStack, YStack} from "tamagui";
 import {
   RecipeEditFieldLabel,
   RecipeEditReadOnlyValue,
-} from "../../../../../../../../_components/recipe-edit";
+} from "../../../../../../_components/recipe-edit";
 import type {GristRow} from "../../../_lib/recipeEditTypes";
 import type {RecipeEditPageModel} from "../../../_hooks/useRecipeEditPage";
 

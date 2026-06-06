@@ -4,7 +4,7 @@ import { useRouter } from "../../../../../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
-import { useRequireAuth } from "../../../../../../../_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../../../../_shell/_lib/useRequireAuth";
 import { useBrewSessionData } from "./useBrewSessionData";
 import { useBrewSessionDueAlerts } from "./useBrewSessionDueAlerts";
 import { useBrewSessionHydrometers } from "./useBrewSessionHydrometers";

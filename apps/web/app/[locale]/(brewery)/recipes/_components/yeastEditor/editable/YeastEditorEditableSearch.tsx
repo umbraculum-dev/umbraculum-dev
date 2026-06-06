@@ -5,8 +5,8 @@ import { Button, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { searchYeasts } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
-import { ErrorBox, RecipeEditFieldLabel } from "../../../../../../_components/recipe-edit";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { type EditorYeastRow } from "../../../_lib/beerjsonRecipe";
 import type { YeastSearchItem } from "../yeastEditorTypes";
 

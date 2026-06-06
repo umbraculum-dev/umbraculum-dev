@@ -1,7 +1,7 @@
 import {Link} from "../../../../../../../../src/i18n/navigation";
 import {SizableText, XStack} from "tamagui";
 
-import {RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 
 export function RecipeEditWaterSection({ model }: { model: RecipeEditPageModel }) {

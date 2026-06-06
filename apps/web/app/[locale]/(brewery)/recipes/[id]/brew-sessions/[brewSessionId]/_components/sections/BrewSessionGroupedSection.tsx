@@ -2,7 +2,7 @@
 
 import { SizableText, View, YStack } from "tamagui";
 
-import { RecipeEditSection } from "../../../../../../../../_components/recipe-edit";
+import { RecipeEditSection } from "../../../../../../_components/recipe-edit";
 
 import {
   brewSessionSectionPillStyles,

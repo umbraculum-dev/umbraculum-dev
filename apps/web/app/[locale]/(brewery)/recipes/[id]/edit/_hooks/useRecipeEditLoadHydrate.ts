@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { asRecord } from "../../../../../../_lib/typeGuards";
+import { asRecord } from "../../../../../../_shell/_lib/typeGuards";
 import { editorStateFromBeerJson, type EditorMiscRow } from "../../../_lib/beerjsonRecipe";
 import type { Recipe } from "../_lib/recipeEditTypes";
 import type { RecipeEditHydrators } from "./useRecipeEditLoad";

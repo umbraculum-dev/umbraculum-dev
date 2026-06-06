@@ -4,7 +4,7 @@ import { type FormEvent } from "react";
 
 import { createInventoryItem } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import { ACID_SALT_OPTIONS } from "../_lib/inventoryTypes";
 import type { UseInventoryPageMutationsParams } from "./useInventoryPageMutationsShared";
 

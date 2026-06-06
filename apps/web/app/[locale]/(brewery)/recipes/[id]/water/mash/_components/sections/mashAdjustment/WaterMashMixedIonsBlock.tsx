@@ -1,4 +1,4 @@
-import { FieldBadge } from "../../../../../../../../../_components/recipe-edit";
+import { FieldBadge } from "../../../../../../../_components/recipe-edit";
 import { SizableText, View } from "tamagui";
 
 import type { WaterMashMixedIonsModel } from "./waterMashAdjustmentTypes";

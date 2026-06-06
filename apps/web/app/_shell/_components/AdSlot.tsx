@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { Image } from "tamagui";
 
-import { Link } from "../../src/i18n/navigation";
+import { Link } from "../../../src/i18n/navigation";
 import { getAdSlot } from "@umbraculum/api-client";
 import { webPlatformApiClient } from "../_lib/webApiClient";
 import { AdSlotCard, Text } from "@umbraculum/ui";

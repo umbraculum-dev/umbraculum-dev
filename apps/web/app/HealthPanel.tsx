@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../src/i18n/navigation";
-import { CodeInline } from "./_components/CodeInline";
+import { CodeInline } from "./_shell/_components/CodeInline";
 
 const MONO_FONT =
   'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';

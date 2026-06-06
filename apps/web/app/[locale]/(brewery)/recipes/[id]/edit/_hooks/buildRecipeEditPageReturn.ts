@@ -1,4 +1,4 @@
-import type { useRequireAuth } from "../../../../../../_lib/useRequireAuth";
+import type { useRequireAuth } from "../../../../../../_shell/_lib/useRequireAuth";
 import type { useRecipeEditCatalogs } from "./useRecipeEditCatalogs";
 import type { useRecipeEditFermentables } from "./useRecipeEditFermentables";
 import type { useRecipeEditHops } from "./useRecipeEditHops";

@@ -71,7 +71,7 @@ import { fileURLToPath } from "node:url";
  * `[locale]/` are NOT violations of Discipline D.
  *
  * Mirrors the eventual `registerWebModule({ code: "platform", ownedUrlSegments: [...] })`
- * call in `apps/web/app/_lib/registerPlatformSegments.ts` (Phase 5).
+ * call in `apps/web/app/_shell/_lib/registerPlatformSegments.ts` (Phase 5).
  */
 const PLATFORM_RESERVED_SEGMENTS = new Set<string>([
   // auth pseudo-segments live inside (auth)/ route group, NOT as flat folders.

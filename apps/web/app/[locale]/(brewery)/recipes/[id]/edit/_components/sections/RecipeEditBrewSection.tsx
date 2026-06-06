@@ -1,6 +1,6 @@
 import {Button, SizableText, YStack} from "tamagui";
 
-import {ErrorBox, RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {ErrorBox, RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 
 export function RecipeEditBrewSection({ model }: { model: RecipeEditPageModel }) {

@@ -2,7 +2,7 @@
 
 import { Button, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel } from "../../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import type { InventorySectionProps } from "../inventorySectionTypes";
 
 export function InventoryFermentablesCustomAddBlock(props: InventorySectionProps) {

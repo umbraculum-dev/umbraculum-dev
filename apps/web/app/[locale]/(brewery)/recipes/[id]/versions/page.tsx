@@ -8,9 +8,9 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 import { listRecipeVersions } from "@umbraculum/api-client/brewery";
 
 import { Link } from "../../../../../../src/i18n/navigation";
-import { ErrorBox } from "../../../../../_components/recipe-edit";
-import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
-import { useRequireAuth } from "../../../../../_lib/useRequireAuth";
+import { ErrorBox } from "../../../_components/recipe-edit";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
+import { useRequireAuth } from "../../../../../_shell/_lib/useRequireAuth";
 
 type VersionListItem = {
   id: string;

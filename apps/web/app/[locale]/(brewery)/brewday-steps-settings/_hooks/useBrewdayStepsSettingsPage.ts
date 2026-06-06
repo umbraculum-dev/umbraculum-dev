@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
 import {
   BREWING_TYPE_OPTIONS,
   PRESET_KEYS,

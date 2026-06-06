@@ -2,7 +2,7 @@ import {Link} from "../../../../../../../../src/i18n/navigation";
 import {SizableText, View} from "tamagui";
 
 import {formatFixed} from "../../../../../../../../src/i18n/format";
-import {RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {RecipeEditSection} from "../../../../../_components/recipe-edit";
 import {YeastEditor} from "../../../../_components/YeastEditor";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 

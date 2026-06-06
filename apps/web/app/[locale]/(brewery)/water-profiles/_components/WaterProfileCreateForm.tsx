@@ -2,8 +2,8 @@
 
 import { Accordion, Button, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../_components/BrewSelect";
-import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { BrewSelect } from "../../_components/BrewSelect";
+import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import type { useWaterProfilesPage } from "../_hooks/useWaterProfilesPage";
 
 type Model = ReturnType<typeof useWaterProfilesPage>;

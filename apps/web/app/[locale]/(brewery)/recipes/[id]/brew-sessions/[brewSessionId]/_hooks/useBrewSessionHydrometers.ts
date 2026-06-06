@@ -10,8 +10,8 @@ import {
 } from "@umbraculum/api-client/brewery";
 import { listIntegrationDevices } from "@umbraculum/api-client";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
-import { webPlatformApiClient } from "../../../../../../../_lib/webApiClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
+import { webPlatformApiClient } from "../../../../../../../_shell/_lib/webApiClient";
 import {
   type HydrometerAttachment,
   type HydrometerDevice,

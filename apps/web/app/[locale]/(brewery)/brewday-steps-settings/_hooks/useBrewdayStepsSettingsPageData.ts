@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { getBrewdaySettings } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import {
   DEFAULT_STEPS_SEED,
   newId,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "../../../src/i18n/navigation";
+import { Link } from "../../../../../src/i18n/navigation";
 import { SizableText, View, YStack } from "tamagui";
 
 import type { UseRecipeImportFormModel } from "./_hooks/useRecipeImportForm";

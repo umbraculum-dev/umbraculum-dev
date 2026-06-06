@@ -2,7 +2,7 @@
 
 import { Accordion, Button, H2, SizableText, View, XStack } from "tamagui";
 
-import { ErrorBox } from "../../../../_components/recipe-edit";
+import { ErrorBox } from "../../_components/recipe-edit";
 import type { useWaterProfilesPage } from "../_hooks/useWaterProfilesPage";
 
 type Model = ReturnType<typeof useWaterProfilesPage>;

@@ -1,6 +1,6 @@
 import { Button, XStack, YStack } from "tamagui";
 
-import { MessageBox } from "../../../../../../../../../_components/recipe-edit";
+import { MessageBox } from "../../../../../../../_components/recipe-edit";
 import type { WaterSpargePageModel } from "../../../_hooks/useWaterSpargePage";
 
 export function WaterSpargeConfigSaveBlock({ model }: { model: WaterSpargePageModel }) {

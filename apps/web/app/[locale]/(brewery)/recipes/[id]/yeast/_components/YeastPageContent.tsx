@@ -3,11 +3,11 @@
 import { Link } from "../../../../../../../src/i18n/navigation";
 import { H1, H2, SizableText, View } from "tamagui";
 
-import { SurfaceMathToggleRow } from "../../../../../../_components/SurfaceMathToggleRow";
+import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { getMediaPublicPath } from "@umbraculum/media";
 import { ManualCellCountHelpBox } from "@umbraculum/brewery-recipes-ui";
 import { YeastEditor } from "../../../_components/YeastEditor";
-import { ErrorBox } from "../../../../../../_components/recipe-edit";
+import { ErrorBox } from "../../../../_components/recipe-edit";
 import { RecipeMetaLine } from "@umbraculum/brewery-recipes-ui";
 import type { UseYeastPageModel } from "../_hooks/useYeastPage";
 

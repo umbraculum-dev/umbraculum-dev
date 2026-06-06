@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
 import { formatFixed } from "../../../../../../../../../src/i18n/format";
-import { MathHelpPopover } from "../../../../../../../../_components/MathHelpPopover";
+import { MathHelpPopover } from "../../../../../../_components/MathHelpPopover";
 import { parseGravityAnalysisResponseV1 } from "@umbraculum/brewery-contracts";
 import { renderDerivationBody } from "../../../../water/_lib/mathBodies";
-import { asRecord } from "../../../../../../../../_lib/typeGuards";
+import { asRecord } from "../../../../../../../../_shell/_lib/typeGuards";
 import { mathExplain } from "../../../_lib/mathExplain";
 import type { DerivationsRecord, FormatHintsRecord } from "../../../_lib/recipeEditTypes";
 import type { RecipeEditPageModel } from "../../../_hooks/useRecipeEditPage";

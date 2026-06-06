@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 
 import { patchBrewdaySettings } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import type {
   BrewdaySectionConfig,
   BrewdayStep,

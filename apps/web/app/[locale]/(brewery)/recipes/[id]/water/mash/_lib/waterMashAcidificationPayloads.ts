@@ -1,6 +1,6 @@
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 
-import type { GristRow } from "../../../../../../../_lib/grist";
+import type { GristRow } from "../../../../../_lib/grist";
 import type { IonProfilePpm } from "../../_lib/waterChem";
 import type { WaterAcidificationMode } from "../../_lib/waterCalcTypes";
 import type { MixedSourceProfile } from "./waterMashAcidificationHydration";

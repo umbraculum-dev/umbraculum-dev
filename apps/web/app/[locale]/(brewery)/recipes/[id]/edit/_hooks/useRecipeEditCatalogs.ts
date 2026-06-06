@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { listEquipmentProfiles, listStyles } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import type { EquipmentProfile, StyleListItem } from "../_lib/recipeEditTypes";
 
 export function useRecipeEditCatalogs(authReady: boolean) {

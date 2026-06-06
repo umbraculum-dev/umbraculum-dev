@@ -1,8 +1,8 @@
 import {Button, Input, SizableText, View, XStack, YStack} from "tamagui";
 
 import {formatFixed} from "../../../../../../../../../src/i18n/format";
-import {BrewSelect} from "../../../../../../../../_components/BrewSelect";
-import {RecipeEditFieldLabel, RecipeEditIngredientCard} from "../../../../../../../../_components/recipe-edit";
+import {BrewSelect} from "../../../../../../_components/BrewSelect";
+import {RecipeEditFieldLabel, RecipeEditIngredientCard} from "../../../../../../_components/recipe-edit";
 import {miscTypeOptions, miscUseOptions} from "../../../_lib/recipeEditConstants";
 import type {MiscType, MiscUse} from "../../../_lib/recipeEditTypes";
 import type {RecipeEditPageModel} from "../../../_hooks/useRecipeEditPage";

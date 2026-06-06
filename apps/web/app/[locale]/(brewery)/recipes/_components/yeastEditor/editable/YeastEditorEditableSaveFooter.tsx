@@ -2,7 +2,7 @@
 
 import { Button, YStack } from "tamagui";
 
-import { MessageBox } from "../../../../../../_components/recipe-edit";
+import { MessageBox } from "../../../../_components/recipe-edit";
 
 type YeastEditorEditableSaveFooterProps = {
   t: (key: string, values?: Record<string, string | number>) => string;

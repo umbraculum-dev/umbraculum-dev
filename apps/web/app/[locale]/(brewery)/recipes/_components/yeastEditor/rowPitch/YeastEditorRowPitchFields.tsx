@@ -3,12 +3,12 @@
 import { useTranslations } from "next-intl";
 import { Input, SizableText, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../_components/BrewSelect";
-import { MathHelpPopover } from "../../../../../../_components/MathHelpPopover";
+import { BrewSelect } from "../../../../_components/BrewSelect";
+import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import {
   RecipeEditFieldLabel,
   RecipeEditReadOnlyValue,
-} from "../../../../../../_components/recipe-edit";
+} from "../../../../_components/recipe-edit";
 import {
   CELLS_PER_KG_DRY,
   CELLS_PER_L_LIQUID,

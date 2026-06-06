@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import { getRecipe, patchRecipe } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../_lib/typeGuards";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { asRecord } from "../../../../../../_shell/_lib/typeGuards";
 import type { EquipmentProfile, Recipe } from "../_lib/recipeEditTypes";
 
 export function useRecipeEditSaveEquipment(params: {

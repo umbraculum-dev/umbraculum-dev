@@ -3,7 +3,7 @@
 import { Link } from "../../../../../../../../src/i18n/navigation";
 import { SizableText } from "tamagui";
 
-import { BrewAccordionSection } from "../../../../../../../_components/BrewAccordionSection";
+import { BrewAccordionSection } from "../../../../../_components/BrewAccordionSection";
 import type { UseWaterHubPageModel } from "../../_hooks/useWaterHubPage";
 
 export function WaterHubLinksSection({ model }: { model: UseWaterHubPageModel }) {

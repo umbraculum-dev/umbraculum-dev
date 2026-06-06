@@ -14,7 +14,7 @@
 | Area | Today | Problem | Target (backbone) |
 |------|-------|---------|-------------------|
 | **Module routes (web)** | `(brewery)/`, `(pim)/`, … under `[locale]/` | **Mostly fixed** after fork-cleanliness Part B (recipes consolidation) | Keep β; enforce module-local `_components` / `_lib` per route group |
-| **Shell helpers (web)** | Flat `app/_components/`, `app/_lib/` | Platform shell mixed with brewery vertical (`BrewAccordion*`, `recipe-edit/`, `breweryWaterClient.ts`) | Split into **platform shell** vs **module-owned** surfaces (see §3) |
+| **Shell helpers (web)** | **`app/_shell/`** (platform) + `(brewery)/{_components,_lib}/` at route-group root | **Wave 1 done (2026-06-06)** — legacy flat `app/_components/`, `app/_lib/` removed | `(platform-shell)/` route group still pending (Wave 2) |
 | **Platform pages (web)** | Flat `[locale]/ai`, `[locale]/accessibility`, … | No visual parity with `(auth)/` or `(pim)/` grouping | `(platform-shell)/` route group + `platform/` admin tree unchanged |
 | **Native apps** | Single `apps/native/` Expo workspace | Name implies one app; ERP/manufacturing needs PIM scanner, warehouse handheld, brew-day, … | Multi-app under `apps/native/<app-code>/` + shared `@umbraculum/native-shell` package |
 | **E2E** | Flat `smoke/` + `brewday/` | No ownership signal for platform vs canonical vs vertical | Mirror module taxonomy under `e2e/{platform,canonical,verticals}/` |
@@ -40,7 +40,7 @@ Integrators already have this table in [BUILDING-YOUR-VERTICAL.md](../BUILDING-Y
 | `app/design/frontend/` | Shell theming / layout overrides | `apps/web/app/_shell/` (platform) + future theme package |
 | `app/etc/config.php` module enable | Boot registration | `registerModule()` / `UMBRACULUM_MODULE_PROFILE` |
 
-**What Magento has that we lack today:** at a glance, you cannot tell whether a file under `apps/web/app/_components/` is platform or brewery. Under Magento, `app/code/` vs `vendor/` vs `app/design/` makes ownership obvious.
+**What Magento has that we lack today:** platform vs brewery shell ownership is now obvious via `app/_shell/` vs `(brewery)/_components|_lib` (Wave 1). Remaining gap: flat `[locale]/ai`, `[locale]/accessibility`, … vs `(platform-shell)/` grouping (Wave 2).
 
 ---
 
@@ -57,9 +57,8 @@ Integrators already have this table in [BUILDING-YOUR-VERTICAL.md](../BUILDING-Y
 
 | Path | Examples | Should be |
 |------|----------|-----------|
-| `app/_components/` | `AccessibilityLink.tsx` (platform) next to `BrewAccordionSection.tsx`, `recipe-edit/` (brewery) | Split — see §3.3 |
-| `app/_lib/` | `webApiClient.ts`, `fetchAuthMe.ts` (platform) next to `breweryWaterClient.ts`, `grist.ts` (brewery) | Split |
-| `[locale]/ai`, `[locale]/accessibility`, `[locale]/about`, … | Platform horizontal features at flat `[locale]/<segment>/` | `(platform-shell)/<segment>/` route group (URLs unchanged) |
+| ~~`app/_components/` / `app/_lib/`~~ | ~~Mixed platform + brewery~~ | **Done (Wave 1)** — `app/_shell/` + `(brewery)/{_components,_lib}/` |
+| `[locale]/ai`, `[locale]/accessibility`, `[locale]/about`, … | Platform horizontal features at flat `[locale]/<segment>/` | `(platform-shell)/<segment>/` route group (URLs unchanged) — **Wave 2** |
 | `[locale]/platform/` | Cross-workspace admin (ads, platform recipes) | **Keep** — distinct from operator shell; rename in docs to “platform admin” |
 
 ### 3.3 Target web tree (operator shell)
@@ -355,7 +354,7 @@ No change to HTTP paths — filesystem clarity only.
 | Work | Status | Backbone relationship |
 |------|--------|----------------------|
 | Fork-cleanliness Part B (brewery recipes tree) | **Done** | Prerequisite — module routes correct |
-| SOLID WS5/WS6 | **Closed** | Extend WS5 paths when `_shell/` lands |
+| SOLID WS5/WS6 | **Closed** | **`web-platform-shell` + `web-brewery-shared` WS5 elements landed (Wave 1)** |
 | F-mod brewery optional profile | **Phase 1 shipped** | Backbone makes opt-out visually obvious |
 | Website sister repo | **Ready to implement** | Independent track; rename to `umbraculum-website` |
 | RFC-0002 β layout | **Accepted** | Unchanged — this doc extends, not replaces |
@@ -392,7 +391,7 @@ flowchart TB
 | Wave | Deliverable | Est. | Flip blocker? |
 |------|-------------|------|---------------|
 | **0** | RFC-0011 + this doc reviewed | 1–2d | No — but sets backbone |
-| **1** | Move brewery files out of `app/_components`, `app/_lib`; introduce `app/_shell/` | 2–4d | **Recommended** — highest integrator confusion |
+| **1** | Move brewery files out of `app/_components`, `app/_lib`; introduce `app/_shell/` | 2–4d | **Done (2026-06-06)** — child plan `rfc-0011_wave_1_web_shell_3435eb19.plan.md` |
 | **2** | `(platform-shell)/` route group; move ai/accessibility/about/contact | 1–2d | Recommended |
 | **3a** | Physical move to `packages/{platform,modules,verticals}/`; workspace globs | 2–3d | Optional pre-flip |
 | **3b** | Create `@umbraculum/brewery-contracts`; migrate `contracts/src/{brewery,water,analysis}` | 3–5d | **Recommended** — closes RFC-0002 gap |

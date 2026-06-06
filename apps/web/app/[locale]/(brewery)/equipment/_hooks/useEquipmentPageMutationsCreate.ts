@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { createEquipmentProfile } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import { parseNullableNumber } from "../_lib/equipmentHelpers";
 
 type UseEquipmentPageMutationsCreateParams = {

@@ -73,12 +73,14 @@ Apps (`apps/web`, `apps/native`) must follow **dependency direction** ([`DATA-AC
 | Type | Path pattern | Rule |
 |------|--------------|------|
 | `api-service` | `services/api/**` | Forbidden from all app elements |
-| `web-app-shared` | `apps/web/{src,app/_components,app/_lib}/**` | Allowed cross-route shared UI/helpers |
+| `web-app-shared` | `apps/web/src/**` | Cross-route shared i18n/navigation helpers |
+| `web-platform-shell` | `apps/web/app/_shell/{_components,_lib}/**` | Platform operator shell — must not import locale verticals |
+| `web-brewery-shared` | `apps/web/app/[locale]/(brewery)/{_components,_lib}/**` | Brewery route-group shared UI/helpers (recipe-edit, recipeImport, …) |
 | `web-water-shared` | `apps/web/app/[locale]/(brewery)/recipes/[id]/water/{_lib,_hooks}/**` | Shared across mash/sparge/boil |
 | `web-water-segment` | `apps/web/app/[locale]/(brewery)/recipes/[id]/water/*/**` | No sibling segment imports (e.g. mash → boil) |
 | `web-recipe-edit-shared` | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/{_lib,_hooks}/**` | Shared edit helpers |
-| `web-recipe-edit-surface` | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/**` | May import edit-shared, water-shared, app-shared only |
-| `web-locale-vertical` | `apps/web/app/[locale]/(pim\|mrp\|crp\|brewery\|automation)/**` | No cross-vertical imports (e.g. `(mrp)` → `(pim)`) |
+| `web-recipe-edit-surface` | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/**` | May import edit-shared, water-shared, platform-shell, brewery-shared, app-shared only |
+| `web-locale-vertical` | `apps/web/app/[locale]/(pim\|mrp\|crp\|brewery\|automation)/**` | No cross-vertical imports; may import platform-shell and brewery-shared (brewery vertical only) |
 | `web-recipe-cluster` | `apps/web/app/[locale]/(brewery)/recipes/**` | Must not import locale vertical admin UI source |
 | `native-app-shared` | `apps/native/src/{auth,components,…}/**` | Allowed cross-module shared surfaces |
 | `native-module-segment` | `apps/native/src/modules/*/**` | No sibling module imports (e.g. brewery → pim) |
@@ -89,7 +91,7 @@ Apps (`apps/web`, `apps/native`) must follow **dependency direction** ([`DATA-AC
 
 **How to fix violations:**
 
-1. Move shared code to an explicit shared layer (`_lib`, `_hooks`, `web-app-shared`, or a `@umbraculum/*` package).
+1. Move shared code to an explicit shared layer (`_lib`, `_hooks`, `web-platform-shell`, `web-brewery-shared`, `web-app-shared`, or a `@umbraculum/*` package).
 2. Do **not** import `services/api/**` or `@prisma/*` from apps — use `@umbraculum/api-client` + contracts.
 3. Rare intentional coupling: document with `@arch-boundary` + README note per charter §6.
 

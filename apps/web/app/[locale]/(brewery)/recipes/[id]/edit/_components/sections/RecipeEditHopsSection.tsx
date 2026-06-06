@@ -1,6 +1,6 @@
 import {SizableText} from "tamagui";
 
-import {RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 import {RecipeEditHopsRows} from "./RecipeEditHopsRows";
 import {RecipeEditHopsSearch} from "./RecipeEditHopsSearch";

@@ -1,7 +1,7 @@
 import {Input, XStack, YStack} from "tamagui";
 
-import {BrewSelect} from "../../../../../../../../_components/BrewSelect";
-import {RecipeEditFieldLabel} from "../../../../../../../../_components/recipe-edit";
+import {BrewSelect} from "../../../../../../_components/BrewSelect";
+import {RecipeEditFieldLabel} from "../../../../../../_components/recipe-edit";
 import type {GristMaltClass, GristPotentialKind, GristRow} from "../../../_lib/recipeEditTypes";
 import type {RecipeEditPageModel} from "../../../_hooks/useRecipeEditPage";
 

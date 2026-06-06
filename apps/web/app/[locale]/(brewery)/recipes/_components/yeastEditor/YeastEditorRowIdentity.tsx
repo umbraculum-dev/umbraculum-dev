@@ -2,11 +2,11 @@
 
 import { Input, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../_components/BrewSelect";
+import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   RecipeEditFieldLabel,
   RecipeEditReadOnlyValue,
-} from "../../../../../_components/recipe-edit";
+} from "../../../_components/recipe-edit";
 import { type EditorYeastRow } from "../../_lib/beerjsonRecipe";
 import { type YeastEditorRowContext } from "./yeastEditorTypes";
 

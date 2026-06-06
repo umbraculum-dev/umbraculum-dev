@@ -1,6 +1,6 @@
 import { getRecipeWaterHubSummary } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 
 export type { RecipeWaterHubStreamSummary, RecipeWaterHubSummary, RecipeWaterHubSummaryResponse } from "@umbraculum/brewery-contracts";
 

@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { getRecipe } from "@umbraculum/api-client/brewery";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import { formatWithHint } from "../../../../../../../../src/i18n/format";
 import { useWaterPageAuthProfiles } from "../../_hooks/useWaterPageAuthProfiles";
 import { useWaterSurfaceMath } from "../../_hooks/useWaterSurfaceMath";

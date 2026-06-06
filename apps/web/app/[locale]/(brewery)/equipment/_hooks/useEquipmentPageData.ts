@@ -7,8 +7,8 @@ import type { AuthMeResponse } from "@umbraculum/contracts";
 
 import { listEquipmentProfiles } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
-import { fetchAuthMe } from "../../../../_lib/fetchAuthMe";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
+import { fetchAuthMe } from "../../../../_shell/_lib/fetchAuthMe";
 import type { EquipmentProfile } from "../_lib/equipmentTypes";
 
 export function useEquipmentPageData() {

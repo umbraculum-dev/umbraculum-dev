@@ -2,7 +2,7 @@
 
 import { Button, Input, SizableText, XStack, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel, RecipeEditSection } from "../../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel, RecipeEditSection } from "../../../_components/recipe-edit";
 import type { InventorySectionProps } from "./inventorySectionTypes";
 import { renderInventoryItemRow } from "./renderInventoryItemRow";
 

@@ -1,4 +1,4 @@
-import { asRecord } from "../../../../../../_lib/typeGuards";
+import { asRecord } from "../../../../../../_shell/_lib/typeGuards";
 import type { Recipe } from "./recipeEditTypes";
 
 /**

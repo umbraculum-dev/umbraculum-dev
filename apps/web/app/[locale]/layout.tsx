@@ -7,10 +7,10 @@ import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-import { AdSlot } from "../_components/AdSlot";
-import { PrimaryNav } from "../_components/PrimaryNav";
-import { WebShellNotice } from "../_components/WebShellNotice";
-import { TamaguiProviderWrapper } from "../_components/TamaguiProviderWrapper";
+import { AdSlot } from "../_shell/_components/AdSlot";
+import { PrimaryNav } from "../_shell/_components/PrimaryNav";
+import { WebShellNotice } from "../_shell/_components/WebShellNotice";
+import { TamaguiProviderWrapper } from "../_shell/_components/TamaguiProviderWrapper";
 import { isLocale } from "../../src/i18n/routing";
 
 export default async function LocaleLayout({

@@ -1,6 +1,6 @@
 import { Accordion, SizableText, View } from "tamagui";
 
-import { BrewAccordionHeader } from "../../../../../../../../_components/BrewAccordionHeader";
+import { BrewAccordionHeader } from "../../../../../../_components/BrewAccordionHeader";
 
 import type { WaterSpargePageModel } from "../../_hooks/useWaterSpargePage";
 import { WaterSpargeSaltsAfterSaltsBlock } from "./spargeSalts/WaterSpargeSaltsAfterSaltsBlock";

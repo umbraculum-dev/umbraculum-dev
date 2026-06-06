@@ -4,7 +4,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 import { getRecipe, listRecipeVersions } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import type { Recipe, RecipeVersionListItem } from "../_lib/recipeEditTypes";
 
 export type RecipeEditLoadDataState = {

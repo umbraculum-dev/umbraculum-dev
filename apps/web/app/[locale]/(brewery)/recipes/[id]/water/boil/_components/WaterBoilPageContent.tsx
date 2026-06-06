@@ -2,8 +2,8 @@
 
 import { Link } from "../../../../../../../../src/i18n/navigation";
 
-import { ErrorBox } from "../../../../../../../_components/recipe-edit";
-import { SurfaceMathToggleRow } from "../../../../../../../_components/SurfaceMathToggleRow";
+import { ErrorBox } from "../../../../../_components/recipe-edit";
+import { SurfaceMathToggleRow } from "../../../../../_components/SurfaceMathToggleRow";
 import { RecipeMetaLine } from "@umbraculum/brewery-recipes-ui";
 import { H1, SizableText, YStack } from "tamagui";
 

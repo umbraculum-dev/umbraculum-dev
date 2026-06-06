@@ -5,10 +5,10 @@ import { Link } from "../../../../../../../../../src/i18n/navigation";
 
 import { Button, Checkbox, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../../../_components/BrewSelect";
-import { PageWideActionBar } from "../../../../../../../../_components/PageWideActionBar";
+import { BrewSelect } from "../../../../../../_components/BrewSelect";
+import { PageWideActionBar } from "../../../../../../_components/PageWideActionBar";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
-import { CodeInline } from "../../../../../../../../_components/CodeInline";
+import { CodeInline } from "../../../../../../../../_shell/_components/CodeInline";
 import {
   ErrorBox,
   MessageBox,
@@ -18,7 +18,7 @@ import {
   RecipeEditSection,
   RecipeEditSummary,
   WarningBox,
-} from "../../../../../../../../_components/recipe-edit";
+} from "../../../../../../_components/recipe-edit";
 
 import {
   type BrewSessionStep,

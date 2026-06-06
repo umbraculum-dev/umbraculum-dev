@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { getRecipe, patchRecipe } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import type {
   EditorGristRow,
   EditorHopRow,

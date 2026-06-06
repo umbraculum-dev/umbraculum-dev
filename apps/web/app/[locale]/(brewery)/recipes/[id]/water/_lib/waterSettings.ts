@@ -3,7 +3,7 @@ import {
   updateRecipeWaterSettings,
 } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 
 export type RecipeWaterSettings = {
   id: string;

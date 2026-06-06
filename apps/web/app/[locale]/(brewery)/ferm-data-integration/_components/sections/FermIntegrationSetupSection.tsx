@@ -2,8 +2,8 @@
 
 import { Button, Input, SizableText, XStack, YStack } from "tamagui";
 
-import { CodeInline } from "../../../../../_components/CodeInline";
-import { MessageBox } from "../../../../../_components/recipe-edit/MessageBox";
+import { CodeInline } from "../../../../../_shell/_components/CodeInline";
+import { MessageBox } from "../../../../_shell/_components/MessageBox";
 import type { UseFermDataIntegrationPageModel } from "../../_hooks/useFermDataIntegrationPage";
 import type { IntegrationKind } from "../../_lib/fermIntegrationTypes";
 import { FermIntegrationDevicesSection } from "./FermIntegrationDevicesSection";

@@ -1,5 +1,5 @@
-import { BrewSelect } from "../../../../../../../../../_components/BrewSelect";
-import { RecipeEditFieldLabel } from "../../../../../../../../../_components/recipe-edit";
+import { BrewSelect } from "../../../../../../../_components/BrewSelect";
+import { RecipeEditFieldLabel } from "../../../../../../../_components/recipe-edit";
 import { Input, View, XStack, YStack } from "tamagui";
 
 import type { WaterMashProfilePickersModel } from "./waterMashAdjustmentTypes";

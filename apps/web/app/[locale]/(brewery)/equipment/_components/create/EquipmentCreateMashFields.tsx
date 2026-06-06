@@ -2,7 +2,7 @@
 
 import { Input, View, XStack, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel } from "../../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 
 export function EquipmentCreateMashFields(props: {
   t: (key: string, values?: Record<string, string>) => string;

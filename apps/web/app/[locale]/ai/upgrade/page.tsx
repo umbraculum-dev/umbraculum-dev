@@ -6,8 +6,8 @@ import { Button, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ApiClientError, createAiUpgradeBillingIntent } from "@umbraculum/api-client";
 
-import { webPlatformApiClient } from "../../../_lib/webApiClient";
-import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
+import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 
 const CONCIERGE_URL = process.env['NEXT_PUBLIC_CONCIERGE_BOOKING_URL'] ?? "";

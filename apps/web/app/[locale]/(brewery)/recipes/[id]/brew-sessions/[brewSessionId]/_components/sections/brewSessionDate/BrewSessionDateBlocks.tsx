@@ -2,7 +2,7 @@
 
 import { Button, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox, RecipeEditFieldLabel } from "../../../../../../../../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../../../../../_components/recipe-edit";
 import type { BrewSessionDetailPageModel } from "../../../_hooks/useBrewSessionDetailPage";
 
 function padDatePart(n: number) {

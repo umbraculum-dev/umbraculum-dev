@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { parseGristJson } from "../../../../../../_lib/grist";
+import { parseGristJson } from "../../../../_lib/grist";
 import { newRowId } from "../_lib/recipeEditHelpers";
 import type { EditorGristRow, EditorMiscRow } from "../../../_lib/beerjsonRecipe";
 import type { MiscRow } from "../_lib/recipeEditTypes";

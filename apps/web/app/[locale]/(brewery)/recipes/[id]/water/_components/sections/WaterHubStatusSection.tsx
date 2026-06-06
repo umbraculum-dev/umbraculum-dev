@@ -3,8 +3,8 @@
 import { Link } from "../../../../../../../../src/i18n/navigation";
 import { Button, SizableText, XStack } from "tamagui";
 
-import { BrewAccordionSection } from "../../../../../../../_components/BrewAccordionSection";
-import { ErrorBox } from "../../../../../../../_components/recipe-edit";
+import { BrewAccordionSection } from "../../../../../_components/BrewAccordionSection";
+import { ErrorBox } from "../../../../../_components/recipe-edit";
 import type { UseWaterHubPageModel } from "../../_hooks/useWaterHubPage";
 
 export function WaterHubStatusSection({ model }: { model: UseWaterHubPageModel }) {

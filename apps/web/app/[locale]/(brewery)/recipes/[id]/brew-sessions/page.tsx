@@ -9,9 +9,9 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
 import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
-import { useRequireAuth } from "../../../../../_lib/useRequireAuth";
-import { ErrorBox, MessageBox } from "../../../../../_components/recipe-edit";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
+import { useRequireAuth } from "../../../../../_shell/_lib/useRequireAuth";
+import { ErrorBox, MessageBox } from "../../../_components/recipe-edit";
 
 type BrewSessionListItem = {
   id: string;

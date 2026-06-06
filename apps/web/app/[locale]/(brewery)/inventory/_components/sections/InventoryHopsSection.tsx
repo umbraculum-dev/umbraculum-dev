@@ -2,8 +2,8 @@
 
 import { Button, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel, RecipeEditSection } from "../../../../../_components/recipe-edit";
-import { StripedRow } from "../../../../../_components/StripedRow";
+import { RecipeEditFieldLabel, RecipeEditSection } from "../../../_components/recipe-edit";
+import { StripedRow } from "../../../_components/StripedRow";
 import { PUBLIC_DB_PAGE_SIZE } from "../../_lib/inventoryTypes";
 import type { InventorySectionProps } from "./inventorySectionTypes";
 import { renderInventoryItemRow } from "./renderInventoryItemRow";

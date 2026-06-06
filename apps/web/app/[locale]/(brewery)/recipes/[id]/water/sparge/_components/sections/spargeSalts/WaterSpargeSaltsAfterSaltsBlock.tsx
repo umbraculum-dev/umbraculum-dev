@@ -1,5 +1,5 @@
-import { MathHelpPopover } from "../../../../../../../../../_components/MathHelpPopover";
-import { FieldBadge } from "../../../../../../../../../_components/recipe-edit";
+import { MathHelpPopover } from "../../../../../../../_components/MathHelpPopover";
+import { FieldBadge } from "../../../../../../../_components/recipe-edit";
 
 import { mathExplain } from "../../../../_lib/mathExplain";
 import { buildWaterMathBody } from "../../../../_lib/mathBodies";

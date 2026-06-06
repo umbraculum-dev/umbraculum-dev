@@ -9,9 +9,9 @@ import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 import { getRecipe, listWaterProfiles } from "@umbraculum/api-client/brewery";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { formatWithHint } from "../../../../../../../src/i18n/format";
-import { useRequireAuth } from "../../../../../../_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../../../_shell/_lib/useRequireAuth";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "../_lib/waterHubSummary";
 import type { DisplayStream } from "../_lib/waterHubPageTypes";
 

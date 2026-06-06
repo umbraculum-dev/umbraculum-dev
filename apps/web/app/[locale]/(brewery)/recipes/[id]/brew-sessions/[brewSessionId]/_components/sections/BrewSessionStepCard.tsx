@@ -2,7 +2,7 @@
 
 import { View, YStack } from "tamagui";
 
-import { RecipeEditIngredientCard } from "../../../../../../../../_components/recipe-edit";
+import { RecipeEditIngredientCard } from "../../../../../../_components/recipe-edit";
 
 import {
   formatElapsedSeconds,

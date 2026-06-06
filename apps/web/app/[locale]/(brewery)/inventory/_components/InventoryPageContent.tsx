@@ -2,7 +2,7 @@
 
 import { H1, SizableText, YStack } from "tamagui";
 
-import { ErrorBox } from "../../../../_components/recipe-edit";
+import { ErrorBox } from "../../_components/recipe-edit";
 import { DashboardClient } from "../../../../DashboardClient";
 import { Link } from "../../../../../src/i18n/navigation";
 import type { useInventoryPage } from "../_hooks/useInventoryPage";

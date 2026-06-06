@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Input, SizableText, TextArea, XStack, YStack } from "tamagui";
 
-import { ErrorBox } from "../../../_components/recipe-edit";
+import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
 import type { PimProductsPageModel } from "./usePimProductsPage";
 
 export function PimProductCreateForm({ model }: { model: PimProductsPageModel }) {

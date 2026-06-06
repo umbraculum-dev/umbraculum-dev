@@ -1,7 +1,7 @@
 import type { computeAndSaveMash } from "@umbraculum/api-client/brewery";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
-import { asRecord } from "../../../../../../../_lib/typeGuards";
+import { asRecord } from "../../../../../../../_shell/_lib/typeGuards";
 import type {
   MashOverallResult,
   SaltAdditionsResult,

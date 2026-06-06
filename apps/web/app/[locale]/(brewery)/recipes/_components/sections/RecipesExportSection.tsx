@@ -1,6 +1,6 @@
-import { BrewSelect } from "../../../../../_components/BrewSelect";
-import { RecipeEditFieldLabel } from "../../../../../_components/recipe-edit";
-import { BrewAccordionSection } from "../../../../../_components/BrewAccordionSection";
+import { BrewSelect } from "../../../_components/BrewSelect";
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
 import { SizableText, View, XStack, YStack } from "tamagui";
 
 import type { useRecipesPage } from "../../_hooks/useRecipesPage";

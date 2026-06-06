@@ -1,5 +1,5 @@
-import { BrewSelect } from "../../../../../../../_components/BrewSelect";
-import { RecipeEditFieldLabel } from "../../../../../../../_components/recipe-edit";
+import { BrewSelect } from "../../../../../_components/BrewSelect";
+import { RecipeEditFieldLabel } from "../../../../../_components/recipe-edit";
 import { ModeFieldset } from "@umbraculum/ui";
 import { Input, View, YStack } from "tamagui";
 

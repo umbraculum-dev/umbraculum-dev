@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { H2, SizableText, View, YStack } from "tamagui";
-import { Link } from "../../src/i18n/navigation";
+import { Link } from "../../../../src/i18n/navigation";
 
 export function ImportExportPanel(props: {
   headingId: string;

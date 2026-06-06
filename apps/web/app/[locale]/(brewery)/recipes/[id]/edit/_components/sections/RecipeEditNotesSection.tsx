@@ -1,6 +1,6 @@
 import {TextArea} from "tamagui";
 
-import {RecipeEditField, RecipeEditSection} from "../../../../../../../_components/recipe-edit";
+import {RecipeEditField, RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";
 
 export function RecipeEditNotesSection({ model }: { model: RecipeEditPageModel }) {

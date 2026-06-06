@@ -3,7 +3,7 @@
 import React from "react";
 import { Button, Input, SizableText, XStack, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel, RecipeEditIngredientCard } from "../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel, RecipeEditIngredientCard } from "../../_components/recipe-edit";
 import type { InventoryItem, InventoryUnit } from "../_lib/inventoryTypes";
 
 export function InventoryItemCard(props: {

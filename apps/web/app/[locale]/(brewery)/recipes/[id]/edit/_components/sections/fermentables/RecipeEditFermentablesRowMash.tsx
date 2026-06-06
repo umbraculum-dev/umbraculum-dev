@@ -1,11 +1,11 @@
 import {Input, SizableText, View, XStack, YStack} from "tamagui";
 
-import {BrewSelect} from "../../../../../../../../_components/BrewSelect";
+import {BrewSelect} from "../../../../../../_components/BrewSelect";
 import {
   RecipeEditFieldLabel,
   RecipeEditReadOnlyValue,
   RecipeEditSummary,
-} from "../../../../../../../../_components/recipe-edit";
+} from "../../../../../../_components/recipe-edit";
 import type {GristRow} from "../../../_lib/recipeEditTypes";
 import type {RecipeEditPageModel} from "../../../_hooks/useRecipeEditPage";
 

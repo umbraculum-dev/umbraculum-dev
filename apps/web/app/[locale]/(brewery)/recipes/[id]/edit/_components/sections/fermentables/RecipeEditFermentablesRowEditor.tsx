@@ -1,4 +1,4 @@
-import {RecipeEditIngredientCard} from "../../../../../../../../_components/recipe-edit";
+import {RecipeEditIngredientCard} from "../../../../../../_components/recipe-edit";
 import type {GristRow} from "../../../_lib/recipeEditTypes";
 import type {RecipeEditPageModel} from "../../../_hooks/useRecipeEditPage";
 import {RecipeEditFermentablesRowAmount} from "./RecipeEditFermentablesRowAmount";

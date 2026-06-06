@@ -1,6 +1,6 @@
 import { Button, SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox, WarningBox } from "../../../../../../../../../_components/recipe-edit";
+import { ErrorBox, WarningBox } from "../../../../../../../_components/recipe-edit";
 
 import { formatDateTime } from "../../../_lib/brewSessionDetailUi";
 

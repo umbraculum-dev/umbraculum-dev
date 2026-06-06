@@ -3,9 +3,9 @@
 import { useTranslations } from "next-intl";
 import { Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../_components/BrewSelect";
-import { MathHelpPopover } from "../../../../../../_components/MathHelpPopover";
-import { RecipeEditFieldLabel } from "../../../../../../_components/recipe-edit";
+import { BrewSelect } from "../../../../_components/BrewSelect";
+import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
+import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { mathExplain } from "../../../[id]/edit/_lib/mathExplain";
 import { roundTo } from "../yeastEditorTypes";
 import {

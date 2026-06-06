@@ -2,7 +2,7 @@
 
 import { TextArea } from "tamagui";
 
-import { RecipeEditField, RecipeEditSection } from "../../../../../_components/recipe-edit";
+import { RecipeEditField, RecipeEditSection } from "../../../_components/recipe-edit";
 import type { useBrewdayStepsSettingsPage } from "../../_hooks/useBrewdayStepsSettingsPage";
 
 type Model = ReturnType<typeof useBrewdayStepsSettingsPage>;

@@ -10,11 +10,11 @@ import {
   listPlatformWorkspaces,
 } from "@umbraculum/api-client";
 
-import { BrewSelect } from "../../../_components/BrewSelect";
-import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
-import { RecipeImportForm } from "../../../_components/RecipeImportForm";
-import { useRequireAuth } from "../../../_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../_lib/webApiClient";
+import { BrewSelect } from "../../(brewery)/_components/BrewSelect";
+import { ErrorBox, RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
+import { RecipeImportForm } from "../../(brewery)/_components/RecipeImportForm";
+import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
 
 type WorkspaceItem = { id: string; name: string };
 type RecipeItem = { id: string; name: string };

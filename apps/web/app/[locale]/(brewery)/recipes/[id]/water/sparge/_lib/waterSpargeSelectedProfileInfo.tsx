@@ -1,7 +1,7 @@
 import type { WaterProfile } from "@umbraculum/brewery-contracts";
 import { Button, SizableText, View, XStack } from "tamagui";
 
-import { FieldBadge } from "../../../../../../../_components/recipe-edit";
+import { FieldBadge } from "../../../../../_components/recipe-edit";
 import { bicarbonatePpmToAlkalinityPpmCaCO3 } from "../../_lib/waterChem";
 
 export function buildSelectedSpargeProfileInfo(args: {

@@ -2,7 +2,7 @@
 
 import { Button, Checkbox, SizableText, View, XStack } from "tamagui";
 
-import { RecipeEditFieldLabel } from "../../../../../../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel } from "../../../../../../../_components/recipe-edit";
 
 import { hasPresetStepTimer, isStepDirtyForLogs, type BrewSessionStep } from "../../../_lib/brewSessionDetailUi";
 import type { BrewSessionStepCardContext } from "./brewSessionStepCardTypes";

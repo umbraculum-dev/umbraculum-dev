@@ -5,7 +5,7 @@ import { H1, SizableText, View, YStack } from "tamagui";
 import {
   ErrorBox,
   MessageBox,
-} from "../../../../_components/recipe-edit";
+} from "../../_components/recipe-edit";
 import { DashboardClient } from "../../../../DashboardClient";
 import { Link } from "../../../../../src/i18n/navigation";
 import type { useBrewdayStepsSettingsPage } from "../_hooks/useBrewdayStepsSettingsPage";

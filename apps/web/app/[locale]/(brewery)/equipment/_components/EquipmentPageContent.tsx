@@ -3,7 +3,7 @@
 import { H1, SizableText, YStack } from "tamagui";
 
 import { Link } from "../../../../../src/i18n/navigation";
-import { ErrorBox } from "../../../../_components/recipe-edit";
+import { ErrorBox } from "../../_components/recipe-edit";
 import type { useEquipmentPage } from "../_hooks/useEquipmentPage";
 import { EquipmentProfileCreateForm } from "./EquipmentProfileCreateForm";
 import { EquipmentProfileEditForm } from "./EquipmentProfileEditForm";

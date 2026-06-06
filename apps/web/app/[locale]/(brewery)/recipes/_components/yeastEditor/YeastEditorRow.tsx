@@ -2,12 +2,12 @@
 
 import { Button, SizableText, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../_components/BrewSelect";
+import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
   RecipeEditSummary,
-} from "../../../../../_components/recipe-edit";
+} from "../../../_components/recipe-edit";
 import { type EditorYeastRow } from "../../_lib/beerjsonRecipe";
 import { type YeastEditorRowContext } from "./yeastEditorTypes";
 import { YeastEditorRowAttenuation } from "./YeastEditorRowAttenuation";

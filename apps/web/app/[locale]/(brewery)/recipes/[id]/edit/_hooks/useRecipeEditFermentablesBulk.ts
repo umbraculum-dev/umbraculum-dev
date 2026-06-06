@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type Dispatch, type FormEvent, ty
 
 import { searchFermentables } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { newRowId } from "../_lib/recipeEditHelpers";
 import type {
   FermentableSearchResult,

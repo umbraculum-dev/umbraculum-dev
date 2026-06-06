@@ -1,8 +1,8 @@
 import { ModeFieldset } from "@umbraculum/ui";
 import { Accordion, View } from "tamagui";
 
-import { ErrorBox } from "../../../../../../../../_components/recipe-edit";
-import { BrewAccordionHeader } from "../../../../../../../../_components/BrewAccordionHeader";
+import { ErrorBox } from "../../../../../../_components/recipe-edit";
+import { BrewAccordionHeader } from "../../../../../../_components/BrewAccordionHeader";
 import {
   WaterAcidificationManualResultPanel,
   WaterAcidificationTargetPhResultPanel,

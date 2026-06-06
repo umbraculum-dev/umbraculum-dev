@@ -1,7 +1,7 @@
 import { Button, MessageBox, SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox, FieldBadge } from "../../../../../../../../../_components/recipe-edit";
-import { MathHelpPopover } from "../../../../../../../../../_components/MathHelpPopover";
+import { ErrorBox, FieldBadge } from "../../../../../../../_components/recipe-edit";
+import { MathHelpPopover } from "../../../../../../../_components/MathHelpPopover";
 
 import { buildWaterMathBody } from "../../../../_lib/mathBodies";
 import { mathExplain } from "../../../../_lib/mathExplain";

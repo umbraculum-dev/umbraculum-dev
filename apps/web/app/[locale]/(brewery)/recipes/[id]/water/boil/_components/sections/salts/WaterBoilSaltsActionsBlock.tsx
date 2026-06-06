@@ -1,6 +1,6 @@
 import { Button, SizableText, XStack, YStack } from "tamagui";
 
-import { ErrorBox, MessageBox } from "../../../../../../../../../_components/recipe-edit";
+import { ErrorBox, MessageBox } from "../../../../../../../_components/recipe-edit";
 import type { WaterBoilPageModel } from "../../../_hooks/useWaterBoilPage";
 
 export function WaterBoilSaltsActionsBlock({ model }: { model: WaterBoilPageModel }) {

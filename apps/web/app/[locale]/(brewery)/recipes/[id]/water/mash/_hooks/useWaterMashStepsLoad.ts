@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getRecipe } from "@umbraculum/api-client/brewery";
 import { parseGravityAnalysisResponseV1 } from "@umbraculum/brewery-contracts";
 
-import { webBreweryApiClient } from "../../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import {
   editorStateFromBeerJson,
   mergeMashDeduceFromExt,

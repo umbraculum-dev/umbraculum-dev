@@ -2,7 +2,7 @@
 
 import { Button, H2, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox } from "../../../../_components/recipe-edit";
+import { ErrorBox } from "../../_components/recipe-edit";
 import type { useEquipmentPage } from "../_hooks/useEquipmentPage";
 import { EquipmentEditKettleFields } from "./edit/EquipmentEditKettleFields";
 import { EquipmentEditMashFields } from "./edit/EquipmentEditMashFields";

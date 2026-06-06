@@ -1,7 +1,7 @@
 import { Link } from "../../../../../../../../../src/i18n/navigation";
 
-import { ErrorBox } from "../../../../../../../../_components/recipe-edit";
-import { BrewAccordionHeader } from "../../../../../../../../_components/BrewAccordionHeader";
+import { ErrorBox } from "../../../../../../_components/recipe-edit";
+import { BrewAccordionHeader } from "../../../../../../_components/BrewAccordionHeader";
 import { Accordion, SizableText, View } from "tamagui";
 
 import type { WaterMashPageModel } from "../../_hooks/useWaterMashPage";

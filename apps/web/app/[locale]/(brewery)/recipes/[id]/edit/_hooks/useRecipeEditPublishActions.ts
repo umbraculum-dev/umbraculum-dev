@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { createRecipeVersion, duplicateRecipe } from "@umbraculum/api-client/brewery";
 
-import { webBreweryApiClient } from "../../../../../../_lib/breweryWaterClient";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 
 export function useRecipeEditPublishActions(params: {
   recipeId: string;

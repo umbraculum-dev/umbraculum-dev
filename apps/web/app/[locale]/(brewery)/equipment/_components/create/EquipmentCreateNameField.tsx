@@ -2,7 +2,7 @@
 
 import { Input, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel } from "../../../../../_components/recipe-edit";
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 
 export function EquipmentCreateNameField(props: {
   t: (key: string) => string;

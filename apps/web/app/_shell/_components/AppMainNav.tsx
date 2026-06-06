@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "../../src/i18n/navigation";
+import { Link } from "../../../src/i18n/navigation";
 import { SizableText, useMedia, XStack } from "tamagui";
 
 export interface AppMainNavItem {

@@ -2,7 +2,7 @@
 
 import { YStack } from "tamagui";
 
-import { RecipeEditSection } from "../../../../../_components/recipe-edit";
+import { RecipeEditSection } from "../../../_components/recipe-edit";
 import type { InventorySectionProps } from "./inventorySectionTypes";
 import { InventoryFermentablesCustomAddBlock } from "./fermentables/InventoryFermentablesCustomAddBlock";
 import { InventoryFermentablesItemListBlock } from "./fermentables/InventoryFermentablesItemListBlock";

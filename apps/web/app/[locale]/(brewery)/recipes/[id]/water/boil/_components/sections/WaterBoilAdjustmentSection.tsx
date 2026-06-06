@@ -1,4 +1,4 @@
-import { ErrorBox } from "../../../../../../../../_components/recipe-edit";
+import { ErrorBox } from "../../../../../../_components/recipe-edit";
 import { H2, SizableText, View } from "tamagui";
 
 import type { WaterBoilPageModel } from "../../_hooks/useWaterBoilPage";

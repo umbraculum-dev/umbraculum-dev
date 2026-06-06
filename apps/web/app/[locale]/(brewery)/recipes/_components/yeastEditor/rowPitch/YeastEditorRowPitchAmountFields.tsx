@@ -3,11 +3,11 @@
 import { useTranslations } from "next-intl";
 import { Input, XStack, YStack } from "tamagui";
 
-import { MathHelpPopover } from "../../../../../../_components/MathHelpPopover";
+import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import {
   RecipeEditFieldLabel,
   RecipeEditReadOnlyValue,
-} from "../../../../../../_components/recipe-edit";
+} from "../../../../_components/recipe-edit";
 import {
   CELLS_PER_L_LIQUID,
   CELLS_PER_L_SLURRY,

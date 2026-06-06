@@ -59,6 +59,7 @@ Routes are registered from [`services/api/src/modules/brewery/index.ts`](../../.
 
 | Segment | What it owns |
 |---|---|
+| `_components/`, `_lib/` (route-group root) | Brewery-shared UI and helpers moved from legacy `app/_components` / `app/_lib` ([RFC-0011 Wave 1](../../../rfcs/0011-application-surface-shell-layering.md)): `recipe-edit/`, `recipeImport/`, `BrewAccordion*`, `breweryWaterClient.ts`, `grist.ts`, `gravity.ts`, … |
 | `recipes/` | Recipe library (`page.tsx`), import, edit (`[id]/edit/`), water steps (`[id]/water/{mash,sparge,boil}`), yeast (`[id]/yeast/`), brew sessions (`[id]/brew-sessions/`), versions (`[id]/versions/`). Shared helpers: `recipes/_components/`, `recipes/_lib/`. |
 | `equipment/` | Equipment-profile editor. |
 | `water-profiles/` | Water-profile library editor. |

@@ -2,11 +2,11 @@
 
 import { Button, Checkbox, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../../../../_components/BrewSelect";
+import { BrewSelect } from "../../../../_components/BrewSelect";
 import {
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
-} from "../../../../../../_components/recipe-edit";
+} from "../../../../_components/recipe-edit";
 import { parseMinutes } from "../../../_lib/brewdayStepsTypes";
 import type { useBrewdayStepsSettingsPage } from "../../../_hooks/useBrewdayStepsSettingsPage";
 

@@ -2,28 +2,28 @@
 
 import type { ReactNode } from "react";
 
-import { MessageBox } from "./MessageBox";
+import { MessageBox } from "../../../../_shell/_components/MessageBox";
 
-export interface WarningBoxProps {
+export interface ErrorBoxProps {
   children: ReactNode;
-  role?: "status" | "alert";
+  role?: "alert";
   "aria-live"?: "polite";
   id?: string;
   mt?: string | number;
   mb?: string | number;
 }
 
-export function WarningBox({
+export function ErrorBox({
   children,
-  role = "status",
+  role = "alert",
   "aria-live": ariaLive,
   id,
   mt,
   mb,
-}: WarningBoxProps) {
+}: ErrorBoxProps) {
   return (
     <MessageBox
-      variant="warning"
+      variant="error"
       id={id}
       mt={mt}
       mb={mb}

@@ -2,9 +2,9 @@
 
 import { Link } from "../../../../../../../../src/i18n/navigation";
 
-import { ErrorBox } from "../../../../../../../_components/recipe-edit";
-import { SurfaceMathToggleRow } from "../../../../../../../_components/SurfaceMathToggleRow";
-import { RecipeTitleWithMeta } from "../../../../../../../_components/RecipeTitleWithMeta";
+import { ErrorBox } from "../../../../../_components/recipe-edit";
+import { SurfaceMathToggleRow } from "../../../../../_components/SurfaceMathToggleRow";
+import { RecipeTitleWithMeta } from "../../../../../_components/RecipeTitleWithMeta";
 import { Accordion, SizableText, YStack } from "tamagui";
 
 import type { WaterSpargePageModel } from "../_hooks/useWaterSpargePage";
