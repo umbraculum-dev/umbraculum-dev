@@ -3,7 +3,6 @@
  * projections until a dedicated BreweryScheduleProjection port lands (Tier B epic).
  */
 import type { BrewSessionStatus } from "@prisma/client";
-import { z } from "zod";
 import {
   BomSchema,
   MaterialRequirementSchema,
@@ -26,6 +25,16 @@ import {
   parseBreweryBrewSessionProductionOrderId,
   parseBreweryRecipeBomId,
 } from "../../../platform/breweryProjectionIds.js";
+import {
+  addMinutes,
+  BrewdaySettingsStepSchema,
+  extractBeerJsonIngredients,
+  isPositiveInt,
+  operationCode,
+  recipeBatchSize,
+  recipeCode,
+  schedulingBase,
+} from "../../../platform/breweryProjectionSchemas.js";
 import type {
   BreweryScheduleProjection,
   ProjectedBrewSession,
@@ -42,47 +51,6 @@ type ProjectedStep = {
   isDisabled: boolean;
   sortOrder: number;
   minutesPlanned: number | null;
-};
-
-const BeerJsonAmountSchema = z.object({
-  value: z.number().finite().positive(),
-  unit: z.string().min(1),
-}).passthrough();
-
-const BeerJsonIngredientAdditionSchema = z.object({
-  id: z.string().min(1).optional(),
-  name: z.string().min(1),
-  amount: BeerJsonAmountSchema,
-}).passthrough();
-
-const BeerJsonRecipePayloadSchema = z.object({
-  beerjson: z.object({
-    recipes: z.array(z.object({
-      batch_size: BeerJsonAmountSchema.optional(),
-      ingredients: z.object({
-        fermentable_additions: z.array(BeerJsonIngredientAdditionSchema).optional(),
-        hop_additions: z.array(BeerJsonIngredientAdditionSchema).optional(),
-        culture_additions: z.array(BeerJsonIngredientAdditionSchema).optional(),
-        miscellaneous_additions: z.array(BeerJsonIngredientAdditionSchema).optional(),
-      }).passthrough().optional(),
-    }).passthrough()).min(1),
-  }).passthrough(),
-}).passthrough();
-
-const BrewdaySettingsStepSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  sectionId: z.string().min(1),
-  exclude: z.boolean().optional().default(false),
-  minutes: z.number().int().positive().nullable().optional(),
-}).passthrough();
-
-type BeerJsonIngredient = {
-  id: string;
-  description: string;
-  quantity: number;
-  unit: string;
-  materialRefModule: string;
 };
 
 export class MrpBreweryProjectionService {
@@ -177,7 +145,7 @@ export class MrpBreweryProjectionService {
   private toProductionOrder(session: BrewSessionRow): ProductionOrder {
     const orderId = breweryBrewSessionProductionOrderId(session.id);
     const batchSize = recipeBatchSize(session.recipe.beerJsonRecipeJson);
-    const plannedStartAt = productionOrderStart(session);
+    const plannedStartAt = schedulingBase(session);
     const operationDurations = sourceSteps(session).map((step) => step.minutesPlanned);
     const dueAt = plannedStartAt && operationDurations.length > 0 && operationDurations.every(isPositiveInt)
       ? addMinutes(plannedStartAt, operationDurations.reduce((sum, minutes) => sum + (minutes ?? 0), 0))
@@ -226,7 +194,7 @@ export class MrpBreweryProjectionService {
         name: step.name,
         requiredResourceKind: step.sectionId,
         plannedDurationMinutes: isPositiveInt(step.minutesPlanned) ? step.minutesPlanned : null,
-        earliestStartAt: productionOrderStart(session)?.toISOString() ?? null,
+        earliestStartAt: schedulingBase(session)?.toISOString() ?? null,
         dueAt: null,
       });
     });
@@ -270,48 +238,6 @@ export class MrpBreweryProjectionService {
   }
 }
 
-function extractBeerJsonIngredients(payload: unknown): readonly BeerJsonIngredient[] {
-  const parsed = BeerJsonRecipePayloadSchema.safeParse(payload);
-  if (!parsed.success) return [];
-  const ingredients = parsed.data.beerjson.recipes[0]?.ingredients;
-  if (!ingredients) return [];
-
-  return [
-    ...ingredientGroup("fermentable", ingredients.fermentable_additions ?? []),
-    ...ingredientGroup("hop", ingredients.hop_additions ?? []),
-    ...ingredientGroup("culture", ingredients.culture_additions ?? []),
-    ...ingredientGroup("miscellaneous", ingredients.miscellaneous_additions ?? []),
-  ];
-}
-
-function ingredientGroup(
-  materialRefModule: string,
-  additions: readonly z.infer<typeof BeerJsonIngredientAdditionSchema>[],
-): BeerJsonIngredient[] {
-  return additions.map((addition, index) => ({
-    id: addition.id ?? `${materialRefModule}-${index + 1}`,
-    description: addition.name,
-    quantity: addition.amount.value,
-    unit: addition.amount.unit,
-    materialRefModule: `brewery.${materialRefModule}`,
-  }));
-}
-
-function recipeBatchSize(payload: unknown): { quantity: number; unit: string } | null {
-  const parsed = BeerJsonRecipePayloadSchema.safeParse(payload);
-  if (!parsed.success) return null;
-  const batchSize = parsed.data.beerjson.recipes[0]?.batch_size;
-  return batchSize ? { quantity: batchSize.value, unit: batchSize.unit } : null;
-}
-
-function recipeCode(recipe: RecipeRow): string {
-  return `recipe-${recipe.versionGroupId}-v${recipe.version}`;
-}
-
-function productionOrderStart(session: BrewSessionRow): Date | null {
-  return session.startedAt ?? session.scheduledDate ?? null;
-}
-
 function mapBrewSessionStatus(status: BrewSessionStatus): ProductionOrderStatus {
   switch (status) {
     case "draft":
@@ -339,20 +265,4 @@ function sourceSteps(session: BrewSessionRow): ProjectedStep[] {
       sortOrder: step.sortOrder,
       minutesPlanned: step.minutesPlanned,
     }));
-}
-
-function operationCode(step: ProjectedStep): string {
-  const stem = `${step.sectionId}-${step.sortOrder}-${step.name}`
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-  return stem || step.id;
-}
-
-function isPositiveInt(value: number | null): value is number {
-  return typeof value === "number" && Number.isInteger(value) && value > 0;
-}
-
-function addMinutes(start: Date, minutes: number): Date {
-  return new Date(start.getTime() + minutes * 60_000);
 }

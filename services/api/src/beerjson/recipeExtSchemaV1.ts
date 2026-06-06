@@ -1,0 +1,251 @@
+export const recipeExtSchemaV1 = {
+  $schema: "http://json-schema.org/draft-07/schema#",
+  $id: "https://brewery-app.local/schemas/recipeExtJson.v1.json",
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    version: { type: "number", enum: [1] },
+    /**
+     * Canonical "v1 real" recipe parameters that we want to be explicit (not defaults),
+     * even if the UI surface is still evolving.
+     */
+    batchSizeLiters: { type: "number", exclusiveMinimum: 0 },
+    brewhouseEfficiencyPercent: { type: "number", minimum: 0, maximum: 100 },
+    ogTarget: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        sg: { type: "number", minimum: 0.9, maximum: 1.3 },
+      },
+      required: ["sg"],
+    },
+    fgTarget: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        sg: { type: "number", minimum: 0.9, maximum: 1.3 },
+      },
+      required: ["sg"],
+    },
+    abvTarget: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        percent: { type: "number", minimum: 0, maximum: 100 },
+      },
+      required: ["percent"],
+    },
+    /**
+     * Recipe-scoped equipment and losses inputs for best-effort volume/gravity analysis (v0).
+     * These are intentionally pragmatic: they allow us to derive a pre-boil volume estimate
+     * and surface OG/FG/ABV/PBG without introducing a full process model yet.
+     */
+    equipment: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        kettle: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            name: { type: "string" },
+            kettleVolumeLiters: { type: "number", exclusiveMinimum: 0 },
+            kettleLossesLiters: { type: "number", minimum: 0 },
+            kettleBoilEvaporationRatePercentPerHour: { type: "number", minimum: 0, maximum: 100 },
+            kettleCoolingShrinkagePercent: { type: "number", minimum: 0, maximum: 100 },
+            kettleHopsAbsorptionLiters: { type: "number", minimum: 0 },
+          },
+        },
+        mash: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            name: { type: "string" },
+            mashVolumeLiters: { type: "number", minimum: 0 },
+            mashEfficiencyPercent: { type: "number", minimum: 0, maximum: 100 },
+            mashLossesLiters: { type: "number", minimum: 0 },
+            mashThicknessLPerKg: { type: "number", minimum: 0 },
+            mashGrainAbsorptionLPerKg: { type: "number", minimum: 0 },
+            mashWaterLeftoverLiters: { type: "number", minimum: 0 },
+          },
+        },
+        misc: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            otherLossesLiters: { type: "number", minimum: 0 },
+          },
+        },
+      },
+    },
+    /**
+     * Per-yeast-row attenuation override (%). Keyed by BeerJSON culture_additions[*].id.
+     * When present, this override is used for analysis in preference to yeast min/max.
+     */
+    yeastAttenuationOverridesPercent: {
+      type: "object",
+      additionalProperties: { type: "number", minimum: 0, maximum: 100 },
+    },
+    /**
+     * Per-yeast-row attenuation range (min/max %) from lab/ingredient DB.
+     * BeerJSON only stores a single attenuation; this preserves the range when the lab provides it.
+     */
+    yeastAttenuationRange: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          min: { type: "number", minimum: 0, maximum: 100 },
+          max: { type: "number", minimum: 0, maximum: 100 },
+        },
+        required: ["min", "max"],
+      },
+    },
+    /**
+     * Per-yeast-row pitch rate preset. Keyed by BeerJSON culture_additions[*].id.
+     * Value is a preset key (e.g. mfg_rec_0_35_ales, pro_1_0_ales).
+     */
+    yeastPitchRateOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", minLength: 1 },
+    },
+    /**
+     * Per-yeast-row fermentation temperature (°C). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastFermentationTempOverrides: {
+      type: "object",
+      additionalProperties: { type: "number", minimum: -10, maximum: 50 },
+    },
+    /**
+     * Per-yeast-row oxygenation (yes/no). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastOxygenationOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["yes", "no"] },
+    },
+    /**
+     * Per-yeast-row diacetyl rest (yes/no). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastDiacetylRestOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["yes", "no"] },
+    },
+    /**
+     * Per-yeast-row format (dry/liquid/slurry). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastFormatOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["dry", "liquid", "slurry"] },
+    },
+    /**
+     * Per-yeast-row species. Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastSpeciesOverrides: {
+      type: "object",
+      additionalProperties: {
+        type: "string",
+        enum: ["saccharomyces_cerevisiae", "saccharomyces_pastorianus", "brettanomyces", "diastaticus", "other"],
+      },
+    },
+    /**
+     * Per-yeast-row needs propagation (yes/no). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastNeedsPropagationOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["yes", "no"] },
+    },
+    /**
+     * Per-yeast-row cells per L override (B/L) for liquid/slurry. Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastCellsPerLOverrides: {
+      type: "object",
+      additionalProperties: { type: "number", exclusiveMinimum: 0 },
+    },
+    /**
+     * Per-yeast-row cells per kg override (B/kg) for dry yeast. Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastCellsPerKGOverrides: {
+      type: "object",
+      additionalProperties: { type: "number", exclusiveMinimum: 0 },
+    },
+    /**
+     * Per-yeast-row manual hemocytometer count for slurry density. Keyed by BeerJSON culture_additions[*].id.
+     * When present for slurry, derives cells_per_L and directly influences Amount (L). B is unchanged.
+     */
+    yeastManualCellCountOverrides: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          dilutionFactor: { type: "number", enum: [200, 2000] },
+          aliveCells: { type: "number", exclusiveMinimum: 0 },
+          totalCells: { type: "number", exclusiveMinimum: 0 },
+        },
+        required: ["dilutionFactor", "aliveCells", "totalCells"],
+      },
+    },
+    /**
+     * Snapshot provenance for `equipment`.
+     * - We snapshot/copy from an account-scoped equipment template (no live reference).
+     * - This records which template was copied and when, enabling an explicit “reload template” action.
+     */
+    equipmentSource: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        equipmentProfileId: { type: "string", minLength: 1 },
+        copiedAt: { type: "string", minLength: 1 },
+      },
+      required: ["equipmentProfileId", "copiedAt"],
+    },
+    /**
+     * Best-effort links from UI row IDs -> canonical Ingredient IDs.
+     * We keep these separate from BeerJSON so the canonical export stays clean.
+     */
+    ingredientLinks: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        grist: { type: "object", additionalProperties: { type: "string" } },
+        hops: { type: "object", additionalProperties: { type: "string" } },
+        yeast: { type: "object", additionalProperties: { type: "string" } },
+        misc: { type: "object", additionalProperties: { type: "string" } },
+      },
+    },
+    /**
+     * Hop form overrides keyed by BeerJSON hop_additions[*].id.
+     * Used for app-specific options not representable in BeerJSON `form` enum.
+     */
+    hopFormOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["debittered_leaf", "hop_extract"] },
+    },
+    /**
+     * Internal-only mash pH model parameters, keyed by fermentable row ID.
+     * (BeerJSON does not have a place for these today.)
+     */
+    mashPhModel: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          mashDiPh: { type: "number" },
+          mashTaToPh57_mEqPerKg: { type: "number" },
+          roastDehuskedOverride: { type: ["boolean", "null"] },
+        },
+      },
+    },
+    mashStepDeduceFromMashIn: {
+      type: "object",
+      additionalProperties: { type: "boolean" },
+    },
+    /**
+     * Manual boil time override (minutes). When present, used for analysis in preference to hop-based inference.
+     */
+    boilTimeMinutesOverride: { type: "number", minimum: 0, maximum: 600 },
+  },
+  required: ["version"],
+} as const;

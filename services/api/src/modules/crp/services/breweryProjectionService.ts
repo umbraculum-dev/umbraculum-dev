@@ -3,7 +3,6 @@
  * for CRP capacity projections until a dedicated BreweryScheduleProjection port lands (Tier B epic).
  */
 import type { BrewSessionStep, EquipmentProfile, Vessel } from "@prisma/client";
-import { z } from "zod";
 import {
   CapacityBucketSchema,
   CapacityConflictSchema,
@@ -26,6 +25,13 @@ import {
   equipmentProfileWorkCenterId,
   parseAutomationVesselResourceId,
 } from "../../../platform/breweryProjectionIds.js";
+import {
+  addMinutes,
+  isPositiveInt,
+  operationCode,
+  recipeEquipmentProfileId,
+  schedulingBase,
+} from "../../../platform/breweryProjectionSchemas.js";
 import type {
   BreweryScheduleProjection,
   ProjectedBrewSession,
@@ -42,12 +48,6 @@ type ScheduledStep = {
   resourceId: string | null;
   workCenterId: string | null;
 };
-
-const EquipmentSourceSchema = z.object({
-  equipmentSource: z.object({
-    equipmentProfileId: z.string().min(1).optional(),
-  }).passthrough().optional(),
-}).passthrough();
 
 export class CrpBreweryProjectionService {
   constructor(private readonly schedule: BreweryScheduleProjection) {}
@@ -305,15 +305,6 @@ function resolveVesselResource(
   };
 }
 
-function recipeEquipmentProfileId(recipeExtJson: unknown): string | null {
-  const parsed = EquipmentSourceSchema.safeParse(recipeExtJson);
-  return parsed.success ? parsed.data.equipmentSource?.equipmentProfileId ?? null : null;
-}
-
-function schedulingBase(session: BrewSessionWithRecipeSteps): Date | null {
-  return session.startedAt ?? session.scheduledDate ?? null;
-}
-
 function sourceSteps(session: BrewSessionWithRecipeSteps): BrewSessionStep[] {
   return session.steps
     .filter((step) => !step.isDisabled)
@@ -330,26 +321,10 @@ function mapStepStatus(status: BrewSessionStep["status"]): ScheduledOperation["s
   }
 }
 
-function operationCode(step: BrewSessionStep): string {
-  const stem = `${step.sectionId}-${step.sortOrder}-${step.name}`
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-  return stem || step.id;
-}
-
 function equipmentProfileCode(profile: EquipmentProfile): string {
   const stem = profile.name
     .toUpperCase()
     .replace(/[^A-Z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
   return stem || profile.id;
-}
-
-function isPositiveInt(value: number | null): value is number {
-  return typeof value === "number" && Number.isInteger(value) && value > 0;
-}
-
-function addMinutes(start: Date, minutes: number): Date {
-  return new Date(start.getTime() + minutes * 60_000);
 }

@@ -26,3 +26,15 @@ Notes:
 - Path-aware T2-PR green after mechanical splits across API water compute, native/web UI, packages, platform pages.
 - API vitest **332/332** with no unhandled errors.
 - WS6 burn-in: lint OK; **defer** warn→error (operator gate unchanged).
+
+## Wave 16 @ TBD (2026-06-06)
+
+```
+T2-PR acceptance @ TBD (Wave 16 SOLID hygiene): jobs=docs-readmes,lint,typecheck,dogfood-npm-smoke parallel=4 ci-parity=OK api=332/332
+```
+
+Notes:
+
+- Hygiene-band mechanical splits (250–399 LoC) across water tail, recipe-edit, API platform, brewday seed, inventory/equipment, brew-session/MRP UI, projection schemas, packages stretch.
+- API vitest **332/332** with no unhandled errors.
+- WS6 burn-in: lint OK; **defer** warn→error (operator gate unchanged).
