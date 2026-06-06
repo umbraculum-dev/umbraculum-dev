@@ -60,7 +60,7 @@ else
 fi
 
 # Keep in sync with ci_parity_version on every .github/workflows/* caller of ci-parity-reusable.yml
-CI_PARITY_PKG_VERSION="${CI_PARITY_PKG_VERSION:-1.0.10}"
+CI_PARITY_PKG_VERSION="${CI_PARITY_PKG_VERSION:-1.0.11}"
 
 run_ci_parity() {
   local cli=""

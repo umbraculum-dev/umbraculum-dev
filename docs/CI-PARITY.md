@@ -208,7 +208,7 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 **Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** follow **[`AGENTS.md`](../AGENTS.md) § ci-parity manifest / version changes** (agent-owned checklist — not optional). Summary: toolset tag publish first → bump **every** `ci_parity_version` + `CI_PARITY_PKG_VERSION` in one commit → `./scripts/ci-parity-check.sh --archive run --jobs lint,typecheck` before push.
 
-**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.10`) — do not use bare `@^1` or a built toolset `dist/cli.js` as pre-push proof unless `CI_PARITY_CLI` is set during local toolset development before npm publish. When you publish a new `@umbraculum/ci-parity`, bump **every** pin in the AGENTS.md table **and** `CI_PARITY_PKG_VERSION` in the **same commit** as manifest job-id changes.
+**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.11`) — do not use bare `@^1` or a built toolset `dist/cli.js` as pre-push proof unless `CI_PARITY_CLI` is set during local toolset development before npm publish. When you publish a new `@umbraculum/ci-parity`, bump **every** pin in the AGENTS.md table **and** `CI_PARITY_PKG_VERSION` in the **same commit** as manifest job-id changes.
 
 **Before `sdk-batch-v*` or `sdk-contracts-v*` tag push:** `./scripts/ci-parity-check.sh run --jobs docs-readmes,sdk-publish-prep,dogfood-npm-smoke` (or full ci-parity).
 

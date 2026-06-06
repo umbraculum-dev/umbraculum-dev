@@ -102,8 +102,8 @@ run_native_step() {
       (cd "$REPO_ROOT" && ./scripts/docker-npm-run.sh -r 'npm run build -w @umbraculum/docs-site')
       ;;
     check-web-url-segments)
-      echo "==> [check-web-url-segments] npm run check-web-url-segments"
-      (cd "$REPO_ROOT" && npm run check-web-url-segments)
+      echo "==> [check-web-url-segments] npm run check-web-url-segments (container)"
+      (cd "$REPO_ROOT" && ./scripts/docker-npm-run.sh -r 'npm run check-web-url-segments')
       ;;
     *)
       echo "verify-slice: unknown native step ${step_id}" >&2
