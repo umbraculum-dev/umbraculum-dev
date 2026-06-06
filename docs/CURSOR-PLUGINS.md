@@ -305,8 +305,10 @@ Node/npm execution, and frontend known-issues patterns.
 
 **Verification tiers (umbraculum-dev):** after TS edits, use skills
 `verify-slice-runbook` (T0/T1) and `scoped-package-build-in-docker` before
-declaring done; T2 uses `ci-parity-local-reproduction` +
-`api-integration-tests-pre-push`. Rule `76-verification-tiers-gate.mdc`.
+declaring done; T2-PR uses **`path-aware-pre-push`** (default:
+`npm run verify:pre-push`); T2-release uses `ci-parity-local-reproduction`
+(`--full` / `verify:pre-push:release`). API vitest auto-runs from T2-PR when
+triggered; else `api-integration-tests-pre-push`. Rule `76-verification-tiers-gate.mdc`.
 Repo doc: [`docs/VERIFICATION-TIERS.md`](../docs/VERIFICATION-TIERS.md).
 
 **Docs-site rules (umbraculum-dev):** `73-website-static-build-before-preview.mdc` (rebuild brochure `dist/` before preview); `74-docusaurus-swizzle-over-css-fights.mdc` (swizzle theme components instead of fighting `custom.css` — see [`docs-site/README.md`](../docs-site/README.md) § Theme customization).

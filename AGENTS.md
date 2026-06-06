@@ -283,12 +283,18 @@ not the human contributor. Do not end a session with "before you push, run …".
 
 1. **Commit** all intended changes (ci-parity archive mode tests **committed**
    tree only — uncommitted fixes can hide broken `HEAD`).
-2. With a **clean working tree**, run **`npm run verify:pre-push`** (T2-PR: path-aware
-   parallel ci-parity + native companions) or **`npm run verify:pre-push:release`**
-   (T2-release: full sequential manifest) when manifest/ci-parity pins or SDK tags
-   change (see [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § T2-PR vs T2-release).
+2. With a **clean working tree**, run the pre-push gate (same commands for agents and human contributors):
+
+```bash
+npm run verify:pre-push              # T2-PR — default
+npm run verify:pre-push:release      # T2-release — manifest / SDK tags / ci-parity pins
+npm run validate:gha-triggers        # optional: drift check for trigger-map editors
+python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master
+```
+
    `verify:pre-push` selects `--archive` automatically when the tree is clean.
    On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@<same-version-as-CI_PARITY_PKG_VERSION> -- run --archive` (read `CI_PARITY_PKG_VERSION` from [`scripts/ci-parity-check.sh`](scripts/ci-parity-check.sh)).
+   Skill: **`path-aware-pre-push`**. Full table: [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § Pre-push commands reference.
 3. T2-PR **auto-runs API vitest** when the diff matches `.github/workflows/api.yml`
    paths (via `.umbraculum/gha-trigger-map.json`). For manifest-only work outside
    the resolver, still run skill **`api-integration-tests-pre-push`** when applicable.

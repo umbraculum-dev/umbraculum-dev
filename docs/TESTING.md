@@ -25,7 +25,7 @@ Layers describe **what** to test; [VERIFICATION-TIERS.md](VERIFICATION-TIERS.md)
 |------|----------------|---------------|
 | T0 | L1, quick API unit | `npm run verify:*` with `--tier T0`, or `docker compose exec api npm run test:unit` |
 | T1 | L1–L4 scoped | `npm run verify:from-diff`, `npm run verify:openapi`, etc. |
-| T2 | ci-parity + GHA `api.yml` | `npm run verify:pre-push` + **`api-integration-tests-pre-push`** skill |
+| T2 | ci-parity + GHA `api.yml` | `npm run verify:pre-push` (T2-PR; API vitest auto-runs when triggered) |
 
 See [VERIFICATION-TIERS.md](VERIFICATION-TIERS.md) for the full change-surface matrix.
 

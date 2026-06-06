@@ -44,6 +44,18 @@ The module SDK ([`packages/module-sdk/README.md`](packages/module-sdk/README.md)
 
 Public docs use **`$REPO_ROOT`** for the monorepo clone directory (for example `~/src/umbraculum-dev`). Set it once per shell: `export REPO_ROOT=~/src/umbraculum-dev`. Docker examples mount `-v "$REPO_ROOT:/repo"`. Per-developer paths belong in gitignored `DEVELOPMENT-LOCAL.md`, not in Tier: Public prose.
 
+## Pre-push commands (T2 — contributors and agents)
+
+Commit first; working tree clean. From repo root:
+
+```bash
+npm run verify:pre-push              # default before push (T2-PR)
+npm run verify:pre-push:release      # manifest / SDK tags / ci-parity pin changes
+npm run validate:gha-triggers        # when editing workflow paths: or trigger map
+```
+
+Inspect resolved jobs: `python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master`. WIP iteration only: `./scripts/ci-parity-check.sh run` (not push proof). See [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § Pre-push commands reference and [`docs/VERIFICATION-TIERS.md`](docs/VERIFICATION-TIERS.md).
+
 ## Policies (apply by default)
 
 - **Node / npm container-only.** Do not run `node` / `npm` / `npx` on the host for project commands. Run inside the `api` or `web` containers via `docker compose exec -T <service> ...`. See the `node-npm-container-only` skill.

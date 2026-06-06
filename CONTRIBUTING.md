@@ -27,6 +27,10 @@ translations, and thoughtful issue triage.
   monorepo; selected SDK packages may be MIT — see the licensing doc).
 - Read [`DEVELOPMENT.md`](./DEVELOPMENT.md), and if it exists in your
   checkout, the project-local addendum `DEVELOPMENT-LOCAL.md`.
+- **Before you push:** commit, then run **`npm run verify:pre-push`** from repo
+  root (T2-PR — path-aware parallel ci-parity; same command agents use). Manifest
+  / SDK tag prep: **`npm run verify:pre-push:release`**. See
+  [`docs/CI-PARITY.md`](./docs/CI-PARITY.md) § Pre-push commands reference.
 - Read [`docs/CODING-STANDARDS.md`](./docs/CODING-STANDARDS.md) §
   **Architectural coupling** — mandatory dependency-direction and
   route/service discipline (SOLID as repo-native boundaries; P0 sibling

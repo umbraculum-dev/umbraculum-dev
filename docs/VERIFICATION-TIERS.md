@@ -29,6 +29,19 @@ From repo root:
 | `npm run verify:pre-push:release` | T2-release | Full sequential ci-parity manifest — SDK tags, manifest/pin changes |
 | `npm run validate:gha-triggers` | — | Drift check: `.umbraculum/gha-trigger-map.json` vs GHA workflow `paths:` |
 
+### Pre-push commands reference (contributors and agents)
+
+Commit first; working tree must be clean for archive replay.
+
+```bash
+npm run verify:pre-push              # T2-PR — default before every push
+npm run verify:pre-push:release      # T2-release — manifest / SDK tags / ci-parity pins
+npm run validate:gha-triggers        # drift check (also runs in ci-parity-validate GHA)
+python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master
+```
+
+WIP only (not push proof): `./scripts/ci-parity-check.sh run`. Full detail: [`docs/CI-PARITY.md`](CI-PARITY.md) § Pre-push commands reference. Agents: skill `path-aware-pre-push`.
+
 Lower-level drivers:
 
 ```bash

@@ -85,25 +85,31 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 | API vitest | Auto-runs when `api.yml` paths match | Not auto-run — use `api-integration-tests-pre-push` when needed |
 | Typical wall clock | ~max(job times) + archive overhead (~3–5 min) | ~sum(job times) (~8–15 min) |
 
-**Resolver:** `.umbraculum/gha-trigger-map.json` mirrors GHA `paths:` filters. Inspect resolved jobs:
+## Pre-push commands reference (contributors and agents)
 
-```bash
-python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master
-npm run validate:gha-triggers   # CI + local drift check vs workflow YAML
-```
+**Prerequisite:** commit first; working tree clean (archive mode tests committed `HEAD` only).
 
-**Parallel + isolated install:** concurrent ci-parity jobs must not share `umbraculum_root_node_modules` — parallel T2-PR skips that volume (each container gets ephemeral `/repo/node_modules`) but keeps warm `umbraculum_npm_cache`.
+| Goal | Command |
+|------|---------|
+| **Default before push (T2-PR)** | `npm run verify:pre-push` |
+| Manifest / SDK tag / ci-parity pin changes (T2-release) | `npm run verify:pre-push:release` |
+| Inspect which jobs the diff would run | `python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master` |
+| Validate trigger map vs GHA workflow `paths:` | `npm run validate:gha-triggers` |
+| WIP iteration only (not push proof) | `./scripts/ci-parity-check.sh run` |
+| Low-level parallel ci-parity subset | `./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,docs-readmes` |
 
-```bash
-./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,docs-readmes
-```
+**Agents:** run T2-PR yourself before push — do not tell the contributor to run it. Skill: `path-aware-pre-push` (toolset). Human contributors use the same commands from repo root (host needs `git`, Docker, Node for the wrapper — jobs run in `node:20-slim`).
 
-Stable agent output lines:
+**Stable output lines** (agents parse these):
 
 ```
 VERIFY-SLICE T2-PR @ abc1234: ci-parity=OK jobs=lint,typecheck,docs-readmes parallel=3 api=OK
 VERIFY-SLICE T2-release @ abc1234: ci-parity=OK jobs=docs-readmes,lint,typecheck,sdk-publish-prep,dogfood-npm-smoke
 ```
+
+**Resolver source:** `.umbraculum/gha-trigger-map.json` mirrors GHA `paths:` filters.
+
+**Parallel + isolated install:** concurrent ci-parity jobs must not share `umbraculum_root_node_modules` — T2-PR skips that volume (each job gets its own snapshot copy + ephemeral `/repo/node_modules`) but keeps warm `umbraculum_npm_cache`.
 
 Dev-container checks use a different `node_modules` layout than CI (hoisting splits). **Never treat dev-container green as proof CI will pass.**
 
