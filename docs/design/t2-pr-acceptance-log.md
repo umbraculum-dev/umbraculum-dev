@@ -38,3 +38,15 @@ Notes:
 - Hygiene-band mechanical splits (250–399 LoC) across water tail, recipe-edit, API platform, brewday seed, inventory/equipment, brew-session/MRP UI, projection schemas, packages stretch.
 - API vitest **332/332** with no unhandled errors.
 - WS6 burn-in: lint OK; **defer** warn→error (operator gate unchanged).
+
+## Wave 17 @ 54b4f06 (2026-06-04)
+
+```
+T2-PR acceptance @ 54b4f06 (Wave 17 SOLID tail parity): jobs=docs-readmes,lint,typecheck,dogfood-npm-smoke ci-parity=OK api=332/332
+```
+
+Notes:
+
+- Tail parity (220–249 LoC web/native), CRP/MRP projection finish, API leftovers + near-threshold splits, packages/ui, Tier A route thinning (AuthService + WaterCalcRouteService), test file hygiene (400+ LoC vitest barrels).
+- API vitest **332/332** with no unhandled errors.
+- WS6 burn-in: lint OK; boundaries B5 **0** violations on `services/api/src/modules`; **defer** warn→error (operator gate unchanged).
