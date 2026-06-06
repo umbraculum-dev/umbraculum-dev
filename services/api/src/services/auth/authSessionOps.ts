@@ -14,7 +14,6 @@ import type { AuthServiceDeps } from "../authService.js";
 import {
   AuthSignupRequestSchema,
   AuthLoginRequestSchema,
-  AuthPreferencesPatchRequestSchema,
 } from "@umbraculum/contracts";
 import {
   makeOpaqueId,
