@@ -100,6 +100,8 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 
 **Agents:** run T2-PR yourself before push — do not tell the contributor to run it. Skill: `path-aware-pre-push` (toolset). Human contributors use the same commands from repo root (host needs `git`, Docker, Node for the wrapper — jobs run in `node:20-slim`).
 
+**SOLID / dependency direction:** The 2026 mechanical SOLID program is **closed** (S hygiene + WS5/WS6 D enforcement). The **`lint` job** in T2-PR enforces `eslint-plugin-boundaries` (B5 API modules, WS5 apps) and WS6 client-safe imports at **`error`** when the diff touches eslint surface. No separate SOLID pre-push tier — see [solid-post-wave17-closure.md](design/solid-post-wave17-closure.md) and [AGENTS.md](../AGENTS.md) § SOLID and dependency direction (D).
+
 **Stable output lines** (agents parse these):
 
 ```

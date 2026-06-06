@@ -228,6 +228,47 @@ user's explicit choice.
 This file's single job is: ensure the agent confirms the apparatus is
 present *before* it starts producing changes.
 
+## SOLID and dependency direction (D)
+
+Umbraculum uses **repo-native** SOLID — dependency *direction* and single
+ownership, not generic DI-container dogma. **D (Dependency)** here means:
+high-level policy (UI, routes) must not import low-level implementation
+(server source, sibling feature folders, Prisma). Communication crosses
+**HTTP + Zod contracts** (`@umbraculum/api-client`, `*-contracts`), not
+TypeScript paths into `services/api/**`.
+
+**Read when touching `apps/**`, `services/api/src/modules/**`, or
+cross-package imports:**
+
+| Topic | Document |
+|-------|----------|
+| S-O-L-I-D rubric | [`docs/design/solid-audit-charter.md`](docs/design/solid-audit-charter.md) §2 (mapping), §11 (WS5 apps) |
+| Program status (S closed; D enforced) | [`docs/design/solid-post-wave17-closure.md`](docs/design/solid-post-wave17-closure.md) §4, §7–§8 |
+| Findings + Tier A/B/C backlog | [`docs/design/solid-decoupling-audit.md`](docs/design/solid-decoupling-audit.md) |
+| Layer taxonomy | [`docs/design/application-surfaces-vs-platform-backbone.md`](docs/design/application-surfaces-vs-platform-backbone.md) |
+| Client vs server data access | [`docs/DATA-ACCESS-BOUNDARIES.md`](docs/DATA-ACCESS-BOUNDARIES.md) §6 |
+| Lint rules + how to fix violations | [`docs/LINTING.md`](docs/LINTING.md) — [Canonical module boundaries](docs/LINTING.md#canonical-module-boundaries), [App layer boundaries (WS5)](docs/LINTING.md#app-layer-boundaries-ws5), [Client-safe (WS6)](docs/LINTING.md#client-safe-package-imports-ws6) |
+
+**Mechanical enforcement (CI-blocking `error` on `lint`):**
+
+| Rule | Scope | Spike |
+|------|-------|-------|
+| **B5** `boundaries/element-types` | Sibling canonical modules (`services/api/src/modules/**`) | [`solid-boundaries-eslint-spike.md`](docs/design/solid-boundaries-eslint-spike.md) |
+| **WS5** `boundaries/element-types` | App segment / locale vertical fences (`apps/{web,native}/**`) | [`solid-boundaries-eslint-apps-spike.md`](docs/design/solid-boundaries-eslint-apps-spike.md) |
+| **WS6** `no-restricted-imports` | Apps → no `@prisma/*`, no `services/api/**` source | [`solid-client-safe-imports-spike.md`](docs/design/solid-client-safe-imports-spike.md) |
+
+**Apparatus rule (glob-attached when editing matching paths):**
+`03-layering-and-coupling-discipline.mdc` in
+`umbraculum-platform-tsjs-cursor-assistant` — dependency direction,
+`@arch-boundary` for rare intentional coupling.
+
+**Report-only drift (not push proof):** `npm run audit:solid-inventory`.
+
+**Agent discipline:** Do **not** schedule mechanical S hygiene waves (Wave
+18+). Split opportunistically on feature work. Do **not** import
+`services/api/**` or sibling segments to “save time” — move shared code to
+`_lib` / `_hooks` or a `@umbraculum/*` package instead.
+
 ## Adjacent context for plan authors and executors
 
 This file deliberately doesn't carry the deeper *"how do I draft a plan

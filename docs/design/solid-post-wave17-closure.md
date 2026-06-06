@@ -32,6 +32,8 @@ The mechanical Wave 11–17 program is **closed**. Do **not** schedule Wave 18+ 
 | Tier B | God services, recipe-edit shells, projection port, thin routes, B5 CI | Child plans B1–B5 |
 | Waves 15–17 | Hygiene band + tail parity + Tier A route thinning + test barrels | `54b4f06`, `bfd6214` |
 | S closure epic | Composer thinning, WS6 promotion, water/brew-session tail | This doc + successor commits |
+| WS5 app boundaries | Locale vertical + recipe-cluster fences; LINTING + charter §11 | `97f583d` |
+| Agent SOLID/D gate | `AGENTS.md` § SOLID and dependency direction (D); toolset `03-layering-and-coupling-discipline.mdc` | post-WS5 |
 
 Regenerate inventory after structural changes:
 
@@ -93,6 +95,7 @@ These gates **already exist**. They are **not** a new SOLID initiative — agent
 
 ### Agent rules
 
+0. **Dependency-direction work** — read [AGENTS.md](../../AGENTS.md) § SOLID and dependency direction (D) and charter §2 before adding cross-folder imports in apps or canonical modules.
 1. **Agents run T2 before push** — never delegate to the operator. See [AGENTS.md](../../AGENTS.md) § Pre-push CI parity.
 2. Use **`./scripts/ci-parity-check.sh`** — not bare `npx @umbraculum/ci-parity` (Cursor AppImage PATH issue).
 3. **Do not** schedule Wave 18+ proactively; run inventory on large merges instead.

@@ -66,7 +66,7 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 | `docs-site/**` (pages, sidebars, static OpenAPI mirror) | — | `./scripts/verify-slice.sh --tier T1 --slice docs-site` | `npm run verify:pre-push` when `docs-site-build` paths match |
 | SDK / multi-package dist | — | `./scripts/check-packages-dist-up-to-date.sh` | `npm run verify:pre-push:release` (`sdk-publish-prep` job) |
 | Unknown mixed diff | — | `npm run verify:from-diff` | `npm run verify:pre-push` |
-| SOLID hygiene / refactor PRs | scoped typecheck | `./scripts/verify-slice.sh --tier T1` as needed | `npm run verify:pre-push` — see [solid-post-wave17-closure.md](design/solid-post-wave17-closure.md) §6 |
+| SOLID hygiene / refactor PRs | scoped typecheck | `./scripts/verify-slice.sh --tier T1` as needed | `npm run verify:pre-push` — **D enforcement** (B5/WS5/WS6) via `lint` job when eslint surface changes; program closed — [solid-post-wave17-closure.md](design/solid-post-wave17-closure.md) §4–§8, [AGENTS.md](../AGENTS.md) § SOLID and dependency direction (D) |
 
 **Hard rule:** T0/T1 never run root `npm ci` unless the lockfile changed or you pass `--fresh` to `build-package-in-docker.sh`.
 

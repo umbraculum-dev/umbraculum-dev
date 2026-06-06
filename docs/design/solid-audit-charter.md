@@ -134,6 +134,8 @@ Mechanical Waves 11–17 and the Tier A/B implementation epic are **complete**. 
 
 Apps (`apps/web`, `apps/native`) enforce **Dependency (D)** direction via `eslint-plugin-boundaries` at **`error`**: no `services/api/**` source imports, no sibling feature-segment imports (water mash↔boil, native module↔module), and no cross-locale-vertical imports (`(pim)` ↔ `(mrp)` etc.). Belt-and-suspenders WS6 `no-restricted-imports` blocks `@prisma/*` and deep API paths by pattern.
 
+**Agent gate:** [AGENTS.md](../../AGENTS.md) § SOLID and dependency direction (D).
+
 **Contributor docs:** [LINTING.md § App layer boundaries (WS5)](../LINTING.md#app-layer-boundaries-ws5), [solid-boundaries-eslint-apps-spike.md](./solid-boundaries-eslint-apps-spike.md), [DATA-ACCESS-BOUNDARIES.md](../DATA-ACCESS-BOUNDARIES.md) §6.
 
 ---

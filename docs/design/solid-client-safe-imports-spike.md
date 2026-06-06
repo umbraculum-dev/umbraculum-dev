@@ -1,7 +1,7 @@
 # SOLID client-safe imports spike — WS6 eslint burn-in
 
 **Tier:** Internal  
-**Status:** Burn-in (2026-06-05) — Wave 11 deliverable  
+**Status:** Promoted to **`error`** (S closure epic 2026-06-06) — was warn burn-in from Wave 11.  
 **Audience:** app authors, CI maintainers  
 **Related:** [DATA-ACCESS-BOUNDARIES.md](../DATA-ACCESS-BOUNDARIES.md) §6, [solid-audit-inventory.md](./solid-audit-inventory.md), [LINTING.md](../LINTING.md)
 
@@ -30,7 +30,7 @@ Grep of both package trees: zero `@prisma`, zero `services/api` imports.
 |----------|------|
 | [`scripts/eslint/appClientPackageAllowlist.mjs`](../../scripts/eslint/appClientPackageAllowlist.mjs) | Single source of truth for inventory + future strict rule |
 | [`scripts/audit/solid-inventory.ts`](../../scripts/audit/solid-inventory.ts) | Imports shared allowlist |
-| [`eslint.config.mjs`](../../eslint.config.mjs) WS6 block | `no-restricted-imports` **warn** for `@prisma/*` and `**/services/api/**` in apps |
+| [`eslint.config.mjs`](../../eslint.config.mjs) WS6 block | `no-restricted-imports` at **`error`** for `@prisma/*` and `**/services/api/**` in apps (promoted S closure epic 2026-06) |
 | [DATA-ACCESS-BOUNDARIES.md](../DATA-ACCESS-BOUNDARIES.md) §6 | Documents client-safe vertical packages |
 
 ---
@@ -64,4 +64,4 @@ Grep of both package trees: zero `@prisma`, zero `services/api` imports.
 |-------|-------|
 | Date | 2026-06-05 |
 | Subplan | WS6 / Wave 11 Phase 5 |
-| Verdict | **SOUND** (warn shipped; error deferred) |
+| Verdict | **SOUND** — promoted to **`error`** (S closure epic 2026-06-06); see [solid-post-wave17-closure.md](./solid-post-wave17-closure.md) §7 |

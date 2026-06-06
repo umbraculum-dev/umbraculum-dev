@@ -252,6 +252,8 @@ Rows in §3 referencing ~1.2k LoC `recipesService` / `brewSessionsService`, ~3.8
 - God services decomposed to facades + focused services under `services/api/src/services/`.
 - God pages reduced to thin shells (~9 LoC) + hooks/components.
 - Inventory automation: **P2=0, P3=0**; P1 = generated OpenAPI only.
+- **D enforcement:** B5 (API modules), WS5 (apps), WS6 (client-safe imports) all at **`error`** — verified via T2-PR `lint` job.
+- **Agent gate:** [AGENTS.md](../../AGENTS.md) § SOLID and dependency direction (D).
 
 **Canonical program status:** [solid-post-wave17-closure.md](./solid-post-wave17-closure.md).
 
