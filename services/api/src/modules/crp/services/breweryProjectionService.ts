@@ -1,3 +1,7 @@
+/**
+ * @arch-boundary Cross-schema read of brewery brew sessions, equipment, and automation vessels
+ * for CRP capacity projections until a dedicated BreweryScheduleProjection port lands (Tier B epic).
+ */
 import type { BrewSessionStep, EquipmentProfile, Vessel } from "@prisma/client";
 import { z } from "zod";
 import {

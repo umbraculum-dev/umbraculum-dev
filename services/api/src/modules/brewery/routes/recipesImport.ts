@@ -14,10 +14,10 @@ import {
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { BadRequestError } from "../../../errors.js";
 import { RecipesService } from "../../../services/recipesService.js";
+import { RecipesImportService } from "../../../services/recipes/recipesImportOps.js";
 import {
   parseSingleImportContent,
   parseBulkImportContent,
-  resolveBjcp2021Style,
   type ImportFormat,
 } from "../../../services/recipesImportService.js";
 import { validateBeerJsonDoc } from "../../../beerjson/index.js";
@@ -28,6 +28,7 @@ const RECIPES_IMPORT_BULK_MAX_BYTES = 5 * 1024 * 1024;
 export function recipesImportRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const recipes = new RecipesService(app.prisma);
+  const recipeImport = new RecipesImportService(app.prisma);
 
   zodApp.post(
     "/recipes/import/preview",
@@ -130,7 +131,7 @@ export function recipesImportRoutes(app: FastifyInstance) {
       const items = parseBulkImportContent(format, content);
       const previewItems = [];
       for (const it of items) {
-        const resolved = await resolveBjcp2021Style(app.prisma, it.styleCandidate);
+        const resolved = await recipeImport.resolveStyle(it.styleCandidate);
         previewItems.push({
           index: it.index,
           name: it.recipeName,
@@ -189,7 +190,7 @@ export function recipesImportRoutes(app: FastifyInstance) {
 
       for (const it of items) {
         try {
-          const resolved = await resolveBjcp2021Style(app.prisma, it.styleCandidate);
+          const resolved = await recipeImport.resolveStyle(it.styleCandidate);
           const recipe = await recipes.createRecipe(ctx.userId, ctx.activeWorkspaceId, {
             name: it.recipeName,
             styleKey: resolved.styleKey,

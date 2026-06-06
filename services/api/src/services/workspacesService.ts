@@ -47,5 +47,13 @@ export class WorkspacesService {
 
     return workspace;
   }
+
+  async patchBrandKey(workspaceId: string, brandKey: string) {
+    return this.prisma.workspace.update({
+      where: { id: workspaceId },
+      data: { brandKey },
+      select: { id: true, name: true, brandKey: true },
+    });
+  }
 }
 

@@ -1,7 +1,7 @@
 # SOLID audit inventory
 
 **Tier:** Internal  
-**Status:** Generated snapshot (2026-06-05) — regenerate with `npm run audit:solid-inventory`  
+**Status:** Generated snapshot (2026-06-06) — regenerate with `npm run audit:solid-inventory`  
 **Audience:** auditors, module authors, agents  
 **Related:** [solid-audit-charter.md](./solid-audit-charter.md), [solid-decoupling-audit.md](./solid-decoupling-audit.md)
 
@@ -13,12 +13,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Files scanned | 1169 |
+| Files scanned | 1189 |
 | Roots | `services/api/src`, `packages`, `apps/web/app`, `apps/native/src` |
 | P0 findings | 0 |
 | P1 findings | 2 |
 | P2 findings | 0 |
-| P3 findings | 1 |
+| P3 findings | 0 |
 
 ---
 
@@ -28,7 +28,6 @@
 |------|-----|-------|------------|----------|--------|------------------|
 | `packages/api-client/src/generated/platform.openapi.ts` | 10161 | Packages | S, I | P1 | file size 10161 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 | `packages/api-client/src/generated/brewery.openapi.ts` | 4895 | Packages | S, I | P1 | file size 4895 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
-| `services/api/src/seed/sources/beerproto/beerproto.ts` | 461 | Other | S, I | P3 | file size 461 LoC | Review logical cohesion |
 
 ---
 

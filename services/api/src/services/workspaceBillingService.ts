@@ -97,5 +97,13 @@ export class WorkspaceBillingService {
       throw new ForbiddenError("not_admin", "Admin role required");
     }
   }
+
+  async countDistinctRecipeVersionGroups(workspaceId: string): Promise<number> {
+    const recipeGroups = await this.prisma.recipe.groupBy({
+      by: ["versionGroupId"],
+      where: { workspaceId },
+    });
+    return recipeGroups.length;
+  }
 }
 

@@ -7,19 +7,21 @@ import {
   IntegrationWorkspaceKindParamsSchema,
 } from "@umbraculum/contracts";
 
-import { ForbiddenError, NotFoundError } from "../errors.js";
-import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { IntegrationsService } from "../services/integrationsService.js";
 import { WorkspacesService } from "../services/workspacesService.js";
-
-function integrationPublicPath(kind: string, token: string): string {
-  return `/api/integrations/${encodeURIComponent(kind)}/${encodeURIComponent(token)}`;
-}
+import {
+  buildIntegrationRevealPayload,
+  requireIntegrationWorkspaceIdParam,
+  requireIntegrationWorkspaceParam,
+} from "./_helpers/integrationRouteHelpers.js";
 
 export function integrationsRevealRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const integrations = new IntegrationsService(app.prisma);
   const workspaces = new WorkspacesService(app.prisma);
+
+  const requireActiveWorkspaceParam = (req: Parameters<typeof requireIntegrationWorkspaceParam>[0]) =>
+    requireIntegrationWorkspaceParam(req, workspaces);
 
   zodApp.get(
     "/workspaces/:workspaceId/integrations/:kind/reveal",
@@ -37,33 +39,10 @@ export function integrationsRevealRoutes(app: FastifyInstance) {
       },
     },
     async (req) => {
-      const ctx = requireActiveWorkspace(req);
-      const { workspaceId, kind } = req.params;
-
-      if (workspaceId !== ctx.activeWorkspaceId) {
-        throw new ForbiddenError("workspace_mismatch", "Active workspace does not match requested workspace");
-      }
-      await workspaces.assertMembership(ctx.userId, workspaceId);
-
-      const integration = await app.prisma.integration.findFirst({
-        where: { workspaceId, kind, revokedAt: null },
-        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-        select: { id: true, tokenVersion: true },
-      });
-      if (!integration) throw new NotFoundError("missing_integration", "Integration not configured");
-
-      const token = integrations.deriveToken({
-        integrationId: integration.id,
-        tokenVersion: integration.tokenVersion,
-      });
-
-      return IntegrationRevealResponseSchema.parse({
-        ok: true,
-        integrationId: integration.id,
-        kind,
-        token,
-        publicPath: integrationPublicPath(kind, token),
-      });
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const { kind } = req.params;
+      const payload = await buildIntegrationRevealPayload(integrations, workspaceId, kind);
+      return IntegrationRevealResponseSchema.parse(payload);
     },
   );
 
@@ -84,33 +63,9 @@ export function integrationsRevealRoutes(app: FastifyInstance) {
       },
     },
     async (req) => {
-      const ctx = requireActiveWorkspace(req);
-      const { workspaceId } = req.params;
-
-      if (workspaceId !== ctx.activeWorkspaceId) {
-        throw new ForbiddenError("workspace_mismatch", "Active workspace does not match requested workspace");
-      }
-      await workspaces.assertMembership(ctx.userId, workspaceId);
-
-      const integration = await app.prisma.integration.findFirst({
-        where: { workspaceId, kind: "tilt", revokedAt: null },
-        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-        select: { id: true, tokenVersion: true },
-      });
-      if (!integration) throw new NotFoundError("missing_integration", "Integration not configured");
-
-      const token = integrations.deriveToken({
-        integrationId: integration.id,
-        tokenVersion: integration.tokenVersion,
-      });
-
-      return IntegrationRevealResponseSchema.parse({
-        ok: true,
-        integrationId: integration.id,
-        kind: "tilt",
-        token,
-        publicPath: integrationPublicPath("tilt", token),
-      });
+      const { workspaceId } = await requireIntegrationWorkspaceIdParam(req, workspaces);
+      const payload = await buildIntegrationRevealPayload(integrations, workspaceId, "tilt");
+      return IntegrationRevealResponseSchema.parse(payload);
     },
   );
 }

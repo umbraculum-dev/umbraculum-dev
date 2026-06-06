@@ -30,7 +30,9 @@ export const renderingRuntimePlugin = fp((app: FastifyInstance) => {
       service,
       logger: app.log,
       workerEnabled: process.env['RENDERING_WORKER_DISABLED'] !== "1",
-      ...(process.env['NODE_ENV'] === "test" ? { queueName: "rendering.jobs.test" } : {}),
+      ...(process.env['NODE_ENV'] === "test"
+        ? { queueName: process.env['RENDERING_QUEUE_NAME']?.trim() || "rendering.jobs.test" }
+        : {}),
     };
     queueRuntime = createRenderingQueueRuntime(queueOptions);
     service.setQueue(queueRuntime);

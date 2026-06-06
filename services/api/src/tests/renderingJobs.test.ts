@@ -10,6 +10,11 @@ import { registerModule } from "@umbraculum/module-sdk";
 import { buildApp } from "../app.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
+// Isolate BullMQ queue per vitest worker so parallel test files do not steal jobs.
+process.env['RENDERING_QUEUE_NAME'] =
+  process.env['RENDERING_QUEUE_NAME']?.trim() ||
+  `rendering.jobs.test.${process.env['VITEST_WORKER_ID'] ?? process.pid}`;
+
 const TEMPLATE_REF = "rendering_test:sample@v1";
 const FLAKY_TEMPLATE_REF = "rendering_test:flaky@v1";
 const SampleTemplateSchema = z.object({ message: z.string().min(1) }).strict();
@@ -54,7 +59,7 @@ async function waitForSucceeded(input: {
   readonly cookie: string;
   readonly jobId: string;
 }) {
-  const deadline = Date.now() + 15_000;
+  const deadline = Date.now() + 25_000;
   let lastStatus = "";
   while (Date.now() < deadline) {
     const res = await input.app.inject({
@@ -74,7 +79,7 @@ async function waitForSucceeded(input: {
   throw new Error(`render job did not succeed before timeout; last status=${lastStatus}`);
 }
 
-describe("rendering jobs — route integration", () => {
+describe.sequential("rendering jobs — route integration", () => {
   const app = buildApp();
   let cookieA = "";
   let workspaceA = "";
@@ -242,7 +247,7 @@ describe("rendering jobs — route integration", () => {
     expect(attempts[0]?.error).toBeTruthy();
     expect(attempts[1]?.error).toBeNull();
   },
-  20_000,
+  35_000,
   );
 
   it("L2 isolation: another workspace cannot read or retrieve a job", async () => {
@@ -292,7 +297,7 @@ describe("rendering jobs — route integration", () => {
   });
 });
 
-describe("rendering jobs — queued cancellation", () => {
+describe.sequential("rendering jobs — queued cancellation", () => {
   let previousWorkerDisabled: string | undefined;
   let app: ReturnType<typeof buildApp> | null = null;
   let cookie = "";

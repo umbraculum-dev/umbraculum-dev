@@ -107,11 +107,7 @@ export function workspacesRoutes(app: FastifyInstance) {
         throw new BadRequestError("not_admin", "Admin role required");
       }
 
-      const updated = await app.prisma.workspace.update({
-        where: { id: workspaceId },
-        data: { brandKey: req.body.brandKey },
-        select: { id: true, name: true, brandKey: true },
-      });
+      const updated = await workspaces.patchBrandKey(workspaceId, req.body.brandKey);
       return WorkspaceBrandPatchResponseSchema.parse({ ok: true, workspace: updated });
     },
   );

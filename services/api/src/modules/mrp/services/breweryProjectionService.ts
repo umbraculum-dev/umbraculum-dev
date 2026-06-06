@@ -1,3 +1,7 @@
+/**
+ * @arch-boundary Cross-schema read of brewery brew sessions/recipes for MRP production-order
+ * projections until a dedicated BreweryScheduleProjection port lands (Tier B epic).
+ */
 import type { BrewSessionStatus } from "@prisma/client";
 import { z } from "zod";
 import {

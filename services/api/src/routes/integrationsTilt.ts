@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
   BrewSessionsRecentQuerySchema,
@@ -15,99 +15,52 @@ import {
   IntegrationWorkspaceIdParamsSchema,
 } from "@umbraculum/contracts";
 
-import { ForbiddenError, NotFoundError } from "../errors.js";
-import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { IntegrationsService } from "../services/integrationsService.js";
 import { WorkspacesService } from "../services/workspacesService.js";
+import {
+  createOrRotateIntegration,
+  getIntegrationForWorkspace,
+  listIntegrationDevices,
+  revokeIntegration,
+  rotateIntegrationToken,
+} from "./_helpers/integrationCrudHandlers.js";
+import { requireActiveWorkspaceIntegration, requireIntegrationWorkspaceIdParam } from "./_helpers/integrationRouteHelpers.js";
 
-function integrationPublicPath(token: string): string {
-  return `/api/integrations/tilt/${encodeURIComponent(token)}`;
-}
+const TILT = "tilt" as const;
+const TILT_MISSING = "Tilt integration not configured";
 
 export function integrationsTiltRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const integrations = new IntegrationsService(app.prisma);
   const workspaces = new WorkspacesService(app.prisma);
 
-  async function requireActiveWorkspaceParam(req: FastifyRequest): Promise<{ userId: string; workspaceId: string }> {
-    const ctx = requireActiveWorkspace(req);
-    const { workspaceId } = IntegrationWorkspaceIdParamsSchema.parse(req.params ?? {});
-    if (workspaceId !== ctx.activeWorkspaceId) {
-      throw new ForbiddenError("workspace_mismatch", "Active workspace does not match requested workspace");
-    }
-    await workspaces.assertMembership(ctx.userId, workspaceId);
-    return { userId: ctx.userId, workspaceId };
-  }
+  const requireWorkspace = (req: Parameters<typeof requireIntegrationWorkspaceIdParam>[0]) =>
+    requireIntegrationWorkspaceIdParam(req, workspaces);
+
+  const crudSchema = {
+    params: IntegrationWorkspaceIdParamsSchema,
+    response: {
+      400: ErrorResponseSchema,
+      401: ErrorResponseSchema,
+      403: ErrorResponseSchema,
+    },
+  };
 
   zodApp.get(
     "/workspaces/:workspaceId/integrations/tilt",
-    {
-      schema: {
-        tags: ["integrations"],
-        params: IntegrationWorkspaceIdParamsSchema,
-        response: {
-          200: IntegrationGetResponseSchema,
-          400: ErrorResponseSchema,
-          401: ErrorResponseSchema,
-          403: ErrorResponseSchema,
-        },
-      },
-    },
+    { schema: { tags: ["integrations"], ...crudSchema, response: { ...crudSchema.response, 200: IntegrationGetResponseSchema } } },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
-
-      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
-      return IntegrationGetResponseSchema.parse({
-        ok: true,
-        integration: integration
-          ? {
-              id: integration.id,
-              workspaceId: integration.workspaceId,
-              kind: integration.kind,
-              revokedAt: integration.revokedAt,
-              createdAt: integration.createdAt,
-              updatedAt: integration.updatedAt,
-            }
-          : null,
-      });
+      const { workspaceId } = await requireWorkspace(req);
+      return getIntegrationForWorkspace(integrations, workspaceId, TILT);
     },
   );
 
   zodApp.post(
     "/workspaces/:workspaceId/integrations/tilt",
-    {
-      schema: {
-        tags: ["integrations"],
-        params: IntegrationWorkspaceIdParamsSchema,
-        response: {
-          200: IntegrationCreateResponseSchema,
-          400: ErrorResponseSchema,
-          401: ErrorResponseSchema,
-          403: ErrorResponseSchema,
-        },
-      },
-    },
+    { schema: { tags: ["integrations"], ...crudSchema, response: { ...crudSchema.response, 200: IntegrationCreateResponseSchema } } },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
-
-      const existing = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
-      if (existing && !existing.revokedAt) {
-        const rotated = await integrations.rotateIntegrationToken(existing.id);
-        return IntegrationCreateResponseSchema.parse({
-          ok: true,
-          integrationId: existing.id,
-          token: rotated.token,
-          publicPath: integrationPublicPath(rotated.token),
-        });
-      }
-
-      const created = await integrations.createIntegration(workspaceId, "tilt");
-      return IntegrationCreateResponseSchema.parse({
-        ok: true,
-        integrationId: created.integration.id,
-        token: created.token,
-        publicPath: integrationPublicPath(created.token),
-      });
+      const { workspaceId } = await requireWorkspace(req);
+      return createOrRotateIntegration(integrations, workspaceId, TILT);
     },
   );
 
@@ -116,29 +69,13 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ["integrations"],
-        params: IntegrationWorkspaceIdParamsSchema,
-        response: {
-          200: IntegrationCreateResponseSchema,
-          400: ErrorResponseSchema,
-          401: ErrorResponseSchema,
-          403: ErrorResponseSchema,
-          404: ErrorResponseSchema,
-        },
+        ...crudSchema,
+        response: { ...crudSchema.response, 200: IntegrationCreateResponseSchema, 404: ErrorResponseSchema },
       },
     },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
-      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
-      if (!integration || integration.revokedAt) {
-        throw new NotFoundError("missing_integration", "Tilt integration not configured");
-      }
-      const rotated = await integrations.rotateIntegrationToken(integration.id);
-      return IntegrationCreateResponseSchema.parse({
-        ok: true,
-        integrationId: integration.id,
-        token: rotated.token,
-        publicPath: integrationPublicPath(rotated.token),
-      });
+      const { workspaceId } = await requireWorkspace(req);
+      return rotateIntegrationToken(integrations, workspaceId, TILT, TILT_MISSING);
     },
   );
 
@@ -147,24 +84,13 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ["integrations"],
-        params: IntegrationWorkspaceIdParamsSchema,
-        response: {
-          200: IntegrationOkResponseSchema,
-          400: ErrorResponseSchema,
-          401: ErrorResponseSchema,
-          403: ErrorResponseSchema,
-          404: ErrorResponseSchema,
-        },
+        ...crudSchema,
+        response: { ...crudSchema.response, 200: IntegrationOkResponseSchema, 404: ErrorResponseSchema },
       },
     },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
-      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
-      if (!integration || integration.revokedAt) {
-        throw new NotFoundError("missing_integration", "Tilt integration not configured");
-      }
-      await integrations.revokeIntegration(integration.id);
-      return IntegrationOkResponseSchema.parse({ ok: true });
+      const { workspaceId } = await requireWorkspace(req);
+      return revokeIntegration(integrations, workspaceId, TILT, TILT_MISSING);
     },
   );
 
@@ -173,42 +99,15 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ["integrations"],
-        params: IntegrationWorkspaceIdParamsSchema,
-        response: {
-          200: IntegrationDevicesListResponseSchema,
-          400: ErrorResponseSchema,
-          401: ErrorResponseSchema,
-          403: ErrorResponseSchema,
-        },
+        ...crudSchema,
+        response: { ...crudSchema.response, 200: IntegrationDevicesListResponseSchema },
       },
     },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
-      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
-      if (!integration || integration.revokedAt) {
-        return IntegrationDevicesListResponseSchema.parse({ ok: true, devices: [] });
-      }
-
-      const devices = await integrations.listIntegrationDevices(integration.id);
-
-      return IntegrationDevicesListResponseSchema.parse({
-        ok: true,
-        devices: devices.map((d) => ({
-          id: d.id,
-          deviceKey: d.deviceKey,
-          displayName: d.displayName,
-          metadataJson: d.metadataJson ?? null,
-          lastSeenAt: d.lastSeenAt,
-          createdAt: d.createdAt,
-          activeAttachment: d.attachments?.[0]
-            ? {
-                id: d.attachments[0].id,
-                attachedAt: d.attachments[0].attachedAt,
-                brewSession: d.attachments[0].brewSession,
-              }
-            : null,
-          lastReading: d.readings?.[0] ?? null,
-        })),
+      const { workspaceId } = await requireWorkspace(req);
+      return listIntegrationDevices(integrations, workspaceId, TILT, {
+        includeReadings: false,
+        readingsTake: 1,
       });
     },
   );
@@ -230,20 +129,14 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
       },
     },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const { workspaceId } = await requireWorkspace(req);
       const { deviceId } = req.params;
       const { brewSessionId } = req.body;
-
-      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
-      if (!integration || integration.revokedAt) {
-        throw new NotFoundError("missing_integration", "Tilt integration not configured");
-      }
-
+      const integration = await requireActiveWorkspaceIntegration(integrations, workspaceId, TILT, TILT_MISSING);
       await integrations.assertIntegrationDevice(integration.id, deviceId);
       await integrations.assertBrewSessionInWorkspace(workspaceId, brewSessionId);
-      const created = await integrations.attachDeviceToBrewSession(deviceId, brewSessionId);
-
-      return IntegrationDeviceAttachResponseSchema.parse({ ok: true, attachment: created });
+      const attachment = await integrations.attachDeviceToBrewSession(deviceId, brewSessionId);
+      return IntegrationDeviceAttachResponseSchema.parse({ ok: true, attachment });
     },
   );
 
@@ -263,17 +156,11 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
       },
     },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const { workspaceId } = await requireWorkspace(req);
       const { deviceId } = req.params;
-
-      const integration = await integrations.findWorkspaceIntegration(workspaceId, "tilt");
-      if (!integration || integration.revokedAt) {
-        throw new NotFoundError("missing_integration", "Tilt integration not configured");
-      }
-
+      const integration = await requireActiveWorkspaceIntegration(integrations, workspaceId, TILT, TILT_MISSING);
       await integrations.assertIntegrationDevice(integration.id, deviceId);
       const res = await integrations.detachDevice(deviceId);
-
       return IntegrationDeviceDetachResponseSchema.parse({ ok: true, detachedCount: res.count });
     },
   );
@@ -294,11 +181,8 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
       },
     },
     async (req) => {
-      const { workspaceId } = await requireActiveWorkspaceParam(req);
-      const limit = req.query.limit ?? 20;
-
-      const sessions = await integrations.listRecentBrewSessions(workspaceId, limit);
-
+      const { workspaceId } = await requireWorkspace(req);
+      const sessions = await integrations.listRecentBrewSessions(workspaceId, req.query.limit ?? 20);
       return BrewSessionsRecentResponseSchema.parse({ ok: true, brewSessions: sessions });
     },
   );

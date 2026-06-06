@@ -79,11 +79,7 @@ export function billingRoutes(app: FastifyInstance) {
       const { workspaceId } = req.params;
 
       const summary = await billing.getWorkspaceBilling(ctx.userId, workspaceId);
-
-      const recipeGroups = await app.prisma.recipe.groupBy({
-        by: ["versionGroupId"],
-        where: { workspaceId },
-      });
+      const recipesCount = await billing.countDistinctRecipeVersionGroups(workspaceId);
 
       return WorkspaceBillingResponseSchema.parse({
         ok: true,
@@ -92,7 +88,7 @@ export function billingRoutes(app: FastifyInstance) {
         expiresAt: summary.expiresAt,
         limits: summary.limits,
         usage: {
-          recipesCount: recipeGroups.length,
+          recipesCount,
         },
       });
     },

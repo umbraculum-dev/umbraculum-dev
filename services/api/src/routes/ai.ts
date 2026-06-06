@@ -1,7 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
-  AiChatRequestBodySchema,
   AiProposalActionResponseSchema,
   AiProposalGetResponseSchema,
   AiProposalIdParamsSchema,
@@ -13,13 +12,13 @@ import {
   WorkspaceAiUsageResponseSchema,
 } from "@umbraculum/contracts";
 
-import { BadRequestError } from "../errors.js";
 import { requireActiveWorkspace, requireUser } from "../plugins/requestContext.js";
 import { AiSettingsService } from "../services/ai/aiSettingsService.js";
 import { AiUsageService } from "../services/ai/aiUsageService.js";
 import { AiOrchestrator } from "../services/ai/orchestrator.js";
 import { AiProposalService } from "../services/ai/proposalService.js";
 import type { AiToolRegistry } from "@umbraculum/ai-tool-sdk";
+import { registerAiChatRoute } from "./_helpers/aiChatRouteHandler.js";
 
 /**
  * Build the AI routes. The boot wiring (in `app.ts`) constructs the tool
@@ -34,51 +33,7 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
     const usage = new AiUsageService(app.prisma);
     const orchestrator = new AiOrchestrator(app.prisma, toolRegistry);
 
-    // ----- Chat (SSE) — streaming; not registered on zodApp (see rule 22 SSE exception) -----
-    app.post("/ai/chat", async (req, reply) => {
-      const ctx = requireActiveWorkspace(req);
-      const parsed = AiChatRequestBodySchema.safeParse(req.body ?? {});
-      if (!parsed.success) {
-        throw new BadRequestError("invalid_body", "Body must match AiChatRequestBody");
-      }
-      const { message, sessionId: sessionIdRaw, routeId: routeIdRaw } = parsed.data;
-      const sessionId = sessionIdRaw ?? null;
-      const routeId = routeIdRaw ?? null;
-
-      await orchestrator.preflight({
-        workspaceId: ctx.activeWorkspaceId,
-        userId: ctx.userId,
-        message,
-        sessionId,
-        routeId,
-      });
-
-      reply.raw.setHeader("Content-Type", "text/event-stream");
-      reply.raw.setHeader("Cache-Control", "no-cache, no-transform");
-      reply.raw.setHeader("Connection", "keep-alive");
-      reply.raw.setHeader("X-Accel-Buffering", "no");
-      reply.raw.flushHeaders();
-
-      try {
-        for await (const event of orchestrator.runChatTurn({
-          workspaceId: ctx.activeWorkspaceId,
-          userId: ctx.userId,
-          message,
-          sessionId,
-          routeId,
-        })) {
-          if (req.raw.destroyed) break;
-          reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
-        }
-      } finally {
-        try {
-          reply.raw.end();
-        } catch {
-          /* socket already closed */
-        }
-      }
-      return reply;
-    });
+    registerAiChatRoute(app, orchestrator);
 
     zodApp.get(
       "/workspaces/:workspaceId/ai/settings",
