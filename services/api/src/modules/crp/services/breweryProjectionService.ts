@@ -2,14 +2,9 @@
  * @arch-boundary Cross-schema read of brewery brew sessions, equipment, and automation vessels
  * for CRP capacity projections until a dedicated BreweryScheduleProjection port lands (Tier B epic).
  */
-import type { BrewSessionStep, EquipmentProfile, Vessel } from "@prisma/client";
+import type { Vessel } from "@prisma/client";
 import {
   CapacityBucketSchema,
-  CapacityConflictSchema,
-  CapacityLoadSchema,
-  ResourceSchema,
-  ScheduledOperationSchema,
-  WorkCenterSchema,
   type CapacityConflict,
   type CapacityLoad,
   type Resource,
@@ -19,35 +14,31 @@ import {
 
 import {
   automationVesselResourceId,
-  breweryBrewSessionProductionOrderId,
   breweryCapacityConflictId,
-  breweryScheduledOperationId,
   equipmentProfileWorkCenterId,
   parseAutomationVesselResourceId,
 } from "../../../platform/breweryProjectionIds.js";
 import {
   addMinutes,
   isPositiveInt,
-  operationCode,
-  recipeEquipmentProfileId,
   schedulingBase,
 } from "../../../platform/breweryProjectionSchemas.js";
 import type {
   BreweryScheduleProjection,
   ProjectedBrewSession,
 } from "../../../platform/breweryScheduleProjection.js";
+import {
+  CapacityLoadSchema,
+  resolveVesselResource,
+  sourceSteps,
+  toConflict,
+  toEquipmentProfileWorkCenter,
+  toScheduledOperation,
+  toVesselResource,
+  type ScheduledStep,
+} from "../breweryProjectionMappers.js";
 
 type BrewSessionWithRecipeSteps = ProjectedBrewSession;
-
-type ScheduledStep = {
-  step: BrewSessionStep;
-  session: BrewSessionWithRecipeSteps;
-  startsAt: Date;
-  endsAt: Date;
-  durationMinutes: number;
-  resourceId: string | null;
-  workCenterId: string | null;
-};
 
 export class CrpBreweryProjectionService {
   constructor(private readonly schedule: BreweryScheduleProjection) {}
@@ -216,115 +207,4 @@ export class CrpBreweryProjectionService {
 
     return [...resolved.values()];
   }
-}
-
-function toVesselResource(vessel: Vessel): Resource {
-  return ResourceSchema.parse({
-    id: automationVesselResourceId(vessel.id),
-    workspaceId: vessel.workspaceId,
-    code: vessel.code,
-    name: vessel.displayName,
-    kind: "equipment",
-    status: "active",
-    sourceModule: "automation",
-    sourceRefId: vessel.id,
-    createdAt: vessel.createdAt.toISOString(),
-    updatedAt: vessel.updatedAt.toISOString(),
-  });
-}
-
-function toEquipmentProfileWorkCenter(
-  profile: EquipmentProfile,
-  vessels: readonly Vessel[],
-): WorkCenter {
-  const matchingVessels = vessels.filter((vessel) => vessel.equipmentProfileId === profile.id);
-  return WorkCenterSchema.parse({
-    id: equipmentProfileWorkCenterId(profile.id),
-    workspaceId: profile.workspaceId,
-    code: equipmentProfileCode(profile),
-    name: profile.name,
-    resourceId: matchingVessels.length === 1 ? automationVesselResourceId(matchingVessels[0]?.id ?? "") : null,
-    status: "active",
-    sourceModule: "brewery",
-    sourceRefId: profile.id,
-    createdAt: profile.createdAt.toISOString(),
-    updatedAt: profile.updatedAt.toISOString(),
-  });
-}
-
-function toScheduledOperation(scheduled: ScheduledStep): ScheduledOperation {
-  return ScheduledOperationSchema.parse({
-    id: breweryScheduledOperationId(scheduled.step.id),
-    workspaceId: scheduled.session.workspaceId,
-    resourceId: scheduled.resourceId,
-    workCenterId: scheduled.workCenterId,
-    productionOrderId: breweryBrewSessionProductionOrderId(scheduled.session.id),
-    operationId: breweryScheduledOperationId(scheduled.step.id),
-    operationCode: operationCode(scheduled.step),
-    name: scheduled.step.name,
-    status: mapStepStatus(scheduled.step.status),
-    sourceModule: "brewery",
-    sourceRefId: scheduled.step.id,
-    startsAt: scheduled.startsAt.toISOString(),
-    endsAt: scheduled.endsAt.toISOString(),
-    plannedDurationMinutes: scheduled.durationMinutes,
-  });
-}
-
-function toConflict(args: {
-  id: string;
-  workspaceId: string;
-  message: string;
-  step: BrewSessionStep;
-  scheduled: ScheduledStep | undefined;
-}): CapacityConflict {
-  return CapacityConflictSchema.parse({
-    id: args.id,
-    workspaceId: args.workspaceId,
-    severity: "warning",
-    status: "open",
-    message: args.message,
-    resourceId: args.scheduled?.resourceId ?? null,
-    scheduledOperationId: args.scheduled ? breweryScheduledOperationId(args.step.id) : null,
-    startsAt: args.scheduled?.startsAt.toISOString() ?? null,
-    endsAt: args.scheduled?.endsAt.toISOString() ?? null,
-    createdAt: args.step.updatedAt.toISOString(),
-  });
-}
-
-function resolveVesselResource(
-  session: BrewSessionWithRecipeSteps,
-  vessels: readonly Vessel[],
-): { vesselId: string | null; equipmentProfileId: string | null } {
-  const equipmentProfileId = recipeEquipmentProfileId(session.recipe.recipeExtJson);
-  if (!equipmentProfileId) return { vesselId: null, equipmentProfileId: null };
-  const matches = vessels.filter((vessel) => vessel.equipmentProfileId === equipmentProfileId);
-  return {
-    vesselId: matches.length === 1 ? matches[0]?.id ?? null : null,
-    equipmentProfileId,
-  };
-}
-
-function sourceSteps(session: BrewSessionWithRecipeSteps): BrewSessionStep[] {
-  return session.steps
-    .filter((step) => !step.isDisabled)
-    .slice()
-    .sort((a, b) => a.sortOrder - b.sortOrder);
-}
-
-function mapStepStatus(status: BrewSessionStep["status"]): ScheduledOperation["status"] {
-  switch (status) {
-    case "done":
-      return "completed";
-    default:
-      return "planned";
-  }
-}
-
-function equipmentProfileCode(profile: EquipmentProfile): string {
-  const stem = profile.name
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-  return stem || profile.id;
 }

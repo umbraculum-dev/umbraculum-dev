@@ -1,8 +1,5 @@
 "use client";
 
-import { useRouter } from "../../../../../src/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { getRecipe } from "@umbraculum/api-client/brewery";
@@ -11,6 +8,7 @@ import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipe
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { roundTo } from "../_lib/recipeEditHelpers";
+import type { YeastSearchResult } from "../_lib/recipeEditTypes";
 import { useRecipeEditCatalogs } from "./useRecipeEditCatalogs";
 import { useRecipeEditFermentables } from "./useRecipeEditFermentables";
 import { useRecipeEditHops } from "./useRecipeEditHops";
@@ -18,25 +16,14 @@ import { useRecipeEditLayout } from "./useRecipeEditLayout";
 import { useRecipeEditLoad } from "./useRecipeEditLoad";
 import { useRecipeEditMashing } from "./useRecipeEditMashing";
 import { useRecipeEditMisc } from "./useRecipeEditMisc";
+import { useRecipeEditPageI18n } from "./useRecipeEditPageI18n";
 import { useRecipeEditSave } from "./useRecipeEditSave";
 import { useRecipeEditSections } from "./useRecipeEditSections";
 import { useRecipeEditYeast } from "./useRecipeEditYeast";
-import type { YeastSearchResult } from "../_lib/recipeEditTypes";
 
 export function useRecipeEditPage() {
-  const t = useTranslations("recipes.edit");
-  const tHops = useTranslations("recipes.edit.hops");
-  const tEquip = useTranslations("recipes.edit.equipmentSection");
-  const tAnalysis = useTranslations("recipes.analysis");
-  const tMath = useTranslations("math");
-  const tNav = useTranslations("nav");
-  const tUnits = useTranslations("units");
-  const tWater = useTranslations("waterHub");
-  const tSparge = useTranslations("recipes.water.sparge");
-  const locale = useLocale();
-  const router = useRouter();
-  const params = useParams<{ id: string }>();
-  const recipeId = params?.id ?? "";
+  const i18n = useRecipeEditPageI18n();
+  const { t, tEquip, router, recipeId } = i18n;
   const authState = useRequireAuth({ requireActiveWorkspace: true });
 
   const loadRecipeMeta = useCallback(async (id: string) => {
@@ -59,7 +46,7 @@ export function useRecipeEditPage() {
   const fermentables = useRecipeEditFermentables({ t, roundTo });
   const hops = useRecipeEditHops({ roundTo });
   const yeast = useRecipeEditYeast();
-  const mashing = useRecipeEditMashing({ analysis, tSparge, canCallAccountScoped, recipeId });
+  const mashing = useRecipeEditMashing({ analysis, tSparge: i18n.tSparge, canCallAccountScoped, recipeId });
 
   const misc = useRecipeEditMisc({ gristRows: fermentables.gristRows, waterSettings: mashing.waterSettings });
 
@@ -118,18 +105,7 @@ export function useRecipeEditPage() {
   };
 
   return {
-    t,
-    tHops,
-    tEquip,
-    tAnalysis,
-    tMath,
-    tNav,
-    tUnits,
-    tWater,
-    tSparge,
-    locale,
-    router,
-    recipeId,
+    ...i18n,
     authState,
     loadRecipeMeta,
     layoutMetrics,

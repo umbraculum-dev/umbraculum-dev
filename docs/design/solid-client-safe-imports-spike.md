@@ -53,6 +53,7 @@ Grep of both package trees: zero `@prisma`, zero `services/api` imports.
 | 2026-06-06 | Wave 14 Phase 8 | Archive lint **OK** on `d25fc8a` pre-commit baseline (full ci-parity green); no WS6 regressions observed | None reported | **Defer** warn→error — operator approval required for promotion PR |
 | 2026-06-06 | Wave 15 Phase 10 | Working-tree + archive lint **OK** on Wave 15 refactor (no WS6 regressions observed in green runs) | None reported | **Defer** warn→error — operator approval required for promotion PR |
 | 2026-06-06 | Wave 16 Phase 9 | Working-tree lint **OK** on Wave 16 hygiene splits (typecheck + lint green; no WS6 regressions observed) | None reported | **Defer** warn→error — operator approval required for promotion PR |
+| 2026-06-04 | Wave 17 Phase 8 | Working-tree + archive lint **OK** on Wave 17 tail parity + Tier A route thinning (no WS6 regressions observed); `boundaries/element-types` **0** violations on `services/api/src/modules` | None reported | **Defer** warn→error — operator approval required for promotion PR |
 
 ---
 

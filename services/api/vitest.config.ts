@@ -9,6 +9,19 @@ const unitTestFiles = [
   "src/tests/ai/reportingAst.test.ts",
 ];
 
+/** Imported by thin barrel files — exclude from glob to avoid duplicate runs. */
+const integrationBarrelPartFiles = [
+  "src/tests/brewSessionsCreate.test.ts",
+  "src/tests/brewSessionsSteps.test.ts",
+  "src/tests/brewSessionsHydrometer.test.ts",
+  "src/tests/brewSessionsExport.test.ts",
+  "src/tests/recipesCrud.test.ts",
+  "src/tests/recipesAnalysis.test.ts",
+  "src/tests/inventoryFermentable.test.ts",
+  "src/tests/inventoryHop.test.ts",
+  "src/tests/inventoryMisc.test.ts",
+];
+
 export default defineConfig({
   test: {
     projects: [
@@ -25,7 +38,7 @@ export default defineConfig({
         test: {
           name: "integration",
           include: ["src/tests/**/*.test.ts"],
-          exclude: unitTestFiles,
+          exclude: [...unitTestFiles, ...integrationBarrelPartFiles],
           setupFiles: ["src/tests/vitest.setup.ts"],
         },
       },

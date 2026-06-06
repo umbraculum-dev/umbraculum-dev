@@ -1,10 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod";
 import {
   ErrorResponseSchema,
   RenderJobSubmitResponseSchema,
-  RenderVisibilitySchema,
 } from "@umbraculum/contracts";
 import {
   CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF,
@@ -14,49 +12,10 @@ import {
   CapacityLoadQuerySchema,
 } from "@umbraculum/crp-contracts";
 
-import { BadRequestError } from "../../../errors.js";
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { CapacityExportService } from "../services/capacityExportService.js";
-
-const RenderJobBodySchema = z
-  .object({
-    visibility: RenderVisibilitySchema.optional(),
-  })
-  .strict();
-
-async function submitAsyncRenderJob(
-  app: FastifyInstance,
-  input: {
-    readonly userId: string;
-    readonly workspaceId: string;
-    readonly templateRef: string;
-    readonly kind: "pdf" | "xlsx" | "csv";
-    readonly data: unknown;
-    readonly visibility?: "workspace" | "public";
-  },
-) {
-  const result = await app.renderingJobs.submit({
-    userId: input.userId,
-    workspaceId: input.workspaceId,
-    locale: "en",
-    request: {
-      templateRef: input.templateRef,
-      kind: input.kind,
-      data: input.data,
-      delivery: {
-        mode: "persist-to-media",
-        visibility: input.visibility ?? "workspace",
-      },
-    },
-  });
-  if (result.kind !== "async") {
-    throw new BadRequestError(
-      "render_unexpected_stream_result",
-      "CRP render jobs must render asynchronously",
-    );
-  }
-  return result;
-}
+import { CrpRenderJobBodySchema } from "./capacityRenderRouteSchemas.js";
+import { submitCrpAsyncRenderJob } from "./capacityRenderRouteSubmit.js";
 
 export function crpCapacityRenderRoutes(app: FastifyInstance): void {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
@@ -68,7 +27,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
       schema: {
         tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
-        body: RenderJobBodySchema,
+        body: CrpRenderJobBodySchema,
         response: {
           202: RenderJobSubmitResponseSchema,
           400: ErrorResponseSchema,
@@ -84,7 +43,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
         ctx.activeWorkspaceId,
         req.query.resourceId,
       );
-      const result = await submitAsyncRenderJob(app, {
+      const result = await submitCrpAsyncRenderJob(app, {
         userId: ctx.userId,
         workspaceId: ctx.activeWorkspaceId,
         templateRef: CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF,
@@ -108,7 +67,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
       schema: {
         tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
-        body: RenderJobBodySchema,
+        body: CrpRenderJobBodySchema,
         response: {
           202: RenderJobSubmitResponseSchema,
           400: ErrorResponseSchema,
@@ -124,7 +83,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
         ctx.activeWorkspaceId,
         req.query.resourceId,
       );
-      const result = await submitAsyncRenderJob(app, {
+      const result = await submitCrpAsyncRenderJob(app, {
         userId: ctx.userId,
         workspaceId: ctx.activeWorkspaceId,
         templateRef: CRP_SCHEDULE_PDF_TEMPLATE_REF,
@@ -148,7 +107,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
       schema: {
         tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
-        body: RenderJobBodySchema,
+        body: CrpRenderJobBodySchema,
         response: {
           202: RenderJobSubmitResponseSchema,
           400: ErrorResponseSchema,
@@ -164,7 +123,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
         ctx.activeWorkspaceId,
         req.query.resourceId,
       );
-      const result = await submitAsyncRenderJob(app, {
+      const result = await submitCrpAsyncRenderJob(app, {
         userId: ctx.userId,
         workspaceId: ctx.activeWorkspaceId,
         templateRef: CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF,
@@ -188,7 +147,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
       schema: {
         tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
-        body: RenderJobBodySchema,
+        body: CrpRenderJobBodySchema,
         response: {
           202: RenderJobSubmitResponseSchema,
           400: ErrorResponseSchema,
@@ -204,7 +163,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
         ctx.activeWorkspaceId,
         req.query.resourceId,
       );
-      const result = await submitAsyncRenderJob(app, {
+      const result = await submitCrpAsyncRenderJob(app, {
         userId: ctx.userId,
         workspaceId: ctx.activeWorkspaceId,
         templateRef: CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF,

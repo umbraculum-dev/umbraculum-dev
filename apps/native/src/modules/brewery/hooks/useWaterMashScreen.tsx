@@ -1,19 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-import {
-  getRecipe,
-  listWaterProfiles,
-  getRecipeWaterSettings,
-  updateRecipeWaterSettings,
-} from "@umbraculum/api-client/brewery";
-import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
-import type { WaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import { useLocaleController } from "../../../i18n/I18nProvider";
 import type { RootStackParamList } from "../../../navigation/types";
 import { useNativeWaterMashAcidification } from "./waterMash/useNativeWaterMashAcidification";
@@ -22,6 +13,7 @@ import { useNativeWaterMashGrist } from "./waterMash/useNativeWaterMashGrist";
 import { useNativeWaterMashProfiles } from "./waterMash/useNativeWaterMashProfiles";
 import { useNativeWaterMashSalts } from "./waterMash/useNativeWaterMashSalts";
 import { useNativeWaterMashSteps } from "./waterMash/useNativeWaterMashSteps";
+import { useWaterMashScreenLoad, type WaterMashScreenLoadHydratorsRef } from "./useWaterMashScreenLoad";
 
 export function useWaterMashScreen() {
   const route = useRoute();
@@ -38,42 +30,25 @@ export function useWaterMashScreen() {
   const { t: tUnits } = useT("units");
   const { t: tWaterCommon } = useT("recipes.water.common");
 
-  const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
-  const [_settings, setSettings] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<string[]>(["adjustment", "acidification"]);
 
   const canCall = Boolean(recipeId && baseUrl && token);
 
-  const loadRecipeMeta = useCallback(async (id: string) => {
-    if (!baseUrl || !token) return null;
-    const api = nativePlatformApiClient(token, baseUrl);
-    try {
-      const data = await getRecipe(api, id);
-      return parseRecipeMetaFromGetRecipeResponse(data);
-    } catch {
-      return null;
-    }
-  }, [baseUrl, token]);
+  const hydratorsRef = useRef<WaterMashScreenLoadHydratorsRef["current"]>({
+    hydrateFromSettings: () => {},
+    applyRecipeMashState: () => {},
+    mashStepsDirty: false,
+  });
 
-  const saveSettings = useCallback(
-    async (patch: Record<string, unknown>) => {
-      if (!canCall) return;
-      const api = nativePlatformApiClient(token!, baseUrl);
-      const d = await updateRecipeWaterSettings(api, recipeId, patch);
-      if (d.settings) setSettings(d.settings);
-    },
-    [canCall, recipeId, baseUrl, token],
-  );
+  const load = useWaterMashScreenLoad({ canCall, recipeId, baseUrl, token, hydratorsRef });
 
-  const profilesDerived = useNativeWaterMashProfiles(profiles);
+  const profilesDerived = useNativeWaterMashProfiles(load.profiles);
 
   const adjustment = useNativeWaterMashAdjustment({
     waterProfiles: profilesDerived.waterProfiles,
     dilutionProfiles: profilesDerived.dilutionProfiles,
-    saveSettings,
-    setError,
+    saveSettings: load.saveSettings,
+    setError: load.setError,
   });
 
   const adjustmentFieldsRef = useRef({
@@ -91,8 +66,8 @@ export function useWaterMashScreen() {
     recipeId,
     baseUrl,
     token,
-    saveSettings,
-    setError,
+    saveSettings: load.saveSettings,
+    setError: load.setError,
     adjustmentFieldsRef,
     saltAdditions: salts.saltAdditions,
   });
@@ -105,18 +80,16 @@ export function useWaterMashScreen() {
     derivedMashWaterVolumeLiters: adjustment.derivedMashWaterVolumeLiters,
   };
 
-  const loadDataRef = useRef<() => Promise<void>>(async () => {});
-
   const steps = useNativeWaterMashSteps({
     canCall,
     recipeId,
     baseUrl,
     token,
     derivedMashWaterVolumeLiters: adjustment.derivedMashWaterVolumeLiters,
-    setError,
+    setError: load.setError,
     t,
     onAfterSave: () => {
-      void loadDataRef.current();
+      void load.loadDataRef.current();
     },
   });
 
@@ -125,59 +98,21 @@ export function useWaterMashScreen() {
     recipeId,
     baseUrl,
     token,
-    saveSettings,
+    saveSettings: load.saveSettings,
     recipe: steps.recipe,
   });
 
-  const gristBridgeRef = useRef({ gristImportedRows: grist.gristImportedRows });
-  gristBridgeRef.current = { gristImportedRows: grist.gristImportedRows };
-
-  const loadData = useCallback(async () => {
-    if (!canCall) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const api = nativePlatformApiClient(token!, baseUrl);
-      const [profilesData, settingsData, recipeData] = await Promise.all([
-        listWaterProfiles(api),
-        getRecipeWaterSettings(api, recipeId),
-        getRecipe(api, recipeId),
-      ]);
-      setProfiles(profilesData);
-      if (settingsData.settings) {
-        const s = settingsData.settings;
-        setSettings(s);
-        adjustment.hydrateMashAdjustment(s);
-        acid.hydrateMashAcidification(s);
-        salts.hydrateMashSalts(s);
-        grist.hydrateMashGrist(s);
-      }
-      const d = recipeData.recipe;
-      if (d) {
-        steps.applyRecipeMashState(d, steps.mashStepsDirty);
-      }
-    } catch (err) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    canCall,
-    recipeId,
-    baseUrl,
-    token,
-    adjustment,
-    acid,
-    salts,
-    grist,
-    steps,
-  ]);
-
-  loadDataRef.current = loadData;
-
-  useEffect(() => {
-    void loadData();
-  }, [loadData]);
+  hydratorsRef.current = {
+    hydrateFromSettings: (s) => {
+      adjustment.hydrateMashAdjustment(s);
+      acid.hydrateMashAcidification(s);
+      salts.hydrateMashSalts(s);
+      grist.hydrateMashGrist(s);
+    },
+    applyRecipeMashState: (recipe, mashStepsDirty) =>
+      steps.applyRecipeMashState(recipe as Parameters<typeof steps.applyRecipeMashState>[0], mashStepsDirty),
+    mashStepsDirty: steps.mashStepsDirty,
+  };
 
   const {
     hydrateMashAdjustment: _hydrateAdjustment,
@@ -196,25 +131,25 @@ export function useWaterMashScreen() {
     locale,
     baseUrl,
     token,
-    loadRecipeMeta,
+    loadRecipeMeta: load.loadRecipeMeta,
     t,
     tEdit,
     tCommon,
     tUnits,
     tWaterCommon,
-    profiles,
-    setProfiles,
-    _settings,
-    setSettings,
-    loading,
-    setLoading,
-    error,
-    setError,
+    profiles: load.profiles,
+    setProfiles: load.setProfiles,
+    _settings: load._settings,
+    setSettings: load.setSettings,
+    loading: load.loading,
+    setLoading: load.setLoading,
+    error: load.error,
+    setError: load.setError,
     openSections,
     setOpenSections,
     canCall,
-    loadData,
-    saveSettings,
+    loadData: load.loadData,
+    saveSettings: load.saveSettings,
     ...profilesDerived,
     ...adjustmentPublic,
     ...saltsPublic,

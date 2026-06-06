@@ -13,7 +13,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Files scanned | 1398 |
+| Files scanned | 1462 |
 | Roots | `services/api/src`, `packages`, `apps/web/app`, `apps/native/src` |
 | P0 findings | 0 |
 | P1 findings | 2 |
