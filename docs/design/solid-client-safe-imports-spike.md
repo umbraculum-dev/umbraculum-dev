@@ -45,6 +45,12 @@ Grep of both package trees: zero `@prisma`, zero `services/api` imports.
 2. No false positives on legitimate `@umbraculum/brewery-*` imports.
 3. Follow B5 pattern: promote in dedicated PR; update this doc + LINTING.md TL;DR table.
 
+### Burn-in evaluation log
+
+| Date | Wave | ci-parity `lint` WS6 warnings | False positives on `@umbraculum/brewery-*` | Decision |
+|------|------|--------------------------------|------------------------------------------|----------|
+| 2026-06-04 | Wave 13 Phase 9 | Archive lint **OK** on `951f51e` (no WS6 regressions observed in green run) | None reported | **Defer** warn→error — operator approval required for promotion PR; one full release cycle since Wave 11 not independently metered |
+
 ---
 
 ## 5. Sign-off
