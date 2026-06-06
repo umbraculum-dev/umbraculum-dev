@@ -59,7 +59,7 @@ Routes are registered from [`services/api/src/modules/brewery/index.ts`](../../.
 
 | Segment | What it owns |
 |---|---|
-| `recipes/` | Recipe library, recipe edit, water-step pages, yeast page. |
+| `recipes/` | Recipe library (`page.tsx`), import, edit (`[id]/edit/`), water steps (`[id]/water/{mash,sparge,boil}`), yeast (`[id]/yeast/`), brew sessions (`[id]/brew-sessions/`), versions (`[id]/versions/`). Shared helpers: `recipes/_components/`, `recipes/_lib/`. |
 | `equipment/` | Equipment-profile editor. |
 | `water-profiles/` | Water-profile library editor. |
 | `brewday-steps-settings/` | Brewday step configuration. |

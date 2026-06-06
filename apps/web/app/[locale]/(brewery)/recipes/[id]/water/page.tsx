@@ -1,2 +1,9 @@
-export { default } from "../../../../../recipes/[id]/water/page";
+"use client";
 
+import { useWaterHubPage } from "./_hooks/useWaterHubPage";
+import { WaterHubPageContent } from "./_components/WaterHubPageContent";
+
+export default function WaterHubPage() {
+  const model = useWaterHubPage();
+  return <WaterHubPageContent model={model} />;
+}

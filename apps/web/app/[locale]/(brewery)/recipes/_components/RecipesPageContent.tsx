@@ -1,8 +1,8 @@
 "use client";
 
-import { Link } from "../../../../src/i18n/navigation";
-import { AskAiLink } from "../../../_components/AskAiLink";
-import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
+import { Link } from "../../../../../src/i18n/navigation";
+import { AskAiLink } from "../../../../_components/AskAiLink";
+import { BrewAccordionSection } from "../../../../_components/BrewAccordionSection";
 import { Accordion, H1, SizableText, YStack } from "tamagui";
 
 import type { useRecipesPage } from "../_hooks/useRecipesPage";

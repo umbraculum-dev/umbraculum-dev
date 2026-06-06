@@ -124,7 +124,7 @@ function detectAppCrossSegmentImports(files: string[]): InventoryRow[] {
     const rel = relative(REPO_ROOT, file);
     const isWebLocale = rel.includes("apps/web/app/[locale]/");
     const isNativeModule = rel.includes("apps/native/src/modules/");
-    const isWebRecipe = rel.includes("apps/web/app/recipes/");
+    const isWebRecipe = rel.includes("apps/web/app/[locale]/(brewery)/recipes/");
     if (!isWebLocale && !isNativeModule && !isWebRecipe) continue;
 
     const fromLocale = rel.match(/\[locale\]\/(\((?:pim|mrp|crp|brewery|automation)\))/)?.[1];

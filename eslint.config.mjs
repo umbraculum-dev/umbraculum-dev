@@ -534,28 +534,28 @@ export default [
         },
         {
           type: "web-water-shared",
-          pattern: "apps/web/app/recipes/[[]id[]]/water/{_lib,_hooks}/**",
+          pattern: "apps/web/app/[[]locale[]]/(brewery)/recipes/[[]id[]]/water/{_lib,_hooks}/**",
           mode: "full",
         },
         {
           type: "web-water-segment",
-          pattern: "apps/web/app/recipes/[[]id[]]/water/*/**",
+          pattern: "apps/web/app/[[]locale[]]/(brewery)/recipes/[[]id[]]/water/*/**",
           mode: "file",
           capture: ["segmentCode"],
         },
         {
           type: "web-recipe-edit-shared",
-          pattern: "apps/web/app/recipes/[[]id[]]/edit/{_lib,_hooks}/**",
+          pattern: "apps/web/app/[[]locale[]]/(brewery)/recipes/[[]id[]]/edit/{_lib,_hooks}/**",
           mode: "full",
         },
         {
           type: "web-recipe-edit-surface",
-          pattern: "apps/web/app/recipes/[[]id[]]/edit/**",
+          pattern: "apps/web/app/[[]locale[]]/(brewery)/recipes/[[]id[]]/edit/**",
           mode: "full",
         },
         {
           type: "web-recipe-cluster",
-          pattern: "apps/web/app/recipes/**",
+          pattern: "apps/web/app/[[]locale[]]/(brewery)/recipes/**",
           mode: "full",
         },
         {

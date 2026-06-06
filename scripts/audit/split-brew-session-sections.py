@@ -9,7 +9,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 CONTENT = (
     REPO
-    / "apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/_components/BrewSessionDetailPageContent.tsx"
+    / "apps/web/app/[locale]/(brewery)/recipes/[id]/brew-sessions/[brewSessionId]/_components/BrewSessionDetailPageContent.tsx"
 )
 SECTIONS_DIR = CONTENT.parent / "sections"
 

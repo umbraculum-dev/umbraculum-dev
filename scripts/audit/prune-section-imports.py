@@ -9,7 +9,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 
 TARGETS = list(
-    (REPO / "apps/web/app/recipes/[id]/edit/_components/sections").glob("*.tsx")
+    (REPO / "apps/web/app/[locale]/(brewery)/recipes/[id]/edit/_components/sections").glob("*.tsx")
 ) + list((REPO / "apps/native/src/modules/brewery/components/recipeEdit/sections").glob("*.tsx"))
 
 

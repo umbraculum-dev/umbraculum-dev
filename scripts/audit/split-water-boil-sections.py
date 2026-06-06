@@ -6,7 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-CONTENT = REPO / "apps/web/app/recipes/[id]/water/boil/_components/WaterBoilPageContent.tsx"
+CONTENT = REPO / "apps/web/app/[locale]/(brewery)/recipes/[id]/water/boil/_components/WaterBoilPageContent.tsx"
 SECTIONS_DIR = CONTENT.parent / "sections"
 
 # (export_name, start_line, end_line inclusive, 1-based)

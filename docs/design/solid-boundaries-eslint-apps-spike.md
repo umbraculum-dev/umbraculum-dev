@@ -1,7 +1,7 @@
 # SOLID boundaries eslint spike — eslint-plugin-boundaries on apps/web + apps/native
 
 **Tier:** Internal  
-**Status:** Frozen (2026-06-06) — SOLID WS5 deliverable (**error**, CI-blocking; locale vertical expansion complete)  
+**Status:** Frozen (2026-06-06) — SOLID WS5 deliverable (**error**, CI-blocking; locale vertical expansion complete). Recipe-cluster element paths retargeted to `(brewery)/recipes/**` in the same month (fork-cleanliness epic); see [`web-brewery-tree-consolidation-inventory.md`](web-brewery-tree-consolidation-inventory.md).  
 **Audience:** app maintainers, lint/CI maintainers  
 **Related:** [solid-boundaries-eslint-spike.md](./solid-boundaries-eslint-spike.md), [solid-decoupling-audit.md](./solid-decoupling-audit.md), [LINTING.md](../LINTING.md#app-layer-boundaries-ws5)
 
@@ -42,11 +42,11 @@
 |------|------|---------|
 | `api-service` | `services/api/**` | Detect and forbid direct app → API source imports |
 | `web-app-shared` | `apps/web/{src,app/_components,app/_lib}/**` | Allowed shared UI/helpers for web routes |
-| `web-water-shared` | `apps/web/app/recipes/[id]/water/{_lib,_hooks}/**` | Cross-segment water helpers |
-| `web-water-segment` | `apps/web/app/recipes/[id]/water/*/**` | Capture water route segment ownership (`capture: ["segmentCode"]`) |
-| `web-recipe-edit-shared` | `apps/web/app/recipes/[id]/edit/{_lib,_hooks}/**` | Cross-section edit helpers |
-| `web-recipe-edit-surface` | `apps/web/app/recipes/[id]/edit/**` | Edit route surface (explicit allow list) |
-| `web-recipe-cluster` | `apps/web/app/recipes/**` | Recipes App Router tree; must not import locale vertical admin UI |
+| `web-water-shared` | `apps/web/app/[locale]/(brewery)/recipes/[id]/water/{_lib,_hooks}/**` | Cross-segment water helpers |
+| `web-water-segment` | `apps/web/app/[locale]/(brewery)/recipes/[id]/water/*/**` | Capture water route segment ownership (`capture: ["segmentCode"]`) |
+| `web-recipe-edit-shared` | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/{_lib,_hooks}/**` | Cross-section edit helpers |
+| `web-recipe-edit-surface` | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/**` | Edit route surface (explicit allow list) |
+| `web-recipe-cluster` | `apps/web/app/[locale]/(brewery)/recipes/**` | Recipes App Router tree; must not import locale vertical admin UI |
 | `web-locale-vertical` | `apps/web/app/[locale]/(pim\|mrp\|crp\|brewery\|automation)/**` | Locale route-group ownership (`capture: ["verticalCode"]`) |
 | `native-app-shared` | `apps/native/src/{auth,components,…}/**` | Allowed shared runtime/navigation surfaces |
 | `native-module-segment` | `apps/native/src/modules/*/**` | Capture native module ownership (`capture: ["moduleCode"]`) |

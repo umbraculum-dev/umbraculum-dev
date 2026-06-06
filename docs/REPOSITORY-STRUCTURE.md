@@ -133,6 +133,23 @@ Per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3, every canonic
 
 **Where the SDK fits.** `@umbraculum/module-sdk` is the registration spine — every β-layout module calls `registerModule()` from its API slice and `registerWebModule({ ownedUrlSegments, navEntry })` to declare the top-level URL segments its web slice owns. The web slice's segment claims feed the build-time CI collision check at `scripts/check-web-url-segments.ts`, which also enforces the two β disciplines (no `(<code>)/page.tsx`, no `(<code>)/[<dynamic>]/page.tsx` at the route-group root — see [`design/web-route-group-audit.md`](design/web-route-group-audit.md) §3). `registerNativeModule()` remains future per RFC-0002 §5. The SDK does not contain any module code itself; it defines the shape every module agrees to.
 
+### Finding vertical module code on web
+
+For any module `<code>`, start at **`apps/web/app/[locale]/(<code>)/`**. Route groups `(brewery)`, `(pim)`, etc. are **structural only** — they do not appear in URLs (`/en/recipes`, not `/en/brewery/recipes`). The `[locale]` segment is the **i18n URL prefix** (Next.js dynamic segment for `/en/…`, `/it/…`), not “local-only” code.
+
+| Need | Go to |
+|------|-------|
+| Brewery recipe list / import | `apps/web/app/[locale]/(brewery)/recipes/page.tsx`, `…/import/` |
+| Recipe edit UI (web) | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/` |
+| Water hub + mash/sparge/boil | `…/(brewery)/recipes/[id]/water/` |
+| Brew sessions + yeast | `…/(brewery)/recipes/[id]/brew-sessions/`, `…/yeast/` |
+| Recipe edit (native) | `apps/native/src/modules/brewery/screens/` (e.g. `RecipeEditScreen`) |
+| Recipe API | `services/api/src/modules/brewery/routes/recipes.ts` |
+| Platform admin recipes (cross-workspace) | `apps/web/app/[locale]/platform/recipes/` — **not** brewery |
+| Well-formed β reference (canonical module) | `apps/web/app/[locale]/(pim)/categories/page.tsx` |
+
+Legacy flat `apps/web/app/recipes/` was removed in 2026-06 ([`design/web-brewery-tree-consolidation-inventory.md`](design/web-brewery-tree-consolidation-inventory.md)). Do not add new brewery recipe pages outside `(brewery)/recipes/`.
+
 ---
 
 ## 5. Dependency diagram

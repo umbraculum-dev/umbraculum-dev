@@ -81,7 +81,7 @@
 
 | Finding | Severity |
 |---------|----------|
-| `apps/web/app/recipes/[id]/edit/page.tsx` (~3.8k LoC) | P1 — god page; Tier B decompose into hooks + subcomponents |
+| `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/` (formerly flat `apps/web/app/recipes/[id]/edit/page.tsx` ~3.8k LoC) | **Resolved** — Tier B decompose landed (Waves 11–17 + S closure); tree consolidated under `(brewery)/recipes/` 2026-06 |
 | `apps/native/src/modules/*` | Pass — thin module slices |
 | `apps/web/src/*` | Pass — re-exports only |
 

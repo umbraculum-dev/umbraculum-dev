@@ -74,16 +74,18 @@ Apps (`apps/web`, `apps/native`) must follow **dependency direction** ([`DATA-AC
 |------|--------------|------|
 | `api-service` | `services/api/**` | Forbidden from all app elements |
 | `web-app-shared` | `apps/web/{src,app/_components,app/_lib}/**` | Allowed cross-route shared UI/helpers |
-| `web-water-shared` | `apps/web/app/recipes/[id]/water/{_lib,_hooks}/**` | Shared across mash/sparge/boil |
-| `web-water-segment` | `apps/web/app/recipes/[id]/water/*/**` | No sibling segment imports (e.g. mash → boil) |
-| `web-recipe-edit-shared` | `apps/web/app/recipes/[id]/edit/{_lib,_hooks}/**` | Shared edit helpers |
-| `web-recipe-edit-surface` | `apps/web/app/recipes/[id]/edit/**` | May import edit-shared, water-shared, app-shared only |
+| `web-water-shared` | `apps/web/app/[locale]/(brewery)/recipes/[id]/water/{_lib,_hooks}/**` | Shared across mash/sparge/boil |
+| `web-water-segment` | `apps/web/app/[locale]/(brewery)/recipes/[id]/water/*/**` | No sibling segment imports (e.g. mash → boil) |
+| `web-recipe-edit-shared` | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/{_lib,_hooks}/**` | Shared edit helpers |
+| `web-recipe-edit-surface` | `apps/web/app/[locale]/(brewery)/recipes/[id]/edit/**` | May import edit-shared, water-shared, app-shared only |
 | `web-locale-vertical` | `apps/web/app/[locale]/(pim\|mrp\|crp\|brewery\|automation)/**` | No cross-vertical imports (e.g. `(mrp)` → `(pim)`) |
-| `web-recipe-cluster` | `apps/web/app/recipes/**` | Must not import locale vertical admin UI source |
+| `web-recipe-cluster` | `apps/web/app/[locale]/(brewery)/recipes/**` | Must not import locale vertical admin UI source |
 | `native-app-shared` | `apps/native/src/{auth,components,…}/**` | Allowed cross-module shared surfaces |
 | `native-module-segment` | `apps/native/src/modules/*/**` | No sibling module imports (e.g. brewery → pim) |
 
 **Allowed without fence:** `@umbraculum/*` packages (`api-client`, `*-contracts`, `ui`, `brewery-*`, etc.) — not modelled as boundary elements.
+
+**Path history (2026-06):** WS5 recipe-cluster elements targeted legacy `apps/web/app/recipes/**` until the fork-cleanliness epic moved the sole implementation to `apps/web/app/[locale]/(brewery)/recipes/**`. Historical Phase 4 lint notes in this doc still cite legacy paths; current enforcement patterns are in the table above. Inventory: [`web-brewery-tree-consolidation-inventory.md`](design/web-brewery-tree-consolidation-inventory.md).
 
 **How to fix violations:**
 

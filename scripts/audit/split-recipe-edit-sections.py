@@ -8,8 +8,8 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 
-WEB_SRC = REPO / "apps/web/app/recipes/[id]/edit/_components/RecipeEditPageContent.tsx"
-WEB_OUT = REPO / "apps/web/app/recipes/[id]/edit/_components/sections"
+WEB_SRC = REPO / "apps/web/app/[locale]/(brewery)/recipes/[id]/edit/_components/RecipeEditPageContent.tsx"
+WEB_OUT = REPO / "apps/web/app/[locale]/(brewery)/recipes/[id]/edit/_components/sections"
 
 NATIVE_SRC = (
     REPO / "apps/native/src/modules/brewery/components/recipeEdit/RecipeEditScreenContent.tsx"

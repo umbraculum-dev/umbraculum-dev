@@ -58,7 +58,7 @@ flowchart TB
 |---|---|---|
 | **Platform backbone** | Cross-cutting services every module consumes ([RFC-0001 §8.2](../rfcs/0001-modules-tiers-governance-and-automation-placement.md)); single source of truth for tenancy and AI context | `services/api`, `@umbraculum/contracts`, `@umbraculum/module-sdk`, `@umbraculum/ui`, `@umbraculum/navigation`, `@umbraculum/rendering`, … |
 | **Canonical modules** | Peer operational domains (flat SAP-style decomposition, not nested under "manufacturing") | `automation`, `pim` (shipped); `mrp`, `crp` (alpha read-only shipped); `wms`, `crm` (open doors) |
-| **Vertical configuration** | Seed data, prompts, vertical UI — consumes canonicals, does not replace them | `brewery` (reference tier-6 configuration) |
+| **Vertical configuration** | Seed data, prompts, vertical UI — consumes canonicals, does not replace them | `brewery` (reference tier-6 configuration) — web slice under `apps/web/app/[locale]/(brewery)/` (β layout complete for recipes, 2026-06) |
 | **Application surfaces** | Deployable UIs or sites for a **specific audience** | `apps/web` + `apps/native` (operators); **Ubuntu Touch** via Click webapp shell over `apps/web` ([`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md)); `apps/website` (public orientation); future storefront = separate `apps/*` |
 
 **Repository layers vs product layers.** [REPOSITORY-STRUCTURE.md](../REPOSITORY-STRUCTURE.md) names layer 1 **Applications** (`apps/*`) and layer 2 **Services** (`services/*`). That is **spatial** (where code lives), not Drupal's merchant/customer split. Both web and native are operator applications talking to the same API.

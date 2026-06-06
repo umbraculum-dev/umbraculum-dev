@@ -1,5 +1,5 @@
-import { Link } from "../../../../../src/i18n/navigation";
-import { BrewAccordionSection } from "../../../../_components/BrewAccordionSection";
+import { Link } from "../../../../../../src/i18n/navigation";
+import { BrewAccordionSection } from "../../../../../_components/BrewAccordionSection";
 import { Button, SizableText, View, XStack, YStack } from "tamagui";
 
 import type { useRecipesPage } from "../../_hooks/useRecipesPage";

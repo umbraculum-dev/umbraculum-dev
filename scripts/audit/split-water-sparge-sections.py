@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-CONTENT = REPO / "apps/web/app/recipes/[id]/water/sparge/_components/WaterSpargePageContent.tsx"
+CONTENT = REPO / "apps/web/app/[locale]/(brewery)/recipes/[id]/water/sparge/_components/WaterSpargePageContent.tsx"
 SECTIONS_DIR = CONTENT.parent / "sections"
 
 SECTION_EXPORTS = {

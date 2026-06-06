@@ -259,7 +259,7 @@ Derivation contract:
   - the web (and future native app) maps IDs → localized labels via i18n keys
 
 Web rendering rules:
-- Use `apps/web/app/recipes/[id]/water/_lib/mathBodies.ts` as the shared renderer.
+- Use `apps/web/app/[locale]/(brewery)/recipes/[id]/water/_lib/mathBodies.ts` as the shared renderer.
 - Labels/copy live under:
   - `packages/i18n/src/en.json` → `math.derivation.*`
   - `packages/i18n/src/it.json` → `math.derivation.*`
@@ -406,7 +406,7 @@ SOLID is expressed as **concrete boundaries**, not abstract OOP dogma. Treat the
 
 Shopify optimises for **store uptime when an extension fails**; Umbraculum optimises for **legible, maintainable code shape** on core and modules — including vertical UI. **S** is the first lever: one file, one concern, one obvious place to debug.
 
-The brewery yeast editor [`apps/web/app/recipes/_components/yeastEditor/`](../../apps/web/app/recipes/_components/yeastEditor/) demonstrates the pattern:
+The brewery yeast editor [`apps/web/app/[locale]/(brewery)/recipes/_components/yeastEditor/`](../../apps/web/app/[locale]/(brewery)/recipes/_components/yeastEditor/) demonstrates the pattern:
 
 - **`YeastEditorRow`** — composes one ingredient row from parts; no single mega-render function.
 - **`YeastEditorRowIdentity`**, **`YeastEditorRowAttenuation`**, **`YeastEditorRowPitch`**, **`YeastEditorRowManualCount`** — each owns one field group; a newcomer adjusts pitch or attenuation without reading the whole editor.

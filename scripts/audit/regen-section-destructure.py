@@ -8,10 +8,10 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 
-WEB_HOOK = REPO / "apps/web/app/recipes/[id]/edit/_hooks/useRecipeEditPage.ts"
+WEB_HOOK = REPO / "apps/web/app/[locale]/(brewery)/recipes/[id]/edit/_hooks/useRecipeEditPage.ts"
 NATIVE_HOOK = REPO / "apps/native/src/modules/brewery/hooks/useRecipeEditScreen.ts"
 
-WEB_SECTIONS = REPO / "apps/web/app/recipes/[id]/edit/_components/sections"
+WEB_SECTIONS = REPO / "apps/web/app/[locale]/(brewery)/recipes/[id]/edit/_components/sections"
 NATIVE_SECTIONS = REPO / "apps/native/src/modules/brewery/components/recipeEdit/sections"
 
 

@@ -10,28 +10,28 @@ REPO = Path(__file__).resolve().parents[2]
 
 PAGES = [
     {
-        "rel": "apps/web/app/recipes/[id]/water/mash/page.tsx",
+        "rel": "apps/web/app/[locale]/(brewery)/recipes/[id]/water/mash/page.tsx",
         "func": "MashWaterPage",
         "hook": "useWaterMashPage",
         "model": "WaterMashPageModel",
         "content": "WaterMashPageContent",
     },
     {
-        "rel": "apps/web/app/recipes/[id]/water/sparge/page.tsx",
+        "rel": "apps/web/app/[locale]/(brewery)/recipes/[id]/water/sparge/page.tsx",
         "func": "SpargeWaterPage",
         "hook": "useWaterSpargePage",
         "model": "WaterSpargePageModel",
         "content": "WaterSpargePageContent",
     },
     {
-        "rel": "apps/web/app/recipes/[id]/water/boil/page.tsx",
+        "rel": "apps/web/app/[locale]/(brewery)/recipes/[id]/water/boil/page.tsx",
         "func": "BoilWaterPage",
         "hook": "useWaterBoilPage",
         "model": "WaterBoilPageModel",
         "content": "WaterBoilPageContent",
     },
     {
-        "rel": "apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/page.tsx",
+        "rel": "apps/web/app/[locale]/(brewery)/recipes/[id]/brew-sessions/[brewSessionId]/page.tsx",
         "func": "BrewSessionDetailPage",
         "hook": "useBrewSessionDetailPage",
         "model": "BrewSessionDetailPageModel",
