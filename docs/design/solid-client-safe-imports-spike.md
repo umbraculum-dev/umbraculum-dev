@@ -50,6 +50,7 @@ Grep of both package trees: zero `@prisma`, zero `services/api` imports.
 | Date | Wave | ci-parity `lint` WS6 warnings | False positives on `@umbraculum/brewery-*` | Decision |
 |------|------|--------------------------------|------------------------------------------|----------|
 | 2026-06-04 | Wave 13 Phase 9 | Archive lint **OK** on `951f51e` (no WS6 regressions observed in green run) | None reported | **Defer** warn→error — operator approval required for promotion PR; one full release cycle since Wave 11 not independently metered |
+| 2026-06-06 | Wave 14 Phase 8 | Archive lint **OK** on `d25fc8a` pre-commit baseline (full ci-parity green); no WS6 regressions observed | None reported | **Defer** warn→error — operator approval required for promotion PR |
 
 ---
 
