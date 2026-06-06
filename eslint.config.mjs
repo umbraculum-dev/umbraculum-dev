@@ -508,6 +508,8 @@ export default [
   // web-water-shared includes water/_lib/** and water/_hooks/** (cross-segment
   // helpers intentionally shared across mash/sparge/boil segments).
   // web-recipe-edit-shared mirrors that for edit/_lib + edit/_hooks.
+  // web-locale-vertical captures route-group folders under [locale]/ (pim, mrp, …).
+  // web-recipe-cluster covers the recipes App Router tree (after water/edit elements).
   // -------------------------------------------------------------------
   {
     files: ["apps/{web,native}/**/*.{ts,tsx}"],
@@ -552,6 +554,23 @@ export default [
           mode: "full",
         },
         {
+          type: "web-recipe-cluster",
+          pattern: "apps/web/app/recipes/**",
+          mode: "full",
+        },
+        {
+          type: "web-locale-vertical",
+          pattern: [
+            "apps/web/app/[[]locale[]]/(pim)/**",
+            "apps/web/app/[[]locale[]]/(mrp)/**",
+            "apps/web/app/[[]locale[]]/(crp)/**",
+            "apps/web/app/[[]locale[]]/(brewery)/**",
+            "apps/web/app/[[]locale[]]/(automation)/**",
+          ],
+          mode: "file",
+          capture: ["verticalCode"],
+        },
+        {
           type: "native-app-shared",
           pattern:
             "apps/native/src/{auth,components,i18n,lib,media,navigation,screens,theme,types}/**",
@@ -579,6 +598,8 @@ export default [
                 ["web-app-shared"],
                 ["web-water-segment"],
                 ["web-recipe-edit-surface"],
+                ["web-recipe-cluster"],
+                ["web-locale-vertical"],
                 ["native-app-shared"],
                 ["native-module-segment"],
               ],
@@ -597,10 +618,37 @@ export default [
               ],
             },
             {
+              from: [["web-recipe-cluster"]],
+              allow: [
+                ["web-recipe-edit-shared"],
+                ["web-recipe-edit-surface"],
+                ["web-water-shared"],
+                ["web-water-segment"],
+                ["web-app-shared"],
+              ],
+            },
+            {
+              from: [["web-locale-vertical"]],
+              allow: [["web-app-shared"]],
+            },
+            {
               from: [["web-water-segment"]],
               disallow: [
                 ["web-water-segment", { segmentCode: "!${from.segmentCode}" }],
               ],
+            },
+            {
+              from: [["web-locale-vertical"]],
+              disallow: [
+                [
+                  "web-locale-vertical",
+                  { verticalCode: "!${from.verticalCode}" },
+                ],
+              ],
+            },
+            {
+              from: [["web-recipe-cluster"]],
+              disallow: [["web-locale-vertical"]],
             },
             {
               from: [["native-module-segment"]],

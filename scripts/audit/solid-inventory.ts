@@ -33,6 +33,8 @@ const EXT = new Set([".ts", ".tsx"]);
 
 const MODULE_CODES = ["pim", "mrp", "crp", "automation", "brewery"] as const;
 
+const NATIVE_MODULE_CODES = ["pim", "mrp", "crp", "automation", "brewery"] as const;
+
 type InventoryRow = {
   path: string;
   loc: number;
@@ -107,6 +109,83 @@ function detectCrossModuleImports(files: string[]): InventoryRow[] {
           signal: `imports sibling module "${toModule}"`,
           suggestedAction: "Extract shared contract to platform/ or *-contracts; remove sibling import",
         });
+      }
+    }
+  }
+  return rows;
+}
+
+function detectAppCrossSegmentImports(files: string[]): InventoryRow[] {
+  const rows: InventoryRow[] = [];
+  const importRe = /from\s+["']([^"']+)["']/g;
+  const localeVerticalRe = /\((pim|mrp|crp|brewery|automation)\)/;
+
+  for (const file of files) {
+    const rel = relative(REPO_ROOT, file);
+    const isWebLocale = rel.includes("apps/web/app/[locale]/");
+    const isNativeModule = rel.includes("apps/native/src/modules/");
+    const isWebRecipe = rel.includes("apps/web/app/recipes/");
+    if (!isWebLocale && !isNativeModule && !isWebRecipe) continue;
+
+    const fromLocale = rel.match(/\[locale\]\/(\((?:pim|mrp|crp|brewery|automation)\))/)?.[1];
+    const fromNative = rel.match(/apps\/native\/src\/modules\/([a-z]+)\//)?.[1];
+
+    const content = readFileSync(file, "utf8");
+    let match: RegExpExecArray | null;
+    importRe.lastIndex = 0;
+    while ((match = importRe.exec(content)) !== null) {
+      const spec = match[1];
+      if (!spec.startsWith(".") && !spec.startsWith("@/")) continue;
+
+      const localeHit = spec.match(localeVerticalRe);
+      if (fromLocale && localeHit) {
+        const toGroup = `(${localeHit[1]})`;
+        if (toGroup !== fromLocale) {
+          rows.push({
+            path: rel,
+            loc: countLoc(file),
+            slice: classifySlice(rel),
+            principles: "D",
+            severity: "P0",
+            signal: `imports locale vertical "${toGroup}" from "${fromLocale}"`,
+            suggestedAction:
+              "Use @umbraculum/* packages or shared _lib; WS5 eslint blocks sibling vertical imports",
+          });
+          break;
+        }
+      }
+
+      if (isWebRecipe && localeHit) {
+        rows.push({
+          path: rel,
+          loc: countLoc(file),
+          slice: classifySlice(rel),
+          principles: "D",
+          severity: "P0",
+          signal: `recipes tree imports locale vertical "(${localeHit[1]})"`,
+          suggestedAction:
+            "Use contracts/api-client; WS5 web-recipe-cluster must not import locale vertical source",
+        });
+        break;
+      }
+
+      const nativeHit = spec.match(/(?:\.\.\/)+modules\/([a-z]+)\//);
+      if (
+        fromNative &&
+        nativeHit &&
+        nativeHit[1] !== fromNative &&
+        NATIVE_MODULE_CODES.includes(nativeHit[1] as (typeof NATIVE_MODULE_CODES)[number])
+      ) {
+        rows.push({
+          path: rel,
+          loc: countLoc(file),
+          slice: classifySlice(rel),
+          principles: "D",
+          severity: "P0",
+          signal: `imports native module "${nativeHit[1]}" from "${fromNative}"`,
+          suggestedAction: "Extract shared code to native-app-shared or @umbraculum/* package",
+        });
+        break;
       }
     }
   }
@@ -316,6 +395,7 @@ function main(): void {
   const rows = dedupeRows(
     sortRows([
       ...detectCrossModuleImports(files),
+      ...detectAppCrossSegmentImports(files),
       ...detectFatRoutes(files),
       ...detectLargeFiles(files),
       ...detectAppServerImports(files),

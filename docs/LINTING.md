@@ -19,6 +19,7 @@
 | Editor-only ESLint config | ✅ `eslint.config.editor.mjs` strips the 12 type-aware rules + `parserOptions.projectService` for editor-extension use. Saves ~6× wall time (~42s → ~7s) and mechanically defeats the auto-fix-overreach failure mode. Copy `.vscode/settings.json.example` to `.vscode/settings.json` to opt in. See [Recommended editor configuration](#recommended-editor-configuration). |
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | Canonical module sibling-import guard | ✅ `eslint-plugin-boundaries` `boundaries/element-types` at **`error`** on `services/api/src/modules/**` (SOLID B5, 2026-06-04). See [Canonical module boundaries](#canonical-module-boundaries). |
+| App layer segment / vertical guard | ✅ `eslint-plugin-boundaries` `boundaries/element-types` at **`error`** on `apps/{web,native}/**` (SOLID WS5, 2026-06). See [App layer boundaries (WS5)](#app-layer-boundaries-ws5). |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ✅ **All 12 rules at `error`** — HIGH-full Phase 5c (2026-05-16). 7 promise-correctness rules (`**/*.{ts,tsx}`) + 5 `no-unsafe-*` rules (`services/api/**` + `apps/web/**`). Tests relaxed via the `**/{tests,e2e}/**` + `**/*.{test,spec}.*` glob block. `parserOptions.projectService` infrastructure live. |
 | Outstanding warnings | **0** (-80 from Phase 6c, -58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,127 cumulative; was 1,127 at HIGH-light landing). **`npm run lint` exits clean — zero warnings, zero errors.** |
@@ -60,6 +61,39 @@ RFC-0002 canonical modules under `services/api/src/modules/**` must not import s
 Configuration lives in [`eslint.config.mjs`](../eslint.config.mjs) (scoped `files` glob). Spike + verdict: [`docs/design/solid-boundaries-eslint-spike.md`](design/solid-boundaries-eslint-spike.md). **`boundaries/element-types` is `error`** (merge-blocking since SOLID B5, 2026-06-04). Complementary report-only drift signal: `npm run audit:solid-inventory`.
 
 Horizontal paths (`services/api/src/routes/**`, `services/api/src/services/ai/tools/**`) are outside this rule's scope by design.
+
+### App layer boundaries (WS5)
+
+Apps (`apps/web`, `apps/native`) must follow **dependency direction** ([`DATA-ACCESS-BOUNDARIES.md`](DATA-ACCESS-BOUNDARIES.md) §6, [`solid-audit-charter.md`](design/solid-audit-charter.md) §2): UI talks to the API over HTTP + Zod contracts, not by importing server source or sibling feature folders they do not own.
+
+**Tool:** `eslint-plugin-boundaries` — `boundaries/element-types` at **`error`** on `apps/{web,native}/**/*.{ts,tsx}`. Complements WS6 `no-restricted-imports` (pattern-based `@prisma/*` and `services/api/**` block). Spike + verdict: [`docs/design/solid-boundaries-eslint-apps-spike.md`](design/solid-boundaries-eslint-apps-spike.md).
+
+**Element types (summary):**
+
+| Type | Path pattern | Rule |
+|------|--------------|------|
+| `api-service` | `services/api/**` | Forbidden from all app elements |
+| `web-app-shared` | `apps/web/{src,app/_components,app/_lib}/**` | Allowed cross-route shared UI/helpers |
+| `web-water-shared` | `apps/web/app/recipes/[id]/water/{_lib,_hooks}/**` | Shared across mash/sparge/boil |
+| `web-water-segment` | `apps/web/app/recipes/[id]/water/*/**` | No sibling segment imports (e.g. mash → boil) |
+| `web-recipe-edit-shared` | `apps/web/app/recipes/[id]/edit/{_lib,_hooks}/**` | Shared edit helpers |
+| `web-recipe-edit-surface` | `apps/web/app/recipes/[id]/edit/**` | May import edit-shared, water-shared, app-shared only |
+| `web-locale-vertical` | `apps/web/app/[locale]/(pim\|mrp\|crp\|brewery\|automation)/**` | No cross-vertical imports (e.g. `(mrp)` → `(pim)`) |
+| `web-recipe-cluster` | `apps/web/app/recipes/**` | Must not import locale vertical admin UI source |
+| `native-app-shared` | `apps/native/src/{auth,components,…}/**` | Allowed cross-module shared surfaces |
+| `native-module-segment` | `apps/native/src/modules/*/**` | No sibling module imports (e.g. brewery → pim) |
+
+**Allowed without fence:** `@umbraculum/*` packages (`api-client`, `*-contracts`, `ui`, `brewery-*`, etc.) — not modelled as boundary elements.
+
+**How to fix violations:**
+
+1. Move shared code to an explicit shared layer (`_lib`, `_hooks`, `web-app-shared`, or a `@umbraculum/*` package).
+2. Do **not** import `services/api/**` or `@prisma/*` from apps — use `@umbraculum/api-client` + contracts.
+3. Rare intentional coupling: document with `@arch-boundary` + README note per charter §6.
+
+Configuration: [`eslint.config.mjs`](../eslint.config.mjs) (WS5 block). Report-only drift signal: `npm run audit:solid-inventory` (app cross-segment heuristic).
+
+**Excluded (by design):** `apps/web/e2e/**` is outside WS5 scope until a dedicated policy lands.
 
 ### Client-safe package imports (WS6)
 

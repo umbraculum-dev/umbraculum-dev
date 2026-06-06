@@ -109,14 +109,13 @@ Full tier reference: [VERIFICATION-TIERS.md](../VERIFICATION-TIERS.md), [CI-PARI
 |------|-------|-------|
 | B5 `boundaries/element-types` | **error** | `services/api/src/modules/**` |
 | WS6 client-safe imports | **error** (post S-closure epic) | `apps/{web,native}/**` — see [solid-client-safe-imports-spike.md](./solid-client-safe-imports-spike.md) |
-| WS5 apps boundaries | deferred | Separate epic (Dependency **D**, not S) |
+| WS5 apps boundaries | **error** (pilot 2026-06-05; locale vertical expansion 2026-06) | `apps/{web,native}/**` — see [solid-boundaries-eslint-apps-spike.md](./solid-boundaries-eslint-apps-spike.md), [LINTING.md § App layer boundaries](../LINTING.md#app-layer-boundaries-ws5) |
 
 ---
 
 ## 8. Out of scope (separate epics)
 
 - OpenAPI generator / client split (P1 inventory — **I** segregation)
-- WS5 `apps/**` boundaries eslint spike
 - Full `BreweryScheduleProjection` port (Tier B — on-demand with MRP/CRP features)
 
 ---

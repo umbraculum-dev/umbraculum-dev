@@ -62,3 +62,15 @@ Notes:
 - Post–Wave 17 program closure doc (`solid-post-wave17-closure.md`), agent verification cross-links, WS6 **promoted to error**.
 - Recipe-edit composer thinning (web + native mashing parity), water/brew-session/equipment tail S splits.
 - Inventory P2/P3=0 unchanged; API not re-run (UI/docs/eslint only).
+
+## WS5 app boundaries @ c5f9945 (2026-06-06)
+
+```
+T2-PR acceptance @ c5f9945 (WS5 app-layer D): jobs=docs-readmes,lint,typecheck,dogfood-npm-smoke ci-parity=OK
+```
+
+Notes:
+
+- WS5 locale vertical + recipe-cluster fences at **error**; closure §7–8 reconciled; LINTING + charter §11 contributor docs.
+- Baseline **0** WS5 violations before and after expansion; inventory app cross-segment heuristic added (report-only).
+- API not re-run (eslint/docs/inventory script only).
