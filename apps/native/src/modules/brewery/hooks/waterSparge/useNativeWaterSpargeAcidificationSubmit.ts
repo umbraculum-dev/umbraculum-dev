@@ -5,6 +5,8 @@ import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 
 import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
 
+import { applyNativeWaterSpargeComputedResult } from "./applyNativeWaterSpargeComputedResult";
+import { buildNativeWaterSpargeAcidificationDraftPatch } from "./buildNativeWaterSpargeAcidificationDraftPatch";
 import type { NativeWaterSpargeAcidificationState } from "./useNativeWaterSpargeAcidificationState";
 
 export function useNativeWaterSpargeAcidificationSubmit(params: {
@@ -52,33 +54,8 @@ export function useNativeWaterSpargeAcidificationSubmit(params: {
   } = state;
 
   const buildDraftPatch = useCallback(
-    () => ({
-      spargeWaterProfileId: spargeWaterProfileId || null,
-      spargeStartingAlkalinityPpmCaCO3: startingAlk,
-      spargeStartingPh: startingPh.trim() === "" ? undefined : Number(startingPh),
-      spargeTargetPh: targetPh,
-      spargeVolumeLiters: volumeLiters,
-      spargeAcidType: acidType,
-      spargeStrengthKind: strengthKind,
-      spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
-      spargeAcidificationMode: acidificationMode,
-      spargeManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
-      spargeManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
-      spargeSaltAdditionsJson: saltAdditions,
-    }),
-    [
-      spargeWaterProfileId,
-      startingAlk,
-      startingPh,
-      targetPh,
-      volumeLiters,
-      acidType,
-      strengthKind,
-      strengthValue,
-      acidificationMode,
-      manualAcidAdded,
-      saltAdditions,
-    ],
+    () => buildNativeWaterSpargeAcidificationDraftPatch({ saltAdditions, state }),
+    [saltAdditions, state],
   );
 
   const onSaveDraft = useCallback(async () => {
@@ -130,33 +107,7 @@ export function useNativeWaterSpargeAcidificationSubmit(params: {
         spargeManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
       };
       const computed = await computeAndSaveSparge(api, recipeId, payload);
-      setSpargeManualResult(null);
-      setSpargeResult(null);
-      if (computed.acid.kind === "sparge_acidification_manual") {
-        const r = computed.acid.result;
-        setSpargeManualResult({
-          achievedPh: r.achievedPh ?? 0,
-          predicted: {
-            finalAlkalinityPpmCaCO3: r.predicted?.finalAlkalinityPpmCaCO3 ?? 0,
-            sulfateAddedPpm: r.predicted?.sulfateAddedPpm ?? 0,
-            chlorideAddedPpm: r.predicted?.chlorideAddedPpm ?? 0,
-          },
-        });
-        setSpargeResult(r.predicted ?? null);
-        setCalcSaveStatus("Estimated & saved snapshot.");
-      } else {
-        const r = computed.acid.result;
-        setSpargeResult({
-          acidRequiredMl: r.acidRequiredMl ?? null,
-          acidRequiredTsp: r.acidRequiredTsp ?? null,
-          acidRequiredGrams: r.acidRequiredGrams ?? null,
-          acidRequiredKg: r.acidRequiredKg ?? null,
-          finalAlkalinityPpmCaCO3: r.finalAlkalinityPpmCaCO3 ?? 0,
-          sulfateAddedPpm: r.sulfateAddedPpm ?? 0,
-          chlorideAddedPpm: r.chlorideAddedPpm ?? 0,
-        });
-        setCalcSaveStatus("Calculated & saved snapshot.");
-      }
+      applyNativeWaterSpargeComputedResult(computed, state);
       if (computed.settings) setSettings(computed.settings as unknown as Record<string, unknown>);
     } catch (err) {
       setError(String(err));
@@ -186,6 +137,7 @@ export function useNativeWaterSpargeAcidificationSubmit(params: {
     setSpargeManualResult,
     setCalcSaveStatus,
     setSubmitting,
+    state,
   ]);
 
   return { onSaveDraft, onCalculateAndSave };

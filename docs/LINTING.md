@@ -63,7 +63,7 @@ Horizontal paths (`services/api/src/routes/**`, `services/api/src/services/ai/to
 
 ### Client-safe package imports (WS6)
 
-Apps must not import `@prisma/*` or `services/api/**` source (belt-and-suspenders alongside WS5 `eslint-plugin-boundaries`). Burn-in rule: `no-restricted-imports` at **`warn`** on `apps/{web,native}/**` — see [`docs/design/solid-client-safe-imports-spike.md`](design/solid-client-safe-imports-spike.md). Allowlist: [`scripts/eslint/appClientPackageAllowlist.mjs`](../scripts/eslint/appClientPackageAllowlist.mjs).
+Apps must not import `@prisma/*` or `services/api/**` source (belt-and-suspenders alongside WS5 `eslint-plugin-boundaries`). Rule: `no-restricted-imports` at **`error`** on `apps/{web,native}/**` (promoted S closure epic 2026-06) — see [`docs/design/solid-client-safe-imports-spike.md`](design/solid-client-safe-imports-spike.md). Allowlist: [`scripts/eslint/appClientPackageAllowlist.mjs`](../scripts/eslint/appClientPackageAllowlist.mjs).
 
 ---
 

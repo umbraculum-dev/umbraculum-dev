@@ -620,13 +620,13 @@ export default [
   // Belt-and-suspenders alongside WS5 boundaries: forbid @prisma and
   // services/api source imports from apps. Verified client-safe packages
   // are allowlisted in scripts/eslint/appClientPackageAllowlist.mjs.
-  // Promote to error after burn-in cycle — see solid-client-safe-imports-spike.md.
+  // Promoted to error 2026-06 (S closure epic) — see solid-client-safe-imports-spike.md.
   // -------------------------------------------------------------------
   {
     files: ["apps/{web,native}/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
-        "warn",
+        "error",
         {
           paths: [
             {

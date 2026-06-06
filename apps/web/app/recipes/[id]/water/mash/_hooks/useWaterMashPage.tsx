@@ -1,17 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
-import { getRecipe } from "@umbraculum/api-client/brewery";
-import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
-
 import { useRequireAuth } from "../../../../../_lib/useRequireAuth";
-import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import { formatWithHint } from "../../../../../../src/i18n/format";
 import { useWaterSurfaceMath } from "../../_hooks/useWaterSurfaceMath";
-import { fetchRecipeWaterSettings, saveRecipeWaterSettings } from "../../_lib/waterSettings";
+import { saveRecipeWaterSettings } from "../../_lib/waterSettings";
+import { buildWaterMashPageReturn } from "./buildWaterMashPageReturn";
 import {
   useWaterMashAcidification,
   type MashAdjustmentFieldsRef,
@@ -19,6 +16,7 @@ import {
 } from "./useWaterMashAcidification";
 import { useWaterMashAdjustment } from "./useWaterMashAdjustment";
 import { useWaterMashGrist } from "./useWaterMashGrist";
+import { useWaterMashPageLoad } from "./useWaterMashPageLoad";
 import { useWaterMashProfiles } from "./useWaterMashProfiles";
 import { useWaterMashSalts, type MashSaltsBridgeRef } from "./useWaterMashSalts";
 import { useWaterMashSteps } from "./useWaterMashSteps";
@@ -36,19 +34,9 @@ export function useWaterMashPage() {
 
   const canCall = authState.status === "ready";
 
-  const loadRecipeMeta = useCallback(async (id: string) => {
-    try {
-      const data = await getRecipe(webBreweryApiClient(), id);
-      return parseRecipeMetaFromGetRecipeResponse(data);
-    } catch {
-      return null;
-    }
-  }, []);
-
   const profilesHook = useWaterMashProfiles(canCall);
   const { surfaceMath, setSurfaceMath } = useWaterSurfaceMath("mash");
   const [openMashSections, setOpenMashSections] = useState<string[]>(["adjustment"]);
-  const [settingsError, setSettingsError] = useState<string | null>(null);
   const [savingError, setSavingError] = useState<string | null>(null);
   const [formatHints, setFormatHints] = useState<Record<string, { decimals?: number }> | undefined>(undefined);
 
@@ -146,36 +134,16 @@ export function useWaterMashPage() {
     ensureZeroSaltsSnapshotIfMissing: salts.ensureZeroSaltsSnapshotIfMissing,
   };
 
-  const loadSettings = useCallback(async () => {
-    if (!canCall || !recipeId) return;
-    setSettingsError(null);
-    try {
-      const data = await fetchRecipeWaterSettings(recipeId);
-      const s = data.settings;
-      if (!s) return;
-      adjustment.hydrateMashAdjustment(s);
-      acid.hydrateMashAcidification(s);
-      salts.hydrateMashSalts(s);
-      grist.hydrateMashGrist(s);
-    } catch (err) {
-      setSettingsError(String(err));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate fns are stable useCallbacks from section hooks
-  }, [
+  const pageLoad = useWaterMashPageLoad({
     canCall,
     recipeId,
-    adjustment.hydrateMashAdjustment,
-    acid.hydrateMashAcidification,
-    salts.hydrateMashSalts,
-    grist.hydrateMashGrist,
-  ]);
+    adjustment,
+    acid,
+    salts,
+    grist,
+  });
 
-  useEffect(() => {
-    if (!canCall) return;
-    void loadSettings();
-  }, [canCall, recipeId, loadSettings]);
-
-  return {
+  return buildWaterMashPageReturn({
     locale,
     tWater,
     t,
@@ -185,37 +153,25 @@ export function useWaterMashPage() {
     authState,
     params,
     recipeId,
-    loadRecipeMeta,
-    me: profilesHook.me,
-    profiles: profilesHook.profiles,
-    loadingProfiles: profilesHook.loadingProfiles,
-    profilesError: profilesHook.profilesError,
-    settingsError,
-    setSettingsError,
+    pageLoad,
+    profilesHook,
+    surfaceMath,
+    setSurfaceMath,
+    openMashSections,
+    setOpenMashSections,
     savingError,
     setSavingError,
     formatHints,
     setFormatHints,
     fmt,
     canCall,
-    surfaceMath,
-    setSurfaceMath,
-    openMashSections,
-    setOpenMashSections,
-    refreshProfiles: profilesHook.refreshProfiles,
-    loadSettings,
-    waterVolumes: steps.waterVolumes,
-    allProfiles: profilesHook.allProfiles,
-    waterProfiles: profilesHook.waterProfiles,
-    dilutionProfiles: profilesHook.dilutionProfiles,
-    admin: profilesHook.admin,
     saveSettings,
-    ...adjustment,
-    ...grist,
-    ...acid,
-    ...salts,
-    ...steps,
-  };
+    adjustment,
+    grist,
+    acid,
+    salts,
+    steps,
+  });
 }
 
 export type WaterMashPageModel = ReturnType<typeof useWaterMashPage>;

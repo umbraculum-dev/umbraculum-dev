@@ -295,6 +295,7 @@ python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base or
    `verify:pre-push` selects `--archive` automatically when the tree is clean.
    On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@<same-version-as-CI_PARITY_PKG_VERSION> -- run --archive` (read `CI_PARITY_PKG_VERSION` from [`scripts/ci-parity-check.sh`](scripts/ci-parity-check.sh)).
    Skill: **`path-aware-pre-push`**. Full table: [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § Pre-push commands reference.
+   **SOLID program:** closed post–Wave 17 — see [`docs/design/solid-post-wave17-closure.md`](docs/design/solid-post-wave17-closure.md) §6 (verification gates; do not treat pre-push as a new SOLID initiative).
 3. T2-PR **auto-runs API vitest** when the diff matches `.github/workflows/api.yml`
    paths (via `.umbraculum/gha-trigger-map.json`). For manifest-only work outside
    the resolver, still run skill **`api-integration-tests-pre-push`** when applicable.

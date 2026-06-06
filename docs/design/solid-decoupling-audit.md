@@ -240,3 +240,19 @@ Would have **failed** SOUND if:
 ---
 
 *Audit body frozen 2026-06-04. Inventory rows regenerate via script; do not edit solid-audit-inventory.md by hand.*
+
+---
+
+## 10. Post–Wave 17 addendum (2026-06)
+
+**Status:** Mechanical Waves 11–17 + Tier A/B epic **complete** on `master` (`bfd6214`).
+
+Rows in §3 referencing ~1.2k LoC `recipesService` / `brewSessionsService`, ~3.8k LoC recipe edit `page.tsx`, and ~2k LoC water pages are **superseded**. Current state:
+
+- God services decomposed to facades + focused services under `services/api/src/services/`.
+- God pages reduced to thin shells (~9 LoC) + hooks/components.
+- Inventory automation: **P2=0, P3=0**; P1 = generated OpenAPI only.
+
+**Canonical program status:** [solid-post-wave17-closure.md](./solid-post-wave17-closure.md).
+
+Do not schedule Wave 18+ unless inventory regresses (see closure doc §4).

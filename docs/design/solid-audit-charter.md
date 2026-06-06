@@ -122,4 +122,12 @@ Output: [solid-audit-inventory.md](./solid-audit-inventory.md) (committed snapsh
 
 ---
 
+## 10. Post–Wave 17 program closure
+
+Mechanical Waves 11–17 and the Tier A/B implementation epic are **complete**. Inventory automation is green (P2/P3=0) except generated OpenAPI (P1 tooling).
+
+**Canonical status for agents and maintainers:** [solid-post-wave17-closure.md](./solid-post-wave17-closure.md) — includes when to reopen hygiene waves, Tier C wont-fix list, and verification gates for SOLID PRs.
+
+---
+
 *Charter frozen 2026-06-04. Amend only when the scoring rubric or slice model needs revision — not for individual inventory rows (those live in solid-audit-inventory.md).*

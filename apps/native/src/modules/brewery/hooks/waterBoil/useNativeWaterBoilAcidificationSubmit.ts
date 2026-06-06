@@ -5,6 +5,9 @@ import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 
 import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
 
+import { applyNativeWaterBoilComputedResult } from "./applyNativeWaterBoilComputedResult";
+import { buildNativeWaterBoilAcidificationComputePayload } from "./buildNativeWaterBoilAcidificationComputePayload";
+import { buildNativeWaterBoilAcidificationDraftPatch } from "./buildNativeWaterBoilAcidificationDraftPatch";
 import type { NativeWaterBoilAcidificationState } from "./useNativeWaterBoilAcidificationState";
 
 export function useNativeWaterBoilAcidificationSubmit(params: {
@@ -47,14 +50,7 @@ export function useNativeWaterBoilAcidificationSubmit(params: {
   } = params;
 
   const {
-    startingAlk,
     startingPh,
-    targetPh,
-    acidType,
-    strengthKind,
-    strengthValue,
-    acidificationMode,
-    manualAcidAdded,
     setAcidResult,
     setManualResult,
     setCalcSaveStatus,
@@ -62,38 +58,24 @@ export function useNativeWaterBoilAcidificationSubmit(params: {
   } = state;
 
   const buildDraftPatch = useCallback(
-    () => ({
-      boilSourceWaterProfileId: sourceProfileId || null,
-      boilTargetWaterProfileId: targetProfileId || null,
-      boilDilutionWaterProfileId: dilutionProfileId || null,
-      boilTapWaterVolumeLiters: tapVolumeLiters,
-      boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
-      boilStartingAlkalinityPpmCaCO3: startingAlk,
-      boilStartingPh: startingPh.trim() === "" ? undefined : Number(startingPh),
-      boilTargetPh: targetPh,
-      boilAcidType: acidType,
-      boilStrengthKind: strengthKind,
-      boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
-      boilAcidificationMode: acidificationMode,
-      boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
-      boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
-      boilSaltAdditionsJson: saltAdditions,
-    }),
+    () =>
+      buildNativeWaterBoilAcidificationDraftPatch({
+        sourceProfileId,
+        targetProfileId,
+        dilutionProfileId,
+        tapVolumeLiters,
+        dilutionVolumeLiters,
+        saltAdditions,
+        state,
+      }),
     [
       sourceProfileId,
       targetProfileId,
       dilutionProfileId,
       tapVolumeLiters,
       dilutionVolumeLiters,
-      startingAlk,
-      startingPh,
-      targetPh,
-      acidType,
-      strengthKind,
-      strengthValue,
-      acidificationMode,
-      manualAcidAdded,
       saltAdditions,
+      state,
     ],
   );
 
@@ -135,50 +117,16 @@ export function useNativeWaterBoilAcidificationSubmit(params: {
     setSubmitting(true);
     try {
       const api = nativePlatformApiClient(token!, baseUrl);
-      const payload: Record<string, unknown> = {
-        boilSourceWaterProfileId: sourceProfileId,
-        boilDilutionWaterProfileId: dilutionProfileId || null,
-        boilTapWaterVolumeLiters: tapVolumeLiters,
-        boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
-        boilStartingAlkalinityPpmCaCO3: startingAlk,
-        boilStartingPh: Number(startingPh),
-        boilTargetPh: targetPh,
-        boilAcidType: acidType,
-        boilStrengthKind: strengthKind,
-        boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
-        boilAcidificationMode: acidificationMode,
-        boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
-        boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
-        boilSaltAdditionsJson: saltAdditions,
-      };
+      const payload = buildNativeWaterBoilAcidificationComputePayload({
+        sourceProfileId,
+        dilutionProfileId,
+        tapVolumeLiters,
+        dilutionVolumeLiters,
+        saltAdditions,
+        state,
+      });
       const computed = await computeAndSaveBoil(api, recipeId, payload);
-      setManualResult(null);
-      setAcidResult(null);
-      if (computed.acid.kind === "boil_acidification_manual") {
-        const r = computed.acid.result;
-        setManualResult({
-          achievedPh: r.achievedPh ?? 0,
-          predicted: {
-            finalAlkalinityPpmCaCO3: r.predicted?.finalAlkalinityPpmCaCO3 ?? 0,
-            sulfateAddedPpm: r.predicted?.sulfateAddedPpm ?? 0,
-            chlorideAddedPpm: r.predicted?.chlorideAddedPpm ?? 0,
-          },
-        });
-        setAcidResult(r.predicted ?? null);
-        setCalcSaveStatus("Estimated & saved snapshot.");
-      } else {
-        const r = computed.acid.result;
-        setAcidResult({
-          acidRequiredMl: r.acidRequiredMl ?? null,
-          acidRequiredTsp: r.acidRequiredTsp ?? null,
-          acidRequiredGrams: r.acidRequiredGrams ?? null,
-          acidRequiredKg: r.acidRequiredKg ?? null,
-          finalAlkalinityPpmCaCO3: r.finalAlkalinityPpmCaCO3 ?? 0,
-          sulfateAddedPpm: r.sulfateAddedPpm ?? 0,
-          chlorideAddedPpm: r.chlorideAddedPpm ?? 0,
-        });
-        setCalcSaveStatus("Calculated & saved snapshot.");
-      }
+      applyNativeWaterBoilComputedResult(computed, state);
       if (computed.settings) setSettings(computed.settings as unknown as Record<string, unknown>);
     } catch (err) {
       setError(String(err));
@@ -197,13 +145,6 @@ export function useNativeWaterBoilAcidificationSubmit(params: {
     dilutionProfileId,
     tapVolumeLiters,
     dilutionVolumeLiters,
-    startingAlk,
-    targetPh,
-    acidType,
-    strengthKind,
-    strengthValue,
-    acidificationMode,
-    manualAcidAdded,
     saltAdditions,
     recipeId,
     setSettings,
@@ -211,6 +152,7 @@ export function useNativeWaterBoilAcidificationSubmit(params: {
     setManualResult,
     setCalcSaveStatus,
     setSubmitting,
+    state,
   ]);
 
   return { onSaveDraft, onCalculateAndSave };
