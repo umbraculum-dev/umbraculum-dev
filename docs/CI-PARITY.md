@@ -43,7 +43,7 @@ Other commands:
 | `--ci` | Mount the live checkout (includes uncommitted edits). **Default via `./scripts/ci-parity-check.sh`.** |
 | `--archive` | Wrapper-only: force `git archive` snapshot (omit `--ci`). Use when replaying a specific commit or debugging archive-only drift. |
 
-**Snapshot modes (agents: read before push):**
+## Snapshot modes (read this before pre-push)
 
 | Mode | Command | What gets tested | When to use |
 |------|---------|------------------|-------------|

@@ -1,7 +1,7 @@
 # Pre-flip application-surface backbone — structural audit and target shape
 
 **Tier:** Public  
-**Status:** v0.1 — pre-flip planning (2026-06-06); companion to [RFC-0011](../rfcs/0011-application-surface-shell-layering.md)  
+**Status:** Pre-flip epic **closed** (2026-06-07) — companion to [RFC-0011](../rfcs/0011-application-surface-shell-layering.md); sign-off [rfc-0011-pre-flip-closure.md](rfc-0011-pre-flip-closure.md)  
 **Audience:** maintainers, integrators forking umbraculum-dev, agent executors, module authors  
 **Related:** [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md) (β module slices), [REPOSITORY-STRUCTURE.md](../REPOSITORY-STRUCTURE.md), [BUILDING-YOUR-VERTICAL.md](../BUILDING-YOUR-VERTICAL.md), [application-surfaces-vs-platform-backbone.md](application-surfaces-vs-platform-backbone.md), [forkable-repo-cleanliness-audit.md](forkable-repo-cleanliness-audit.md)
 
@@ -419,6 +419,8 @@ No change to HTTP paths — filesystem clarity only.
 
 ## 8. Relationship to completed / in-flight work
 
+> **Pre-flip epic closed (2026-06-07).** Waves 0–6 and the post-W6 backlog (3e Phase 2, cross-module UI, `@umbraculum/brewery-api-client`, Rule 63, brochure extraction) are **landed**. Post-flip opportunistic work only — see [§13](#13-post-flip-opportunistic-backlog).
+
 | Work | Status | Backbone relationship |
 |------|--------|----------------------|
 | Fork-cleanliness Part B (brewery recipes tree) | **Done** | Prerequisite — module routes correct |
@@ -487,14 +489,16 @@ flowchart TB
 
 ---
 
-## 11. Open questions for maintainer decision
+## 11. Maintainer decisions — closed for pre-flip
 
-1. **Route group name:** `(platform-layout)/` vs `(platform)/` — latter collides mentally with `[locale]/platform/` admin. Prefer **`(platform-layout)/`** or **`(platform-layout)/`**.
-2. **Native multi-app CI:** one EAS project per app vs monorepo matrix — defer to [NATIVE-STRATEGY-AND-CI.md](../NATIVE-STRATEGY-AND-CI.md) amendment.
-3. **On-disk package move (Wave 3a):** before flip (cleaner first fork) vs after (less churn now).
-4. **`brewery-contracts` extraction (Wave 3b):** pre-flip vs post-flip — pre-flip aligns public seed with RFC-0002 text.
-5. **Integrator doc:** update BUILDING-YOUR-VERTICAL with “shared layout vs module vs vertical” filesystem diagram after Wave 1. — **Closed (Wave 6, 2026-06-07)**
-6. **`app/_shared-layout/` path and doc vocabulary (Wave 3f):** **Closed (2026-06-07)** — **workspace web UI** retained as integrator term per RFC-0011 §3.1; deprecated slang (`operator shell`, `/_shell/`, `WebShellNotice`) removed from integrator prose.
+| # | Question | Resolution |
+|---|----------|------------|
+| 1 | Route group name: `(platform-layout)/` vs `(platform)/` | **Closed** — `(platform-layout)/` (Wave 3f) |
+| 2 | Native multi-app CI matrix | **Deferred post-flip** — [NATIVE-STRATEGY-AND-CI.md](../NATIVE-STRATEGY-AND-CI.md) amendment |
+| 3 | On-disk package move (Wave 3a) timing | **Closed pre-flip** — landed 2026-06-07 |
+| 4 | `brewery-contracts` extraction timing | **Closed pre-flip** — Wave 3b |
+| 5 | BUILDING-YOUR-VERTICAL filesystem diagram | **Closed** — Wave 6 |
+| 6 | `_shared-layout/` path and doc vocabulary | **Closed** — Wave 3f; **workspace web UI** retained per RFC-0011 §3.1 |
 
 ---
 
@@ -512,10 +516,19 @@ Audit (2026-06-07, Wave 6): full table in [`rfc-0011-wave-6-doc-capstone-build-l
 | 6 | Native README multi-app pattern | **Met** — Wave 4A umbrella + Wave 4B `@umbraculum/native-shell` |
 | 7 | REPOSITORY-STRUCTURE ↔ RFC-0011 ↔ backbone linked | **Met** |
 
-1. A new contributor can open `apps/web/app/` and identify **platform shared layout**, **platform horizontal pages**, **canonical module**, and **vertical** folders without reading chat history.
-2. Deprecated internal slang (`operator shell`, `/_shell/`, `WebShellNotice`, …) returns zero hits in `docs/` and `apps/web/` except RFC-0011 historical title and `@umbraculum/native-shell` package name.
-3. `grep brewery-only paths outside `(brewery)/`` returns zero — brewery naming only under `(brewery)/` or `@umbraculum/brewery-*`.
-4. `grep brewery packages/platform` returns zero — no vertical subtrees under platform packages.
-5. `@umbraculum/brewery-contracts` exists; `@umbraculum/contracts` root export has no brewery/water/analysis paths.
-6. Native README describes **multi-app workspace** pattern with one reference app shipped.
-7. [REPOSITORY-STRUCTURE.md](../REPOSITORY-STRUCTURE.md) and RFC-0011 cross-link this doc; deferral register lists anything intentionally post-flip.
+Pre-flip sign-off: [rfc-0011-pre-flip-closure.md](rfc-0011-pre-flip-closure.md).
+
+---
+
+## 13. Post-flip opportunistic backlog
+
+These items **do not** block public-alpha flip. Land opportunistically on feature work or dedicated hygiene PRs.
+
+| Item | Notes |
+|------|-------|
+| **API flat-services eslint fence** | Landed pre-flip (2026-06-07) — [solid-boundaries-eslint-api-flat-services-spike.md](solid-boundaries-eslint-api-flat-services-spike.md); prevents Wave 3e regression |
+| **Apps → `@umbraculum/brewery-api-client`** | ~30 web files still import `@umbraculum/api-client/brewery` shim; migrate when touching those call sites |
+| **`platformRecipesService` refactor** | `@arch-boundary` allowlist — delegate path could move into module or platform route layer |
+| **Second native app scaffold** | Post-alpha — maintainer to choose **PIM handheld** (`apps/native/pim/`) vs **quality** app after structure is stable (2026-06-07 Step 4) |
+| **F-mod brewery-less product SKU** | Post-alpha — deferral register F-mod row |
+| **`docs-site/` sister-repo extraction** | Post-alpha — R-POLICY |

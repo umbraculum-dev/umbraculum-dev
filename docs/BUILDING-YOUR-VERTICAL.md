@@ -33,7 +33,7 @@ Umbraculum uses the **same three-layer idea** with different packaging today:
 > **Magento:** `composer require` core → skip or remove sample data → add your modules in the merchant project.  
 > **Umbraculum (intent):** depend on platform + canonical modules → omit reference vertical → register **your** vertical from **your** repo.
 
-**Where we are honest:** Magento has had a clean **optional sample-data** story for years. Umbraculum's **reference vertical is still wired like core** in the stock monorepo build — that is a **known product gap**, not the long-term model. [`GLOSSARY.md`](GLOSSARY.md) FAQ #5; [§ Running without brewery](#running-without-brewery-today-vs-target) below.
+**Where we are honest:** Magento has had a clean **optional sample-data** story for years. Umbraculum's **reference vertical is still wired like core** in the stock monorepo build — that is a **known product gap**, not the long-term model. [`GLOSSARY.md`](GLOSSARY.md) FAQ #5; [§ Question 2 — Running without brewery (today vs target)](#question-2--running-without-brewery-today-vs-target) below.
 
 Practitioner context (stewardship, agency-owned stacks): [`design/ecosystem-case-study-adobe-magento.md`](design/ecosystem-case-study-adobe-magento.md). Odoo/Omnis "core vs vertical product" parallels: [`GLOSSARY.md`](GLOSSARY.md) §"Where code lives".
 

@@ -57,6 +57,11 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
+        label: 'packages/verticals/brewery/api-client',
+        href: '/reference/packages/verticals/brewery/api-client/',
+      },
+      {
+        type: 'link',
         label: 'packages/verticals/brewery/contracts',
         href: '/reference/packages/verticals/brewery/contracts/',
       },

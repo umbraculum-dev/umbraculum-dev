@@ -6,7 +6,7 @@
   "scripts": {
     "prestart": "node scripts/copy-brand-assets.mjs",
     "start": "docusaurus start --host 0.0.0.0 --port 3000",
-    "prebuild": "node scripts/copy-brand-assets.mjs",
+    "prebuild": "node scripts/copy-brand-assets.mjs && node scripts/sync-openapi-static.mjs",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear",

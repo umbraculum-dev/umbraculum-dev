@@ -30,6 +30,7 @@ const referencePackagesReadmes = [
   'verticals/brewery/beerjson/README.md',
   'platform/contracts/README.md',
   'verticals/brewery/contracts/README.md',
+  'verticals/brewery/api-client/README.md',
   'verticals/brewery/core/README.md',
   'modules/crp-contracts/README.md',
   'verticals/brewery/i18n/README.md',

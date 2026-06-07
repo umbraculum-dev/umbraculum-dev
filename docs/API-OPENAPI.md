@@ -243,7 +243,7 @@ Phase E6d-native migrates all brewery-domain screens under `apps/native/src/modu
 | E6d-PR2 | `RecipesListScreen`, `RecipeEditScreen`, `YeastScreen`, `EquipmentScreen`, `BrewdayStepsSettingsScreen`, `WaterProfilesScreen` | `@umbraculum/api-client/brewery` recipes/styles/ingredients/equipment/brewday/water-settings |
 | E6d-PR3 | `BrewSessionDetailScreen`, `FermDataIntegrationScreen` | `brewSessions` + `platform/integrations` |
 
-Completed in E10: `AdSlot.tsx`, `openWebFallback.ts` — see [Phase E10-native-tail](#phase-e10-native-tail-2026-06-02) below.
+Completed in E10: `AdSlot.tsx`, `openWebFallback.ts` — see [Phase E10-native-tail](#phase-e10-native-tail--native-platform-migration-2026-06-02) below.
 
 **Grep gate:** zero raw `api.(get|post|patch|delete)(…'/api/(recipes|brew-sessions|…)` under `apps/native/src/modules/brewery/`.
 

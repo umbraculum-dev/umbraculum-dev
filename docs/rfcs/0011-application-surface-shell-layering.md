@@ -174,6 +174,8 @@ Folder ownership mirrors §3–§6. Not required for public-alpha if deferral re
 
 See [`pre-flip-application-surface-backbone.md`](../design/pre-flip-application-surface-backbone.md) §9. RFC acceptance precedes Wave 1 merges.
 
+**Pre-flip implementation complete (2026-06-07).** All waves 0–6 and the post-W6 backlog are landed. Post-flip opportunistic work is listed in [backbone §13](../design/pre-flip-application-surface-backbone.md) and [rfc-0011-pre-flip-closure.md](../design/rfc-0011-pre-flip-closure.md).
+
 **Ordered follow-ons (backbone §9, abbreviated):**
 
 | After | Wave | Notes |
@@ -214,7 +216,7 @@ Integrator docs synced with post–Wave 3a/3c/3d reality:
 2. Playwright projects: `platform`, `canonical`, `verticals-brewery`.
 3. [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md), [`docs/TESTING.md`](../TESTING.md) L5 layer map updated.
 4. [`packages/platform/test-mcp`](../../packages/platform/test-mcp/) — `--project=platform`, example `platform/auth.spec.ts`.
-5. Rule 63 b2c/b2b filename prefixes **deferred**.
+5. Rule 63 b2c/b2b filename prefixes — **closed (2026-06-07)**; all 11 specs use `b2b-registered-*`.
 
 ### 10.4 Wave 4 — native multi-app + `@umbraculum/native-shell` (complete 2026-06-07)
 
@@ -223,7 +225,7 @@ Integrator docs synced with post–Wave 3a/3c/3d reality:
 3. Brewery app imports `@umbraculum/native-shell/*`; navigation + vertical screens remain in `apps/native/brewery/`.
 4. CI/ci-parity/eslint/docs-site/README updates; `build:packages` includes native-shell.
 
-**Deferred:** second native app scaffold (`apps/native/pim-floor/` etc.).
+**Deferred:** second native app scaffold (`apps/native/pim/` or `pim-handheld/` — post-alpha; see [rfc-0011-pre-flip-closure.md](../design/rfc-0011-pre-flip-closure.md)).
 
 ---
 

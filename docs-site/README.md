@@ -51,7 +51,7 @@ Browsable OpenAPI on the docs site uses **Redoc standalone** inside a Docusaurus
 | [`src/components/OpenApiRedocEmbed.tsx`](src/components/OpenApiRedocEmbed.tsx) | **Reuse this** — loads Redoc CDN script, calls `Redoc.init`, re-inits on theme toggle |
 | [`src/openapi/redocTheme.ts`](src/openapi/redocTheme.ts) | Light/dark theme presets synced with Docusaurus `useColorMode()` |
 | [`src/css/custom.css`](src/css/custom.css) | `.openapi-redoc-host` / `.openapi-redoc-page` — stops IFM dark-mode typography from overriding Redoc text |
-| [`static/openapi/*.json`](static/openapi/) | Static copies of committed specs (mirrored from `services/api/openapi/` on generate) |
+| [`static/openapi/*.json`](static/openapi/) | Static copies of committed specs — **`prebuild` runs `scripts/sync-openapi-static.mjs`** from `services/api/openapi/`; verify with `python3 scripts/docs/check-docs-site-openapi-sync.py` |
 | [`src/pages/openapi-platform.tsx`](src/pages/openapi-platform.tsx) | Platform catalog page — `/openapi-platform` |
 | [`src/pages/openapi-brewery.tsx`](src/pages/openapi-brewery.tsx) | Brewery add-on page — `/openapi-brewery` |
 

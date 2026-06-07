@@ -60,6 +60,7 @@ Listed in [`forkable-repo-cleanliness-audit.md`](forkable-repo-cleanliness-audit
 | Path-aware T2-PR pre-push | 2026-06 | `npm run verify:pre-push` |
 | Legacy `apps/web/app/recipes/` dual tree | 2026-06 | Consolidated to `(brewery)/recipes/**` |
 | Brochure (`apps/website/`) → `umbraculum-brochure` | 2026-06-07 | Pre-flip extraction; `@umbraculum/brochure`; Cloudflare Worker unchanged |
+| RFC-0011 application-surface backbone (waves 0–6 + post-W6 backlog) | 2026-06-07 | [rfc-0011-pre-flip-closure.md](rfc-0011-pre-flip-closure.md) |
 
 ---
 

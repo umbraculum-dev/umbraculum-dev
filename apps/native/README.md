@@ -28,7 +28,7 @@ Manufacturing/ERP products often ship **multiple mobile apps** against one backe
 apps/native/
   brewery/                 # @umbraculum/native-brewery — reference brew-day app (shipping)
   # future (scaffold only until product need):
-  # pim-floor/             # @umbraculum/native-pim-floor
+  # pim/                 # @umbraculum/native-pim — shop-floor / handheld (post-alpha scaffold)
   # wms-scanner/           # @umbraculum/native-wms-scanner
 
 packages/platform/native-shell/   # @umbraculum/native-shell (Wave 4B — shared auth/nav/i18n)

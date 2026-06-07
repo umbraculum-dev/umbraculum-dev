@@ -21,6 +21,7 @@
 | Canonical module sibling-import guard | ✅ `eslint-plugin-boundaries` `boundaries/element-types` at **`error`** on `services/api/src/modules/**` (SOLID B5, 2026-06-04). See [Canonical module boundaries](#canonical-module-boundaries). |
 | Package tier import guard | ✅ `eslint-plugin-boundaries` `boundaries/element-types` at **`error`** on `packages/**` (RFC-0011 Wave 3d, 2026-06-07). See [Package layer boundaries (3d)](#package-layer-boundaries-3d). |
 | App layer segment / vertical guard | ✅ `eslint-plugin-boundaries` `boundaries/element-types` at **`error`** on `apps/{web,native}/**` (SOLID WS5, 2026-06). See [App layer boundaries (WS5)](#app-layer-boundaries-ws5). |
+| API flat services import guard | ✅ `eslint-plugin-boundaries` at **`error`** on `services/api/src/services/**` excluding `ai/**` (RFC-0011 Phase 3, 2026-06-07). See [API flat services boundaries](#api-flat-services-boundaries). |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ✅ **All 12 rules at `error`** — HIGH-full Phase 5c (2026-05-16). 7 promise-correctness rules (`**/*.{ts,tsx}`) + 5 `no-unsafe-*` rules (`services/api/**` + `apps/web/**`). Tests relaxed via the `**/{tests,e2e}/**` + `**/*.{test,spec}.*` glob block. `parserOptions.projectService` infrastructure live. |
 | Outstanding warnings | **0** (-80 from Phase 6c, -58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,127 cumulative; was 1,127 at HIGH-light landing). **`npm run lint` exits clean — zero warnings, zero errors.** |
@@ -51,7 +52,7 @@ This is exactly the kind of bug that:
 
 It's the reason ESLint is worth its tooling overhead in this repo.
 
-### Canonical module boundaries (`eslint-plugin-boundaries`)
+### Canonical module boundaries {#canonical-module-boundaries}
 
 RFC-0002 canonical modules under `services/api/src/modules/**` must not import sibling modules directly (e.g. `crp` → `mrp`). Allowed dependency directions:
 
@@ -61,7 +62,11 @@ RFC-0002 canonical modules under `services/api/src/modules/**` must not import s
 
 Configuration lives in [`eslint.config.mjs`](../eslint.config.mjs) (scoped `files` glob). Spike + verdict: [`docs/design/solid-boundaries-eslint-spike.md`](design/solid-boundaries-eslint-spike.md). **`boundaries/element-types` is `error`** (merge-blocking since SOLID B5, 2026-06-04). Complementary report-only drift signal: `npm run audit:solid-inventory`.
 
-Horizontal paths (`services/api/src/routes/**`, `services/api/src/services/ai/tools/**`) are outside this rule's scope by design.
+Horizontal paths (`services/api/src/routes/**`, `services/api/src/services/ai/tools/**`) are outside B5 scope by design. Flat non-AI services are fenced separately — see [API flat services boundaries](#api-flat-services-boundaries).
+
+### API flat services boundaries {#api-flat-services-boundaries}
+
+Flat horizontal orchestrators under `services/api/src/services/` must not import `services/api/src/modules/*/services/**` — RFC-0011 Wave 3e colocation. **`services/api/src/services/ai/**` is excluded** (horizontal AI advisor reads module services intentionally). Legacy allowlist: `platformRecipesService.ts` (`@arch-boundary`). Spike: [`docs/design/solid-boundaries-eslint-api-flat-services-spike.md`](design/solid-boundaries-eslint-api-flat-services-spike.md).
 
 ### Package layer boundaries (3d)
 

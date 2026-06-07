@@ -34,7 +34,7 @@ It does **not** mean:
 
 - Umbraculum is a brewery-only product (the platform is industry-agnostic; manufacturing is a stress test, not the boundary — see [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1).
 - Every deployment must run the brewery vertical (workspaces install the vertical configurations they need).
-- `brewery` is a canonical module (it is **not** — see [vertical configuration](#vertical-configuration) below).
+- `brewery` is a canonical module (it is **not** — see [Vertical configuration](#vertical-configuration) in the taxonomy table below).
 
 **Preferred phrasing in new prose:** *brewery (reference vertical)* or *the brewery reference vertical* on first mention in a doc that is not brewery-specific. Brewery-domain docs may use *brewery* alone after the header establishes context.
 
@@ -45,6 +45,8 @@ It does **not** mean:
 ## Core taxonomy
 
 These terms are the minimum set for reading any other doc without getting lost.
+
+<a id="vertical-configuration"></a>
 
 | Term | Plain-language meaning | Umbraculum-specific meaning | Source of truth |
 |---|---|---|---|

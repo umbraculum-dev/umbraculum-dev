@@ -1,5 +1,6 @@
 import type { Recipe, PrismaClient } from "@prisma/client";
 
+// @arch-boundary — platform-admin recipes orchestrator; delegates to brewery module services until route-layer refactor.
 import { validateBeerJsonDoc } from "../beerjson/index.js";
 import { exportRecipeFull } from "../beerjson/strictExport.js";
 import { BadRequestError } from "../errors.js";

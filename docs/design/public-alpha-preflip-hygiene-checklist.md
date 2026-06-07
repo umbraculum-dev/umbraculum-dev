@@ -59,7 +59,7 @@ Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres
 | 4.2 | RFC companion links (optional) | `python3 scripts/docs/check-rfc-companion-links.py` | ☑ (10/10) |
 | 4.3 | Docs site build | `npm run build -w @umbraculum/docs-site` in Node 20 container | ☑ |
 | 4.4 | Brochure build | `npm run build` in `umbraculum-brochure` | ☑ |
-| 4.5 | OpenAPI docs + static spec | [`API-OPENAPI.md`](../API-OPENAPI.md) linked from [`docs/README.md`](../README.md); `docs-site/static/openapi/openapi.json` present; docs build includes `API-OPENAPI` page | ☐ |
+| 4.5 | OpenAPI docs + static spec | [`API-OPENAPI.md`](../API-OPENAPI.md) linked from [`docs/README.md`](../README.md); `docs-site/static/openapi/openapi.json` synced via `prebuild` + `python3 scripts/docs/check-docs-site-openapi-sync.py` | ☑ (2026-06-07) |
 
 ---
 
@@ -85,9 +85,39 @@ Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres
 | 6.6 | Community forum provisioned or scheduled ([`community-forum-runbook.md`](community-forum-runbook.md)) — §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1); may trail flip by days but before first proposal cycle | ☐ |
 | 6.7 | **Donation channel accounts (before flip)** — Liberapay `Umbraculum` + Buy Me a Coffee live; URLs match `/support/` — **roadmap Phase 2 `2d`** | ☐ |
 
+**Docs-site flip coordination:** see [docs-site-flip-runbook.md](docs-site-flip-runbook.md) (noIndex removal, brochure vendor sync, DocSearch, Cloudflare deploy).
+
 ---
 
 ## 7. Sign-off log
+
+### Maintainer flip checklist (Step 4 — 2026-06-07)
+
+Answers from [RFC-0011 pre-flip closure](rfc-0011-pre-flip-closure.md) Step 4:
+
+| # | Question | Answer (maintainer) |
+|---|----------|---------------------|
+| M1 | **Flip window** | **July 2026.** **Single coordinated release** — monorepo app + toolset + public docs/brochure go public together (not a weeks-long staged rollout of docs first, product later). |
+| M2 | **Manual hygiene — block flip vs may trail** | See plain-language table below. Solo maintainer triages in flip week; nothing delegated yet. |
+| M3 | **Platform-only (`UMBRACULUM_MODULE_PROFILE=platform`) demo for evaluators** | **Post-alpha** — stock monorepo stays brewery-inclusive for flip; optional platform-only install story stays F-mod / post-alpha unless explicitly promoted before July. |
+| M4 | **Second native app scaffold** | **Post-alpha** — decide **PIM handheld vs quality** app code after application-surface structure is stable; tracked in [backbone §13](pre-flip-application-surface-backbone.md). |
+| M5 | **Docs deploy + noIndex on flip day** | **Solo maintainer** (same operator for Cloudflare deploy, `noIndex` removal, brochure sync). No separate “owner” role — checklist item exists so flip-day steps are not forgotten. |
+
+#### M2 — what each manual item means (block vs trail)
+
+| Checklist ref | What it is | Typical flip posture |
+|---------------|------------|----------------------|
+| **§2.2 gitleaks** | Scan **git history** for leaked secrets (API keys, tokens) in both umbraculum-dev and umbraculum-toolset. | **Block flip** — do once before first public clone. |
+| **§3.5 Postgres** | RFC-0010 **platform vs brewery schema split**: migrations applied on dev/test DBs, backup taken before DDL, fresh-clone docs accurate. | **Block flip** if prod-like dev DB is behind migrations; self-host docs should already match. |
+| **§5.1 legal files** | `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` present and consistent in **both** repos. | **Block flip** — AGPL + contribution path must be correct on day one. |
+| **§6.3 Cloudflare Pages** | Hosting projects wired for **docs** + **brochure** per [public-alpha-cloudflare-pages-runbook.md](public-alpha-cloudflare-pages-runbook.md) (build commands, env, custom domains). | **Block flip** for URLs you announce; can flip repo public before DNS if URLs stay noIndex. |
+| **§6.4 DocSearch** | Algolia **site search** application (replace local lunr search) — submitted **after** docs URL is live and indexable. | **Trail by days** — local search works at flip. |
+| **§6.6 Community forum** | Discourse at forum.umbraculum.dev provisioned + pinned “How we communicate”. | **May trail flip by days** — not required for code/docs go-public. |
+| **§6.7 Donations** | Liberapay + Buy Me a Coffee accounts live; `/support/` links work. | **May trail flip** — roadmap 2d; nice-to-have for announcement. |
+
+---
+
+### Historical entries
 
 | Date | Repo | Stage 1 result | Notes |
 |------|------|----------------|-------|

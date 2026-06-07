@@ -396,7 +396,7 @@ Each sub-phase below is independently shippable and follows the established boun
 
 The audit is additive: it documents the gap state at a point in time and lays out the work needed to close it.
 
-### Phase 5a `packages/verticals/brewery/core` audit + gap-fix (2026-05-18)
+### Phase 5a `packages/verticals/brewery/core` audit + gap-fix (2026-05-18) {#phase-5a-packagescore-audit--gap-fix-2026-05-18}
 
 The L1 audit for the `packages/verticals/brewery/core` math/units surface was the optional follow-on to the Phase 4 L2 work. Unlike Phase 4, the `packages/verticals/brewery/core` surface is small enough that the audit + gap-fix shipped as a single bounded PR rather than being split into audit-only + gap-fix sub-phases.
 

@@ -520,6 +520,79 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // RFC-0011 Phase 3 — API flat services fence (error-level).
+  //
+  // Prevents Wave 3e regression: new brewery logic in services/api/src/services/
+  // instead of modules/brewery/services/. services/ai/** is excluded — horizontal
+  // AI advisor intentionally imports module services (solid-boundaries-eslint-spike §2).
+  // Allowlist: platformRecipesService.ts (@arch-boundary).
+  // Spike: docs/design/solid-boundaries-eslint-api-flat-services-spike.md
+  // -------------------------------------------------------------------
+  {
+    files: ["services/api/src/services/**/*.{ts,tsx}"],
+    ignores: ["services/api/src/services/ai/**"],
+    plugins: { boundaries },
+    settings: {
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+          project: ["services/api/tsconfig.json"],
+        },
+      },
+      "boundaries/elements": [
+        {
+          type: "api-flat-services",
+          pattern: "services/api/src/services/**",
+          mode: "full",
+        },
+        {
+          type: "canonical-module-services",
+          pattern: "services/api/src/modules/*/services/**",
+          mode: "full",
+        },
+        {
+          type: "platform",
+          pattern: "services/api/src/platform/**",
+          mode: "full",
+        },
+        {
+          type: "domain",
+          pattern: "services/api/src/domain/**",
+          mode: "full",
+        },
+        {
+          type: "plugins",
+          pattern: "services/api/src/plugins/**",
+          mode: "full",
+        },
+      ],
+    },
+    rules: {
+      "boundaries/no-unknown-files": "off",
+      "boundaries/element-types": [
+        "error",
+        {
+          default: "allow",
+          rules: [
+            {
+              from: [["api-flat-services"]],
+              disallow: [["canonical-module-services"]],
+              message:
+                "Flat API services must not import canonical module services — colocate in modules/<code>/services/ (RFC-0011 Wave 3e).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["services/api/src/services/platformRecipesService.ts"],
+    rules: {
+      "boundaries/element-types": "off",
+    },
+  },
+
+  // -------------------------------------------------------------------
   // SOLID WS5 — app import boundaries (error-level, CI-blocking).
   //
   // Mirrors the API spike structure with an app-scoped pilot:
