@@ -248,7 +248,7 @@ Concretely, for module READMEs:
 
 The mascot **Umbi** (the canonical asset at [`media/umbi.png`](media/umbi.png)) is the only playful element across the public-doc surface, and it does not appear in module READMEs by default — its home is onboarding, error/empty-state illustrations, and the homepage at `umbraculum.dev`. Module READMEs are read by people doing technical work; the playful surface is reserved for surfaces where playfulness reduces friction.
 
-The **brochure site** (`apps/website/`, umbraculum.dev) follows the same voice with stricter visual discipline: no startup marketing aesthetics (rockets, neon heroes, hype copy). Mindset: **less ego, more facts** — see [`design/brochure-site-design-policy.md`](design/brochure-site-design-policy.md).
+The **brochure site** ([`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure), umbraculum.dev) follows the same voice with stricter visual discipline: no startup marketing aesthetics (rockets, neon heroes, hype copy). Mindset: **less ego, more facts** — see [`design/brochure-site-design-policy.md`](design/brochure-site-design-policy.md).
 
 ---
 

@@ -2,8 +2,8 @@
 
 **Tier:** Public  
 **Status:** v1 (living)  
-**Audience:** maintainers, contributors, and agents editing `apps/website/` or reviewing brochure deploys  
-**Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §1 guardrails, [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) §6, [`apps/website/README.md`](../../apps/website/README.md), [`docs-site/README.md`](../../docs-site/README.md) § Theme customization (swizzled docs announcement bar; shared `announcement.config.json`)
+**Audience:** maintainers, contributors, and agents editing [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) or reviewing brochure deploys  
+**Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §1 guardrails, [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) §6, [brochure README](https://github.com/umbraculum-dev/umbraculum-brochure), [`docs-site/README.md`](../../docs-site/README.md) § Theme customization (swizzled docs announcement bar; shared `announcement.config.json`)
 
 ---
 
@@ -21,7 +21,7 @@ Much public software marketing leans on **cosmetics** — polish that makes a pr
 
 Umbraculum is **not** against funding, sponsorship, or commercial use. [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §5 welcomes sponsors for **capacity** (inference, maintainer time, modest infra such as the forum). The **primary** brochure message is not “catch the big win” but **sustain the ordinary work** — commit to buying groceries, not to pointing at big deals and big money.
 
-Convey: what exists, what is next, how to contribute, honest pre-alpha posture, support as optional help with **running costs** ([`/support/`](../../apps/website/public/support/index.html)), not a hype funnel.
+Convey: what exists, what is next, how to contribute, honest pre-alpha posture, support as optional help with **running costs** ([`/support/`](https://umbraculum.dev/support/)), not a hype funnel.
 
 Do not convey: inflated scale, fake urgency, prestige signalling to attract “whales” before substance exists.
 
@@ -41,7 +41,7 @@ Umbraculum is a **solo-maintained, community-governed open-source toolset** prep
 
 ### Prefer
 
-- **Restrained palette** — muted text on a calm background (the current dark theme in `apps/website/public/styles.css` is the reference).
+- **Restrained palette** — muted text on a calm background (reference: `public/styles.css` in brochure repo).
 - **System or unobtrusive typography** — readable body copy; no display-font hero theatrics.
 - **Simple layout** — single column, clear hierarchy, generous whitespace; no parallax, no autoplay video, no scroll-jacking.
 - **Functional UI** — links to docs, source, support, and forum; buttons that look like buttons, not billboards.
@@ -86,7 +86,7 @@ Positioning copy source of truth: [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHI
 
 ## 5. Scope — brochure only
 
-This policy applies to **`apps/website/`** (static umbraculum.dev brochure).
+This policy applies to **[`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure)** (static umbraculum.dev).
 
 It does **not** override product UI in `apps/web/` (operational shared layout components follows platform UX patterns; **Tamagui is the go-to** — see [`TAMAGUI.md`](../TAMAGUI.md) §"UI stack choice — product vs public surfaces"). It **does** align with docs-site tone — Docusaurus theme choices should stay similarly restrained; see RFC-0005 and the docs build log for docs-specific decisions.
 
@@ -97,16 +97,16 @@ It does **not** override product UI in `apps/web/` (operational shared layout co
 - [ ] No rocket / hype iconography or “launch” marketing language added.
 - [ ] Colors remain readable and muted; no new neon or full-bleed gradient heroes.
 - [ ] Copy is factual; links point to docs/runbooks for depth.
-- [ ] Umbi present in header + favicon on every page ([`apps/website/README.md`](../../apps/website/README.md)).
-- [ ] `dist/` rebuilt after `public/` edits (compose `website` restart or `npm run build -w @umbraculum/website`).
+- [ ] Umbi present in header + favicon on every page (brochure repo README).
+- [ ] `dist/` rebuilt after `public/` edits (`npm run build` in brochure repo).
 - [ ] Pre-flip: `noindex` / `robots.txt` gating unchanged unless flip runbook says otherwise.
 
 ---
 
 ## 7. Cross-references
 
-- [`apps/website/README.md`](../../apps/website/README.md) — build, deploy, header convention.
-- [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) — Cloudflare Pages deploy.
+- [Brochure README](https://github.com/umbraculum-dev/umbraculum-brochure) — build, deploy, header convention.
+- [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) — Cloudflare Workers deploy.
 - [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) — flip-day smoke URLs.
 - [`MANIFESTO.md`](../../MANIFESTO.md) §1 — “not a marketing document” guardrail; deliberately ordinary values.
 - [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §5 — sponsorship for capacity, not priority or deal theatre.

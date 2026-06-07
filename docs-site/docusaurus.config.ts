@@ -3,20 +3,10 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import fs from 'node:fs';
 import path from 'node:path';
-import {toDocusaurusAnnouncementBar} from '../apps/website/scripts/announcement-theme.mjs';
-
-const announcementConfig = JSON.parse(
-  fs.readFileSync(
-    path.resolve(__dirname, '../apps/website/announcement.config.json'),
-    'utf8',
-  ),
-) as {
-  enabled: boolean;
-  id: string;
-  variant?: 'info' | 'warning' | 'critical';
-  dismissible?: boolean;
-  html: string;
-};
+import {
+  announcementConfig,
+  toDocusaurusAnnouncementBar,
+} from '@umbraculum/brochure/announcement';
 
 const announcementBar = toDocusaurusAnnouncementBar(announcementConfig);
 

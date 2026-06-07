@@ -13,6 +13,7 @@
 | [umbraculum-hosting-common](https://github.com/umbraculum-dev/umbraculum-hosting-common) | (dependency only) | Embedded as `common/` submodule — do not clone alone on VPS |
 | [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) | `forum.umbraculum.dev` | **Forum VPS only** |
 | [umbraculum-hosting-demo](https://github.com/umbraculum-dev/umbraculum-hosting-demo) | `demo.umbraculum.dev` | **Demo VPS only** |
+| [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | `umbraculum.dev` | **Brochure only** — static marketing site + announcement SoT |
 
 **This repo (umbraculum-dev)** holds application code, governance runbooks (forum §6–§7), flip-day, and product docs — not VPS shell scripts.
 
@@ -29,6 +30,7 @@ $HOSTING_ROOT/
   umbraculum-hosting-common/
   umbraculum-hosting-forum/
   umbraculum-hosting-demo/
+  umbraculum-brochure/           # static umbraculum.dev (optional sibling)
 $REPO_ROOT/                    # this repo (umbraculum-dev)
 ```
 

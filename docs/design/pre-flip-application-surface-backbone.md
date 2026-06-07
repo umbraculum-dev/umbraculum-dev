@@ -20,7 +20,7 @@
 | **E2E** | `platform/`, `canonical/`, `verticals/brewery/` | **Done (Wave 5, 2026-06-07)** | Mirror module taxonomy under `e2e/{platform,canonical,verticals}/` |
 | **Packages (on disk)** | Flat `packages/*` (19 siblings) | Horizontal, SDK, canonical contracts, and brewery vertical at same level; folder names disagree with npm names | On-disk tiers + align paths with npm + split brewery out of platform packages |
 | **Packages (content)** | Brewery DTOs in `@umbraculum/contracts`; `BrewCheckbox` in `@umbraculum/ui` | Platform packages contain vertical logic/content — same class of bug as `app/_components` | `@umbraculum/brewery-contracts`; purge vertical leakage from platform packages |
-| **Website** | `apps/website/` in monorepo | Wrong audience for forkable product repo | Sister repo **`umbraculum-website`** (private OK pre-flip) — see website extraction plan |
+| **Website** | **`umbraculum-brochure`** sister repo (2026-06-07) | Wrong audience for forkable product repo | **Done** — [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) |
 | **`apps/web` without verticals** | Present with platform profile | **Yes — stays.** Shared layout, auth, canonical modules, AI, accessibility remain | Document as the **member-facing web application**, not “brewery app” |
 
 **Bottom line:** RFC-0002 solved **where module pages live**. This epic solves **where everything else lives** so a forked tree reads like Magento's `vendor/` + `app/code/` + `app/design/` mental model without splitting the member-facing web app into two deployables.
@@ -411,7 +411,7 @@ No change to HTTP paths — filesystem clarity only.
 
 | Item | Action | Plan reference |
 |------|--------|----------------|
-| `apps/website/` | Extract to **`umbraculum-website`** (private repo OK) | Cursor plan *Extract `apps/website` → `umbraculum-website`* (`website_sister_repo_08f8173a.plan.md` under operator `.cursor/plans/`) |
+| `apps/website/` | **Done** → [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) (2026-06-07) | Extraction plan `website_sister_repo_08f8173a.plan.md` |
 | `docs-site/` | **Keep** in monorepo through flip | deferral register R-POLICY |
 | Forum/demo VPS | Already in hosting repos | production-hosts.md |
 
@@ -424,7 +424,7 @@ No change to HTTP paths — filesystem clarity only.
 | Fork-cleanliness Part B (brewery recipes tree) | **Done** | Prerequisite — module routes correct |
 | SOLID WS5/WS6 | **Closed** | **`web-platform-shared-layout` + `web-brewery-shared` WS5 elements landed (Wave 1)** |
 | F-mod brewery optional profile | **Phase 1 shipped** | Backbone makes opt-out visually obvious |
-| Website sister repo | **Ready to implement** | Independent track; rename to `umbraculum-website` |
+| Website sister repo | **Done (2026-06-07)** | `umbraculum-brochure` + `@umbraculum/brochure` |
 | RFC-0002 β layout | **Accepted** | Unchanged — this doc extends, not replaces |
 
 ---
@@ -473,7 +473,7 @@ flowchart TB
 | **5** | E2E folder taxonomy | 1d | No — **Done (2026-06-07)** |
 | **6** | Docs + eslint + module READMEs | 1d | Yes for changed waves — **Done (2026-06-07)** |
 
-**Parallel track:** website → `umbraculum-website` extraction (existing plan).
+**Parallel track:** website → `umbraculum-brochure` extraction — **done (2026-06-07)**.
 
 ---
 

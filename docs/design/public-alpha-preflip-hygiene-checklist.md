@@ -58,7 +58,7 @@ Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres
 | 4.1 | Module README structure | `python3 scripts/docs/check-readmes.py` (or CI `docs-readmes` workflow) | ☑ (21/21) |
 | 4.2 | RFC companion links (optional) | `python3 scripts/docs/check-rfc-companion-links.py` | ☑ (10/10) |
 | 4.3 | Docs site build | `npm run build -w @umbraculum/docs-site` in Node 20 container | ☑ |
-| 4.4 | Brochure build | `npm run build -w @umbraculum/website` | ☑ |
+| 4.4 | Brochure build | `npm run build` in `umbraculum-brochure` | ☑ |
 | 4.5 | OpenAPI docs + static spec | [`API-OPENAPI.md`](../API-OPENAPI.md) linked from [`docs/README.md`](../README.md); `docs-site/static/openapi/openapi.json` present; docs build includes `API-OPENAPI` page | ☐ |
 
 ---
@@ -78,7 +78,7 @@ Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres
 | # | Check | Pass? |
 |---|--------|-------|
 | 6.1 | Docs: `noIndex: true` + `static/robots.txt` disallow until flip ([`docs-site/docusaurus.config.ts`](../../docs-site/docusaurus.config.ts)) | ☑ |
-| 6.2 | Brochure: `noindex` meta + `robots.txt` until flip (`apps/website/public/`) | ☑ |
+| 6.2 | Brochure: `noindex` meta + `robots.txt` until flip (`umbraculum-brochure` `public/`) | ☑ |
 | 6.3 | Cloudflare Pages projects configured per [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | ☐ |
 | 6.4 | DocSearch application submitted after docs URL live ([`docsearch-application-draft.md`](docsearch-application-draft.md)) | ☐ |
 | 6.5 | Flip announcement reviewed ([`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)) | ☐ |

@@ -48,7 +48,7 @@
 
 /* Site announcement (rendered by the swizzled AnnouncementBar component
    in src/theme/AnnouncementBar/index.tsx — content from
-   apps/website/announcement.config.json). Owns its own class names so the
+   umbraculum-brochure announcement.config.json). Owns its own class names so the
    theme's announcementBar_* CSS doesn't apply. */
 
 .umb-doc-announcement {

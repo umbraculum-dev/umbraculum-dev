@@ -38,7 +38,7 @@ Docusaurus `@docusaurus/theme-classic` ships CSS modules with hashed classes and
 
 Do **not** override hashed `announcementBar_*` classes or put `display: flex` on announcement content wrappers — HTML children layout as columns and desktop height stays at 30px until swizzled.
 
-**Announcement bar (2026-05):** swizzled `AnnouncementBar`; copy from [`apps/website/announcement.config.json`](../apps/website/announcement.config.json) via [`announcement-theme.mjs`](../apps/website/scripts/announcement-theme.mjs). Cursor rule: `74-docusaurus-swizzle-over-css-fights.mdc` in `umbraculum-node-react-cursor-assistant` (umbraculum-toolset).
+**Announcement bar (2026-05):** swizzled `AnnouncementBar`; copy from [`@umbraculum/brochure/announcement`](https://github.com/umbraculum-dev/umbraculum-brochure) (sister repo [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) — SoT: `announcement.config.json`). Local dev: clone sibling at `../umbraculum-brochure` (see `file:` dep in `package.json`). Cursor rule: `74-docusaurus-swizzle-over-css-fights.mdc` in `umbraculum-node-react-cursor-assistant` (umbraculum-toolset).
 
 After swizzle changes: `docker compose restart docs-site`.
 

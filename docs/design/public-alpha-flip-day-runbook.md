@@ -57,16 +57,16 @@ Draft GitHub Release notes from [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA
 
 ## 3. Remove pre-flip SEO gates (commit on `master`, then deploy)
 
-### 3.1 Brochure (`apps/website`)
+### 3.1 Brochure (`umbraculum-brochure` sister repo)
 
 | File | Change |
 |------|--------|
-| `apps/website/public/robots.txt` | Replace `Disallow: /` with allow-all, e.g. `User-agent: *\nAllow: /` |
-| `apps/website/public/index.html` | Remove `<meta name="robots" content="noindex, nofollow" />` |
-| `apps/website/public/support/index.html` | Same meta removal |
+| `public/robots.txt` | Replace `Disallow: /` with allow-all, e.g. `User-agent: *\nAllow: /` |
+| `public/index.html` | Remove `<meta name="robots" content="noindex, nofollow" />` |
+| `public/support/index.html` | Same meta removal |
 | Footer “Pre-release … noindex” lines | Remove or reword |
 
-Rebuild: `npm run build -w @umbraculum/website` → redeploy Cloudflare brochure project.
+Rebuild: `npm run build` in [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) → Cloudflare redeploys brochure Worker (`umbraculum-dev-website`).
 
 ### 3.2 Docs site (`docs-site`)
 

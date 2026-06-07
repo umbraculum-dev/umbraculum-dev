@@ -120,7 +120,7 @@ These are **pedagogical parallels**, not one-to-one product comparisons. They cl
 | **Vertical route group** | Industry-specific UI under `app/[locale]/(<vertical-code>)/` — e.g. `(brewery)/` | Canonical module segments |
 | **Workspace-member app** | Same as **workspace web UI** — one audience, one AI context (RFC-0011 §3.1 endorsed term) | B2C shopper app |
 | **Module registration** | Boot-time `registerModule()` / `registerWebModule()` / `registerNativeModule()` | Runtime shared layout registration (partially deferred) |
-| **Public surface (marketing)** | Static orientation site (`apps/website`) | Operational "public API" |
+| **Public surface (marketing)** | Static orientation site ([`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure)) | Operational "public API" |
 | **Storefront / commerce** (future) | Separate deployable; read-only consumer of PIM/CRM | PIM admin UI inside workspace web UI |
 | **UT Morph webapp wrapper** | Ubuntu Touch Click package wrapping `apps/web` in Morph | Native React Native on Linux mobile; Qt/QML rewrite |
 

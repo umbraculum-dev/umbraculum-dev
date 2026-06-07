@@ -29,7 +29,7 @@ Apply to every candidate tree before the **fresh public seed**:
 | [`infra/pgpool/`](../../infra/pgpool/) | Connection pooling | 2 | **KEEP** | compose stack |
 | [`infra/db-guard/`](../../infra/db-guard/) | DB guard scripts | 1 | **KEEP** | compose stack |
 | [`infra/community-forum/`](../../infra/community-forum/) | Stub pointer only | 1 README (+ scripts stub removed) | **KEEP stub** — no VPS scripts; see [`production-hosts.md`](production-hosts.md) | None (not in product build) |
-| [`apps/website/`](../../apps/website/) | Static brochure (`umbraculum.dev`) | 20 | **KEEP for flip** — pre-flip §6.2 (`noindex`, announcement JSON) | Deploy workflows; not root workspace |
+| [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) | Static brochure (`umbraculum.dev`) | 20 | **Done** (2026-06-07) — sister repo | Brochure repo GHA + Cloudflare Worker |
 | [`docs-site/`](../../docs-site/) | Docusaurus (`docs.umbraculum.dev`) | 757 | **KEEP for flip** — same Cloudflare/deploy coupling | `docs-site` CI; Docusaurus build |
 | `internal/**` | Pre-flip working notes | 11 | **EXCLUDE from public seed** — policy in PLATFORM-ARCHITECTURE §10.1.1 | `check-public-docs-no-internal-links.py` |
 | Forum **governance** | [`community-forum-runbook.md`](community-forum-runbook.md) §6–§7 | — | **KEEP in monorepo** | Docs-only |
@@ -78,8 +78,7 @@ See [`REPOSITORY-STRUCTURE.md`](../REPOSITORY-STRUCTURE.md) § “Finding vertic
 
 ## Post-alpha optional skim (not flip blockers)
 
-- **`apps/website/` → `umbraculum-marketing`** — only if Cloudflare project split is ready (reason code **R-SISTER** in deferral register).
-- **`docs-site/` → `umbraculum-docs`** — same posture.
+- **`docs-site/` → `umbraculum-docs`** — same posture (deferral register R-POLICY).
 - **F-mod brewery-less SKU** — ROADMAP; cite **R-COUPLING** only if tree work truly depends on it.
 
 ---

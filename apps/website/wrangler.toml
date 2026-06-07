@@ -1,9 +1,0 @@
-# Cloudflare Workers static assets — brochure (umbraculum.dev).
-# Project name in the dashboard MUST match `name` below.
-# Deploy: npx wrangler deploy --config apps/website/wrangler.toml
-
-name = "umbraculum-dev-website"
-compatibility_date = "2026-05-30"
-
-[assets]
-directory = "./dist"

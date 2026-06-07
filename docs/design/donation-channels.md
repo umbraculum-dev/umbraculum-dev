@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** v1.1 — environmental accounting (Stripe Climate, forest stewardship) (2026-05-31)  
 **Audience:** maintainers wiring `/support`, prospective sponsors, community members reviewing payment infrastructure  
-**Related:** [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §5, [`MANIFESTO.md`](../../MANIFESTO.md) §3.2, [`apps/website/public/support/index.html`](../../apps/website/public/support/index.html), [`community-forum-runbook.md`](community-forum-runbook.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md)
+**Related:** [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §5, [`MANIFESTO.md`](../../MANIFESTO.md) §3.2, [`umbraculum-brochure` support page](https://github.com/umbraculum-dev/umbraculum-brochure/blob/main/public/support/index.html), [`community-forum-runbook.md`](community-forum-runbook.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md)
 
 > [!IMPORTANT]
 > **§5.3 is unchanged.** Money and in-kind support never buy vote weight, queue priority, veto immunity, private channels, or feature paywalls. Payment rails are operational detail; governance commitments live in §5.3.
@@ -77,7 +77,7 @@ Route via **Cloudflare Email Routing** on `umbraculum.dev` to the maintainer inb
 
 ### 3.3 Wire `/support`
 
-Update [`apps/website/public/support/index.html`](../../apps/website/public/support/index.html) — both buttons live, placeholder paragraph removed.
+Update [`umbraculum-brochure` `public/support/index.html`](https://github.com/umbraculum-dev/umbraculum-brochure/blob/main/public/support/index.html) — both buttons live, placeholder paragraph removed.
 
 ### 3.4 Forum pin
 

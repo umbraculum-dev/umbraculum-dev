@@ -195,7 +195,7 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 
 **Docs site (`docs-site/`)** uses Docusaurus — documentation layout, search, and MDX are a different job. That is not a precedent for replacing Tamagui in the product apps.
 
-**Brochure (`apps/website/`)** is intentionally **static HTML + CSS** today ([`design/brochure-site-design-policy.md`](design/brochure-site-design-policy.md)): a small, web-only orientation surface at `umbraculum.dev`, not operational UI. Staying static is **not** a rejection of Tamagui; it reflects that Tamagui’s main payoff (web + native from one source) does not apply to a two-page pre-alpha brochure, and that a zero-dependency build keeps Cloudflare deploy and the “less ego, more facts” posture simple.
+**Brochure (`umbraculum-brochure`)** is intentionally **static HTML + CSS** today ([`design/brochure-site-design-policy.md`](design/brochure-site-design-policy.md)): a small, web-only orientation surface at `umbraculum.dev`, not operational UI. Staying static is **not** a rejection of Tamagui; it reflects that Tamagui’s main payoff (web + native from one source) does not apply to a two-page pre-alpha brochure, and that a zero-dependency build keeps Cloudflare deploy and the “less ego, more facts” posture simple.
 
 ### When to reconsider migrating the brochure to Tamagui
 
@@ -208,8 +208,8 @@ Re-open this decision (RFC or roadmap note + maintainer sign-off) only when **at
 
 Until a trigger fires, prefer:
 
-- [`apps/website/announcement.config.json`](../apps/website/announcement.config.json) + shared announcement mapping for Docusaurus (already in tree).
-- New brochure pages as static HTML following [`apps/website/README.md`](../apps/website/README.md).
+- [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) `announcement.config.json` + `@umbraculum/brochure/announcement` for Docusaurus (already wired).
+- New brochure pages as static HTML following [`umbraculum-brochure` README](https://github.com/umbraculum-dev/umbraculum-brochure).
 - Optional **design-token export** from the Tamagui theme to brochure CSS — lighter than a full React + Tamagui brochure app.
 
 If migration proceeds later, the likely shape is **Vite (or similar) + React SSG + Tamagui web config only**, with a dedicated **`packages/marketing-shell`** (or equivalent) — **not** folding marketing layout into `@umbraculum/ui`, which stays operational primitives.

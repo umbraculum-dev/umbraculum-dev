@@ -608,8 +608,9 @@ Forum and demo **VPS operator** scripts live in separate public repos — **not*
 | `github.com/umbraculum-dev/umbraculum-hosting-common` | Shared VPS hardening (`vps-hardening-baseline.sh`) |
 | `github.com/umbraculum-dev/umbraculum-hosting-forum` | `forum.umbraculum.dev` — Discourse ops, `bin/pull`, `bin/harden` |
 | `github.com/umbraculum-dev/umbraculum-hosting-demo` | `demo.umbraculum.dev` — Traefik/compose (scaffold; product build still here) |
+| `github.com/umbraculum-dev/umbraculum-brochure` | `umbraculum.dev` — static brochure (`@umbraculum/brochure`); not product `apps/web` |
 
-Local maintainer layout: `/home/rf/dkprojects/rfapps/umbraculum-hosting/{common,forum,demo}/` — see [`docs/design/production-hosts.md`](docs/design/production-hosts.md).
+Local maintainer layout: `/home/rf/dkprojects/rfapps/umbraculum-hosting/{common,forum,demo}/` and sibling `umbraculum-brochure/` — see [`docs/design/production-hosts.md`](docs/design/production-hosts.md).
 
 **Agent rules:**
 

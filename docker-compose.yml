@@ -138,17 +138,6 @@ services:
       - docs_site_docusaurus:/repo/docs-site/.docusaurus
       - npm_cache:/root/.npm
 
-  # Static umbraculum.dev brochure (Cloudflare Pages in production). Rebuilds
-  # dist/ from public/ on container start; not proxied through nginx:18080.
-  website:
-    image: node:20-slim
-    working_dir: /repo
-    command: sh -c "node apps/website/scripts/build.mjs && exec npx --yes serve@14 apps/website/dist -l tcp://0.0.0.0:4321"
-    ports:
-      - "${WEBSITE_PORT:-4321}:4321"
-    volumes:
-      - .:/repo
-
   api:
     build: ./services/api
     command: sh -c "npm install --no-audit --no-fund --prefer-offline && npm run dev"

@@ -40,8 +40,7 @@ Vague “ran out of time” without code + risk + revisit trigger is **not accep
 | Item | Target | Code | Why / evidence | Risk | Revisit | Owner |
 |------|--------|------|----------------|------|---------|-------|
 | F-mod optional brewery SKU (brewery-less product) | post-alpha | R-SCOPE | ROADMAP F-mod; not flip scope | Forkers may assume brewery is mandatory | F-mod plan lands | maintainer |
-| Brochure (`apps/website/`) sister-repo skim | post-alpha | R-POLICY | Pre-flip §6.2 requires monorepo build + shared announcement JSON | None for flip | Post-alpha Cloudflare split decision | maintainer |
-| `docs-site/` → standalone docs repo | post-alpha | R-POLICY | Same deploy coupling as brochure for flip | None for flip | Post-alpha hygiene | maintainer |
+| `docs-site/` → standalone docs repo | post-alpha | R-POLICY | Deploy coupling with monorepo flip window | None for flip | Post-alpha hygiene | maintainer |
 
 ---
 
@@ -60,6 +59,7 @@ Listed in [`forkable-repo-cleanliness-audit.md`](forkable-repo-cleanliness-audit
 | SOLID water/edit mechanical splits | 2026-06 | S closure; Part B was move-only |
 | Path-aware T2-PR pre-push | 2026-06 | `npm run verify:pre-push` |
 | Legacy `apps/web/app/recipes/` dual tree | 2026-06 | Consolidated to `(brewery)/recipes/**` |
+| Brochure (`apps/website/`) → `umbraculum-brochure` | 2026-06-07 | Pre-flip extraction; `@umbraculum/brochure`; Cloudflare Worker unchanged |
 
 ---
 

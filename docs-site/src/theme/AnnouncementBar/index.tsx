@@ -5,8 +5,7 @@
  * close button persists across navigations.
  *
  * Reads `themeConfig.announcementBar` produced by
- * `apps/website/scripts/announcement-theme.mjs` from
- * `apps/website/announcement.config.json`.
+ * `@umbraculum/brochure/announcement` (sister repo umbraculum-brochure).
  */
 
 import React, {type ReactNode} from 'react';
