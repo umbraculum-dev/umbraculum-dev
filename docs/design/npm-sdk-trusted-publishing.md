@@ -49,14 +49,14 @@ npx @umbraculum/ci-parity run --jobs sdk-publish-prep
 If `brewery-contracts` is on the registry but `brewery-api-client` 404s (second publish failed or ran before contracts propagated), republish only the client:
 
 ```bash
-cd ~/dkprojects/rfapps/umbraculum-dev
+# from umbraculum-dev repo root
 ./scripts/publish-brewery-api-client-laptop.sh
 ```
 
 If dogfood fails with `ERR_PACKAGE_PATH_NOT_EXPORTED` for `@umbraculum/api-client/transport`, the registry still has `@0.0.1` (pre–`./transport` export). Publish platform client `@0.0.2`, then republish brewery client `@0.0.2`:
 
 ```bash
-cd ~/dkprojects/rfapps/umbraculum-dev
+# from umbraculum-dev repo root
 git pull
 ./scripts/publish-api-client-laptop.sh
 ./scripts/publish-brewery-api-client-laptop.sh
