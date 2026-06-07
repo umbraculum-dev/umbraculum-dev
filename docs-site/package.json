@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@umbraculum/brochure": "file:../../umbraculum-brochure",
+    "@umbraculum/brochure": "file:./vendor/brochure",
     "@docusaurus/core": "^3.10.1",
     "@docusaurus/faster": "^3.10.1",
     "@docusaurus/preset-classic": "^3.10.1",

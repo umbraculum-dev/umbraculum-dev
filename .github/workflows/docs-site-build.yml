@@ -34,13 +34,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Checkout umbraculum-brochure (announcement package)
-        uses: actions/checkout@v5
-        with:
-          repository: umbraculum-dev/umbraculum-brochure
-          path: ../umbraculum-brochure
-          ref: v0.0.1
-
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:

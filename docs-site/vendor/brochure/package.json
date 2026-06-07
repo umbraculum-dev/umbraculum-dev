@@ -1,0 +1,10 @@
+{
+  "name": "@umbraculum/brochure",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Vendored mirror of umbraculum-brochure announcement export for docs-site CI (sync via scripts/sync-brochure-vendor.sh).",
+  "type": "module",
+  "exports": {
+    "./announcement": "./src/announcement.mjs"
+  }
+}
