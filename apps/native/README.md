@@ -48,6 +48,18 @@ The native app expects `services/api` to be reachable; for local development aga
 - **Depends on**: `services/api` (HTTP backend, bearer auth); `@umbraculum/api-client` (transport); `@umbraculum/contracts` (typed responses); `@umbraculum/ui` + `@umbraculum/brewery-recipes-ui` (UI); `@umbraculum/i18n` + `@umbraculum/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with web); `@umbraculum/media` (assets); `@umbraculum/brewery-beerjson` (recipe parsing).
 - **Auth**: bearer tokens in `expo-secure-store`. The web sibling rides cookie sessions — the difference is abstracted in `@umbraculum/api-client`.
 
+## Multi-app target (RFC-0011 Wave 4 — deferred)
+
+Today this workspace ships **one reference app** (`apps/native/` root). The pre-flip target (Wave 4, not yet executed):
+
+```text
+packages/platform/native-shell/   # @umbraculum/native-shell — shared nav, auth, theme
+apps/native/brewery/              # reference vertical app (brew-day flows)
+apps/native/<your-code>/          # future integrator apps
+```
+
+Each app would depend on `@umbraculum/native-shell` plus vertical packages; EAS/CI matrix details are deferred to [NATIVE-STRATEGY-AND-CI.md](../../docs/NATIVE-STRATEGY-AND-CI.md). See [backbone §9 Wave 4](../../docs/design/pre-flip-application-surface-backbone.md).
+
 ## Status
 
 **July 2026 EAS demo (brewery-only):** Internal EAS `preview` APK against **`demo.umbraculum.dev`** (demonstration host — not production `cloud`). Brew-day flows only on native; MRP/CRP/PIM/automation remain web. Inventory uses **Open on web** via `openWebFallbackRoute`.

@@ -115,7 +115,10 @@ These are **pedagogical parallels**, not one-to-one product comparisons. They cl
 | **API service** | HTTP monolith: Fastify routes, Prisma, jobs | Operator UI, "admin theme" |
 | **Command-line shell** | bash/sh (or similar) for CI scripts, Docker Compose, and local dev commands | Platform shared layout, UT Morph wrapper |
 | **Platform shared layout** | Persistent UI frame in `apps/web` (nav, footer, auth bar, providers). Path: `app/_shared-layout/` — see [backbone §3.7](design/pre-flip-application-surface-backbone.md) | Page-internal layout; `@umbraculum/native-shell` |
-| **Workspace-member app** | Same as **workspace web UI** — one audience, one AI context | B2C shopper app |
+| **Platform horizontal pages** | Member-facing platform features grouped under `app/[locale]/(platform-layout)/` (AI, accessibility, about). URLs omit the route-group segment. | Cross-workspace admin under `[locale]/platform/` |
+| **Canonical module segment** | Route group `(pim|mrp|crp|automation)/` — peer domain modules, not industry verticals | `(brewery)/` reference vertical |
+| **Vertical route group** | Industry-specific UI under `app/[locale]/(<vertical-code>)/` — e.g. `(brewery)/` | Canonical module segments |
+| **Workspace-member app** | Same as **workspace web UI** — one audience, one AI context (RFC-0011 §3.1 endorsed term) | B2C shopper app |
 | **Module registration** | Boot-time `registerModule()` / `registerWebModule()` / `registerNativeModule()` | Runtime shared layout registration (partially deferred) |
 | **Public surface (marketing)** | Static orientation site (`apps/website`) | Operational "public API" |
 | **Storefront / commerce** (future) | Separate deployable; read-only consumer of PIM/CRM | PIM admin UI inside workspace web UI |

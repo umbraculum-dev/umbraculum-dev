@@ -473,7 +473,7 @@ flowchart TB
 | **3f** | **Shared layout nomenclature + path rename:** `_shared-layout/`, `(platform-layout)/`, `web-platform-shared-layout`; glossary + BUILDING-YOUR-VERTICAL decision tree | 1–2d | **Done (2026-06-07)** |
 | **4** | `@umbraculum/native-shell` + `apps/native/brewery/` | 3–5d | Optional pre-flip — scaffold second app README |
 | **5** | E2E folder taxonomy | 1d | No |
-| **6** | Docs + eslint + module READMEs | 1d | Yes for changed waves |
+| **6** | Docs + eslint + module READMEs | 1d | Yes for changed waves — **Done (2026-06-07)** |
 
 **Parallel track:** website → `umbraculum-website` extraction (existing plan).
 
@@ -495,12 +495,24 @@ flowchart TB
 2. **Native multi-app CI:** one EAS project per app vs monorepo matrix — defer to [NATIVE-STRATEGY-AND-CI.md](../NATIVE-STRATEGY-AND-CI.md) amendment.
 3. **On-disk package move (Wave 3a):** before flip (cleaner first fork) vs after (less churn now).
 4. **`brewery-contracts` extraction (Wave 3b):** pre-flip vs post-flip — pre-flip aligns public seed with RFC-0002 text.
-5. **Integrator doc:** update BUILDING-YOUR-VERTICAL with “shared layout vs module vs vertical” filesystem diagram after Wave 1.
-6. **`app/_shared-layout/` path and doc vocabulary (Wave 3f):** sunset **workspace web UI**, **shared layout components**, and similar internal slang (§3.5); use conventional IT / Next.js terms in integrator docs; optional folder rename after prose is fixed.
+5. **Integrator doc:** update BUILDING-YOUR-VERTICAL with “shared layout vs module vs vertical” filesystem diagram after Wave 1. — **Closed (Wave 6, 2026-06-07)**
+6. **`app/_shared-layout/` path and doc vocabulary (Wave 3f):** **Closed (2026-06-07)** — **workspace web UI** retained as integrator term per RFC-0011 §3.1; deprecated slang (`operator shell`, `/_shell/`, `WebShellNotice`) removed from integrator prose.
 
 ---
 
 ## 12. Success criteria (epic complete)
+
+Audit (2026-06-07, Wave 6): full table in [`rfc-0011-wave-6-doc-capstone-build-log.md`](./rfc-0011-wave-6-doc-capstone-build-log.md).
+
+| # | Criterion | Status |
+|---|-----------|--------|
+| 1 | Contributor can identify layout / module / vertical folders | **Partial** — documented; cross-module `(brewery)/_components` imports remain |
+| 2 | Zero deprecated slang | **Met** |
+| 3 | Brewery naming only under `(brewery)/` or `@umbraculum/brewery-*` | **Partial** — cross-module UI imports documented |
+| 4 | No brewery under `packages/platform/` | **Partial** — package purity landed; `api-client/src/brewery/` documented |
+| 5 | `@umbraculum/brewery-contracts`; platform contracts clean | **Met** |
+| 6 | Native README multi-app pattern | **Partial** — target stub added; Wave 4 deferred |
+| 7 | REPOSITORY-STRUCTURE ↔ RFC-0011 ↔ backbone linked | **Met** |
 
 1. A new contributor can open `apps/web/app/` and identify **platform shared layout**, **platform horizontal pages**, **canonical module**, and **vertical** folders without reading chat history.
 2. Deprecated internal slang (`operator shell`, `/_shell/`, `WebShellNotice`, …) returns zero hits in `docs/` and `apps/web/` except RFC-0011 historical title and `@umbraculum/native-shell` package name.

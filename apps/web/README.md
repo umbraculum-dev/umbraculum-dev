@@ -51,10 +51,11 @@ apps/web/app/
   _shared-layout/          # platform UI frame (nav, footer, auth — private folder)
   [locale]/
     layout.tsx             # imports _shared-layout; wraps all locale routes
+    (auth)/                # login, signup, workspace select
     (platform-layout)/     # platform horizontal pages (ai, accessibility, …)
+    (pim|mrp|crp|automation)/   # canonical module route groups
     (brewery)/             # reference vertical module routes
-    platform/              # cross-workspace admin (unchanged)
-    (auth)/                # login/register
+    platform/              # cross-workspace admin (unchanged URL shape)
 ```
 
 **Where does new UI go?** See [`docs/BUILDING-YOUR-VERTICAL.md`](../../docs/BUILDING-YOUR-VERTICAL.md) § "Where does my UI code go?"

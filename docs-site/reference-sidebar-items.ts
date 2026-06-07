@@ -56,6 +56,11 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
+        label: 'packages/verticals/brewery/contracts',
+        href: '/reference/packages/verticals/brewery/contracts/',
+      },
+      {
+        type: 'link',
         label: 'packages/platform/contracts',
         href: '/reference/packages/platform/contracts/',
       },
@@ -63,6 +68,16 @@ export const referenceSidebarItems = [
         type: 'link',
         label: 'packages/verticals/brewery/core (brewery-core)',
         href: '/reference/packages/verticals/brewery/core/',
+      },
+      {
+        type: 'link',
+        label: 'packages/verticals/brewery/i18n',
+        href: '/reference/packages/verticals/brewery/i18n/',
+      },
+      {
+        type: 'link',
+        label: 'packages/verticals/brewery/media-assets',
+        href: '/reference/packages/verticals/brewery/media-assets/',
       },
       {
         type: 'link',

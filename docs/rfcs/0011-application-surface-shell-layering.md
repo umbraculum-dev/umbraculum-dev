@@ -181,7 +181,8 @@ See [`pre-flip-application-surface-backbone.md`](../design/pre-flip-application-
 | Wave 1 (landed) | **2** | `(platform-layout)/` route group — **done (2026-06-07, absorbed into Wave 3f)** |
 | Wave 3b (landed) | **3e** | API brewery service colocation under `modules/brewery/services/` — **complete (2026-06-06)** |
 | **Wave 3e (complete)** | **3f** | **Shared layout nomenclature** — **complete (2026-06-07)** |
-| Various | **6** | BUILDING-YOUR-VERTICAL pedagogical rewrite + integrator glossary sync |
+| Wave 3f (complete) | **6** | Doc capstone — **complete (2026-06-07)** |
+| Wave 6 (complete) | **5** | E2E folder taxonomy — see §10.2 |
 
 ### 10.1 Wave 3f — shared layout nomenclature and path rename (complete 2026-06-07)
 
@@ -193,6 +194,19 @@ Wave **3f** landed the mechanical rename and documentation vocabulary in one PR:
 4. **Out of scope (unchanged):** `@umbraculum/native-shell` package name; RFC-0011 title/filename; Wave **6** full BUILDING-YOUR-VERTICAL rewrite.
 
 **Non-goals (honored):** re-export shims at old paths; “formerly called shell” redirect prose.
+
+### 10.2 Wave 6 — doc capstone (complete 2026-06-07)
+
+Integrator docs synced with post–Wave 3a/3c/3d reality:
+
+1. [`REPOSITORY-STRUCTURE.md`](../REPOSITORY-STRUCTURE.md) — tier prefixes, `(platform-layout)/`, vertical sub-packages, backbone cross-links.
+2. [`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md) — filesystem diagram, expanded decision tree, known-gap callouts.
+3. [`GLOSSARY.md`](../GLOSSARY.md) — platform horizontal pages, canonical module segment, vertical route group; **workspace web UI** retained per §3.1.
+4. [`docs-site/reference-sidebar-items.ts`](../../docs-site/reference-sidebar-items.ts) — brewery-contracts, brewery-i18n, brewery-media-assets.
+5. [`apps/web/README.md`](../../apps/web/README.md), [`apps/native/README.md`](../../apps/native/README.md) — layering tree; native multi-app target stub (Wave 4 deferred).
+6. Build log + §12 audit: [`rfc-0011-wave-6-doc-capstone-build-log.md`](../design/rfc-0011-wave-6-doc-capstone-build-log.md).
+
+**§11 companion artifacts (Wave 6):** all rows above ticked; Wave 5 E2E taxonomy remains.
 
 ---
 

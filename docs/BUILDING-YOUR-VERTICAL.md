@@ -1,7 +1,7 @@
 # Building your vertical on Umbraculum
 
 **Tier:** Public  
-**Status:** v1.0 — foundational onboarding (2026-05-31)  
+**Status:** v1.1 — RFC-0011 Wave 6 sync (2026-06-07)  
 **Audience:** integrators, ISVs, and in-house teams building **product X** on Umbraculum — especially when product X is **not** a brewery and you want to know how that differs from the reference vertical shipped in this repo.
 
 > **Two questions this page answers**
@@ -83,6 +83,31 @@ umbraculum platform (upstream)       ← backbone you track / deploy
 
 **Contributing a vertical into this monorepo:** optional. Only the **reference vertical** (`brewery`) and core team's demos live here by policy. Your production vertical should default to **your repo** ([`GLOSSARY.md`](GLOSSARY.md) §"Where code lives").
 
+### Web app filesystem map
+
+Where routes and shared code live under `apps/web/app/` (terminology contract: [backbone §3.7](design/pre-flip-application-surface-backbone.md)):
+
+```text
+apps/web/app/[locale]/
+  _shared-layout/          # platform chrome (nav, footer, providers)
+  (auth)/                  # login, signup, workspace select
+  (platform-layout)/       # platform horizontal pages (ai, accessibility, …)
+  (pim|mrp|crp|automation)/   # canonical module route groups
+  (brewery)/               # reference vertical
+  platform/                # cross-workspace admin (unchanged URL shape)
+```
+
+On-disk **package tiers** (RFC-0011 Wave 3a):
+
+```text
+packages/
+  platform/                # @umbraculum/ui, i18n, api-client, contracts, …
+  modules/                 # canonical *-contracts, module-sdk
+  verticals/brewery/       # brewery-core, brewery-contracts, brewery-i18n, …
+```
+
+See [`REPOSITORY-STRUCTURE.md`](REPOSITORY-STRUCTURE.md) §2–§3 for the full inventory.
+
 ### Where does my UI code go?
 
 Use this decision tree when adding web UI or helpers (conventional terms — see [backbone §3.7](design/pre-flip-application-surface-backbone.md)):
@@ -94,7 +119,27 @@ Module-only shared UI for one module code?     → app/[locale]/(<code>)/{_compo
 Routable page (URL segment)?                   → app/[locale]/(<code>)/<segment>/
                                               OR app/[locale]/(platform-layout)/<segment>/  (platform horizontal)
 Cross-workspace admin (ads, platform recipes)? → app/[locale]/platform/  (unchanged)
+Login / signup / workspace picker?             → app/[locale]/(auth)/
 ```
+
+**`(platform-layout)/` vs `platform/` admin:** `(platform-layout)/` holds **member-facing platform horizontal pages** (AI consultant, accessibility statement, about) — same audience as module routes. `platform/` is **cross-workspace admin** (platform recipe catalog, ads) with a distinct URL prefix; do not move admin pages into `(platform-layout)/`.
+
+**Package placement for a new vertical:**
+
+| Need | Package | On-disk path |
+|---|---|---|
+| Wire types + Zod schemas | `@umbraculum/<code>-contracts` | `packages/verticals/<code>/contracts/` |
+| Locale JSON (vertical-only namespaces) | `@umbraculum/<code>-i18n` | `packages/verticals/<code>/i18n/` |
+| PNG/SVG assets + manifest | `@umbraculum/<code>-media-assets` | `packages/verticals/<code>/media-assets/` |
+| Shared domain UI widgets | `@umbraculum/<code>-<feature>-ui` | `packages/verticals/<code>/<feature>-ui/` |
+| Platform merge/loader only | `@umbraculum/i18n`, `@umbraculum/media` | `packages/platform/` — no vertical content |
+
+**API colocation:** domain services belong under `services/api/src/modules/<code>/services/` (Wave 3e). Do not add new vertical logic under `services/api/src/services/` or `domain/`.
+
+**Known pre-flip gaps (documented, not fixed in Wave 6):**
+
+- **`packages/platform/api-client/src/brewery/`** — vertical HTTP facade in a platform package; extraction deferred.
+- **Cross-module `(brewery)/_components` imports** — some canonical module pages still import brewery shared UI; prefer `@umbraculum/brewery-recipes-ui` or module-local `_components/`.
 
 **Not** platform shared layout: a page's internal column/grid layout (recipe editor sections); Tamagui `layout` props; the POSIX command-line shell.
 
