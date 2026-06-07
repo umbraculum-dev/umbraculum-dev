@@ -62,6 +62,8 @@
       "pathPatterns": [
         "packages/platform/contracts/**",
         "packages/platform/api-client/**",
+        "packages/verticals/brewery/contracts/**",
+        "packages/verticals/brewery/api-client/**",
         "packages/modules/ai-tool-sdk/**",
         "packages/modules/i18n-keys/**",
         "packages/modules/module-sdk/**",

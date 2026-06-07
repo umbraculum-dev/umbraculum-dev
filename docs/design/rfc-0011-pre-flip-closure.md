@@ -48,7 +48,7 @@ Full audit trail: [wave-6 build log §12 audit](rfc-0011-wave-6-doc-capstone-bui
 | **F-mod brewery-less SKU** | **Keep deferred (product SKU)** | Runtime `UMBRACULUM_MODULE_PROFILE=platform` **documented pre-flip** ([`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md)); full install SKU post-alpha. **Demo:** `demo.umbraculum.dev` stays reference profile (core + brewery), not platform-only. |
 | **Second native app scaffold** | **Keep deferred** | Pattern in [`apps/native/README.md`](../../apps/native/README.md). **2026-06-07:** choose PIM vs quality module app **after** application-surface structure is stable — not pre-flip. |
 | **`docs-site/` extraction** | **Keep deferred** | R-POLICY — monorepo through public alpha; foundations pass pre-flip |
-| **API flat-services eslint fence** | **Land pre-flip (Phase 3)** | Prevents Wave 3e regression; see [backbone §13](pre-flip-application-surface-backbone.md) |
+| **API flat-services eslint fence** | **Done pre-flip (2026-06-07)** | [solid-boundaries-eslint-api-flat-services-spike.md](solid-boundaries-eslint-api-flat-services-spike.md) |
 | **Apps → `@umbraculum/brewery-api-client` direct imports** | **Done pre-flip (2026-06-07)** | Web + native brewery migrated; platform `./brewery` shim deleted |
 | **Website / forum VPS automation** | **Done / sister repos** | Brochure extracted; forum/demo in hosting repos |
 

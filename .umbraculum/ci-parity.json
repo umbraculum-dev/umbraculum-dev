@@ -92,7 +92,9 @@
         "npm pack -w @umbraculum/pim-contracts --dry-run",
         "npm pack -w @umbraculum/mrp-contracts --dry-run",
         "npm pack -w @umbraculum/crp-contracts --dry-run",
-        "npm pack -w @umbraculum/api-client --dry-run"
+        "npm pack -w @umbraculum/api-client --dry-run",
+        "npm pack -w @umbraculum/brewery-contracts --dry-run",
+        "npm pack -w @umbraculum/brewery-api-client --dry-run"
       ]
     },
     {

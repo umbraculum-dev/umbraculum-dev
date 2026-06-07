@@ -305,7 +305,7 @@ Phase E13 completes the web Phase E migration by retiring legacy `apiFetch` and 
 | [`scripts/integrator-api-smoke.sh`](../scripts/integrator-api-smoke.sh) | Cookie-session login → `/api/auth/me` → `/api/workspaces` → `/api/styles` (reference stack) |
 | [`scripts/dogfood-npm-smoke.sh`](../scripts/dogfood-npm-smoke.sh) | Registry npm install smoke: contracts, api-client, module-sdk α batch (CI job `dogfood-npm-smoke`) |
 | [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | Live cookie + bearer npm smoke (docker compose; not ci-parity) |
-| [`publish-contracts-api-client.yml`](../.github/workflows/publish-contracts-api-client.yml) | OIDC publish for `@umbraculum/contracts` + `@umbraculum/api-client` on `sdk-contracts-v*` tags |
+| [`publish-contracts-api-client.yml`](../.github/workflows/publish-contracts-api-client.yml) | OIDC publish for `@umbraculum/contracts`, `@umbraculum/api-client`, `@umbraculum/brewery-contracts`, `@umbraculum/brewery-api-client` on `sdk-contracts-v*` tags |
 
 **npm publish:** `@umbraculum/contracts@0.0.1` and `@umbraculum/api-client@0.0.1` (2026-06-02); module-sdk α batch at `@0.0.2` / `@0.1.1` (see [`LICENSING.md`](LICENSING.md) §6.2.1). Monorepo consumers dogfood registry semver for all published SDK packages — see [`npm-sdk-monorepo-dogfood.md`](design/npm-sdk-monorepo-dogfood.md). Future bumps: [`npm-sdk-trusted-publishing.md`](design/npm-sdk-trusted-publishing.md) (`sdk-contracts-v*` / `sdk-batch-v*` tags).
 

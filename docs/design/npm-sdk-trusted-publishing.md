@@ -29,12 +29,21 @@ Full URL prefix: `https://registry.npmjs.org`
 |---------|----------|-------------|
 | `@umbraculum/contracts` | `publish-contracts-api-client.yml` | `sdk-contracts-v*` |
 | `@umbraculum/api-client` | `publish-contracts-api-client.yml` | `sdk-contracts-v*` |
+| `@umbraculum/brewery-contracts` | `publish-contracts-api-client.yml` | `sdk-contracts-v*` |
+| `@umbraculum/brewery-api-client` | `publish-contracts-api-client.yml` | `sdk-contracts-v*` |
 
-**First-time:** npm requires a package record before OIDC trust attaches. Publish `0.0.1` from a maintainer laptop:
+**First-time (platform pair, 2026-06-02):** npm requires a package record before OIDC trust attaches. Publish `0.0.1` from a maintainer laptop:
 
 ```bash
 npx @umbraculum/ci-parity run --jobs sdk-publish-prep
 ./scripts/publish-contracts-api-client-laptop.sh
+```
+
+**First-time (brewery vertical pair, 2026-06-07):**
+
+```bash
+npx @umbraculum/ci-parity run --jobs sdk-publish-prep
+./scripts/publish-brewery-sdk-laptop.sh
 ```
 
 Then configure trusted publishers (workflow filename **`publish-contracts-api-client.yml`**, not `publish-sdk-batch.yml`):
@@ -43,13 +52,18 @@ Then configure trusted publishers (workflow filename **`publish-contracts-api-cl
 REPO="umbraculum-dev/umbraculum-dev"
 WF="publish-contracts-api-client.yml"
 
-for pkg in @umbraculum/contracts @umbraculum/api-client; do
+for pkg in \
+  @umbraculum/contracts \
+  @umbraculum/api-client \
+  @umbraculum/brewery-contracts \
+  @umbraculum/brewery-api-client
+do
   npx npm@11.16.0 trust github "$pkg" --repo "$REPO" --file "$WF" --allow-publish -y
   sleep 2
 done
 ```
 
-**Future bumps:** increment semver in `packages/platform/contracts/package.json` and/or `packages/platform/api-client/package.json`, push a **new** tag (e.g. `sdk-contracts-v0.0.2`). Do **not** push `sdk-contracts-v0.0.1` after a successful laptop first publish — that semver is already on the registry.
+**Future bumps:** increment semver in the affected `package.json`(s), push a **new** tag (e.g. `sdk-contracts-v0.0.2`). The workflow skips packages whose version is already on the registry.
 
 ---
 
@@ -167,3 +181,4 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 | 2026-05-29 | `sdk-batch-v0.1.1` GHA OIDC publish | **Green** — patch bump to `0.1.1` / `0.0.2` |
 | — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published manually |
 | 2026-06-02 | `publish-contracts-api-client.yml` + laptop script | Done — `@umbraculum/contracts` / `@umbraculum/api-client` `0.0.1` on registry + OIDC trust |
+| 2026-06-07 | Brewery vertical SDK (`brewery-contracts`, `brewery-api-client`) | In progress — `publish-brewery-sdk-laptop.sh` + workflow skip-if-exists |

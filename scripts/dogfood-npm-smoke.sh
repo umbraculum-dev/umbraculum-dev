@@ -10,6 +10,7 @@
 #   MODULE_SDK_VERSION=0.0.2 AI_TOOL_SDK_VERSION=0.1.1
 #   AUTOMATION_CONTRACTS_VERSION=0.0.2 PIM_CONTRACTS_VERSION=0.0.2
 #   MRP_CONTRACTS_VERSION=0.0.2 CRP_CONTRACTS_VERSION=0.0.2
+#   BREWERY_CONTRACTS_VERSION=0.0.1 BREWERY_API_CLIENT_VERSION=0.0.1
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,6 +24,8 @@ AUTOMATION_CONTRACTS_VERSION="${AUTOMATION_CONTRACTS_VERSION:-0.0.2}"
 PIM_CONTRACTS_VERSION="${PIM_CONTRACTS_VERSION:-0.0.2}"
 MRP_CONTRACTS_VERSION="${MRP_CONTRACTS_VERSION:-0.0.2}"
 CRP_CONTRACTS_VERSION="${CRP_CONTRACTS_VERSION:-0.0.2}"
+BREWERY_CONTRACTS_VERSION="${BREWERY_CONTRACTS_VERSION:-0.0.1}"
+BREWERY_API_CLIENT_VERSION="${BREWERY_API_CLIENT_VERSION:-0.0.1}"
 TMPDIR="${TMPDIR:-/tmp}/umbraculum-dogfood-npm-smoke-$$"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
@@ -48,6 +51,29 @@ import('@umbraculum/api-client').then((m) => {
 "
 
 node --check "${REPO_ROOT}/scripts/integrator-bearer-smoke.mjs"
+
+echo "=== dogfood-npm-smoke (brewery vertical SDK) ==="
+echo "brewery-contracts=@${BREWERY_CONTRACTS_VERSION} brewery-api-client=@${BREWERY_API_CLIENT_VERSION}"
+
+BREWERY_DIR="${TMPDIR}/brewery-sdk"
+mkdir -p "${BREWERY_DIR}"
+cd "${BREWERY_DIR}"
+
+npm init -y >/dev/null
+npm install \
+  "@umbraculum/brewery-contracts@${BREWERY_CONTRACTS_VERSION}" \
+  "@umbraculum/brewery-api-client@${BREWERY_API_CLIENT_VERSION}" \
+  "@umbraculum/api-client@${API_CLIENT_VERSION}"
+
+node --input-type=module -e "
+const assertExports = (label, mod) => {
+  const keys = Object.keys(mod).slice(0, 8);
+  console.log(label + ' exports sample:', keys.join(', '));
+  if (!keys.length) throw new Error('no ' + label + ' exports');
+};
+import('@umbraculum/brewery-contracts').then((m) => assertExports('brewery-contracts', m));
+import('@umbraculum/brewery-api-client').then((m) => assertExports('brewery-api-client', m));
+"
 
 echo "=== dogfood-npm-smoke (module-sdk α batch) ==="
 echo "module-sdk=@${MODULE_SDK_VERSION} ai-tool-sdk=@${AI_TOOL_SDK_VERSION}"

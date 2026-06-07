@@ -1,12 +1,15 @@
 name: publish-contracts-api-client
 
-# Publishes @umbraculum/contracts + @umbraculum/api-client on sdk-contracts-v* tags.
-# Separate from publish-sdk-batch.yml so first-time publish does not republish the
-# seven-package α batch (403 on unchanged semver).
+# Publishes MIT SDK packages on sdk-contracts-v* tags:
+#   @umbraculum/contracts, @umbraculum/api-client,
+#   @umbraculum/brewery-contracts, @umbraculum/brewery-api-client
+#
+# Skips a package when its package.json version is already on the registry (403-safe bumps).
+# Separate from publish-sdk-batch.yml (seven-package α batch).
 #
 # Auth: npm Trusted Publishing (OIDC) — no NPM_TOKEN.
-# First-time: maintainer laptop publish + npm trust CLI — see
-# docs/design/npm-sdk-trusted-publishing.md § "Contracts + api-client extension".
+# First-time packages: maintainer laptop publish + npm trust CLI — see
+# docs/design/npm-sdk-trusted-publishing.md.
 
 on:
   push:
@@ -16,7 +19,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     permissions:
       contents: read
       id-token: write
@@ -36,10 +39,12 @@ jobs:
       - run: npm run build:packages
       - run: npm run test:packages
 
-      - name: Publish contracts + api-client to npm (OIDC)
+      - name: Publish contracts SDK batch to npm (OIDC)
         env:
           CONTRACTS_ESCAPED: "@umbraculum%2fcontracts"
           API_CLIENT_ESCAPED: "@umbraculum%2fapi-client"
+          BREWERY_CONTRACTS_ESCAPED: "@umbraculum%2fbrewery-contracts"
+          BREWERY_API_CLIENT_ESCAPED: "@umbraculum%2fbrewery-api-client"
         run: |
           set -euo pipefail
 
@@ -101,18 +106,49 @@ jobs:
             echo "::endgroup::"
           }
 
-          publish_npm_oidc packages/platform/contracts "${CONTRACTS_ESCAPED}" "@umbraculum/contracts"
+          publish_npm_oidc_skip_if_exists() {
+            local PKG_DIR="$1"
+            local PKG_ESCAPED="$2"
+            local PKG_LABEL="$3"
+            local VERSION
+            VERSION="$(jq -r .version "${PKG_DIR}/package.json")"
+            if npm view "${PKG_LABEL}@${VERSION}" version >/dev/null 2>&1; then
+              echo "Skip ${PKG_LABEL}@${VERSION} — already on registry"
+              return 0
+            fi
+            publish_npm_oidc "${PKG_DIR}" "${PKG_ESCAPED}" "${PKG_LABEL}"
+          }
 
+          publish_npm_oidc_skip_if_exists packages/platform/contracts "${CONTRACTS_ESCAPED}" "@umbraculum/contracts"
+
+          cp packages/platform/api-client/package.json /tmp/api-client-package.json.bak
           echo "Rewriting api-client dependencies to registry semver for publish tarball only"
           jq '.dependencies["@umbraculum/contracts"] = "^0.0.1" | .dependencies["@umbraculum/automation-contracts"] = "^0.0.2" | .dependencies["@umbraculum/pim-contracts"] = "^0.0.2" | .dependencies["@umbraculum/mrp-contracts"] = "^0.0.2" | .dependencies["@umbraculum/crp-contracts"] = "^0.0.2"' \
             packages/platform/api-client/package.json > /tmp/api-client-package.json
           mv /tmp/api-client-package.json packages/platform/api-client/package.json
 
-          publish_npm_oidc packages/platform/api-client "${API_CLIENT_ESCAPED}" "@umbraculum/api-client"
+          publish_npm_oidc_skip_if_exists packages/platform/api-client "${API_CLIENT_ESCAPED}" "@umbraculum/api-client"
+          mv /tmp/api-client-package.json.bak packages/platform/api-client/package.json
+
+          cp packages/verticals/brewery/contracts/package.json /tmp/brewery-contracts-package.json.bak
+          jq '.dependencies["@umbraculum/contracts"] = "^0.0.1"' \
+            packages/verticals/brewery/contracts/package.json > /tmp/brewery-contracts-package.json
+          mv /tmp/brewery-contracts-package.json packages/verticals/brewery/contracts/package.json
+
+          publish_npm_oidc_skip_if_exists packages/verticals/brewery/contracts "${BREWERY_CONTRACTS_ESCAPED}" "@umbraculum/brewery-contracts"
+          mv /tmp/brewery-contracts-package.json.bak packages/verticals/brewery/contracts/package.json
+
+          cp packages/verticals/brewery/api-client/package.json /tmp/brewery-api-client-package.json.bak
+          jq '.dependencies["@umbraculum/api-client"] = "^0.0.1" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
+            packages/verticals/brewery/api-client/package.json > /tmp/brewery-api-client-package.json
+          mv /tmp/brewery-api-client-package.json packages/verticals/brewery/api-client/package.json
+
+          publish_npm_oidc_skip_if_exists packages/verticals/brewery/api-client "${BREWERY_API_CLIENT_ESCAPED}" "@umbraculum/brewery-api-client"
+          mv /tmp/brewery-api-client-package.json.bak packages/verticals/brewery/api-client/package.json
 
       - name: Published versions summary
         run: |
           set -euo pipefail
-          for PKG in contracts api-client; do
+          for PKG in contracts api-client brewery-contracts brewery-api-client; do
             echo "@umbraculum/${PKG}@$(npm view "@umbraculum/${PKG}" version)"
           done
