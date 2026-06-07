@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "profile": "ts-npm-monorepo",
   "runtime": {
-    "image": "node:20-slim",
+    "image": "public.ecr.aws/docker/library/node:20-slim",
     "nodeOptions": "--max-old-space-size=6144"
   },
   "docker": {

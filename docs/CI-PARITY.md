@@ -122,7 +122,7 @@ Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 ## Cross-platform contract (agents and contributors)
 
-`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI runs manifest jobs inside `node:20-slim`. **Agent pre-push uses `--archive`** (committed tree, cold install); **`--ci`** is for WIP iteration only — see [Snapshot modes](#snapshot-modes-read-this-before-pre-push) below.
+`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI runs manifest jobs inside the manifest `runtime.image` (default: `public.ecr.aws/docker/library/node:20-slim`). **Agent pre-push uses `--archive`** (committed tree, cold install); **`--ci`** is for WIP iteration only — see [Snapshot modes](#snapshot-modes-read-this-before-pre-push) below.
 
 | Layer | Role |
 |-------|------|
@@ -143,6 +143,30 @@ Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 Agent rule (toolset): `72-ci-parity-local-vs-ci-divergence.mdc` § Agent anti-patterns.
 
+## Local vs GHA: what is the same (and what is not)
+
+**Same when ci-parity actually runs:** manifest job ids, install commands (`npm ci`, nested installs), lint/typecheck/docs commands, container image **name** from `.umbraculum/ci-parity.json` → `runtime.image`, and (for archive pre-push) committed-tree snapshot via `git archive`.
+
+**Not the same — GHA-only registry pull:**
+
+| Layer | Local (`npm run verify:pre-push`) | GHA (`typecheck` / `web-lint` via `ci-parity-reusable.yml`) |
+|-------|-----------------------------------|-------------------------------------------------------------|
+| Docker image on disk | Usually **cached** from prior pulls — `ensureDockerImage()` returns in ms | **Empty** runner cache — must **network-pull** the runtime image |
+| Workflow pre-pull step | **Does not exist** locally | Runs **before** `@umbraculum/ci-parity` — failure here means **typecheck never started** |
+| Failure looks like | N/A locally (cache hit) | Red workflow named **`typecheck`** with log line `FATAL: could not pull …` — **not** `error TS…` |
+
+If Actions shows **only** Docker Hub / `registry-1.docker.io` timeout errors at **“Pull CI parity runtime image”**, local archive typecheck being green is **expected** — you are not missing TS errors; CI never reached `tsc`.
+
+**Primary registry (2026-06):** manifest `runtime.image` is `public.ecr.aws/docker/library/node:20-slim` (AWS public mirror of Docker Official Images). GHA pre-pull tries manifest image first, then ECR, then Docker Hub, tagging the winner as the manifest name so `@umbraculum/ci-parity` uses the cached layer.
+
+**Reproduce the GHA pull gate locally (optional):**
+
+```bash
+docker rmi public.ecr.aws/docker/library/node:20-slim node:20-slim 2>/dev/null || true
+docker pull public.ecr.aws/docker/library/node:20-slim
+./scripts/ci-parity-check.sh --archive run --jobs typecheck
+```
+
 ## Four divergence mechanisms
 
 Local static-analysis can lie in four documented ways:
@@ -154,7 +178,7 @@ Local static-analysis can lie in four documented ways:
 | 3 | Stale `node_modules` bind-mount | Rules/types differ when mounting live tree vs clean snapshot |
 | 4 | Workspace hoisting splits | Plugin augmentations missing under hoisted CI install |
 
-The parity runner uses either a **live checkout mount (`--ci`)** for local pre-push or a **`git archive` snapshot** when replaying a specific ref. Both use the same `node:20-slim` image + install commands as CI. See [Snapshot modes](#snapshot-modes-read-this-before-pre-push).
+The parity runner uses either a **live checkout mount (`--ci`)** for local pre-push or a **`git archive` snapshot** when replaying a specific ref. Both use the same manifest `runtime.image` + install commands as CI. See [Snapshot modes](#snapshot-modes-read-this-before-pre-push) and [Local vs GHA](#local-vs-gha-what-is-the-same-and-what-is-not).
 
 **Local install persistence (≥ `@umbraculum/ci-parity` 1.0.8):** the manifest may declare `docker.volumes` — umbraculum-dev mounts `umbraculum_npm_cache` and `umbraculum_root_node_modules` so repeat local parity runs reuse warm cache/trees on the same Docker host. See [`DEVELOPMENT-NPM-VOLUMES.md`](DEVELOPMENT-NPM-VOLUMES.md). GitHub Actions runners remain cold per job.
 

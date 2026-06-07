@@ -112,6 +112,9 @@ services:
       # Mounted now so Phase B-3 PRs only have to add imports, not compose.
       # MRP/CRP async export (renderJobClient.ts) uses cookie-auth helpers from api-client.
       - ./packages/platform/api-client:/packages/platform/api-client:ro
+      # RFC-0011 brewery-api-client extraction: @umbraculum/api-client/brewery shim re-exports
+      # this package (tsup --external); web must resolve it at Next/webpack bundle time.
+      - ./packages/verticals/brewery/api-client:/packages/verticals/brewery/api-client:ro
       - ./packages/modules/automation-contracts:/packages/modules/automation-contracts:ro
       - ./packages/modules/pim-contracts:/packages/modules/pim-contracts:ro
       - ./packages/modules/mrp-contracts:/packages/modules/mrp-contracts:ro
