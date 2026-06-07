@@ -65,7 +65,7 @@ echo "Verifying registry…"
 for i in 1 2 3 4 5; do
   if npm view "${PKG_NAME}@${VERSION}" version >/dev/null 2>&1; then
     echo "OK: ${PKG_NAME}@$(npm view "${PKG_NAME}@${VERSION}" version) on registry"
-    if ! npm view "${PKG_NAME}@${VERSION}" exports | grep -q '"./transport"'; then
+    if ! npm view "${PKG_NAME}@${VERSION}" exports --json | jq -e 'has("./transport")' >/dev/null 2>&1; then
       echo "FAIL: ${PKG_NAME}@${VERSION} missing ./transport export in package.json"
       exit 1
     fi
