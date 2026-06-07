@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
-import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
-import { WorkspacesService } from "./workspacesService.js";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../../../errors.js";
+import { WorkspacesService } from "../../../services/workspacesService.js";
 
 /**
  * Numeric fields are typed as `unknown` because they cross the trust boundary

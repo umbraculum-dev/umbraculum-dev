@@ -1,7 +1,7 @@
 import type { AiTool } from "@umbraculum/ai-tool-sdk";
 import type { PrismaClient } from "@prisma/client";
 
-import { WorkspacesService } from "../../../workspacesService.js";
+import { WorkspacesService } from "../../../../../services/workspacesService.js";
 
 /** Empty input — the tool returns the workspace's most-recent session. */
 type CurrentBrewSessionStatusInput = Record<string, never>;

@@ -17,7 +17,7 @@ export const BASE_PROMPT = [
 ].join(" ");
 
 /** @deprecated Use brewery module overlay via registerModule; kept for tests. */
-export { BREWERY_MODULE_OVERLAY as BREWERY_OVERLAY } from "./prompts/brewery.js";
+export { BREWERY_MODULE_OVERLAY as BREWERY_OVERLAY } from "../../modules/brewery/services/ai/prompts/brewery.js";
 
 export interface WorkspaceAiMemoryBlob {
   facts: string[];
