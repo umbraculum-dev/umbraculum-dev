@@ -3,7 +3,7 @@ import { BeerJsonExportResponseSchema } from "@umbraculum/brewery-contracts";
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { getBytesParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type RecipeBeerJsonExportPath = "/recipes/{id}/export/beerjson";
 type RecipeBeerJsonExportGet = BreweryOpenApiPaths[RecipeBeerJsonExportPath]["get"];

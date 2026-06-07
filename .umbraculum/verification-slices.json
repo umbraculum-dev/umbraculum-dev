@@ -33,6 +33,7 @@
         "services/api/src/openapi/",
         "services/api/openapi/",
         "packages/platform/api-client/",
+        "packages/verticals/brewery/api-client/",
         "packages/platform/contracts/src/auth/",
         "packages/platform/contracts/src/workspaces/",
         "packages/verticals/brewery/contracts/src/brewery/",
@@ -64,6 +65,10 @@
           {
             "id": "api-client-openapi-codegen-check",
             "cmd": "./scripts/docker-npm-run.sh -r 'npm install --no-audit --no-fund --prefer-offline -w @umbraculum/api-client --include-workspace-root && npm run openapi:codegen:check -w @umbraculum/api-client'"
+          },
+          {
+            "id": "brewery-api-client-openapi-codegen-check",
+            "cmd": "./scripts/docker-npm-run.sh -r 'npm install --no-audit --no-fund --prefer-offline -w @umbraculum/brewery-api-client --include-workspace-root && npm run openapi:codegen:check -w @umbraculum/brewery-api-client'"
           }
         ]
       }

@@ -3,7 +3,7 @@ import { BrewdaySettingsPatchRequestSchema, BrewdaySettingsResponseSchema } from
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { getParsed, patchParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type BrewdaySettingsPath = "/brewday-settings";
 type BrewdaySettingsGet = BreweryOpenApiPaths[BrewdaySettingsPath]["get"];

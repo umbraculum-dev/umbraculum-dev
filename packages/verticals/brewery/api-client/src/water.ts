@@ -3,7 +3,7 @@ import { parseRecipeWaterHubSummaryResponse } from "@umbraculum/brewery-contract
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { getParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type WaterHubSummaryPath = "/recipes/{id}/water-hub-summary";
 type WaterHubSummaryGet = BreweryOpenApiPaths[WaterHubSummaryPath]["get"];

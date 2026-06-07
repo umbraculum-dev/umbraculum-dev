@@ -126,7 +126,7 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 - **F1 closure** — **175 documented operations** (~97%). One handler exempt: `POST /ai/chat` SSE (see §Streaming endpoints).
 - **BeerJSON / complex JSON** — OpenAPI may show loose object schemas; contracts + route tables win.
 - **Binary / stream responses** — routes that `reply.send(Buffer)` use `z.custom<Buffer>` in contracts (e.g. [`BeerJsonExportResponseSchema`](../packages/platform/contracts/src/brewery/routeSchemas.ts)); OpenAPI shows an empty JSON schema (`{}`) while runtime returns raw bytes with `Content-Type` / `Content-Disposition` headers. Human route tables and contracts win on wire format.
-- **Codegen + facades (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **types** plus typed **platform facades** (`listWorkspaces`, rendering helpers, …). Brewery reference vertical facades live in **`@umbraculum/brewery-api-client`** (RFC-0011 extraction). Regenerate platform types: `npm run openapi:codegen -w @umbraculum/api-client`. Runtime validation remains `@umbraculum/contracts` / `@umbraculum/brewery-contracts` parsers inside each facade.
+- **Codegen + facades (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **platform** types plus typed platform facades. Brewery OpenAPI types + facades live in **`@umbraculum/brewery-api-client`**. Regenerate: `npm run openapi:codegen -w @umbraculum/api-client` (platform) and `npm run openapi:codegen -w @umbraculum/brewery-api-client` (brewery). Runtime validation remains `@umbraculum/contracts` / `@umbraculum/brewery-contracts` parsers inside each facade.
 
 ---
 
@@ -328,7 +328,7 @@ E8-follow-up adds brewery catalog facades deferred from E8 (BeerJSON export down
 | `brewery/recipeExport` | `exportRecipeBeerJson`, `exportAllRecipesBeerJson`, `recipeBeerJsonExportPath`, `allRecipesBeerJsonExportPath` (GET binary via `BeerJsonExportResponseSchema`) |
 | `brewery/ingredientAdmin` | `listIngredientSyncRuns`, `runIngredientSync` |
 
-Parser map entries live in `BREWERY_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/platform/api-client/src/facadeParserMap.ts).
+Parser map entries live in `BREWERY_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/verticals/brewery/api-client/src/facadeParserMap.ts) (`@umbraculum/brewery-api-client`).
 
 ---
 

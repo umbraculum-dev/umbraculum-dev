@@ -3,7 +3,7 @@ import { WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchem
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { postParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type SaltAdditionsPath = "/water-calc/salt-additions";
 type SaltAdditionsPost = BreweryOpenApiPaths[SaltAdditionsPath]["post"];

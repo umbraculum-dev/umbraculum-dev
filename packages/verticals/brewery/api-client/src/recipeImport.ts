@@ -3,7 +3,7 @@ import { RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, R
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { postParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type RecipeImportPreviewPath = "/recipes/import/preview";
 type RecipeImportPreviewPost = BreweryOpenApiPaths[RecipeImportPreviewPath]["post"];

@@ -11,7 +11,7 @@ The transport layer between any client and `services/api`. Web (Next.js) and nat
 
 ## Scope
 
-- **Contains**: the `createApiClient(baseUrl, auth, options?)` factory, auth strategies, **typed facades** (Phase E), RFC-0007 render-job helpers, OpenAPI-derived path/component **types** (`PlatformOpenApiPaths`, `BreweryOpenApiPaths`, …), and a `fetch` injection point for environments where the global `fetch` is not appropriate (Node tests, RN Hermes).
+- **Contains**: the `createApiClient(baseUrl, auth, options?)` factory, auth strategies, **typed platform facades** (Phase E), RFC-0007 render-job helpers, OpenAPI-derived **platform** path/component types (`PlatformOpenApiPaths`, …), and a `fetch` injection point for environments where the global `fetch` is not appropriate (Node tests, RN Hermes). Brewery OpenAPI types and HTTP facades: **`@umbraculum/brewery-api-client`**.
 - **Does not contain**: contract DTO/parser definitions (those live in `@umbraculum/contracts`); auth backend logic — token issuance, session creation (lives in `services/api/src/routes/auth/`); UI session-state management (lives in the consuming app).
 
 ## Typed facades (Phase E)
@@ -105,7 +105,7 @@ Wire authority remains `@umbraculum/contracts` parsers inside each facade — se
 - `@umbraculum/api-client/pim` — canonical PIM facades
 - `@umbraculum/api-client/mrp` — canonical MRP facades
 - `@umbraculum/api-client/crp` — canonical CRP facades
-- `PlatformOpenApiPaths`, `BreweryOpenApiPaths`, and related `components` / `operations` type exports (generated from committed OpenAPI JSON)
+- `PlatformOpenApiPaths` and related `components` / `operations` type exports (generated from committed platform OpenAPI JSON)
 
 ## OpenAPI codegen (Phase E)
 

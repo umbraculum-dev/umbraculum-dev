@@ -3,7 +3,7 @@ import { IngredientSyncResponseSchema, IngredientSyncRunsResponseSchema } from "
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { getParsed, postParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type IngredientSyncRunsPath = "/admin/ingredients/sync-runs";
 type IngredientSyncRunsGet = BreweryOpenApiPaths[IngredientSyncRunsPath]["get"];

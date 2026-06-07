@@ -6,9 +6,9 @@ import { describe, expect, it } from "vitest";
 
 const pkgRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-describe("OpenAPI generated types", () => {
-  it("platform artifact includes /health", () => {
-    const text = readFileSync(join(pkgRoot, "src/generated/platform.openapi.ts"), "utf8");
-    expect(text).toContain('"/health"');
+describe("brewery OpenAPI generated types", () => {
+  it("brewery artifact includes brewery-tagged paths", () => {
+    const text = readFileSync(join(pkgRoot, "src/generated/brewery.openapi.ts"), "utf8");
+    expect(text).toContain('"/recipes"');
   });
 });

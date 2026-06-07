@@ -11,7 +11,7 @@ import openapiTS, { astToString } from "openapi-typescript";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgRoot = join(__dirname, "..");
-const repoRoot = join(pkgRoot, "../..");
+const repoRoot = join(pkgRoot, "../../..");
 const outDir = join(pkgRoot, "src/generated");
 
 const BANNER =
@@ -23,11 +23,6 @@ const SPECS = [
     id: "platform",
     input: join(repoRoot, "services/api/openapi/openapi.json"),
     output: join(outDir, "platform.openapi.ts"),
-  },
-  {
-    id: "brewery",
-    input: join(repoRoot, "services/api/openapi/brewery.json"),
-    output: join(outDir, "brewery.openapi.ts"),
   },
 ];
 

@@ -3,7 +3,7 @@ import { StylesListResponseSchema } from "@umbraculum/brewery-contracts";
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { getParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type StylesListPath = "/styles";
 type StylesListGet = BreweryOpenApiPaths[StylesListPath]["get"];

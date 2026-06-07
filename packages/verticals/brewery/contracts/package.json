@@ -40,7 +40,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@umbraculum/contracts": "file:../../../platform/contracts",
+    "@umbraculum/contracts": "^0.0.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@ import { OkResponseSchema, parseBrewSessionCreateResponse, parseBrewSessionsList
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { deleteParsed, getParsed, patchParsed, postParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type RecipesListPath = "/recipes";
 type RecipesListGet = BreweryOpenApiPaths[RecipesListPath]["get"];

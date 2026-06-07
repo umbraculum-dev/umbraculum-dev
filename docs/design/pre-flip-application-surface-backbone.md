@@ -530,3 +530,5 @@ These items **do not** block public-alpha flip. Land opportunistically on featur
 | **Second native app scaffold** | Post-alpha — maintainer to choose **PIM handheld** (`apps/native/pim/`) vs **quality** app after structure is stable (2026-06-07 Step 4) |
 | **F-mod brewery-less product SKU** | Post-alpha — deferral register F-mod row |
 | **`docs-site/` sister-repo extraction** | Post-alpha — R-POLICY |
+| ~~Brewery OpenAPI metadata in platform api-client~~ | **Done (2026-06-07)** — `brewery.openapi.ts`, `BreweryOpenApiPaths`, `BREWERY_FACADE_PARSER_MAP` → `@umbraculum/brewery-api-client@0.0.3`; platform `@0.0.3` is platform-only |
+| ~~Monorepo registry semver pins~~ | **Done (2026-06-07)** — `apps/native/brewery` pins `@umbraculum/api-client@^0.0.3`; dogfood defaults `0.0.3` |

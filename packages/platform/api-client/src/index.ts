@@ -1,11 +1,8 @@
 export { cookieAuth, bearerTokenAuth, type AuthStrategy } from "./auth.js";
 export { createApiClient, type ApiClient, type ApiResponse } from "./client.js";
 export { ApiClientError } from "./errors.js";
-export { BREWERY_FACADE_PARSER_MAP, PLATFORM_FACADE_PARSER_MAP } from "./facadeParserMap.js";
+export { PLATFORM_FACADE_PARSER_MAP } from "./facadeParserMap.js";
 export type {
-  BreweryOpenApiComponents,
-  BreweryOpenApiOperations,
-  BreweryOpenApiPaths,
   PlatformOpenApiComponents,
   PlatformOpenApiOperations,
   PlatformOpenApiPaths,

@@ -3,7 +3,7 @@ import { InventoryCreateRequestSchema, InventoryItemResponseSchema, InventoryLis
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { deleteParsed, getParsed, patchParsed, postParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type InventoryListPath = "/inventory";
 type InventoryListGet = BreweryOpenApiPaths[InventoryListPath]["get"];

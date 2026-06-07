@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/api-client",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Typed API client with pluggable auth strategies (cookie sessions for web; bearer tokens for native + Node). The transport layer between any client and services/api. Returned payloads are runtime-validated by parsers from @umbraculum/contracts. Platform-classified per sub-plan #9 §1.1 — no brewery-domain logic.",
   "license": "MIT",
   "type": "module",
@@ -73,11 +73,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@umbraculum/automation-contracts": "file:../../modules/automation-contracts",
-    "@umbraculum/contracts": "file:../contracts",
-    "@umbraculum/crp-contracts": "file:../../modules/crp-contracts",
-    "@umbraculum/mrp-contracts": "file:../../modules/mrp-contracts",
-    "@umbraculum/pim-contracts": "file:../../modules/pim-contracts"
+    "@umbraculum/automation-contracts": "^0.0.2",
+    "@umbraculum/contracts": "^0.0.1",
+    "@umbraculum/crp-contracts": "^0.0.2",
+    "@umbraculum/mrp-contracts": "^0.0.2",
+    "@umbraculum/pim-contracts": "^0.0.2"
   },
   "devDependencies": {
     "openapi-typescript": "^7.10.1",

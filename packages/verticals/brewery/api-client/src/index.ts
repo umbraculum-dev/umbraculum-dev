@@ -1,3 +1,9 @@
+export { BREWERY_FACADE_PARSER_MAP } from "./facadeParserMap.js";
+export type {
+  BreweryOpenApiComponents,
+  BreweryOpenApiOperations,
+  BreweryOpenApiPaths,
+} from "./openapiTypes.js";
 export * from "./recipes.js";
 export * from "./recipeExport.js";
 export * from "./ingredientAdmin.js";

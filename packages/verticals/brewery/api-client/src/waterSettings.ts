@@ -3,7 +3,7 @@ import { RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSch
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { getParsed, putParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type RecipeWaterSettingsPath = "/recipes/{id}/water-settings";
 type RecipeWaterSettingsGet = BreweryOpenApiPaths[RecipeWaterSettingsPath]["get"];

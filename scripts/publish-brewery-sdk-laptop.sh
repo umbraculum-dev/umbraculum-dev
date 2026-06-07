@@ -66,7 +66,7 @@ mv /tmp/brewery-contracts-package.json.bak packages/verticals/brewery/contracts/
 
 echo "2. Rewrite brewery-api-client deps for registry tarball"
 cp packages/verticals/brewery/api-client/package.json /tmp/brewery-api-client-package.json.bak
-jq '.dependencies["@umbraculum/api-client"] = "^0.0.2" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
+jq '.dependencies["@umbraculum/api-client"] = "^0.0.3" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
   packages/verticals/brewery/api-client/package.json > /tmp/brewery-api-client-package.json
 mv /tmp/brewery-api-client-package.json packages/verticals/brewery/api-client/package.json
 

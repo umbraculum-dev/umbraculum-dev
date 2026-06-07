@@ -8,7 +8,7 @@ Typed **brewery** vertical API client facades: recipes, brew sessions, water che
 ## Install
 
 ```bash
-npm install @umbraculum/brewery-api-client@^0.0.1 @umbraculum/api-client@^0.0.1
+npm install @umbraculum/brewery-api-client@^0.0.3 @umbraculum/api-client@^0.0.3
 ```
 
 Requires `@umbraculum/api-client` (create client + auth) in the same app.
@@ -27,6 +27,7 @@ const recipes = await listRecipes(client);
 
 From repo root (in container):
 
+- **OpenAPI codegen**: `npm run openapi:codegen -w @umbraculum/brewery-api-client` (from `services/api/openapi/brewery.json`)
 - **Build**: `npm run build -w @umbraculum/brewery-api-client`
 - **Test**: `npm run test -w @umbraculum/brewery-api-client`
 - **Typecheck**: `npm run typecheck -w @umbraculum/brewery-api-client`

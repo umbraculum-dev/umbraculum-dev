@@ -43,7 +43,7 @@ ensure_brewery_api_client_dist() {
 ensure_brewery_api_client_dist
 
 cp "${PKG_DIR}/package.json" /tmp/brewery-api-client-package.json.bak
-jq '.dependencies["@umbraculum/api-client"] = "^0.0.2" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
+jq '.dependencies["@umbraculum/api-client"] = "^0.0.3" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
   "${PKG_DIR}/package.json" > /tmp/brewery-api-client-package.json
 mv /tmp/brewery-api-client-package.json "${PKG_DIR}/package.json"
 

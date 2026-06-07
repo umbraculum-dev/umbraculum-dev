@@ -3,7 +3,7 @@ import { FermentablesListResponseSchema, HopsListResponseSchema, IngredientsSear
 import type { ApiClient } from "@umbraculum/api-client";
 import { toClientPath } from "@umbraculum/api-client/transport";
 import { getParsed } from "@umbraculum/api-client/transport";
-import type { BreweryOpenApiPaths } from "@umbraculum/api-client";
+import type { BreweryOpenApiPaths } from "./openapiTypes.js";
 
 type FermentablesPath = "/ingredients/fermentables";
 type FermentablesGet = BreweryOpenApiPaths[FermentablesPath]["get"];

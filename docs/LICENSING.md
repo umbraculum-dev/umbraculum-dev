@@ -275,9 +275,9 @@ A specific subset of packages — the ones third-party module developers must de
 | `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
 | `@umbraculum/crp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
 | `@umbraculum/contracts` | ✅ | **Published** | `0.0.1` | Platform wire parsers; prerequisite for `@umbraculum/api-client`. Monorepo dev keeps `file:../contracts`. OIDC via `publish-contracts-api-client.yml`. |
-| `@umbraculum/api-client` | ✅ | **Published** | `0.0.2` | OpenAPI-derived path types + typed **platform** facades; `./transport` subpath for vertical SDK packages. `@0.0.1` lacked `./transport` (pre–brewery-shim removal). Future bumps: tag `sdk-contracts-v*`. |
-| `@umbraculum/brewery-contracts` | ✅ | **Published** | `0.0.1` | Brewery vertical wire types + Zod parsers (RFC-0011). OIDC via `publish-contracts-api-client.yml`. |
-| `@umbraculum/brewery-api-client` | ✅ | **Published** | `0.0.2` | Brewery HTTP facades; requires `@umbraculum/api-client@^0.0.2` (`./transport`). `@0.0.1` pinned platform client without transport export. |
+| `@umbraculum/api-client` | ✅ | **Published** | `0.0.3` | Platform facades + `./transport`; brewery OpenAPI types moved to `@umbraculum/brewery-api-client@0.0.3`. |
+| `@umbraculum/brewery-contracts` | ✅ | **Published** | `0.0.1` | Brewery vertical wire types + Zod parsers (RFC-0011). |
+| `@umbraculum/brewery-api-client` | ✅ | **Published** | `0.0.3` | Brewery HTTP facades + `BreweryOpenApiPaths` + `BREWERY_FACADE_PARSER_MAP`; requires `@umbraculum/api-client@^0.0.3`. |
 
 **Monorepo contributors** use npm workspaces (workspace symlinks to `packages/*` for in-tree SDKs; consumer manifests pin published `@umbraculum/*` at registry semver — contracts/api-client `@0.0.1`, module-sdk α batch `@0.0.2` / `@0.1.1` — see [`docs/design/npm-sdk-monorepo-dogfood.md`](design/npm-sdk-monorepo-dogfood.md)). **External module repos** install from npm first; git/workspace is a fallback for unreleased pins.
 

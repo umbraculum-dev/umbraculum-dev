@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/brewery-api-client",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Typed brewery vertical API client facades (recipes, water, brew sessions, inventory, …). Extracted from @umbraculum/api-client per RFC-0011 backlog; depends on platform transport + @umbraculum/brewery-contracts parsers.",
   "license": "MIT",
   "type": "module",
@@ -26,6 +26,8 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "openapi:codegen": "node ./scripts/openapi-codegen.mjs",
+    "openapi:codegen:check": "node ./scripts/openapi-codegen.mjs --check",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
@@ -44,6 +46,7 @@
     "@umbraculum/brewery-contracts": "file:../contracts"
   },
   "devDependencies": {
+    "openapi-typescript": "^7.10.1",
     "vitest": "^3.0.0"
   }
 }
