@@ -1,0 +1,49 @@
+{
+  "name": "@umbraculum/brewery-api-client",
+  "version": "0.0.1",
+  "description": "Typed brewery vertical API client facades (recipes, water, brew sessions, inventory, …). Extracted from @umbraculum/api-client per RFC-0011 backlog; depends on platform transport + @umbraculum/brewery-contracts parsers.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
+    "directory": "packages/verticals/brewery/api-client"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
+  },
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/verticals/brewery/api-client#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@umbraculum/api-client": "file:../../../platform/api-client",
+    "@umbraculum/brewery-contracts": "file:../contracts"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

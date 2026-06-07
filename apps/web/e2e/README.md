@@ -60,7 +60,7 @@ docker run --rm --network host \
   bash -lc "npm install --no-audit --no-fund && npx playwright test --project=platform"
 ```
 
-MRP/CRP export only (`canonical/mrp-crp-export-alpha.spec.ts` — needs **gotenberg** + **redis**):
+MRP/CRP export only (`canonical/b2b-registered-mrp-crp-export-alpha.spec.ts` — needs **gotenberg** + **redis**):
 
 ```bash
 docker run --rm --network host \
@@ -69,7 +69,7 @@ docker run --rm --network host \
   -v "$PWD/apps/web/e2e:/e2e" \
   -w /e2e \
   mcr.microsoft.com/playwright:v1.60.0-noble \
-  bash -lc "npm install --no-audit --no-fund && npx playwright test --project=canonical canonical/mrp-crp-export-alpha.spec.ts --workers=1"
+  bash -lc "npm install --no-audit --no-fund && npx playwright test --project=canonical canonical/b2b-registered-mrp-crp-export-alpha.spec.ts --workers=1"
 ```
 
 Per-project shortcuts (from `apps/web/e2e/` after `npm install`):
@@ -107,12 +107,12 @@ docker run --rm --network host \
 | `verticals/brewery/*.spec.ts` | reference vertical (recipes, water, brew-day) |
 | `.auth/<persona>.json` | persisted storageState per persona (gitignored) |
 
-**Rule 63 b2c/b2b filename prefixes:** deferred — folder taxonomy only in Wave 5; optional follow-on PR.
+**Rule 63 b2c/b2b filename prefixes:** **Done (2026-06-07 backlog)** — specs use `b2b-registered-<action>.spec.ts` (workspace SaaS; authenticated persona flows).
 
 ## Build / test / lint (local)
 
 - **Test (full suite)**: see Quick start above. Always run from repo root.
-- **Test (single spec)**: e.g. `npx playwright test platform/auth.spec.ts` in the docker invocation.
+- **Test (single spec)**: e.g. `npx playwright test platform/b2b-registered-auth.spec.ts` in the docker invocation.
 - **Trace inspection**: when a spec fails, `test-results/<test-name>/trace.zip` is produced; open with the `playwright show-trace` route in Quick start.
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace landed in Phase 5, commit `aab5b41`).
 - **Container-only execution**: per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`, the suite never runs against host Node / npm / Chromium.
@@ -121,7 +121,7 @@ docker run --rm --network host \
 
 - **Consumed by**: CI (the typecheck workflow `.github/workflows/typecheck.yml`); developer machines for local regression validation; nightly E2E triage per the plugin-shipped `62-nightly-e2e-unattended.mdc` workflow rule.
 - **Depends on**: a running dev stack (`docker compose up -d`); the seeded fixture output of `services/api`'s `seed:e2e` script; persona definitions kept in sync with `services/api/src/cli/seedE2eFixture.ts`.
-- **Naming convention**: specs follow the plugin-shipped `63-e2e-test-naming-convention.mdc` rule (b2c/b2b + guest/registered + action) — filename prefix migration deferred.
+- **Naming convention**: specs follow the plugin-shipped `63-e2e-test-naming-convention.mdc` rule — `b2b-registered-<action>.spec.ts` for authenticated workspace flows.
 
 ## Notes
 

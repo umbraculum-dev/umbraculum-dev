@@ -9,7 +9,7 @@ import { H1, SizableText, XStack, YStack } from "tamagui";
 import { AskAiLink } from "../../../_shared-layout/_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
 import { AsyncExportButton } from "../../../_shared-layout/_components/AsyncExportButton";
-import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
+import { ErrorBox } from "../../../_shared-layout/_components/ErrorBox";
 import { useRequireAuth } from "../../../_shared-layout/_lib/useRequireAuth";
 import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 import { ProductionOrderSummary, RefreshButton, SectionCard } from "../_components/MrpReadOnly";

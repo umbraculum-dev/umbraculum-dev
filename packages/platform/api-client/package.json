@@ -25,7 +25,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsup src/index.ts src/brewery/index.ts src/automation/index.ts src/pim/index.ts src/mrp/index.ts src/crp/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "build": "npm run build:core && npm run build:brewery-shim",
+    "build:core": "tsup src/index.ts src/transport/index.ts src/automation/index.ts src/pim/index.ts src/mrp/index.ts src/crp/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "build:brewery-shim": "tsup src/brewery/index.ts --format esm,cjs --dts --out-dir dist/brewery --tsconfig tsconfig.build.json --external @umbraculum/brewery-api-client",
     "openapi:codegen": "node ./scripts/openapi-codegen.mjs",
     "openapi:codegen:check": "node ./scripts/openapi-codegen.mjs --check",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -37,6 +39,12 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "default": "./dist/index.js"
+    },
+    "./transport": {
+      "types": "./dist/transport/index.d.ts",
+      "import": "./dist/transport/index.js",
+      "require": "./dist/transport/index.cjs",
+      "default": "./dist/transport/index.js"
     },
     "./brewery": {
       "types": "./dist/brewery/index.d.ts",
@@ -73,7 +81,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@umbraculum/automation-contracts": "file:../../modules/automation-contracts",
-    "@umbraculum/brewery-contracts": "file:../../verticals/brewery/contracts",
+    "@umbraculum/brewery-api-client": "file:../../verticals/brewery/api-client",
     "@umbraculum/contracts": "file:../contracts",
     "@umbraculum/crp-contracts": "file:../../modules/crp-contracts",
     "@umbraculum/mrp-contracts": "file:../../modules/mrp-contracts",

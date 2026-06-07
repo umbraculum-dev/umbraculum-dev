@@ -5,8 +5,9 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { H1, SizableText, View, YStack } from "tamagui";
 
-import { BrewSelect } from "../../(brewery)/_components/BrewSelect";
-import { ErrorBox, RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
+import { BrewSelect } from "../../../_shared-layout/_components/AppSelect";
+import { ErrorBox } from "../../../_shared-layout/_components/ErrorBox";
+import { RecipeEditFieldLabel } from "../../../_shared-layout/_components/FieldLabel";
 import { fetchAuthMe } from "../../../_shared-layout/_lib/fetchAuthMe";
 import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 import { ApiClientError, patchAuthPreferences } from "@umbraculum/api-client";

@@ -365,8 +365,10 @@ RFC-0002 β layout landed **module routes** under `services/api/src/modules/<cod
 | `modules/brewery/services/waterProfiles/` + barrel | **Done** |
 | `modules/brewery/services/brewdaySettings/` + barrel | **Done** |
 | `modules/brewery/services/inventoryService.ts` | **Done** |
+| `modules/brewery/services/equipmentProfilesService.ts` | **Done** — Wave 3e Phase 2 (2026-06-07) |
+| `modules/brewery/services/ai/tools/` + `ai/prompts/brewery.ts` | **Done** — Wave 3e Phase 2 (2026-06-07) |
 
-**Stays flat (horizontal platform admin):** `services/platformRecipesService.ts` — imports brewery `RecipesService` / `RecipesImportService` from the module tree.
+**Stays flat (horizontal platform admin):** `services/platformRecipesService.ts` — imports brewery `RecipesService` / `RecipesImportService` from the module tree. Platform `services/ai/tools/automation/` remains horizontal.
 
 #### 6.8.2 Failure modes (remaining)
 
@@ -409,7 +411,7 @@ No change to HTTP paths — filesystem clarity only.
 
 | Item | Action | Plan reference |
 |------|--------|----------------|
-| `apps/website/` | Extract to **`umbraculum-website`** (private repo OK) | Update website sister-repo plan name from `umbraculum-marketing` |
+| `apps/website/` | Extract to **`umbraculum-website`** (private repo OK) | Cursor plan *Extract `apps/website` → `umbraculum-website`* (`website_sister_repo_08f8173a.plan.md` under operator `.cursor/plans/`) |
 | `docs-site/` | **Keep** in monorepo through flip | deferral register R-POLICY |
 | Forum/demo VPS | Already in hosting repos | production-hosts.md |
 
@@ -465,7 +467,7 @@ flowchart TB
 | **3b** | Create `@umbraculum/brewery-contracts`; migrate `contracts/src/{brewery,water,analysis}` | 3–5d | **Done (2026-06-06)** — closes RFC-0002 gap |
 | **3c** | Purge vertical leakage from `@umbraculum/ui`, split `@umbraculum/i18n` content | 2–4d | **Done (2026-06-07)** |
 | **3d** | Package-layer eslint boundaries + spike doc | 1–2d | **Done (2026-06-07)** |
-| **3e** | Colocate brewery API services — move `src/services/recipeWaterHub*`, `recipeWaterCompute/`, `domain/waterCalc/`, `domain/recipeAnalysis/` under `modules/brewery/services/` (§6.8) | 2–3d | **Done (2026-06-06)** — Phase 1; Phase 2 flat orchestrators deferred |
+| **3e** | Colocate brewery API services under `modules/brewery/services/` (§6.8) | 2–3d | **Done (2026-06-07)** — Phase 1 + Phase 2 flat orchestrators |
 | **3f** | **Shared layout nomenclature + path rename:** `_shared-layout/`, `(platform-layout)/`, `web-platform-shared-layout`; glossary + BUILDING-YOUR-VERTICAL decision tree | 1–2d | **Done (2026-06-07)** |
 | **4** | `@umbraculum/native-shell` + `apps/native/brewery/` | 3–5d | **Done (2026-06-07)** — 4A multi-app re-home + 4B shell extraction |
 | **5** | E2E folder taxonomy | 1d | No — **Done (2026-06-07)** |
@@ -502,10 +504,10 @@ Audit (2026-06-07, Wave 6): full table in [`rfc-0011-wave-6-doc-capstone-build-l
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | Contributor can identify layout / module / vertical folders | **Partial** — documented; cross-module `(brewery)/_components` imports remain |
+| 1 | Contributor can identify layout / module / vertical folders | **Met** — generic UI hoisted to `_shared-layout/_components/`; one `@arch-boundary` bridge at `platform/recipes/_components/RecipeImportForm.tsx` |
 | 2 | Zero deprecated slang | **Met** |
-| 3 | Brewery naming only under `(brewery)/` or `@umbraculum/brewery-*` | **Partial** — cross-module UI imports documented |
-| 4 | No brewery under `packages/platform/` | **Partial** — package purity landed; `api-client/src/brewery/` documented |
+| 3 | Brewery naming only under `(brewery)/` or `@umbraculum/brewery-*` | **Met** — cross-module `(brewery)/_components` imports cleared (2026-06-07 backlog) |
+| 4 | No brewery under `packages/platform/` | **Met** — `@umbraculum/brewery-api-client` extracted; platform keeps deprecated `./brewery` re-export shim only |
 | 5 | `@umbraculum/brewery-contracts`; platform contracts clean | **Met** |
 | 6 | Native README multi-app pattern | **Met** — Wave 4A umbrella + Wave 4B `@umbraculum/native-shell` |
 | 7 | REPOSITORY-STRUCTURE ↔ RFC-0011 ↔ backbone linked | **Met** |

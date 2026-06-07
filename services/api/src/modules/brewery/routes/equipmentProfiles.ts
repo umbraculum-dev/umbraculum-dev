@@ -5,7 +5,7 @@ import { ErrorResponseSchema } from "@umbraculum/contracts";
 import { EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, IdParamsSchema, OkResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import { EquipmentProfilesService } from "../../../services/equipmentProfilesService.js";
+import { EquipmentProfilesService } from "../services/equipmentProfilesService.js";
 
 function toEquipmentPayload(p: EquipmentProfile) {
   return {

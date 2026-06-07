@@ -5,9 +5,9 @@ import { useState } from "react";
 import { Accordion, H1, SizableText, View, YStack } from "tamagui";
 import { AppPermissionsContent, HealthStatusContent } from "../HealthPanel";
 import { DashboardClient } from "../DashboardClient";
-import { ImportExportPanel } from "./(brewery)/_components/ImportExportPanel";
+import { ImportExportPanel } from "../_shared-layout/_components/ImportExportPanel";
 import { Link } from "../../src/i18n/navigation";
-import { BrewAccordionHeader } from "./(brewery)/_components/BrewAccordionHeader";
+import { BrewAccordionHeader } from "../_shared-layout/_components/AccordionSectionHeader";
 
 export function HomeAuthenticated() {
   const t = useTranslations("dashboard");

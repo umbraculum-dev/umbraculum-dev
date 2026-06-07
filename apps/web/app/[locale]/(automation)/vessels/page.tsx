@@ -8,7 +8,7 @@ import { type VesselState } from "@umbraculum/automation-contracts";
 
 import { AskAiLink } from "../../../_shared-layout/_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
-import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
+import { ErrorBox } from "../../../_shared-layout/_components/ErrorBox";
 import { useRequireAuth } from "../../../_shared-layout/_lib/useRequireAuth";
 import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 

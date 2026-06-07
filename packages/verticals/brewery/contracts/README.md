@@ -37,7 +37,7 @@ Platform cross-cutting types (`ErrorResponseSchema`, `AuthMeResponse`, `NumberFo
 |---|---|
 | **Contracts (today)** | Zod schemas + parsers + `CONTRACT_VERSION`. **This package.** Extracted from `@umbraculum/contracts` in RFC-0011 Wave 3b (2026-06-06). |
 | API | Consumed by [`services/api/src/modules/brewery/`](../../../../services/api/src/modules/brewery/) Fastify routes and [`services/api/src/domain/recipeAnalysis/`](../../../../services/api/src/domain/recipeAnalysis/). |
-| Client transport | Consumed by [`packages/platform/api-client/src/brewery/`](../../../platform/api-client/src/brewery/) for runtime-validated fetch helpers. |
+| Client transport | Consumed by [`packages/verticals/brewery/api-client/`](../api-client/) (`@umbraculum/brewery-api-client`) for runtime-validated fetch helpers. |
 | Web / native | Response-side re-parse in brewery hooks under [`apps/web/app/[locale]/(brewery)/`](../../../../apps/web/app/%5Blocale%5D/%28brewery%29/) and [`apps/native/src/modules/brewery/`](../../../../apps/native/src/modules/brewery/) per [RFC-0003](../../../../docs/rfcs/0003-validation-library-adoption.md). |
 
 ## Build / test / lint (local)
@@ -56,4 +56,4 @@ From repo root (run Node/npm inside the project container, not on the host — s
 - [RFC-0003](../../../../docs/rfcs/0003-validation-library-adoption.md) — Zod-as-canonical-validator rule.
 - [`docs/design/pre-flip-application-surface-backbone.md`](../../../../docs/design/pre-flip-application-surface-backbone.md) §6.4 — migration table (no re-export shims from `@umbraculum/contracts`).
 - [`services/api/src/modules/brewery/`](../../../../services/api/src/modules/brewery/) — API slice consuming these schemas.
-- [`packages/platform/api-client/src/brewery/`](../../../platform/api-client/src/brewery/) — typed client helpers.
+- [`packages/verticals/brewery/api-client/`](../api-client/) — typed client helpers (`@umbraculum/brewery-api-client`; platform `@umbraculum/api-client/brewery` is a deprecated shim).

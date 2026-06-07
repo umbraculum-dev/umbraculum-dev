@@ -20,12 +20,12 @@ import { waterCalcRoutes } from "./routes/waterCalc.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
 import { breweryDocumentTemplates } from "./documentTemplates.js";
 import { breweryTierLimits } from "./tierLimits.js";
-import { registerBreweryTools } from "../../services/ai/tools/brewery/index.js";
+import { registerBreweryTools } from "./services/ai/tools/index.js";
 import {
   BREWERY_KNOWLEDGE,
   BREWERY_MODULE_OVERLAY,
   BREWERY_ROUTE_OVERLAYS,
-} from "../../services/ai/prompts/brewery.js";
+} from "./services/ai/prompts/brewery.js";
 
 const MODULE_CODE = "brewery";
 

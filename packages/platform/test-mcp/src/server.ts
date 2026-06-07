@@ -100,7 +100,7 @@ function listTools() {
       runApiTests: { args: { filter: "string (vitest -t filter, optional)" } },
       runContractsCheck: { args: { update: "boolean (default false; UPDATE_CONTRACTS=1)" } },
       runPlaywrightSmoke: { args: { baseUrl: "string" } },
-      runPlaywrightSpec: { args: { spec: "string (required, e.g. 'platform/auth.spec.ts')", baseUrl: "string" } },
+      runPlaywrightSpec: { args: { spec: "string (required, e.g. 'platform/b2b-registered-auth.spec.ts')", baseUrl: "string" } },
       loginAs: { args: { persona: "string (e2e-admin|e2e-member|e2e-viewer)", baseUrl: "string" } },
     },
   };

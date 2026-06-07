@@ -9,7 +9,7 @@
 |-------|--------|
 | `operator shell` / `WebShellNotice` / `/_shell/` in `docs/` + `apps/web/` | 1 file only — backbone §12 self-reference |
 | `(brewery)/_components` imports outside `(brewery)/` | 24 `.tsx` files (known gap — doc-only wave) |
-| `packages/platform/api-client/src/brewery/` | Vertical HTTP facade (known gap — extraction deferred) |
+| `packages/platform/api-client/src/brewery/` | Deprecated re-export shim → `@umbraculum/brewery-api-client` (2026-06-07 backlog) |
 
 ## §12 success criteria audit (post–Wave 6)
 
@@ -32,6 +32,16 @@
 - [backbone §9](pre-flip-application-surface-backbone.md) — Wave 6 Done
 - [docs-site/reference-sidebar-items.ts](../../docs-site/reference-sidebar-items.ts) — brewery-contracts, brewery-i18n, brewery-media-assets
 - [apps/web/README.md](../../apps/web/README.md), [apps/native/README.md](../../apps/native/README.md) — layering / multi-app target
+
+## Post W6 backlog closure (2026-06-07)
+
+| Track | Status | Notes |
+|-------|--------|-------|
+| **Wave 3e Phase 2** | **Done** | `equipmentProfilesService`, brewery AI tools/prompts → `modules/brewery/services/` |
+| **Cross-module `(brewery)/_components`** | **Done** | Generic UI → `app/_shared-layout/_components/`; brewery re-export stubs retained |
+| **`@umbraculum/brewery-api-client`** | **Done** | Facades extracted from `packages/platform/api-client/src/brewery/` |
+| **Rule 63 E2E prefixes** | **Done** | 11 specs renamed `b2b-registered-*` under `apps/web/e2e/` |
+| **umbraculum-website** extraction | Deferred | Parallel track — Cursor plan `website_sister_repo_08f8173a.plan.md` |
 
 ## Post W6+W5 sequencing (2026-06-07)
 

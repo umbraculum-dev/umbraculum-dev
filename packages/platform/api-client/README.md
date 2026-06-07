@@ -110,7 +110,9 @@ Wire authority remains `@umbraculum/contracts` parsers inside each facade — se
 - `cookieAuth()` (web)
 - `bearerTokenAuth(getToken)` (native + Node)
 - Platform facades — see `src/platform/*` (re-exported from main entry)
-- `@umbraculum/api-client/brewery` — brewery add-on facades only (tree-shaking friendly)
+- `@umbraculum/api-client/transport` — shared JSON transport helpers for vertical facade packages
+- `@umbraculum/api-client/brewery` — **deprecated shim** re-exporting `@umbraculum/brewery-api-client` (prefer the vertical package for new code)
+- `@umbraculum/brewery-api-client` — brewery add-on facades ([`packages/verticals/brewery/api-client`](../../verticals/brewery/api-client/))
 - `@umbraculum/api-client/automation` — canonical automation facades
 - `@umbraculum/api-client/pim` — canonical PIM facades
 - `@umbraculum/api-client/mrp` — canonical MRP facades

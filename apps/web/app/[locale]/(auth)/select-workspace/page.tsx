@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
+import { ErrorBox } from "../../../_shared-layout/_components/ErrorBox";
 import { fetchAuthMe } from "../../../_shared-layout/_lib/fetchAuthMe";
 import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 import { ApiClientError, setActiveWorkspace } from "@umbraculum/api-client";

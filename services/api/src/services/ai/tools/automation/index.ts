@@ -14,7 +14,7 @@ import { createVesselStateTool } from "./vesselState.js";
  *
  * The casts to `AiTool` widen the per-tool narrow generic parameters
  * back to the registry's runtime-shape `AiTool<unknown, unknown>` —
- * same pattern as `services/ai/tools/brewery/index.ts`.
+ * same pattern as `modules/brewery/services/ai/tools/index.ts`.
  */
 export function registerAutomationTools(
   registry: AiToolRegistry,

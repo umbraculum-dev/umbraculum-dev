@@ -10,9 +10,10 @@ import {
   listPlatformWorkspaces,
 } from "@umbraculum/api-client";
 
-import { BrewSelect } from "../../(brewery)/_components/BrewSelect";
-import { ErrorBox, RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
-import { RecipeImportForm } from "../../(brewery)/_components/RecipeImportForm";
+import { BrewSelect } from "../../../_shared-layout/_components/AppSelect";
+import { ErrorBox } from "../../../_shared-layout/_components/ErrorBox";
+import { RecipeEditFieldLabel } from "../../../_shared-layout/_components/FieldLabel";
+import { RecipeImportForm } from "./_components/RecipeImportForm";
 import { useRequireAuth } from "../../../_shared-layout/_lib/useRequireAuth";
 import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 

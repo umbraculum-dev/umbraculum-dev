@@ -1,15 +1,2 @@
-export * from "./recipes.js";
-export * from "./recipeExport.js";
-export * from "./ingredientAdmin.js";
-export * from "./styles.js";
-export * from "./ingredients.js";
-export * from "./recipeImport.js";
-export * from "./brewSessions.js";
-export * from "./inventory.js";
-export * from "./equipmentProfiles.js";
-export * from "./brewdaySettings.js";
-export * from "./water.js";
-export * from "./waterCalc.js";
-export * from "./waterCompute.js";
-export * from "./waterProfiles.js";
-export * from "./waterSettings.js";
+/** @deprecated Import from `@umbraculum/brewery-api-client` — shim retained for integrators on `@umbraculum/api-client/brewery`. */
+export * from "@umbraculum/brewery-api-client";

@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { Button, Checkbox, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../../(brewery)/_components/BrewSelect";
-import { RecipeEditFieldLabel } from "../../../(brewery)/_components/recipe-edit";
+import { BrewSelect } from "../../../../_shared-layout/_components/AppSelect";
+import { RecipeEditFieldLabel } from "../../../../_shared-layout/_components/FieldLabel";
 import type { Placement } from "../_lib/platformAdsTypes";
 import { placements } from "../_lib/platformAdsTypes";
 

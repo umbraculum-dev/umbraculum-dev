@@ -53,7 +53,7 @@ export async function runPlaywrightSmoke(args: { baseUrl?: string } = {}): Promi
 
 export async function runPlaywrightSpec(args: { spec: string; baseUrl?: string }): Promise<ToolResult> {
   if (!args.spec || typeof args.spec !== "string") {
-    throw new Error("runPlaywrightSpec: 'spec' is required (e.g. 'platform/auth.spec.ts')");
+    throw new Error("runPlaywrightSpec: 'spec' is required (e.g. 'platform/b2b-registered-auth.spec.ts')");
   }
   const baseUrl = args.baseUrl ?? process.env['E2E_BASE_URL'] ?? "http://localhost:18080";
   return runCommand(

@@ -9,7 +9,7 @@ import { getAttributeSet } from "@umbraculum/api-client/pim";
 import { type AttributeSet } from "@umbraculum/pim-contracts";
 
 import { Link } from "../../../../../src/i18n/navigation";
-import { ErrorBox } from "../../../(brewery)/_components/recipe-edit";
+import { ErrorBox } from "../../../../_shared-layout/_components/ErrorBox";
 import { useRequireAuth } from "../../../../_shared-layout/_lib/useRequireAuth";
 import { webPlatformApiClient } from "../../../../_shared-layout/_lib/webApiClient";
 
