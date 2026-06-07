@@ -7,6 +7,19 @@
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
+## What this is
+
+Umbrella directory for **multiple Expo app workspaces** under `apps/native/<app-code>/`. Each deployable native app is its own npm workspace; shared bootstrap will live in `@umbraculum/native-shell` (Wave 4B).
+
+## Scope
+
+- **Contains:** multi-app index, links to per-app READMEs, layout diagram.
+- **Does not contain:** Expo entrypoints, Metro config, or module slices (those live under `brewery/` today).
+
+## Build / test / lint (local)
+
+Per-app commands live in each app README — start with [`brewery/README.md`](brewery/README.md) (`cd apps/native/brewery && npx expo start`).
+
 ## Multi-app layout
 
 Manufacturing/ERP products often ship **multiple mobile apps** against one backend (brew-day, warehouse scanner, PIM floor app). Umbraculum models that under `apps/native/<app-code>/`:

@@ -6,7 +6,7 @@ React Native + Expo + Tamagui mobile application — the on-the-go brew-day surf
 > Part of [Umbraculum](../../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
 > [!TIP]
-> **Looking for the web app?** See [`apps/web`](../../web/README.md) — Next.js + Tamagui desktop-first operational UI. Web and native share UI through `@umbraculum/ui`; see [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../../../docs/CROSS-PLATFORM-BOUNDARIES.md).
+> **Looking for the web app?** See [`apps/web`](../../web/README.md) — Next.js + Tamagui desktop-first operational UI. Web and native share UI through `@umbraculum/ui`; see [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../../docs/CROSS-PLATFORM-BOUNDARIES.md).
 
 > **Multi-app index:** [`apps/native/README.md`](../README.md)
 
@@ -14,9 +14,9 @@ React Native + Expo + Tamagui mobile application — the on-the-go brew-day surf
 
 The native (iOS + Android) application for brewers who need brew-day reliability tooling on a phone or tablet during a brew session. Built on React Native 0.81 + Expo 54 + Tamagui, sharing the bulk of its UI surface with `apps/web` through the `@umbraculum/ui` (primitives) and `@umbraculum/brewery-recipes-ui` (domain UI) packages — the platform-neutral components render identically on both surfaces. Authentication uses bearer tokens stored in `expo-secure-store` and refreshed against `services/api` via `@umbraculum/api-client`; localization runs through `@umbraculum/i18n-react` reading from `@umbraculum/i18n`; charts use `victory-native` + `react-native-svg`.
 
-The native-specific build / CI / publishing strategy is documented in [`docs/NATIVE-STRATEGY-AND-CI.md`](../../../../docs/NATIVE-STRATEGY-AND-CI.md); the kickoff readiness criteria (now mostly cleared) are in [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../../../../docs/REACT-NATIVE-KICKOFF-READINESS.md). Local-development setup is in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../../../docs/DEVELOPMENT-NATIVE-LOCAL.md).
+The native-specific build / CI / publishing strategy is documented in [`docs/NATIVE-STRATEGY-AND-CI.md`](../../../docs/NATIVE-STRATEGY-AND-CI.md); the kickoff readiness criteria (now mostly cleared) are in [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../../../docs/REACT-NATIVE-KICKOFF-READINESS.md). Local-development setup is in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../../docs/DEVELOPMENT-NATIVE-LOCAL.md).
 
-**Platform context (post–RFC-0002/0003/0007):** The operational source of truth for route availability, module obligations, July 2026 alpha scope, and post-alpha gates is [`docs/design/canonical-native-platform-surface.md`](../../../../docs/design/canonical-native-platform-surface.md). Canonical modules (`mrp`, `crp`, `pim`, `automation`) ship **web-first** today; native covers **brewery brew-day** flows only. Planning, exports, and admin surfaces remain on web (with optional **Open on web** for whitelisted routes such as `inventory`).
+**Platform context (post–RFC-0002/0003/0007):** The operational source of truth for route availability, module obligations, July 2026 alpha scope, and post-alpha gates is [`docs/design/canonical-native-platform-surface.md`](../../../docs/design/canonical-native-platform-surface.md). Canonical modules (`mrp`, `crp`, `pim`, `automation`) ship **web-first** today; native covers **brewery brew-day** flows only. Planning, exports, and admin surfaces remain on web (with optional **Open on web** for whitelisted routes such as `inventory`).
 
 ## Scope
 
