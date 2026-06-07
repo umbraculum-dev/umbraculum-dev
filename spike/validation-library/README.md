@@ -13,8 +13,8 @@ A side-by-side implementation of three contracts in **Zod v4** and **Valibot**, 
 
 The three contracts cover the complexity axes that matter for the project's contracts surface:
 
-1. **`MAILBOX_SPEC` validator** — JSON-loaded artifact with structural validation + cross-entry duplicate detection. Real-world equivalent: [`packages/automation-contracts/src/mailbox-data.ts`](../../packages/automation-contracts/src/mailbox-data.ts) (168 lines hand-rolled).
-2. **`parseMashAcidBlock` discriminated union** — three-variant discriminated union with shared nested schemas. Real-world equivalent: [`packages/contracts/src/water/parseComputeAndSave.ts`](../../packages/contracts/src/water/parseComputeAndSave.ts) lines 207–235 (30 lines hand-rolled, plus shared helpers).
+1. **`MAILBOX_SPEC` validator** — JSON-loaded artifact with structural validation + cross-entry duplicate detection. Real-world equivalent: [`packages/modules/automation-contracts/src/mailbox-data.ts`](../../packages/modules/automation-contracts/src/mailbox-data.ts) (168 lines hand-rolled).
+2. **`parseMashAcidBlock` discriminated union** — three-variant discriminated union with shared nested schemas. Real-world equivalent: [`packages/platform/contracts/src/water/parseComputeAndSave.ts`](../../packages/platform/contracts/src/water/parseComputeAndSave.ts) lines 207–235 (30 lines hand-rolled, plus shared helpers).
 3. **`/auth/signup` Fastify route** — typed body via library-specific Fastify type provider. Real-world equivalent: [`services/api/src/routes/auth.ts`](../../services/api/src/routes/auth.ts) lines 86–108 (23 lines hand-rolled).
 
 ## Falsifiable tests (audit §5.6) — stop-or-proceed gate
@@ -142,7 +142,7 @@ The deciding factors over Valibot, at this project's stage:
 1. **Ecosystem gravity.** Zod is the de-facto TypeScript runtime-validation library in 2026. `fastify-type-provider-zod` is mature; `zod-to-openapi` exists and Zod v4 ships first-party OpenAPI support. For the H1 2027 public flip, this matters more than for an internal-only product.
 2. **AI-assistant pattern recognition.** Every TypeScript-aware AI assistant recognizes `z.object(...)` patterns from training data; Valibot's footprint is smaller. Module developers using AI assistants (the explicit audience for the plugin pack) will produce Zod by default.
 3. **Bundle delta is acceptable, not minimal.** Zod's ~5–8 KB estimate is above Valibot's ~2–5 KB but well under the 10 KB stop condition. The ecosystem advantage outweighs the bundle delta for our profile.
-4. **Discriminated-union API.** Zod's `z.discriminatedUnion("kind", [...])` reads more naturally than Valibot's `v.variant("kind", [...])` for the mash/sparge/boil acid-block pattern that recurs throughout `packages/contracts/water/`.
+4. **Discriminated-union API.** Zod's `z.discriminatedUnion("kind", [...])` reads more naturally than Valibot's `v.variant("kind", [...])` for the mash/sparge/boil acid-block pattern that recurs throughout `packages/platform/contracts/water/`.
 
 The recommendation is **not** overwhelming — Valibot would be a defensible second choice and the spike code demonstrates either library could carry the migration. If the container-side bundle measurement (F7) shows Zod exceeds 10 KB despite the paper estimate, Valibot is the fallback. The spike code in `valibot/` is preserved for that contingency.
 

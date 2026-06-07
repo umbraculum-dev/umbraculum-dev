@@ -44,7 +44,7 @@ Purpose:
   - **Notes/Links**:
     - Plugin file: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/skills/agentic-browser-web-app/SKILL.md`
     - Brewery job catalog (where the upstream skill defers to): [`docs/AGENTIC-JOBS.md`](docs/AGENTIC-JOBS.md)
-    - Brewery test-MCP package (provides `loginAs`, etc.): [`packages/test-mcp`](packages/test-mcp)
+    - Brewery test-MCP package (provides `loginAs`, etc.): [`packages/platform/test-mcp`](packages/platform/test-mcp)
   - **Inputs_required (do_not_assume)**: `<APP_BASE_URL>`, `<PERSONA_EMAIL>`, `<PERSONA_PASSWORD>`, `<FIXTURE_FILE>`, `<JOB>`, optional `<RUN_DIR_ROOT>`, `<MCP_BASE_URL>`
   - **Commands**: max 5 (discover → smoke → optional loginAs → drive job → write artifacts)
   - **Stop_conditions**: smoke red; 502/500 after one retry; UI hang > 30s; ambiguous selector; one full run
@@ -56,7 +56,7 @@ Purpose:
   - **Status**: ✅ Migrated to the `umbraculum-node-react-cursor-assistant` plugin.
   - **Notes/Links**:
     - Plugin file: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/skills/test-mcp-server/SKILL.md`
-    - Brewery implementation (reference subset): [`packages/test-mcp`](packages/test-mcp), [`packages/test-mcp/README.md`](packages/test-mcp/README.md)
+    - Brewery implementation (reference subset): [`packages/platform/test-mcp`](packages/platform/test-mcp), [`packages/platform/test-mcp/README.md`](packages/platform/test-mcp/README.md)
   - **Inputs_required (do_not_assume)**: `<TEST_MCP_BASE_URL>`, `<TOOL>`, `<ARGS>`, optional `<RUN_DIR_ROOT>`, `<APP_BASE_URL>`
   - **Commands**: max 5 (discover → smoke → optional seed → invoke tool → read run-dir)
   - **Stop_conditions**: tool not in discovery list; smoke red; non-JSON or HTTP >= 400; missing `verdict.txt`; one invocation per session

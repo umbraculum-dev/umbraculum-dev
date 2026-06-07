@@ -58,7 +58,7 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 
 | You touched | T0 | T1 | T2 |
 |-------------|----|----|-----|
-| `packages/contracts/src/**` | `npm test -w @umbraculum/contracts` (scoped container) | `npm run verify:contracts` | `./scripts/ci-parity-check.sh run --jobs typecheck` |
+| `packages/platform/contracts/src/**` | `npm test -w @umbraculum/contracts` (scoped container) | `npm run verify:contracts` | `./scripts/ci-parity-check.sh run --jobs typecheck` |
 | API routes + OpenAPI | `docker compose exec api npm run test:unit` | `npm run verify:openapi` | ci-parity (`--ci`) + **`api-integration-tests-pre-push`** skill |
 | `services/api/src/routes/auth.ts`, `workspaces.ts` | scoped vitest | `npm run verify:api-platform` | T2 row above |
 | Brewery batch routes | scoped vitest files | `./scripts/verify-slice.sh --tier T1 --slice api-brewery-batch1` | T2 row above |

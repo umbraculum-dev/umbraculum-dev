@@ -13,7 +13,7 @@
  *   reconciliation with optimistic updates.
  * - `/water-hub-summary` is the synthesized snapshot used by the hub
  *   overview page; its parser already has L1 unit coverage at
- *   `packages/contracts/src/water/parseHubSummary.test.ts`. The L4 snapshot
+ *   `packages/platform/contracts/src/water/parseHubSummary.test.ts`. The L4 snapshot
  *   here pins the wire payload that the L1 parser is meant to consume.
  *
  * To intentionally update:
@@ -227,7 +227,7 @@ describe("contract: recipe water endpoints", () => {
     const body = res.json();
     expect(body.ok).toBe(true);
     // The hub-summary parser pins the shape contract on the client side
-    // (packages/contracts/src/water/parseHubSummary.test.ts). The L4
+    // (packages/platform/contracts/src/water/parseHubSummary.test.ts). The L4
     // snapshot here pins the WIRE FORMAT that parser is meant to consume.
     expect(body.summary.version).toBe(1);
     assertSnapshotShape("recipeWater.hubSummary", body);

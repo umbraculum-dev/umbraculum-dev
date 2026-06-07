@@ -399,7 +399,7 @@ the browser” unless you have already run the sequence below yourself.
 containers. The live **`api`** service bind-mounts `packages/**` and runs
 `tsx watch`. Archive/ci-parity runs can emit **`unlink`** events under those
 mounts; tsx restarts mid-relink and the api process crashes with
-`ERR_MODULE_NOT_FOUND` (e.g. `packages/contracts` → `zod`). **Nginx still serves
+`ERR_MODULE_NOT_FOUND` (e.g. `packages/platform/contracts` → `zod`). **Nginx still serves
 `/en/login` HTML (200)** but **every `/api/*` proxy returns 502** — including
 `GET /api/auth/me` and `POST /api/auth/login` that the login page needs.
 

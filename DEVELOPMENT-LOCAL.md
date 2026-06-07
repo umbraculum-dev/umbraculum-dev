@@ -54,20 +54,20 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
 - **Local dev entrypoint**: `docker compose up --build`
 - **Shared packages build (native-ready)**:
   - Packages consumed by native apps ship runtime JS + `.d.ts` under `dist/` and we commit those build outputs.
-  - When you change anything under `packages/i18n`, `packages/i18n-react`, `packages/navigation`, `packages/contracts`, `packages/api-client`, `packages/ui`, `packages/beerjson`, `packages/recipes-ui`, or `packages/media`, rebuild only what changed:
+  - When you change anything under `packages/platform/i18n`, `packages/platform/i18n-react`, `packages/platform/navigation`, `packages/platform/contracts`, `packages/platform/api-client`, `packages/platform/ui`, `packages/verticals/brewery/beerjson`, `packages/verticals/brewery/recipes-ui`, or `packages/platform/media`, rebuild only what changed:
     - **Scoped (day-to-day):** `./scripts/build-package-in-docker.sh @umbraculum/<workspace> --include-dependents`
     - **Full monorepo (SDK / native EAS / release):** `./scripts/build-packages-in-docker.sh` (wrapper for `--all`)
     - See [`docs/VERIFICATION-TIERS.md`](docs/VERIFICATION-TIERS.md) for the T0/T1/T2 matrix.
   - Reminder: do not run npm on the host in this repo. Run the build via Docker if needed.
   - **Build order matters.** `package.json:11` runs the packages sequentially; `@umbraculum/brewery-beerjson` is built **before** `@umbraculum/brewery-recipes-ui` because recipes-ui imports types/values from beerjson at build time. Do not reorder casually — recipes-ui's `dist/` will silently encode whatever beerjson `dist/` was on disk at build time.
-  - **Drift detection (catches the original 2026-05 regression).** If you add or rename a field in `packages/beerjson/src/index.ts` and forget to rebuild, downstream consumers (`apps/native` first, because it has the only repo-wide `tsc --noEmit`; web won't notice locally) will fail typecheck against the stale `packages/beerjson/dist/*.d.ts`. Two ways to catch it:
+  - **Drift detection (catches the original 2026-05 regression).** If you add or rename a field in `packages/verticals/brewery/beerjson/src/index.ts` and forget to rebuild, downstream consumers (`apps/native` first, because it has the only repo-wide `tsc --noEmit`; web won't notice locally) will fail typecheck against the stale `packages/verticals/brewery/beerjson/dist/*.d.ts`. Two ways to catch it:
     1. **Automated, fast (preferred before pushing):** run `./scripts/check-packages-dist-up-to-date.sh` — scoped by default (rebuilds only packages with `src/` changes + dependents). Use `--all` for SDK publish / full dist audit. Exit `0` = no drift; non-zero = rebuild and commit `dist/`.
     2. **End-to-end reproduction (for understanding the symptom):**
        ```bash
        # Wipe beerjson dist to simulate "field added, dist forgot to be rebuilt"
-       docker run --rm -v "$PWD:/repo" node:20-slim bash -lc 'rm -rf /repo/packages/beerjson/dist'
+       docker run --rm -v "$PWD:/repo" node:20-slim bash -lc 'rm -rf /repo/packages/verticals/brewery/beerjson/dist'
        ./scripts/build-packages-in-docker.sh
-       grep -c lateAddition packages/beerjson/dist/index.d.ts   # expect >=1 once that field exists
+       grep -c lateAddition packages/verticals/brewery/beerjson/dist/index.d.ts   # expect >=1 once that field exists
        docker run --rm -v "$PWD:/repo" -w /repo/apps/native node:20-slim \
          bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
        # exit 0 means the chain is healthy end-to-end
@@ -77,7 +77,7 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
     docker run --rm -v "$PWD:/repo" node:20-slim \
       chown -R "$(id -u):$(id -g)" /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json
     ```
-  - **CI guard.** `.github/workflows/native-deps.yml` runs the `apps/native` typecheck on every PR touching `apps/native/**`, `packages/**`, or the lockfiles. If `packages/beerjson/dist/*` is committed stale relative to `packages/beerjson/src/`, that workflow will go red — which is the desired signal. (A future, stricter CI step would invoke `./scripts/check-packages-dist-up-to-date.sh` directly to fail on *any* shared-package dist drift, not only the ones that happen to break `apps/native` typecheck.)
+  - **CI guard.** `.github/workflows/native-deps.yml` runs the `apps/native` typecheck on every PR touching `apps/native/**`, `packages/**`, or the lockfiles. If `packages/verticals/brewery/beerjson/dist/*` is committed stale relative to `packages/verticals/brewery/beerjson/src/`, that workflow will go red — which is the desired signal. (A future, stricter CI step would invoke `./scripts/check-packages-dist-up-to-date.sh` directly to fail on *any* shared-package dist drift, not only the ones that happen to break `apps/native` typecheck.)
   - Native baseline: start `apps/native` on the latest stable Expo SDK (React 19) and keep React aligned between web and native.
   - **Native strategy + CI (prose)**: when deciding Expo Go vs custom dev clients, React drift vs web, and whether GitHub Actions are worth it, read `docs/NATIVE-STRATEGY-AND-CI.md`.
   - **Expo Go ABI exception (important)**: when developing on a physical device via Expo Go, `apps/native` MUST match the React / `react-dom` / `react-native-svg` / `expo` versions that Expo Go's installed binary ships with. If `apps/web` is on a newer React minor and Expo Go's React is older, `apps/native` follows **Expo Go**, not web — accept the temporary minor drift between web and native. Symptoms of ignoring this: blank/black screen on the device with `Incompatible React versions: react X.Y.Z vs react-native-renderer X.Y.W`, or a blank Metro web preview at `:8081/` with `Incompatible React versions: react X.Y.Z vs react-dom X.Y.W`. To re-align, run `expo install --fix` in `apps/native` and ensure `react-dom` is pinned to the same exact version as `react` (see `docs/DEVELOPMENT-NATIVE-LOCAL.md` → "Troubleshooting (native + Expo Go)" and "Native baseline"). Permanent alignment requires either bumping the Expo SDK to one that ships your target React, or moving native off Expo Go to a custom dev client.
@@ -93,24 +93,24 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
     3. **`ERR_MODULE_NOT_FOUND` from `/packages/<name>/dist/index.js`** (the failure mode that took down `/en/login` on 2026-05-25 after the RFC-0007 rendering loop closed):
        ```text
        Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@fast-csv/format'
-         imported from /packages/rendering/dist/index.js
+         imported from /packages/platform/rendering/dist/index.js
        ```
-       Root cause: `packages/rendering`'s dist needs runtime deps (`eta`, `mjml`, `@fast-csv/format`, `exceljs`, `xmlbuilder2`, `bwip-js`, `bullmq`, `@babel/runtime`) but `npm install` at the workspace root **hoists** them into `./node_modules/`, leaving `packages/rendering/node_modules/` without them. The `api` container only mounts `/packages/rendering:ro` plus `/app/node_modules` — and because Node resolves from the realpath `/packages/rendering/dist/index.js`, neither location is on the resolver walk. The api crashes at boot, nothing listens on `:4000`, nginx returns 502 for every `/api/*` request.
+       Root cause: `packages/platform/rendering`'s dist needs runtime deps (`eta`, `mjml`, `@fast-csv/format`, `exceljs`, `xmlbuilder2`, `bwip-js`, `bullmq`, `@babel/runtime`) but `npm install` at the workspace root **hoists** them into `./node_modules/`, leaving `packages/platform/rendering/node_modules/` without them. The `api` container only mounts `/packages/platform/rendering:ro` plus `/app/node_modules` — and because Node resolves from the realpath `/packages/platform/rendering/dist/index.js`, neither location is on the resolver walk. The api crashes at boot, nothing listens on `:4000`, nginx returns 502 for every `/api/*` request.
        - Fix (one-off; container-only, no host npm, no `docker-compose.yml` change):
          ```bash
          docker run --rm \
            -v "$PWD/packages:/packages" \
-           -w /packages/rendering \
+           -w /packages/platform/rendering \
            node:20-slim \
            sh -c "npm install --omit=dev --no-save --no-package-lock --ignore-scripts --legacy-peer-deps"
          docker compose restart api
          ```
-       - `packages/rendering/node_modules/` is gitignored, so this is a host-only, non-committed bootstrap. Re-run it any time that directory gets wiped (`git clean -fdx`, fresh clone, accidental delete).
-       - Same pattern applies if you ever add another workspace package whose built `dist/` imports runtime deps not already in `services/api/package.json` — replace `packages/rendering` in the command above with the offending package path.
+       - `packages/platform/rendering/node_modules/` is gitignored, so this is a host-only, non-committed bootstrap. Re-run it any time that directory gets wiped (`git clean -fdx`, fresh clone, accidental delete).
+       - Same pattern applies if you ever add another workspace package whose built `dist/` imports runtime deps not already in `services/api/package.json` — replace `packages/platform/rendering` in the command above with the offending package path.
     4. **`tsx` unlink / ci-parity archive disturbed bind mounts** (common after `./scripts/ci-parity-check.sh --archive run` or a long agent session that runs ci-parity then hits the dev stack):
        ```text
        tsx unlink in ./../packages/.../node_modules/... Rerunning...
-       Error [ERR_MODULE_NOT_FOUND]: Cannot find package '/packages/contracts/node_modules/zod/index.js'
+       Error [ERR_MODULE_NOT_FOUND]: Cannot find package '/packages/platform/contracts/node_modules/zod/index.js'
        ```
        Root cause: the `api` dev runner (`tsx watch`) watches bind-mounted `packages/**`; ci-parity (or host-side npm) can unlink/relink files under those trees. tsx restarts mid-relink and Node module resolution breaks. Nginx still serves `/en/login` HTML (200) but every `/api/*` proxy returns **502**.
        - Fix: `docker compose restart api` and wait for `Server listening at http://127.0.0.1:4000` in api logs. If boot still fails with `ERR_MODULE_NOT_FOUND`, run the package-local `npm install` one-off from item 3 for the package named in the error, then restart api again.
@@ -142,10 +142,10 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
 - **Tamagui non-boolean DOM attributes**: Tamagui components (e.g. `Select.Viewport`) may default `elevate={true}` or `bordered={true}`, causing React to warn: "Received `true`/`false` for a non-boolean attribute". Fix: pass `elevate={undefined}` and `bordered={undefined}` to override defaults and prevent forwarding to the DOM. Example: `<Select.Viewport elevate={undefined} bordered={undefined} elevation={0}>`.
 - **`<details>/<summary>` (IMPORTANT for i18n + UX)**: Browsers show a built-in fallback label (often “Details”) when a `<details>` does not have a real `<summary>` element as its first child. That fallback does **not** follow app locale/i18n. In this repo, use `RecipeEditSummary` (`apps/web/app/_components/recipe-edit/RecipeEditSummary.tsx`) so we always render a real `<summary>` and keep native click-to-expand behavior.
 - **Shared media (MANDATORY)**:
-  - **Source of truth**: `packages/media/assets/**` — all images and other shared media live here.
+  - **Source of truth**: `packages/platform/media/assets/**` — all images and other shared media live here.
   - **Web**: assets are synced into `apps/web/public/media/**` via `apps/web/scripts/sync-media.mjs` (runs on postinstall, predev, prebuild, prestart). Reference them as `/media/<domain>/<filename>` (e.g. `/media/yeast/dilution-1-100.png`).
-  - **Do not** add or edit images directly under `apps/web/public/**`; use `packages/media` only.
-  - **Docker**: the `web` (and `api`) containers mount `./packages/media:/packages/media:ro` so the sync script can read the source.
+  - **Do not** add or edit images directly under `apps/web/public/**`; use `packages/platform/media` only.
+  - **Docker**: the `web` (and `api`) containers mount `./packages/platform/media:/packages/platform/media:ro` so the sync script can read the source.
 - **Auth (local dev)**:
   - Auth is **cookie-session-based** (`sid` httpOnly cookie). Dev header auth (`X-User-Id` / `X-Account-Id`) is not supported.
   - Use `http://localhost:18080/en/signup` or `http://localhost:18080/en/login`.
@@ -230,7 +230,7 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
 - **Internationalization / i18n (MANDATORY for all user-facing web UI)**
   - **Routing**: all app routes are **locale-prefixed**: `/en/...`, `/it/...` (default: `en`). Unprefixed URLs are redirected by middleware.
   - **No hard-coded UI strings**: do not add new user-facing text inline in JSX.
-    - Put strings in `packages/i18n/src/en.json` and `packages/i18n/src/it.json`.
+    - Put strings in `packages/platform/i18n/src/en.json` and `packages/platform/i18n/src/it.json`.
     - Use `useTranslations('namespace')` and `t('key')` (or `t.rich(...)` when you need markup).
   - **Multi-line strings (MathHelpPopover / formula bodies)**:
     - Use JSON `\\n` escapes as `\n` (single backslash) to create real newlines.

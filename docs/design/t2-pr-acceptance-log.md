@@ -47,7 +47,7 @@ T2-PR acceptance @ 54b4f06 (Wave 17 SOLID tail parity): jobs=docs-readmes,lint,t
 
 Notes:
 
-- Tail parity (220–249 LoC web/native), CRP/MRP projection finish, API leftovers + near-threshold splits, packages/ui, Tier A route thinning (AuthService + WaterCalcRouteService), test file hygiene (400+ LoC vitest barrels).
+- Tail parity (220–249 LoC web/native), CRP/MRP projection finish, API leftovers + near-threshold splits, packages/platform/ui, Tier A route thinning (AuthService + WaterCalcRouteService), test file hygiene (400+ LoC vitest barrels).
 - API vitest **332/332** with no unhandled errors.
 - WS6 burn-in: lint OK; boundaries B5 **0** violations on `services/api/src/modules`; **defer** warn→error (operator gate unchanged).
 

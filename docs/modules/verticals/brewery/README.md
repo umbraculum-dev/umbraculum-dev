@@ -81,16 +81,18 @@ Brewery screens live under `apps/native/src/modules/brewery/screens/` (`RecipesL
 
 | Package | Sub-plan #9 slot | Role |
 |---|---|---|
-| `@umbraculum/brewery-contracts` ([`packages/brewery-contracts/`](../../../../packages/brewery-contracts/)) | RFC-0002 β contracts slice (Wave 3b, [RFC-0011](../../../rfcs/0011-application-surface-shell-layering.md)) | Recipe/brew-session/water/gravity wire schemas and parsers — the only brewery slice third-party vertical authors pin. |
-| `@umbraculum/brewery-core` ([`packages/core/`](../../../../packages/core/)) | slot 6 (done) | Brewing math: gravity, water chemistry, unit conversions. |
-| `@umbraculum/brewery-beerjson` ([`packages/beerjson/`](../../../../packages/beerjson/README.md)) | slot 12 (done) | BeerJSON spec layer. |
-| `@umbraculum/brewery-recipes-ui` ([`packages/recipes-ui/`](../../../../packages/recipes-ui/README.md)) | slot 13 (done) | Recipe / mash / water / yeast UI components. |
+| `@umbraculum/brewery-contracts` ([`packages/verticals/brewery/contracts/`](../../../../packages/verticals/brewery/contracts/)) | RFC-0002 β contracts slice (Wave 3b, [RFC-0011](../../../rfcs/0011-application-surface-shell-layering.md)) | Recipe/brew-session/water/gravity wire schemas and parsers — the only brewery slice third-party vertical authors pin. |
+| `@umbraculum/brewery-core` ([`packages/verticals/brewery/core/`](../../../../packages/verticals/brewery/core/)) | slot 6 (done) | Brewing math: gravity, water chemistry, unit conversions. |
+| `@umbraculum/brewery-beerjson` ([`packages/verticals/brewery/beerjson/`](../../../../packages/verticals/brewery/beerjson/README.md)) | slot 12 (done) | BeerJSON spec layer. |
+| `@umbraculum/brewery-recipes-ui` ([`packages/verticals/brewery/recipes-ui/`](../../../../packages/verticals/brewery/recipes-ui/README.md)) | slot 13 (done) | Recipe / mash / water / yeast UI components (`BrewCheckbox`, `HydrometerChart`, …). |
+| `@umbraculum/brewery-i18n` ([`packages/verticals/brewery/i18n/`](../../../../packages/verticals/brewery/i18n/README.md)) | Wave 3c (2026-06-07) | Brewery-vertical locale namespaces; merged by `@umbraculum/i18n` `getSharedMessages()`. |
+| `@umbraculum/brewery-media-assets` ([`packages/verticals/brewery/media-assets/`](../../../../packages/verticals/brewery/media-assets/README.md)) | Wave 3c (2026-06-07) | Brewery PNG assets + manifest (yeast help images). |
 
 The `@umbraculum/brewery-<name>` scope prefix is the [RFC-0002 §4](../../../rfcs/0002-canonical-module-physical-layout.md) convention for vertical-flavored packages — distinguishes them from horizontal packages (`@umbraculum/i18n`, `@umbraculum/ui`, …) at a glance.
 
 ### 3.5 Brewery-vertical i18n namespace
 
-Brewery strings live under brewery-specific namespaces inside [`packages/i18n/src/en.json`](../../../../packages/i18n/src/en.json) (e.g. `recipes.*`, `waterHub.*`, `math.*`). The package itself is platform-neutral; the *content* is brewery-flavored. A content split (extracting brewery strings into a separate `brewery-locales` bundle) is deferred per [sub-plan #9 plan doc §1.4](../../../design/brewery-scope-migration-plan.md).
+Brewery strings live in [`@umbraculum/brewery-i18n`](../../../../packages/verticals/brewery/i18n/README.md) (`recipes`, `waterHub`, `math`, …). [`@umbraculum/i18n`](../../../../packages/platform/i18n/README.md) holds platform + canonical namespaces and deep-merges brewery bundles in `getSharedMessages()` for the reference vertical.
 
 ### 3.6 Brewery-vertical domain docs
 
@@ -133,7 +135,7 @@ This is the standard "multi-runtime module with a versioned interface contract" 
 
 The two repos are joined by an explicit, versioned contract:
 
-- **`PI_*` Modbus mailbox spec** — sister repo is the source of truth; platform mirrors via a script-generated artifact (`PI_*.json` / `.ts`) checked into [`packages/automation-contracts/`](../../../../packages/automation-contracts/README.md) via PR. Drift is visible in PR diffs rather than at runtime. Per [canonical-automation-module-surface.md §12.2](../../../design/canonical-automation-module-surface.md).
+- **`PI_*` Modbus mailbox spec** — sister repo is the source of truth; platform mirrors via a script-generated artifact (`PI_*.json` / `.ts`) checked into [`packages/modules/automation-contracts/`](../../../../packages/modules/automation-contracts/README.md) via PR. Drift is visible in PR diffs rather than at runtime. Per [canonical-automation-module-surface.md §12.2](../../../design/canonical-automation-module-surface.md).
 - **`CONTRACT_VERSION` handshake** — major-version mismatch refuses connection; minor mismatch warns and continues. Pinned in `@umbraculum/automation-contracts`.
 - **`integrated_release_tag`** — the PLC version + sidecar version + contract_version + API version move together as one coordinated baseline. (The integrated-release-versioning discipline is documented and enforced in the OpenPLC sister repo; the discipline is what lets the two repos evolve independently without diverging out of compatibility silently.)
 

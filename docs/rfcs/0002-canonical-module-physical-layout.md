@@ -15,7 +15,7 @@ This RFC commits to four decisions and defers one cluster of implementation work
 
 - **Decision A — Physical-layout shape: β (three-tree distribution).** Canonical-module surface is distributed across three runtime trees plus one contracts package per code: API slice in `services/api/src/modules/<code>/`; web slice in `apps/web/app/[locale]/(<code>)/`; native slice in `apps/native/src/modules/<code>/`; shared types and registration contracts in `packages/<code>-contracts/` (published as `@umbraculum/<code>-contracts`). Rejects α (single tree under `packages/modules/<code>/`) and γ (status-quo flat layout).
 - **Decision B — Naming conventions.** Folder name = canonical code (lowercase, no `module-` prefix). Web route group = `(<code>)/` (no URL change). Contracts package = `@umbraculum/<code>-contracts`. Prisma `multiSchema` namespace = canonical code for new modules.
-- **Decision C — `registerModule()` helper location.** The public `registerModule()` API and its TypeScript types live in `packages/module-sdk/` (npm scope `@umbraculum/module-sdk`, MIT per [`docs/LICENSING.md`](../LICENSING.md) §6.2). A parallel web-side module registry lives in the same package (or a thin `@umbraculum/module-sdk-web` re-export if the web bundler requires a split — the boundary is an implementation detail; the RFC commits to one logical SDK surface).
+- **Decision C — `registerModule()` helper location.** The public `registerModule()` API and its TypeScript types live in `packages/modules/module-sdk/` (npm scope `@umbraculum/module-sdk`, MIT per [`docs/LICENSING.md`](../LICENSING.md) §6.2). A parallel web-side module registry lives in the same package (or a thin `@umbraculum/module-sdk-web` re-export if the web bundler requires a split — the boundary is an implementation detail; the RFC commits to one logical SDK surface).
 - **Decision D — Brewery-as-first-vertical migration sequencing.** Brewery does NOT pre-migrate as a no-op restructure. The flat brewery surface migrates to the β layout at H1 2027 alongside the second canonical module landing, validating the convention against a real cross-module workspace. The `@brewery/*` → `@umbraculum/*` package-scope migration (sub-plan #9) happens in the same window.
 
 The deferred cluster (§7) covers three implementation-boundary questions that β does not resolve: tier-6 vertical-configuration folder shape, contracts-package contents vs in-module `contracts.ts`, and cross-module shared types. Those belong to sub-plan #9 (`@brewery/*` package scope migration), not to this RFC.
@@ -94,9 +94,9 @@ Four conventions, applied consistently across all β slices:
 
 ---
 
-## 5. Decision C — `registerModule()` helper location: `packages/module-sdk/` (commit)
+## 5. Decision C — `registerModule()` helper location: `packages/modules/module-sdk/` (commit)
 
-**The public `registerModule()` contract lives in `packages/module-sdk/`, published as `@umbraculum/module-sdk` (MIT).**
+**The public `registerModule()` contract lives in `packages/modules/module-sdk/`, published as `@umbraculum/module-sdk` (MIT).**
 
 Rationale:
 
@@ -252,7 +252,7 @@ When the second canonical module shipped and the web-route audit landed, RFC-000
 | (same pattern for equipment, water-profiles, brewday-steps-settings, ferm-data-integration) | Under `(brewery)/` |
 | New `wms` pages | `apps/web/app/[locale]/(wms)/**` |
 | Native brewery screens (today under `apps/native/src/screens/` etc.) | `apps/native/src/modules/brewery/**` |
-| New contracts (greenfield) | `packages/wms-contracts/`, `packages/brewery-contracts/` (brewery contracts may start as re-export of existing `@brewery/*` types during migration) |
+| New contracts (greenfield) | `packages/wms-contracts/`, `packages/verticals/brewery/contracts/` (brewery contracts may start as re-export of existing `@brewery/*` types during migration) |
 | `services/api/src/app.ts` flat `register` calls | `registerModule()` per installed module |
 | `@umbraculum/i18n`, `@umbraculum/ui`, … | `@umbraculum/*` horizontal; `@umbraculum/brewery-*` or equivalent for vertical packages (sub-plan #9) |
 
@@ -260,7 +260,7 @@ When the second canonical module shipped and the web-route audit landed, RFC-000
 
 **Prisma (historical planning row):** ~~brewery tables remain `public` until a follow-on migration authorizes `brewery` schema~~ → superseded by RFC-0010.
 
-**`registerModule()`:** create `packages/module-sdk/` and wire `services/api/src/app.ts` to register `brewery` and `wms` (and any other installed modules).
+**`registerModule()`:** create `packages/modules/module-sdk/` and wire `services/api/src/app.ts` to register `brewery` and `wms` (and any other installed modules).
 
 ### 11.3 Per-future-canonical-module shape
 

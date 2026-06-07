@@ -33,7 +33,7 @@ import { buildApp } from "../../app.js";
 import { createSessionForTestUser } from "../helpers/session.js";
 
 /**
- * NOTE — keep in sync with `packages/ui/src/ai/parseAiChatSseFrame.ts`.
+ * NOTE — keep in sync with `packages/platform/ui/src/ai/parseAiChatSseFrame.ts`.
  *
  * The shared consumer lives in `@umbraculum/ui`, which depends on Tamagui +
  * React Native and cannot be imported into a node-only test context. The

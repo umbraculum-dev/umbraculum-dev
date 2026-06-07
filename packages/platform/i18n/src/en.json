@@ -1,0 +1,826 @@
+{
+  "pim": {
+    "title": "Product Information Management",
+    "subtitle": "Master product, variant, attribute, and category catalog.",
+    "products": {
+      "title": "Products",
+      "listTitle": "Products",
+      "noProducts": "No products in this workspace yet.",
+      "loading": "Loading…",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing…",
+      "create": "Create product",
+      "creating": "Creating…",
+      "createSuccess": "Product created.",
+      "createError": "Could not create product.",
+      "createRequired": "SKU and name are required.",
+      "openDetail": "View product",
+      "back": "Back to products",
+      "searchPlaceholder": "Search by SKU or name…",
+      "attributeSetPlaceholder": "Optional attribute set id",
+      "notFound": "Product not found in this workspace."
+    },
+    "variants": {
+      "title": "Variants",
+      "noVariants": "No variants for this product yet."
+    },
+    "categories": {
+      "title": "Categories",
+      "noCategories": "No categories in this workspace yet.",
+      "back": "Back to products"
+    },
+    "attributeSets": {
+      "title": "Attribute sets",
+      "noSets": "No attribute sets in this workspace yet.",
+      "openDetail": "View set",
+      "back": "Back to attribute sets"
+    },
+    "fields": {
+      "sku": "SKU",
+      "name": "Name",
+      "status": "Status",
+      "description": "Description",
+      "attributeSet": "Attribute set",
+      "code": "Code",
+      "label": "Label"
+    },
+    "values": {
+      "draft": "Draft",
+      "active": "Active",
+      "archived": "Archived",
+      "none": "—"
+    }
+  },
+  "automation": {
+    "title": "Automation",
+    "subtitle": "Live controller state for the vessels in this workspace. (Scheduling, capacity, and utilization belong to the future capacity-resource-planning module — not this surface.)",
+    "listTitle": "Vessels",
+    "noVessels": "No vessels in this workspace yet. Vessels appear here once the automation supervisor receives the first snapshot from a connected adapter.",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "openDetail": "View details",
+    "back": "Back to vessels",
+    "error": "Could not load vessels.",
+    "notFound": "Vessel not found in this workspace.",
+    "fields": {
+      "code": "Code",
+      "displayName": "Display name",
+      "vesselKind": "Kind",
+      "mode": "Mode",
+      "currentTempC": "Current temperature (°C)",
+      "targetTempC": "Target temperature (°C)",
+      "alarmActive": "Alarm",
+      "lastSeenAt": "Last seen",
+      "equipmentProfileId": "Equipment profile",
+      "adapterConnectionId": "Adapter connection"
+    },
+    "values": {
+      "alarmOn": "Active",
+      "alarmOff": "None",
+      "never": "Never",
+      "none": "—"
+    }
+  },
+  "mrp": {
+    "title": "Production planning",
+    "subtitle": "Read-only MRP alpha view over existing brewery recipes and brew sessions.",
+    "alphaNote": "Rows marked as projected are read models. Brewery remains the source of truth; no MRP rows are created from this page.",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "error": "Could not load production planning data.",
+    "noProductionOrders": "No production orders or brewery projections in this workspace yet.",
+    "noMaterialRequirements": "No material requirements are visible yet.",
+    "export": {
+      "workOrderPdf": "Export work order (PDF)",
+      "routeCardPdf": "Export route card (PDF)",
+      "materialRequirementsXlsx": "Export material requirements (XLSX)",
+      "productionOrdersCsv": "Export production orders (CSV)",
+      "working": "Preparing export…",
+      "download": "Download export",
+      "error": "Export failed"
+    },
+    "productionOrders": {
+      "listTitle": "Production orders",
+      "openDetail": "View order",
+      "back": "Back to production orders",
+      "materialRequirements": "Material requirements",
+      "operations": "Operations",
+      "capacityLink": "Open capacity view",
+      "scheduleLink": "Open CRP schedule"
+    },
+    "materialRequirements": {
+      "title": "Material requirements",
+      "subtitle": "Read-only entry point for per-order material requirements. Open an order to see its ingredient-derived requirements.",
+      "openOrder": "Open order requirements"
+    },
+    "fields": {
+      "orderNumber": "Order number",
+      "status": "Status",
+      "quantity": "Quantity",
+      "plannedStartAt": "Planned start",
+      "dueAt": "Due",
+      "createdAt": "Created",
+      "source": "Source",
+      "sourceRefId": "Source reference",
+      "debugId": "Debug ID",
+      "outputProductId": "Output product",
+      "lineCount": "Lines",
+      "operationCode": "Operation code",
+      "operationName": "Operation",
+      "duration": "Duration",
+      "earliestStartAt": "Earliest start",
+      "availability": "Availability",
+      "availabilityNote": "Availability note",
+      "material": "Material",
+      "requiredQuantity": "Required quantity",
+      "productionOrder": "Production order"
+    },
+    "values": {
+      "none": "—",
+      "unknownDate": "Not scheduled",
+      "canonicalMrpRow": "Canonical MRP row",
+      "projectedFromBrewery": "Projected from brewery",
+      "projectedFromModule": "Projected from {module}"
+    }
+  },
+  "crp": {
+    "title": "Capacity planning",
+    "subtitle": "Read-only CRP alpha view over automation vessels, brewery equipment, and timed brew-session steps.",
+    "alphaNote": "Rows marked as projected are read models. Automation and brewery remain the sources of truth; no CRP rows are created from this page.",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "error": "Could not load capacity planning data.",
+    "noResources": "No capacity resources or automation projections in this workspace yet.",
+    "noWorkCenters": "No work-center projections in this workspace yet.",
+    "noCapacity": "No capacity load buckets are visible yet.",
+    "noSchedule": "No scheduled operations are visible yet.",
+    "noConflicts": "No capacity warnings are visible.",
+    "resources": {
+      "listTitle": "Resources",
+      "openDetail": "View resource",
+      "workCentersTitle": "Work centers",
+      "workCentersNote": "Work centers are read-only brewery equipment profile projections. They explain the capacity context without moving ownership out of brewery.",
+      "openRelatedResource": "Open related resource",
+      "automationSourceLink": "Open automation vessel",
+      "back": "Back to resources",
+      "capacityLink": "Open capacity view",
+      "scheduleLink": "Open schedule"
+    },
+    "export": {
+      "capacityLoadXlsx": "Export capacity load (XLSX)",
+      "schedulePdf": "Export schedule (PDF)",
+      "conflictReportPdf": "Export conflict report (PDF)",
+      "resourceCalendarCsv": "Export resource calendar (CSV)",
+      "working": "Preparing export…",
+      "download": "Download export",
+      "error": "Export failed"
+    },
+    "capacity": {
+      "title": "Capacity load",
+      "note": "Alpha buckets with 0 available minutes are read-model evidence, not final CRP calendar capacity.",
+      "resourceLink": "Open resource detail"
+    },
+    "schedule": {
+      "title": "Schedule",
+      "conflictsTitle": "Read-only warnings",
+      "resourcesLink": "Open resources",
+      "capacityLink": "Open capacity"
+    },
+    "fields": {
+      "resource": "Resource",
+      "code": "Code",
+      "name": "Name",
+      "kind": "Kind",
+      "status": "Status",
+      "source": "Source",
+      "sourceRefId": "Source reference",
+      "createdAt": "Created",
+      "updatedAt": "Updated",
+      "debugId": "Debug ID",
+      "bucketStartAt": "Bucket start",
+      "bucketEndAt": "Bucket end",
+      "availableMinutes": "Available minutes",
+      "plannedMinutes": "Planned minutes",
+      "overloadMinutes": "Overload minutes",
+      "operationCode": "Operation code",
+      "productionOrder": "Production order",
+      "workCenter": "Work center",
+      "startsAt": "Starts",
+      "endsAt": "Ends",
+      "duration": "Duration",
+      "conflict": "Conflict",
+      "severity": "Severity"
+    },
+    "values": {
+      "none": "—",
+      "canonicalCrpRow": "Canonical CRP row",
+      "projectedFromAutomationVessel": "Projected from automation vessel",
+      "projectedFromBrewery": "Projected from brewery",
+      "projectedFromModule": "Projected from {module}",
+      "zeroAvailabilityAlpha": "0 available minutes (alpha read model)"
+    }
+  },
+  "common": {
+    "backToDashboard": "Back to Dashboard",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "close": "Close",
+    "remove": "Remove",
+    "dateLabel": "Date",
+    "timeLabel": "Time",
+    "localeLabel": "Language",
+    "toggle": "Toggle",
+    "changeLanguage": "Change language",
+    "toggleLanguage": "Toggle language",
+    "dilutionDiagramLabel": "Dilution 1:100 diagram",
+    "imageUnavailable": "Image unavailable"
+  },
+  "locales": {
+    "en": "English",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
+  },
+  "units": {
+    "C": "°C",
+    "L": "L",
+    "count": "count",
+    "g": "g",
+    "mL": "mL",
+    "kg": "kg",
+    "lovibond": "°L",
+    "LPerKg": "L/kg",
+    "LPerG": "L/g",
+    "ppm": "ppm",
+    "ppmAsCaCO3": "ppm as CaCO3",
+    "tsp": "tsp",
+    "pH": "pH"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "recipes": "Recipes",
+    "inventory": "Inventory",
+    "waterProfiles": "Water profiles",
+    "equipment": "Equipment",
+    "automation": "Automation",
+    "pim": "Products",
+    "mrp": "Production planning",
+    "crp": "Capacity planning",
+    "ai": "AI",
+    "about": "About",
+    "language": "Language",
+    "accessibility": "Accessibility",
+    "login": "Log in",
+    "logout": "Log out",
+    "notAvailableOnMobileYet": "Not available on mobile yet.",
+    "openOnWeb": "Open on web",
+    "missingApiBaseUrl": "Missing API base URL (EXPO_PUBLIC_API_BASE_URL).",
+    "signedInAs": "Signed in as",
+    "activeWorkspace": "Active workspace",
+    "switchWorkspace": "Switch workspace",
+    "activeAccount": "Active workspace",
+    "switchAccount": "Switch workspace",
+    "ariaPrimary": "Primary",
+    "ariaSession": "Session",
+    "menu": "Menu"
+  },
+  "ads": {
+    "ariaLabel": "Advertisement",
+    "contactLine": "Contact us for hosting your ad here.",
+    "upgradeLine": "Upgrade to a paid plan for removal."
+  },
+  "platformAds": {
+    "title": "Platform ads",
+    "subtitle": "Manage platform-scoped ads (web). Visible across accounts unless ads are disabled for a workspace.",
+    "hint": "Tip: preview placements by opening any page and hard-reloading (locale: {locale}).",
+    "globalBottomNote": "Note: the Global bottom placement is hidden on the recipe edit page to avoid layout jumps on mobile.",
+    "loading": "Loading…",
+    "notAuthorized": "You are not authorized to manage platform ads.",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "create": "Create ad",
+    "creating": "Creating…",
+    "listTitle": "Ads",
+    "noAds": "No ads yet.",
+    "form": {
+      "placement": "Placement",
+      "priority": "Priority",
+      "imageUrl": "Image URL",
+      "linkUrl": "Link URL",
+      "altText": "Alt text",
+      "isActive": "Active"
+    },
+    "placements": {
+      "globalTop": "Global top",
+      "globalBottom": "Global bottom",
+      "recipeEditAfterFermentables": "Recipe edit: after Fermentables",
+      "recipeEditAfterHops": "Recipe edit: after Hops",
+      "recipeEditAfterYeast": "Recipe edit: after Yeast"
+    },
+    "table": {
+      "placement": "Placement",
+      "imageUrl": "Image",
+      "linkUrl": "Link",
+      "active": "Active",
+      "actions": "Actions",
+      "open": "Open",
+      "yes": "yes",
+      "no": "no",
+      "delete": "Delete",
+      "toggleActiveAria": "Toggle active for ad {id}"
+    }
+  },
+  "platform": {
+    "navLabel": "Platform admin",
+    "ads": "Ads",
+    "recipes": "Recipes"
+  },
+  "platformRecipes": {
+    "title": "Platform recipes import/export",
+    "subtitle": "Import or export recipes for any workspace. Select a workspace first.",
+    "loading": "Loading…",
+    "notAuthorized": "You are not authorized to manage platform recipes.",
+    "workspaceLabel": "Workspace",
+    "workspacePlaceholder": "Select workspace…",
+    "workspaceRequired": "Select a workspace to import or export.",
+    "accountLabel": "Workspace",
+    "accountPlaceholder": "Select workspace…",
+    "accountRequired": "Select a workspace to import or export.",
+    "exportSectionTitle": "Export (full BeerJSON)",
+    "exportSingleLabel": "Export single recipe",
+    "exportSingleCta": "Download selected",
+    "exportBulkCta": "Export all recipes",
+    "exportNoneAvailable": "No recipes",
+    "exportFullNote": "Platform export includes full BeerJSON and recipeExtJson."
+  },
+  "accessibility": {
+    "title": "Accessibility",
+    "subtitle": "Adjust contrast, text size, and spacing. Saved on this device; if you are signed in, settings also sync to your account.",
+    "loading": "Loading…",
+    "themePreset": "Theme preset",
+    "fontScale": "Text size",
+    "density": "Spacing",
+    "saving": "Saving…",
+    "savingHint": "Changes apply immediately.",
+    "theme": {
+      "default": "Default",
+      "hcDark": "High contrast (dark)",
+      "hcLight": "High contrast (light)"
+    },
+    "font": {
+      "sm": "Small (90%)",
+      "md": "Normal (100%)",
+      "lg": "Large (110%)",
+      "xl": "Extra large (125%)"
+    },
+    "densityOptions": {
+      "comfortable": "Comfortable",
+      "compact": "Compact"
+    },
+    "note": "Tip: your browser zoom also works, and respects locale ({locale})."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Desktop-first web app + native mobile apps, offline-first brew-day logging.",
+    "links": {
+      "title": "Brew day & Brewing data",
+      "fermDataIntegration": "Ferm Data & Integration",
+      "brewdayStepsSettings": "Brewday Steps Settings",
+      "waterProfiles": "Water profiles",
+      "brewery": "Brewery",
+      "equipment": "Equipment",
+      "inventory": "Inventory",
+      "ai": "AI consultant"
+    },
+    "importExport": {
+      "title": "Import / Export",
+      "supportedNote": "Recipe import/export interoperability is centered on BeerJSON (canonical).",
+      "importFormats": "Import: BeerJSON (.json) and BeerXML (.xml).",
+      "exportFormats": "Export: BeerJSON (.json).",
+      "actionsLiveInRecipes": "Import/export actions live under Recipes:",
+      "actionsCta": "Go to Recipes",
+      "customImportNote": "Need another system?",
+      "customImportCta": "Contact us for affordable custom import."
+    },
+    "fermDataIntegration": {
+      "title": "Ferm Data & Integration",
+      "subtitle": "Integrations and fermentation data (stats and insights).",
+      "backToDashboard": "Back to dashboard",
+      "sections": {
+        "integration": {
+          "title": "Floating hydrometers integrations",
+          "empty": "No integrations yet.",
+          "error": "Error:",
+          "intro": "Each integration has its own Cloud URL. Pick your device type and follow its steps.",
+          "tiltTitle": "Tilt Hydrometer",
+          "tiltSupportedNotice": "Supported.",
+          "tiltSubtitle": "Use this if you have a Tilt gateway or TiltPi.",
+          "stepsLabel": "Steps:",
+          "step1": "1) Reveal token + Cloud URL",
+          "step2": "2) Paste the Cloud URL into TiltPi or the Tilt app",
+          "step3": "3) After the first log, attach the device to a brew session.",
+          "ispindelTitle": "iSpindel",
+          "ispindelWarning": "Not supported yet (coming soon).",
+          "ispindelSubtitle": "Token management will be available soon.",
+          "raptTitle": "RAPT",
+          "raptWarning": "Not supported yet (coming soon).",
+          "raptSubtitle": "Token management will be available soon.",
+          "configured": "Configured.",
+          "notConfigured": "Not configured.",
+          "working": "Working…",
+          "cloudUrlLabel": "Cloud URL",
+          "cloudUrlAria": "Cloud URL",
+          "cloudUrlAriaTilt": "Cloud URL (copy into your Tilt gateway)",
+          "cloudUrlAriaGeneric": "Cloud URL (copy into your gateway)",
+          "cloudUrlHelp": "Use this URL in your gateway.",
+          "cloudUrlHelpTilt": "Use this URL in TiltPi / Tilt 2 “Custom Cloud URL”.",
+          "cloudUrlHelpGeneric": "Use this URL in your device gateway once supported.",
+          "tokenLabel": "Token (one-time)",
+          "tokenAria": "Integration token (one-time display)",
+          "tokenHelp": "This token is shown once. Save it if you need to reconfigure; otherwise rotate a new token later.",
+          "copy": "Copy",
+          "copied": "Copied",
+          "copyUrlAria": "Copy Cloud URL",
+          "copyTokenAria": "Copy token",
+          "devicesTitle": "Connected Tilt devices",
+          "noDevices": "No Tilt devices have logged yet.",
+          "device": "Device",
+          "deviceKey": "Key",
+          "deviceChartTitle": "Recent readings",
+          "chartGravity": "Gravity",
+          "chartTemperature": "Temperature",
+          "chartXAxis": "Time",
+          "chartGravityAxis": "Gravity (SG)",
+          "chartTemperatureAxis": "Temperature (°C)",
+          "lastReading": "Last reading",
+          "noReadingsYet": "No readings yet.",
+          "attachedTo": "Attached to",
+          "notAttached": "Not attached",
+          "attachLabel": "Attach to brew session",
+          "attachPlaceholder": "Select…",
+          "attach": "Attach",
+          "detach": "Detach",
+          "actions": {
+            "create": "Create integration",
+            "createAgain": "Generate new token",
+            "reveal": "Reveal Cloud URL",
+            "rotate": "Rotate token",
+            "revoke": "Revoke",
+            "createAria": "Create Tilt integration",
+            "rotateAria": "Rotate Tilt integration token",
+            "revokeAria": "Revoke Tilt integration",
+            "createAriaGeneric": "Create integration",
+            "rotateAriaGeneric": "Rotate integration token",
+            "revokeAriaGeneric": "Revoke integration"
+          }
+        }
+      }
+    },
+    "brewdayStepsSettings": {
+      "title": "Brewday Steps Settings",
+      "subtitle": "Configure brew day steps, timers, and brewing type.",
+      "backToDashboard": "Back to dashboard",
+      "brewingTypeAllGrain": "All grain",
+      "brewingTypeExtractPartialBiab": "Extract/Partial-mash/BIAB (homebrewing)",
+      "saveSuccess": "Saved.",
+      "loading": "Loading…",
+      "saving": "Saving…",
+      "accountRequired": "Select an account to continue.",
+      "exclude": "Exclude",
+      "addCustomSection": "Add custom section",
+      "addCustomBrewingMethod": "Add custom brewing method",
+      "addCustomStep": "Add custom step",
+      "assignedSection": "Assigned section",
+      "minutes": "Minutes",
+      "presetSections": {
+        "preparation": "Preparation",
+        "pre_mash": "Pre mash",
+        "mash": "Mash",
+        "lauter": "Lauter",
+        "sparge": "Sparge",
+        "boil": "Boil",
+        "post_boil": "Post boil",
+        "fermentor": "Fermentor",
+        "cleanup": "Cleanup",
+        "quality": "Quality",
+        "miscellaneous": "Miscellaneous"
+      },
+      "defaultSectionNote": "Brew steps: add to your default setup. You can exclude them in brew day if you use only for specific recipes but you can not add in brew day workflow if not added here.",
+      "customSectionNote": "Add custom steps with name, optional minutes, and assigned section.",
+      "add": "Add",
+      "save": "Save",
+      "name": "Name",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "remove": "Remove",
+      "sections": {
+        "brewdayStepsRecap": {
+          "title": "Brewday Steps Recap",
+          "empty": "No brew steps yet."
+        },
+        "brewingType": {
+          "title": "Brewing methods",
+          "label": "Brewing method"
+        },
+        "brewdayStepsSections": {
+          "title": "Brewday steps - sections",
+          "placeholder": "Coming soon."
+        },
+        "brewdayStepsDefault": {
+          "title": "Brewday steps - default",
+          "placeholder": "Coming soon."
+        },
+        "brewdayStepsCustom": {
+          "title": "Brewday steps - custom",
+          "placeholder": "Coming soon."
+        },
+        "brewdayNotes": {
+          "title": "Brewday notes"
+        }
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "For custom import requests, send us a message and we’ll reply with next steps and an estimate.",
+    "emailHeading": "Email",
+    "emailLabel": "Email:",
+    "emailAddress": "demo@umbraculum.dev",
+    "mailtoSubject": "Custom import request",
+    "emailCta": "Email us"
+  },
+  "health": {
+    "title": "API health",
+    "subtitle": "Fetching {url} from the browser (via Nginx).",
+    "appPermissions": {
+      "title": "App permissions",
+      "subtitle": "User = your login identity. Workspace = shared tenant boundary. Roles (brewery_admin/member/viewer) and ACL determine what you can do.",
+      "userLabel": "User",
+      "activeWorkspaceLabel": "Active workspace",
+      "roleLabel": "Your role in this workspace",
+      "roleUnknown": "unknown",
+      "selectWorkspaceCta": "Select workspace"
+    }
+  },
+  "contributing": {
+    "title": "Contributing",
+    "subtitle": "Help improve translations and brewing datasets used by the app.",
+    "sections": {
+      "i18n": {
+        "title": "Help translate (i18n contributing)"
+      },
+      "rawMaterials": {
+        "title": "Help improve raw materials database",
+        "subtitle": "If you find missing or incorrect fermentables/hops/yeast/other ingredients (or water-related profiles), tell us so we can improve the canonical dataset.",
+        "step1": "Note what’s missing/incorrect (name, producer, key specs like color/yield/AA% where applicable).",
+        "step2": "Include a screenshot or the exact values if possible (helps avoid ambiguity).",
+        "step3": "Open a report using our Raw materials issue template (coming soon).",
+        "issueTemplateNote": "We’ll add a direct link once the GitHub contribution workflow is finalized."
+      }
+    }
+  },
+  "ui": {
+    "addSalt": "Add salt",
+    "amountLabel": "Amount ({unit})",
+    "salt": "Salt",
+    "noSaltsAddedYet": "No salts added yet.",
+    "fx": "fx"
+  },
+  "about": {
+    "title": "About",
+    "subtitle": "Brewery App is an internal tool for recipe development and brew-day logging, with a water chemistry calculator inspired by BrunWater, Troester and others. Beer.json schema fully supported. Raw material database of choice for v0 is BeerProto.",
+    "translationsRowPrefix": "Translations are welcome and managed via our contribution workflow (see",
+    "translationsRowLinkText": "Help translate",
+    "translationsRowSuffix": ").",
+    "translationsSideNote": "Side note: this is just a primer — the translation contribution workflow is planned, but not fully in place yet."
+  },
+  "auth": {
+    "selectAccount": {
+      "title": "Select workspace",
+      "subtitle": "Choose which workspace you want to work in.",
+      "loading": "Loading…",
+      "noAccountsFound": "No workspaces found."
+    },
+    "selectWorkspace": {
+      "title": "Select workspace",
+      "subtitle": "Choose which workspace you want to work in.",
+      "loading": "Loading…",
+      "noWorkspacesFound": "No workspaces found."
+    },
+    "loginTitle": "Sign in",
+    "signupTitle": "Create account",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "workspaceNameLabel": "Workspace name (optional)",
+    "accountNameLabel": "Workspace name (optional)",
+    "submitLogin": "Sign in",
+    "submitSignup": "Create account",
+    "submitting": "Submitting…",
+    "languageLabel": "Language",
+    "noteTitle": "Translations status",
+    "noteBody": "English is the original language. Other languages (starting with Italian) will soon be 100% supported. Spanish and German are coming soon as well.",
+    "helpTranslate": "Help translate (i18n contributing)",
+    "sessionExpired": {
+      "title": "Session expired",
+      "body": "You have been signed out. Redirecting you to sign in again.",
+      "cta": "Log in now",
+      "countdown": "Redirecting in {seconds}s…"
+    }
+  },
+  "i18nContributing": {
+    "title": "Help translate (i18n contributing)",
+    "subtitle": "We welcome translation contributions. English is the source of truth; Italian is the first community language.",
+    "howItWorksTitle": "How translations work",
+    "howItWorks1": "The web app uses locale-prefixed URLs (e.g. /en/..., /it/...).",
+    "howItWorks2Prefix": "Translations live in",
+    "howItWorks2Middle": "and",
+    "howItWorks3": "Keys should be stable. Don’t change keys unless you’re intentionally refactoring text across the app.",
+    "recommendedToolTitle": "Recommended tool (easiest)",
+    "recommendedToolBody": "We recommend using Weblate (web UI) connected to GitHub. It allows anyone to translate without touching git, and it opens PRs automatically.",
+    "recommendedTool1": "Translate using a browser (no git required).",
+    "recommendedTool2": "Maintainers review and merge Weblate PRs.",
+    "githubFallbackTitle": "GitHub fallback",
+    "githubFallbackBody": "If you’re comfortable with git/GitHub, you can also open a PR editing the JSON message files directly.",
+    "rulesTitle": "Rules",
+    "rule1": "Keep placeholders intact (e.g. {url}).",
+    "rule2": "Keep meaning accurate; avoid overly literal translations if they read unnaturally.",
+    "rule3": "Don’t translate technical identifiers like file paths, API paths, or code.",
+    "backToLogin": "Back to sign in"
+  },
+  "ai": {
+    "title": "AI Consultant",
+    "subtitle": "Ask questions about your workspace — recipes, products, vessels, production planning, and inventory.",
+    "askAboutThisPage": "Ask AI about this page",
+    "composer": {
+      "placeholder": "Ask a question about your brewery…",
+      "send": "Send",
+      "sendAriaLabel": "Send message",
+      "thinking": "Thinking…",
+      "streamingAriaLabel": "Streaming assistant response"
+    },
+    "messages": {
+      "empty": "Start a conversation by asking a question below.",
+      "you": "You",
+      "assistant": "Consultant",
+      "toolCall": "Looking up: {tool}",
+      "toolError": "Tool error: {message}"
+    },
+    "proposals": {
+      "apply": "Apply",
+      "dismiss": "Dismiss",
+      "applied": "Applied",
+      "dismissed": "Dismissed"
+    },
+    "errors": {
+      "subscriptionRequired": "AI consultant is available on paid tiers.",
+      "subscriptionRequiredCta": "Upgrade to unlock",
+      "notEnabled": "AI consultant is not enabled in this workspace. Ask an admin to enable it.",
+      "noKey": "No AI provider key configured. An admin must add one in the AI settings.",
+      "dataEgressNotAccepted": "An admin must accept the data-egress notice before AI calls can be made.",
+      "rateLimit": "AI usage limit reached. Try again later.",
+      "rateLimitRole": "Your role’s monthly AI usage limit has been reached.",
+      "rateLimitUserDaily": "Your daily AI usage limit has been reached.",
+      "internal": "Something went wrong. Please try again."
+    },
+    "settings": {
+      "title": "AI Settings",
+      "subtitle": "Configure the AI consultant for this workspace. Admin-only.",
+      "memberOnlyNotice": "Only workspace admins can change AI settings. You can still use the consultant once it has been enabled.",
+      "enableLabel": "Enable AI consultant",
+      "enableHint": "When enabled, members can use the AI consultant in this workspace.",
+      "providerLabel": "AI provider",
+      "providerHint": "Anthropic (full tools) or OpenAI BYOK (chat without tools until adapter completes).",
+      "apiKeyLabel": "Anthropic API key",
+      "apiKeyHint": "Stored encrypted at rest. We never display the key back; clear by saving an empty value.",
+      "apiKeyConfigured": "A key is currently configured.",
+      "apiKeyMissing": "No key configured.",
+      "apiKeyPlaceholder": "sk-ant-…",
+      "apiKeyClearLabel": "Clear stored key",
+      "dataEgressLabel": "I understand that messages and tool results will be sent to Anthropic for processing.",
+      "dataEgressHint": "Required by EU + US privacy regimes. Tool results may include recipe, equipment, and inventory data from this workspace.",
+      "dataEgressAcceptedAt": "Accepted on {date}.",
+      "roleLimitsTitle": "Per-role monthly token caps",
+      "roleLimitsHint": "Sum of input + output tokens over the trailing 30 days. 0 = no cap.",
+      "perUserDailyCapLabel": "Per-user daily token cap",
+      "perUserDailyCapHint": "Sum of input + output tokens today (UTC). 0 = no cap.",
+      "saveButton": "Save changes",
+      "savingButton": "Saving…",
+      "savedMessage": "Settings saved.",
+      "saveError": "Could not save settings: {message}",
+      "concierge": {
+        "title": "Need help setting up?",
+        "body": "Book a 15-minute call with our team. Italian and English available.",
+        "cta": "Schedule a call"
+      },
+      "roles": {
+        "brewery_admin": "Admin",
+        "member": "Member",
+        "viewer": "Viewer"
+      }
+    },
+    "upgrade": {
+      "title": "Unlock the AI consultant",
+      "body": "The AI consultant is included with the paid plan. Upgrade your workspace to ask questions in plain language about your recipes, equipment, brew sessions, and inventory — answered using your workspace’s real data.",
+      "bullet1": "Read-only access to your workspace data",
+      "bullet2": "Configurable per-role and per-user limits",
+      "bullet3": "Encrypted-at-rest provider key (BYOK)",
+      "ctaButton": "Upgrade workspace",
+      "ctaLoading": "Preparing checkout…",
+      "ctaError": "Could not start checkout: {message}",
+      "concierge": {
+        "title": "Want help getting set up?",
+        "body": "Once your workspace is upgraded, book a 15-minute call with our team. Italian and English available.",
+        "cta": "Schedule a call"
+      }
+    },
+    "usage": {
+      "title": "AI usage",
+      "description": "Aggregated token spend, per-user activity, and role limits for this workspace.",
+      "monthlyTokensIn": "Tokens in (month-to-date)",
+      "monthlyTokensOut": "Tokens out (month-to-date)",
+      "monthlyCallCount": "Calls (month-to-date)",
+      "perUserTitle": "Per user (month-to-date)",
+      "userColumn": "User",
+      "todayColumn": "Today (in + out)",
+      "monthColumn": "Month (in + out)",
+      "monthCallsColumn": "Calls",
+      "empty": "No AI usage recorded yet.",
+      "monthly": {
+        "callCount": "Calls (MTD)",
+        "tokensIn": "Tokens in (MTD)",
+        "tokensOut": "Tokens out (MTD)",
+        "total": "Total tokens (MTD)"
+      },
+      "chart": {
+        "title": "Token spend — last 30 days",
+        "ariaLabel": "Bar chart of daily token spend over the last 30 days"
+      },
+      "table": {
+        "title": "Per-user breakdown",
+        "empty": "No AI usage recorded yet.",
+        "user": "User",
+        "role": "Role",
+        "today": "Today",
+        "month": "Month",
+        "roleLimit": "Role limit",
+        "rolePercent": "% of role limit"
+      },
+      "alerts": {
+        "heading": "Limits approaching",
+        "roleApproachingLimit": "Role '{role}' is at {percent} of its monthly cap ({used}/{limit}).",
+        "userApproachingDailyCap": "User '{user}' is at {percent} of today's cap ({used}/{cap})."
+      }
+    },
+    "actions": {
+      "openSettings": "AI settings",
+      "openUsage": "View usage",
+      "tryAgain": "Try again"
+    }
+  },
+  "sharedLayoutNotice": {
+    "demo": {
+      "ariaLabel": "Demo environment notice",
+      "summaryLine": "Public demonstration environment on demo.umbraculum.dev — illustrative data only; may be reset without notice.",
+      "dataLossWarning": "Do not store records you cannot afford to lose.",
+      "expanderLabel": "About this demo and Umbraculum",
+      "platformIntro": "Umbraculum is an open-source platform for workspace-shaped operational applications — shared backbone (auth, workspaces, billing, AI, rendering) plus canonical modules (PIM, MRP, CRP, automation, …) that vertical products compose.",
+      "referenceVertical": "This demo runs the brewery reference vertical: an example manufacturing product the Umbraculum core team ships in the monorepo to show how a team builds a specific vertical on the platform. It is a showcase, not proof that Umbraculum is brewery-only.",
+      "credentialsHeading": "Demo sign-in",
+      "roleAdmin": "Brewery admin (primary)",
+      "roleMember": "Member",
+      "roleViewer": "Viewer",
+      "roleMultiAdmin": "Multi-workspace admin",
+      "columnRole": "Role",
+      "columnEmail": "Email",
+      "columnPassword": "Password",
+      "emailAdmin": "e2e-admin@brewery.local",
+      "passwordAdmin": "e2e-admin-pw!",
+      "emailMember": "e2e-member@brewery.local",
+      "passwordMember": "e2e-member-pw!",
+      "emailViewer": "e2e-viewer@brewery.local",
+      "passwordViewer": "e2e-viewer-pw!",
+      "emailMultiAdmin": "e2e-multi-admin@brewery.local",
+      "passwordMultiAdmin": "e2e-multi-admin-pw!",
+      "fixtureWorkspace": "Fixture workspace: {workspaceId} (primary admin).",
+      "linkGettingStarted": "Getting started",
+      "linkGettingStartedDesc": "setup, vocabulary, first contribution path",
+      "linkBuildingVertical": "Building your vertical",
+      "linkBuildingVerticalDesc": "how ISVs/integrators build their own product on Umbraculum",
+      "linkGlossary": "Glossary",
+      "linkGlossaryDesc": "vertical vs canonical module (precise definitions)",
+      "unsurePrefix": "Unsure? Read the docs above, then ask on the ",
+      "unsureForumLink": "community forum",
+      "unsureSuffix": ".",
+      "nativeIntro": "Mobile (brewery native): Internal EAS preview builds point at this same origin (https://demo.umbraculum.dev). Sign in with the same demo accounts above. Brew-day flows run on device; MRP, CRP, PIM, and inventory use Open on web (browser on this host).",
+      "nativeLinkNativeCi": "Native strategy & CI",
+      "nativeLinkDemoRunbook": "Demo host runbook",
+      "nativeLinkSmoke": "Canonical native platform surface §5.1",
+      "nativeBulletOperators": "Operators / contributors:",
+      "nativeBulletSmokeLabel": "Device smoke checklist:",
+      "nativeBulletApk": "Build/install APK: repo path apps/native/EAS-DEMO-SETUP.md (GitHub: umbraculum-dev monorepo) or workflow native-eas-build with profile preview."
+    }
+  }
+}

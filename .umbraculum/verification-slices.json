@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "slices": {
     "contracts": {
-      "pathPrefixes": ["packages/contracts/"],
+      "pathPrefixes": ["packages/platform/contracts/"],
       "tiers": {
         "T0": [
           {
@@ -32,18 +32,18 @@
         "services/api/src/modules/brewery/routes/",
         "services/api/src/openapi/",
         "services/api/openapi/",
-        "packages/api-client/",
-        "packages/contracts/src/auth/",
-        "packages/contracts/src/workspaces/",
-        "packages/brewery-contracts/src/brewery/",
-        "packages/brewery-contracts/src/water/",
-        "packages/brewery-contracts/src/analysis/",
-        "packages/contracts/src/billing/",
-        "packages/contracts/src/ads/",
-        "packages/contracts/src/ai/",
-        "packages/contracts/src/integrations/",
-        "packages/contracts/src/webhooks/",
-        "packages/contracts/src/platformAdmin/"
+        "packages/platform/api-client/",
+        "packages/platform/contracts/src/auth/",
+        "packages/platform/contracts/src/workspaces/",
+        "packages/verticals/brewery/contracts/src/brewery/",
+        "packages/verticals/brewery/contracts/src/water/",
+        "packages/verticals/brewery/contracts/src/analysis/",
+        "packages/platform/contracts/src/billing/",
+        "packages/platform/contracts/src/ads/",
+        "packages/platform/contracts/src/ai/",
+        "packages/platform/contracts/src/integrations/",
+        "packages/platform/contracts/src/webhooks/",
+        "packages/platform/contracts/src/platformAdmin/"
       ],
       "tiers": {
         "T0": [
@@ -117,7 +117,7 @@
       }
     },
     "packages-pim": {
-      "pathPrefixes": ["packages/pim-contracts/"],
+      "pathPrefixes": ["packages/modules/pim-contracts/"],
       "tiers": {
         "T0": [
           {

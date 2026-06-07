@@ -61,13 +61,13 @@ EXTRA_MARKDOWN = (
 README_GLOBS = ("apps", "services", "packages")
 
 I18N_SOURCE = (
-    REPO_ROOT / "packages/i18n/src/en.json",
-    REPO_ROOT / "packages/i18n/src/it.json",
+    REPO_ROOT / "packages/platform/i18n/src/en.json",
+    REPO_ROOT / "packages/platform/i18n/src/it.json",
 )
 
 TEST_MCP_SOURCE = (
-    REPO_ROOT / "packages/test-mcp/README.md",
-    REPO_ROOT / "packages/test-mcp/src/server.ts",
+    REPO_ROOT / "packages/platform/test-mcp/README.md",
+    REPO_ROOT / "packages/platform/test-mcp/src/server.ts",
 )
 
 DENYLIST_SOURCE_PATHS = (

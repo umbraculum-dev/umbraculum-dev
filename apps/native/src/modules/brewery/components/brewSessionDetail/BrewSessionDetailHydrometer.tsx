@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 
 import { Button, Card, Heading, SelectField, Text } from "@umbraculum/ui";
-import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
+import { HydrometerChart } from "@umbraculum/brewery-recipes-ui/charts/HydrometerChart";
 
 import type { BrewSessionDetailScreenModel } from "../../hooks/brewSessionDetail/useBrewSessionDetailScreen";
 import type { IntegrationKind } from "../../hooks/brewSessionDetail/brewSessionDetailTypes";

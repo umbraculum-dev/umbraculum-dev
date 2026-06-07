@@ -1,5 +1,5 @@
 /**
- * Valibot equivalent of packages/automation-contracts/src/mailbox-data.ts.
+ * Valibot equivalent of packages/modules/automation-contracts/src/mailbox-data.ts.
  *
  * Paper-design spike per docs/rfcs/0003-validation-library-adoption.md §15
  * — comparison axis to the Zod v4 implementation in

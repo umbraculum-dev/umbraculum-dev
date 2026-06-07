@@ -49,7 +49,7 @@ for pkg in @umbraculum/contracts @umbraculum/api-client; do
 done
 ```
 
-**Future bumps:** increment semver in `packages/contracts/package.json` and/or `packages/api-client/package.json`, push a **new** tag (e.g. `sdk-contracts-v0.0.2`). Do **not** push `sdk-contracts-v0.0.1` after a successful laptop first publish — that semver is already on the registry.
+**Future bumps:** increment semver in `packages/platform/contracts/package.json` and/or `packages/platform/api-client/package.json`, push a **new** tag (e.g. `sdk-contracts-v0.0.2`). Do **not** push `sdk-contracts-v0.0.1` after a successful laptop first publish — that semver is already on the registry.
 
 ---
 

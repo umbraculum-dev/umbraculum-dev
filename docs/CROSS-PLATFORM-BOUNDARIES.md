@@ -13,7 +13,7 @@ This document records **implemented** decisions for sharing code between **Next.
 
 ## 1. Locales are single-source-of-truth
 
-- **Canonical locale ownership**: `packages/i18n` (`@umbraculum/i18n`)
+- **Canonical locale ownership**: `packages/platform/i18n` (`@umbraculum/i18n`)
 - Implemented exports:
   - `locales` (readonly tuple)
   - `SupportedLocale`
@@ -37,7 +37,7 @@ We do **not** share Next.js routes or file-based routing across web/native. Inst
 
 Implemented package:
 
-- `packages/navigation` (`@umbraculum/navigation`)
+- `packages/platform/navigation` (`@umbraculum/navigation`)
   - `RouteId`, `RouteParamsById`, `RouteRef`
   - `routeToPath(RouteRef)` produces a **non-locale** web path (e.g. `/inventory`, `/recipes/:id/water/mash`)
   - `getRouteAvailability(id, platform)` returns:
@@ -74,7 +74,7 @@ To share screens across web and native while keeping message syntax consistent, 
 
 Implemented package:
 
-- `packages/i18n-react` (`@umbraculum/i18n-react`)
+- `packages/platform/i18n-react` (`@umbraculum/i18n-react`)
   - Universal runtime:
     - `LocaleProvider({ locale, messages })`
     - `useT(namespace)` returning `{ t(key, values), rich(key, values) }`
@@ -100,9 +100,9 @@ Instead it depends on small shared interfaces:
 
 | Concern | Package / adapter |
 |--------|-------------------|
-| Locales + messages | `packages/i18n` |
-| Universal translation hook | `packages/i18n-react` |
-| Universal route IDs + policy | `packages/navigation` |
+| Locales + messages | `packages/platform/i18n` |
+| Universal translation hook | `packages/platform/i18n-react` |
+| Universal route IDs + policy | `packages/platform/navigation` |
 | Web adapter | `apps/web/src/navigation/appRouter.ts` (`useAppRouter()`) |
 
 ---
@@ -125,7 +125,7 @@ See also [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md) and [`NATIVE-STRATEGY-AND-CI.md`
 
 Implemented package:
 
-- `packages/api-client` (`@umbraculum/api-client`)
+- `packages/platform/api-client` (`@umbraculum/api-client`)
   - Uses a minimal cross-platform fetch contract (injectable `fetch`) and avoids DOM-only typing in its public API.
   - **Auth direction (current)**:
     - Web: cookie sessions (`sid`) via `cookieAuth()`

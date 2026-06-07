@@ -26,10 +26,10 @@ RFC-0005 limits versioned snapshots to **`packages/*-contracts/`** READMEs and c
 
 | Package | README path | `CONTRACT_VERSION` source |
 |---------|-------------|---------------------------|
-| `@umbraculum/automation-contracts` | `packages/automation-contracts/README.md` | `packages/automation-contracts/src/version.ts` |
-| `@umbraculum/pim-contracts` | `packages/pim-contracts/README.md` | `packages/pim-contracts/src/version.ts` |
-| `@umbraculum/mrp-contracts` | `packages/mrp-contracts/README.md` | `packages/mrp-contracts/src/version.ts` |
-| `@umbraculum/crp-contracts` | `packages/crp-contracts/README.md` | `packages/crp-contracts/src/version.ts` |
+| `@umbraculum/automation-contracts` | `packages/modules/automation-contracts/README.md` | `packages/modules/automation-contracts/src/version.ts` |
+| `@umbraculum/pim-contracts` | `packages/modules/pim-contracts/README.md` | `packages/modules/pim-contracts/src/version.ts` |
+| `@umbraculum/mrp-contracts` | `packages/modules/mrp-contracts/README.md` | `packages/modules/mrp-contracts/src/version.ts` |
+| `@umbraculum/crp-contracts` | `packages/modules/crp-contracts/README.md` | `packages/modules/crp-contracts/src/version.ts` |
 
 ---
 

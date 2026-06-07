@@ -94,7 +94,7 @@ All routes require active workspace context (`requireActiveWorkspace`).
 | `mrp.proposeOrderAdjustment` | `propose` | mrp | Timing/qty/split suggestions; never calls write services |
 | `crp.proposeScheduleAdjustment` | `propose` | crp | Capacity/schedule hint proposals |
 
-Input/output shapes live in `@umbraculum/contracts` (`packages/contracts/src/ai/aiProposals.ts`).
+Input/output shapes live in `@umbraculum/contracts` (`packages/platform/contracts/src/ai/aiProposals.ts`).
 
 **Apply behaviour (2026-05):** When underlying MRP/CRP PATCH/write routes are read-only, apply marks the proposal `applied` and returns `appliedPreviewOnly: true` in the response envelope. Wire real domain writes when H1 2027 write workflows land.
 

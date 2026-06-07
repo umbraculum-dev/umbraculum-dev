@@ -2,7 +2,7 @@
 
 import { SizableText } from "tamagui";
 
-import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
+import { HydrometerChart } from "@umbraculum/brewery-recipes-ui/charts/HydrometerChart";
 import { CodeInline } from "../../../../../../../../../_shared-layout/_components/CodeInline";
 import type { BrewSessionDetailPageModel } from "../../../_hooks/useBrewSessionDetailPage";
 

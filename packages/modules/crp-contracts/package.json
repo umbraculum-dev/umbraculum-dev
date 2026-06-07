@@ -1,0 +1,48 @@
+{
+  "name": "@umbraculum/crp-contracts",
+  "version": "0.0.2",
+  "description": "Canonical CRP module contract types: resources, capacity calendars, scheduleable-operation handoffs, load buckets, and planned AI/rendering schemas.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
+    "directory": "packages/modules/crp-contracts"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
+  },
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/modules/crp-contracts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

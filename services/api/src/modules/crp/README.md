@@ -7,7 +7,7 @@ Canonical `crp` API slice for Wave 1.
 
 ## What this is
 
-The API companion to [`@umbraculum/crp-contracts`](../../../../../packages/crp-contracts/README.md) and the public [canonical CRP surface design](../../../../../docs/design/canonical-crp-module-surface.md).
+The API companion to [`@umbraculum/crp-contracts`](../../../../../packages/modules/crp-contracts/README.md) and the public [canonical CRP surface design](../../../../../docs/design/canonical-crp-module-surface.md).
 
 ## Routes
 

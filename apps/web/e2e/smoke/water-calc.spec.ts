@@ -41,7 +41,7 @@ test.describe("water calc smoke (authenticated)", () => {
   // through onValueChange. As a result, switching the acidification mode to
   // "Manual" did nothing in React: the submit button kept saying
   // "Calculate & save snapshot" and the "Acid added" input never appeared.
-  // See packages/ui/src/primitives/ModeFieldset.tsx.
+  // See packages/platform/ui/src/primitives/ModeFieldset.tsx.
   test("mash acidification mode radio actually flips React state on web (ModeFieldset regression)", async ({
     authenticatedPage,
   }) => {

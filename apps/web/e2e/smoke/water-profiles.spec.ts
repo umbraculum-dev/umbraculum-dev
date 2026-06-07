@@ -6,7 +6,7 @@
  * 2026-04-23; surfaced by HIGH-full Phase 4b commit `4d9ec1e` on
  * 2026-05-16). The trio:
  *
- *   - L1 unit:    packages/contracts/src/water/waterProfile.test.ts
+ *   - L1 unit:    packages/platform/contracts/src/water/waterProfile.test.ts
  *                 → pins the dual-key parser behavior on the client side.
  *   - L4 snapshot: services/api/src/tests/contracts/waterProfiles.contract.test.ts
  *                 → pins the `body.workspace` (not `.account`) wire grouping

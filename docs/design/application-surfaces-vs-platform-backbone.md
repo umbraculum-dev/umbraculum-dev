@@ -120,9 +120,9 @@ In governance and npm terms, the **module registration spine** is shipped:
 
 | Package | Tier | Role |
 |---|---|---|
-| [`@umbraculum/module-sdk`](../../packages/module-sdk/README.md) | 2 (MIT) | `registerModule()`, `registerWebModule()`, `registerNativeModule()`, reserved codes, `ValidatedSchema<T>`, document-template types |
-| [`@umbraculum/ai-tool-sdk`](../../packages/ai-tool-sdk/README.md) | 2 (MIT) | AI tool contract types |
-| [`@umbraculum/i18n-keys`](../../packages/i18n-keys/README.md) | 2 (MIT) | Module nav / message-key conventions |
+| [`@umbraculum/module-sdk`](../../packages/modules/module-sdk/README.md) | 2 (MIT) | `registerModule()`, `registerWebModule()`, `registerNativeModule()`, reserved codes, `ValidatedSchema<T>`, document-template types |
+| [`@umbraculum/ai-tool-sdk`](../../packages/modules/ai-tool-sdk/README.md) | 2 (MIT) | AI tool contract types |
+| [`@umbraculum/i18n-keys`](../../packages/modules/i18n-keys/README.md) | 2 (MIT) | Module nav / message-key conventions |
 
 Third-party modules pin these — they **are** the public "how you plug into the platform" contract ([MODULES.md](../MODULES.md) §3.3, [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) tier 2).
 
@@ -144,7 +144,7 @@ During the `@brewery/*` → `@umbraculum/*` scope migration, `@brewery/core` (br
 
 Some **runtime** shell concerns are partially extracted:
 
-- **Registry-driven primary nav** — `composeWebSharedLayoutNavItems()` in `@umbraculum/module-sdk` reads `registerWebModule({ navEntries })` metadata from [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/module-sdk/src/builtinWebModules.ts); [`PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) receives composed items from the server layout.
+- **Registry-driven primary nav** — `composeWebSharedLayoutNavItems()` in `@umbraculum/module-sdk` reads `registerWebModule({ navEntries })` metadata from [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/modules/module-sdk/src/builtinWebModules.ts); [`PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) receives composed items from the server layout.
 - **Platform-owned URL segments** — [`registerPlatformSegments.ts`](../../apps/web/app/_lib/registerPlatformSegments.ts) lives in `apps/web` today.
 - **Entitlement-gated nav / upgrade affordances** — tied to `WorkspaceBilling` and future `WorkspaceBillingAddon` ([PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) §3.6–§3.7).
 
@@ -196,7 +196,7 @@ To offer "Umbraculum hosted for breweries" or "hosted PIM":
 - [PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) — vision, audit, target module model
 - [REPOSITORY-STRUCTURE.md](../REPOSITORY-STRUCTURE.md) — five-layer monorepo map
 - [MODULES.md](../MODULES.md) — ecosystem entry + horizontal package catalog
-- [packages/module-sdk/README.md](../../packages/module-sdk/README.md) — registration contract (the backbone SDK)
+- [packages/modules/module-sdk/README.md](../../packages/modules/module-sdk/README.md) — registration contract (the backbone SDK)
 - [design/web-route-group-audit.md](web-route-group-audit.md) — URL segment ownership + `registerWebModule`
 - [design/canonical-native-platform-surface.md](canonical-native-platform-surface.md) — native shell obligations
 - [design/ubuntu-touch-shell-strategy.md](ubuntu-touch-shell-strategy.md) — Ubuntu Touch Morph webapp wrapper (web slice + Click packaging; online-first)

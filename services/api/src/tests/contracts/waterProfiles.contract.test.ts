@@ -11,7 +11,7 @@
  * Historically the third group was named `.account` on the wire. Commit
  * `87876d0` renamed it to `.workspace` (with a backward-compat tunnel in
  * the parser that accepts both keys — pinned by the L1 unit test in
- * `packages/contracts/src/water/waterProfile.test.ts`). Four UI consumers
+ * `packages/platform/contracts/src/water/waterProfile.test.ts`). Four UI consumers
  * in apps/web kept reading `profiles?.account` and silently broke for
  * months until HIGH-full Phase 4b (commit `4d9ec1e`, 2026-05-16) flagged it.
  *

@@ -6,7 +6,7 @@ import { Button, Card, Heading, Text } from "@umbraculum/ui";
 
 // Tamagui v2 RC's typed Button surface omits `chromeless` and a few layout
 // longhand props (`width`, `justifyContent`) even though they are valid at
-// runtime (see packages/ui/src/primitives/{Collapsible,SelectField}.tsx). We
+// runtime (see packages/platform/ui/src/primitives/{Collapsible,SelectField}.tsx). We
 // cast locally to keep the existing collapsible-section-header pattern
 // without weakening shared typings.
 export const SectionToggleButton = Button as unknown as React.ComponentType<

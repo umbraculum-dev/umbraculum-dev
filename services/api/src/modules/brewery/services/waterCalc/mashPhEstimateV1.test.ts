@@ -29,7 +29,7 @@ describe("mashPhEstimateV1 — baseline + boundary outputs (Phase 5b-2)", () => 
   // Pinned: empty grist + zero alkalinity + no acid → pH falls back to the
   // baseline DI mash pH constant (5.76). Catches a refactor that changes
   // the empty-grist fallback (e.g. to null or to 5.6 to align with
-  // DEFAULT_MASH_TARGET_PH from packages/core/water.js).
+  // DEFAULT_MASH_TARGET_PH from packages/verticals/brewery/core/water.js).
   it("empty grist + zero alkalinity → estimated pH = baseline DI mash pH (5.76)", () => {
     const r = mashPhEstimateV1(input());
     expect(r.estimatedMashPhRoomTemp).toBeCloseTo(5.76, 6);

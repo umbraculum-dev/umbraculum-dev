@@ -50,7 +50,7 @@
 | Rendering horizontal surface | [`canonical-document-rendering-surface.md`](canonical-document-rendering-surface.md) | Update template registry when adding `documentTemplates` |
 | Notifications boundary surface | [`canonical-notifications-outbound-delivery-surface.md`](canonical-notifications-outbound-delivery-surface.md) | Amend when RFC-0008 implementation starts |
 | RFC-0007 cross-links | [`0007-canonical-document-rendering.md`](../rfcs/0007-canonical-document-rendering.md) §14 | Point to horizontal surface |
-| Rendering package README | [`packages/rendering/README.md`](../../packages/rendering/README.md) | Consumer modules subsection |
+| Rendering package README | [`packages/platform/rendering/README.md`](../../packages/platform/rendering/README.md) | Consumer modules subsection |
 | AI consultant index | [`AI-CONSULTANT.md`](../AI-CONSULTANT.md) | Template ref SoT = horizontal surface |
 | AI prompt composition surface | [`canonical-ai-prompt-composition-surface.md`](canonical-ai-prompt-composition-surface.md) | Update when `aiPrompts` SDK fields or composition order change |
 

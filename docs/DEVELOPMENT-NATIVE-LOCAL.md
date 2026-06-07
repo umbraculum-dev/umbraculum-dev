@@ -40,7 +40,7 @@ Exit 0 with "Dependencies are up to date" means you're good. Non-zero means at l
 ## UI system (Tamagui, shared with web)
 
 - Native UI is built with **Tamagui** system-wide.
-- The shared cross-platform design system lives in `packages/ui` (`@umbraculum/ui`) and is used by **both**:
+- The shared cross-platform design system lives in `packages/platform/ui` (`@umbraculum/ui`) and is used by **both**:
   - `apps/native` (React Native / Expo)
   - `apps/web` (Next.js)
 - Tamagui config must be imported via platform-safe entrypoints:
@@ -326,9 +326,9 @@ A non-zero exit means at least one package will fail at runtime on Expo Go.
 
 ### `apps/native` typecheck fails with `Property 'X' does not exist on type 'EditorGristRow'` (or similar `@umbraculum/brewery-beerjson` type)
 
-Symptom: a fresh `npm run typecheck` in `apps/native` (or a red `native-deps.yml` PR check) complaining about a property that **clearly exists** in `packages/beerjson/src/index.ts`. The dist on disk (and committed to git) is older than the source.
+Symptom: a fresh `npm run typecheck` in `apps/native` (or a red `native-deps.yml` PR check) complaining about a property that **clearly exists** in `packages/verticals/brewery/beerjson/src/index.ts`. The dist on disk (and committed to git) is older than the source.
 
-Root cause: `packages/beerjson/dist/*` is consumed via the workspace symlink, and tsup builds happen only when the `build:packages` script runs. Until 2026-05, the script omitted `@umbraculum/brewery-beerjson`, so dist could drift silently. The script now (re)builds beerjson before `@umbraculum/brewery-recipes-ui` — but if someone bypasses the script, the dist still goes stale.
+Root cause: `packages/verticals/brewery/beerjson/dist/*` is consumed via the workspace symlink, and tsup builds happen only when the `build:packages` script runs. Until 2026-05, the script omitted `@umbraculum/brewery-beerjson`, so dist could drift silently. The script now (re)builds beerjson before `@umbraculum/brewery-recipes-ui` — but if someone bypasses the script, the dist still goes stale.
 
 Fix:
 
@@ -348,7 +348,7 @@ docker run --rm \
 # exit 0 means dist drift is gone
 ```
 
-Then commit the regenerated `packages/beerjson/dist/*` (and any other dist that changed as a result of the rebuild) alongside the source change.
+Then commit the regenerated `packages/verticals/brewery/beerjson/dist/*` (and any other dist that changed as a result of the rebuild) alongside the source change.
 
 See `DEVELOPMENT-LOCAL.md` → "Shared packages build (native-ready)" for the drift-reproduction recipe and CI guard details.
 
@@ -393,7 +393,7 @@ Walk through these in this exact order before deep-diving:
 2. **Metro running on the right IP?** `docker ps --filter name=brewery-metro` should show it Up. `docker logs --tail=20 brewery-metro` should mention the LAN IP. If the IP looks wrong for your current network, restart it: `docker stop brewery-metro && ./scripts/start-metro-dev.sh`.
 3. **Phone reaches host?** From the **phone's browser**, open `http://<LAN_IP>:8081/` (the IP printed by the helper script). If that fails, no Expo Go change will help — fix the network first (Wi-Fi mismatch, AP isolation, firewall).
 4. **Versions aligned?** Run `expo install --check`. If it complains, run `expo install --fix` and (if `react` moved) ensure `react-dom` was bumped to the same exact version.
-5. **Shared packages dist fresh?** If you (or someone) just edited `packages/beerjson/src/` (or any other shared package source) and `apps/native` typecheck fails on a property that exists in source, run `./scripts/build-packages-in-docker.sh` — see "beerjson dist drift" entry above.
+5. **Shared packages dist fresh?** If you (or someone) just edited `packages/verticals/brewery/beerjson/src/` (or any other shared package source) and `apps/native` typecheck fails on a property that exists in source, run `./scripts/build-packages-in-docker.sh` — see "beerjson dist drift" entry above.
 6. **Bundle cache?** Restart Metro with `-c` and rescan the QR (or re-enter `exp://<LAN_IP>:8081`).
 7. **Read the device error log.** On the blue "Something went wrong" screen, tap **View error log** — `java.io.IOException: Failed to download remote update` means step 2/3; `Incompatible React versions` means step 4.
 

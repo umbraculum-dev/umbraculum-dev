@@ -1,0 +1,41 @@
+{
+  "name": "@umbraculum/brewery-recipes-ui",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Brewery-vertical domain UI — recipe / mash / water / yeast editors. Sits one tier above @umbraculum/ui (platform-neutral primitives). Cross-platform (web + native) via injected-adapter pattern. Brewery-vertical-classified per sub-plan #9 §1.1 (recipe domain is brewing-specific; the @umbraculum/brewery-* prefix marks the vertical boundary).",
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./charts/HydrometerChart": {
+      "types": "./dist/charts/HydrometerChart.web.d.ts",
+      "react-native": "./dist/charts/HydrometerChart.native.js",
+      "import": "./dist/charts/HydrometerChart.web.js",
+      "require": "./dist/charts/HydrometerChart.web.cjs",
+      "default": "./dist/charts/HydrometerChart.web.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@umbraculum/brewery-beerjson": "file:../beerjson",
+    "@umbraculum/i18n-react": "file:../../../platform/i18n-react",
+    "@umbraculum/ui": "file:../../../platform/ui",
+    "tamagui": "^2.0.0-rc.11",
+    "victory": "^36.9.2",
+    "victory-native": "^36.9.2"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.70"
+  }
+}
+

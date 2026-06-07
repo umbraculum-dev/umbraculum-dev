@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { Image } from "expo-image";
 
-import { getMediaUrl, type MediaAssetKey } from "@umbraculum/media";
+import { getMediaUrl, type MediaAssetKey } from "@umbraculum/brewery-media-assets";
 
 import { getMediaBaseUrl } from "./mediaBaseUrl";
 

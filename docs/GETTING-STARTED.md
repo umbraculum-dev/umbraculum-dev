@@ -527,8 +527,8 @@ Concrete categories that fit:
 
 - Fixing a typo or a broken cross-reference in a `docs/` file.
 - Adding a missing Italian translation for an existing English key in
-  [`packages/i18n/src/it.json`](../packages/i18n/src/it.json) (the
-  English keys live in [`packages/i18n/src/en.json`](../packages/i18n/src/en.json)).
+  [`packages/platform/i18n/src/it.json`](../packages/platform/i18n/src/it.json) (the
+  English keys live in [`packages/platform/i18n/src/en.json`](../packages/platform/i18n/src/en.json)).
 - Fixing an `eslint`-flagged violation in a small file.
 
 Avoid for a first PR: schema migrations, billing surfaces, AI

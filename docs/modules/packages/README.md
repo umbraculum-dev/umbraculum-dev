@@ -25,20 +25,20 @@ Horizontal packages must stay industry-agnostic ([RFC-0002 §4](../../rfcs/0002-
 
 | Package | Role | README |
 |---|---|---|
-| `@umbraculum/module-sdk` | Module registration spine — `registerModule()`, reserved codes, `ValidatedSchema<T>`, web/native registration helpers | [`packages/module-sdk/README.md`](../../../packages/module-sdk/README.md) |
-| `@umbraculum/ai-tool-sdk` | AI tool contract types (`AiTool`, scopes, registry) | [`packages/ai-tool-sdk/README.md`](../../../packages/ai-tool-sdk/README.md) |
-| `@umbraculum/i18n-keys` | Module message-key conventions (`ModuleNavLabelKey`, reserved roots) | [`packages/i18n-keys/README.md`](../../../packages/i18n-keys/README.md) |
-| `@umbraculum/contracts` | Platform-wide auth/me and shared API wire DTOs | [`packages/contracts/README.md`](../../../packages/contracts/README.md) |
-| `@umbraculum/api-client` | HTTP client — cookie auth (web), bearer auth (native), render-job helpers | [`packages/api-client/README.md`](../../../packages/api-client/README.md) |
-| `@umbraculum/i18n` | Cross-platform message catalog (`en`, `it`) | [`packages/i18n/README.md`](../../../packages/i18n/README.md) |
-| `@umbraculum/i18n-react` | Universal `useT()` for React + React Native | [`packages/i18n-react/README.md`](../../../packages/i18n-react/README.md) |
-| `@umbraculum/ui` | Tamagui design-system primitives (web + native) | [`packages/ui/README.md`](../../../packages/ui/README.md) |
-| `@umbraculum/navigation` | Route IDs and cross-platform availability policy | [`packages/navigation/README.md`](../../../packages/navigation/README.md) |
-| `@umbraculum/media` | Shared asset URLs and sync helpers | [`packages/media/README.md`](../../../packages/media/README.md) |
-| `@umbraculum/rendering` | Document rendering pipeline ([RFC-0007](../../rfcs/0007-canonical-document-rendering.md)) | [`packages/rendering/README.md`](../../../packages/rendering/README.md) |
-| `@umbraculum/test-mcp` | Test-MCP HTTP server (developer tooling) | [`packages/test-mcp/README.md`](../../../packages/test-mcp/README.md) |
+| `@umbraculum/module-sdk` | Module registration spine — `registerModule()`, reserved codes, `ValidatedSchema<T>`, web/native registration helpers | [`packages/modules/module-sdk/README.md`](../../../packages/modules/module-sdk/README.md) |
+| `@umbraculum/ai-tool-sdk` | AI tool contract types (`AiTool`, scopes, registry) | [`packages/modules/ai-tool-sdk/README.md`](../../../packages/modules/ai-tool-sdk/README.md) |
+| `@umbraculum/i18n-keys` | Module message-key conventions (`ModuleNavLabelKey`, reserved roots) | [`packages/modules/i18n-keys/README.md`](../../../packages/modules/i18n-keys/README.md) |
+| `@umbraculum/contracts` | Platform-wide auth/me and shared API wire DTOs | [`packages/platform/contracts/README.md`](../../../packages/platform/contracts/README.md) |
+| `@umbraculum/api-client` | HTTP client — cookie auth (web), bearer auth (native), render-job helpers | [`packages/platform/api-client/README.md`](../../../packages/platform/api-client/README.md) |
+| `@umbraculum/i18n` | Cross-platform message catalog (`en`, `it`) | [`packages/platform/i18n/README.md`](../../../packages/platform/i18n/README.md) |
+| `@umbraculum/i18n-react` | Universal `useT()` for React + React Native | [`packages/platform/i18n-react/README.md`](../../../packages/platform/i18n-react/README.md) |
+| `@umbraculum/ui` | Tamagui design-system primitives (web + native) | [`packages/platform/ui/README.md`](../../../packages/platform/ui/README.md) |
+| `@umbraculum/navigation` | Route IDs and cross-platform availability policy | [`packages/platform/navigation/README.md`](../../../packages/platform/navigation/README.md) |
+| `@umbraculum/media` | Shared asset URLs and sync helpers | [`packages/platform/media/README.md`](../../../packages/platform/media/README.md) |
+| `@umbraculum/rendering` | Document rendering pipeline ([RFC-0007](../../rfcs/0007-canonical-document-rendering.md)) | [`packages/platform/rendering/README.md`](../../../packages/platform/rendering/README.md) |
+| `@umbraculum/test-mcp` | Test-MCP HTTP server (developer tooling) | [`packages/platform/test-mcp/README.md`](../../../packages/platform/test-mcp/README.md) |
 
-**Worked examples for new horizontal packages:** [`@umbraculum/i18n`](../../../packages/i18n/README.md) and [`@umbraculum/ui`](../../../packages/ui/README.md) READMEs; consumption-contract checklist shape in [RFC-0007 §9](../../rfcs/0007-canonical-document-rendering.md) for `@umbraculum/rendering`.
+**Worked examples for new horizontal packages:** [`@umbraculum/i18n`](../../../packages/platform/i18n/README.md) and [`@umbraculum/ui`](../../../packages/platform/ui/README.md) READMEs; consumption-contract checklist shape in [RFC-0007 §9](../../rfcs/0007-canonical-document-rendering.md) for `@umbraculum/rendering`.
 
 ---
 
@@ -48,10 +48,10 @@ These are the **stable npm surfaces** third-party adapters and integrators pin. 
 
 | Package | Canonical | README |
 |---|---|---|
-| `@umbraculum/automation-contracts` | `automation` | [`packages/automation-contracts/README.md`](../../../packages/automation-contracts/README.md) |
-| `@umbraculum/pim-contracts` | `pim` | [`packages/pim-contracts/README.md`](../../../packages/pim-contracts/README.md) |
-| `@umbraculum/mrp-contracts` | `mrp` | [`packages/mrp-contracts/README.md`](../../../packages/mrp-contracts/README.md) |
-| `@umbraculum/crp-contracts` | `crp` | [`packages/crp-contracts/README.md`](../../../packages/crp-contracts/README.md) |
+| `@umbraculum/automation-contracts` | `automation` | [`packages/modules/automation-contracts/README.md`](../../../packages/modules/automation-contracts/README.md) |
+| `@umbraculum/pim-contracts` | `pim` | [`packages/modules/pim-contracts/README.md`](../../../packages/modules/pim-contracts/README.md) |
+| `@umbraculum/mrp-contracts` | `mrp` | [`packages/modules/mrp-contracts/README.md`](../../../packages/modules/mrp-contracts/README.md) |
+| `@umbraculum/crp-contracts` | `crp` | [`packages/modules/crp-contracts/README.md`](../../../packages/modules/crp-contracts/README.md) |
 
 Open-door canonicals (`wms`, `crm`) will gain `<code>-contracts` packages when their read paths ship.
 
@@ -63,9 +63,9 @@ Open-door canonicals (`wms`, `crm`) will gain `<code>-contracts` packages when t
 
 | Package | Role | README |
 |---|---|---|
-| `@umbraculum/brewery-core` | Gravity, unit conversion, mash pH helpers | [`packages/core/README.md`](../../../packages/core/README.md) |
-| `@umbraculum/brewery-beerjson` | BeerJSON types and editor-row converters | [`packages/beerjson/README.md`](../../../packages/beerjson/README.md) |
-| `@umbraculum/brewery-recipes-ui` | Recipe / water / yeast Tamagui editors | [`packages/recipes-ui/README.md`](../../../packages/recipes-ui/README.md) |
+| `@umbraculum/brewery-core` | Gravity, unit conversion, mash pH helpers | [`packages/verticals/brewery/core/README.md`](../../../packages/verticals/brewery/core/README.md) |
+| `@umbraculum/brewery-beerjson` | BeerJSON types and editor-row converters | [`packages/verticals/brewery/beerjson/README.md`](../../../packages/verticals/brewery/beerjson/README.md) |
+| `@umbraculum/brewery-recipes-ui` | Recipe / water / yeast Tamagui editors | [`packages/verticals/brewery/recipes-ui/README.md`](../../../packages/verticals/brewery/recipes-ui/README.md) |
 
 Future verticals use their own prefix (`@umbraculum/distillery-*`, etc.) per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md).
 

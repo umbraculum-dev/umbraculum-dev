@@ -4,7 +4,7 @@
 **Status:** As-built post-implementation 2026-05-20; updated by RFC-0007 PR7 channel-feed rendering work and PIM Phase E read/write work (Phase A + B + C + D-integration-test-Option-B landed in one tranche per [`docs/design/canonical-pim-build-log.md`](canonical-pim-build-log.md); core team approval implicit via solo-dev internal-alpha project posture per [`MANIFESTO.md`](../../MANIFESTO.md) §1.2)<br>
 **Audience:** core team, PIM-vertical maintainers, future commerce / channel-feed implementors, module SDK authors  
 **Resolves:** [RFC-0004](../rfcs/0004-canonical-pim.md) §7 ("Phase A delivers contracts; Phase B delivers read path; Phase C delivers web admin; surface doc lands post-implementation")  
-**Builds on:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md), [RFC-0003](../rfcs/0003-validation-library-adoption.md), [RFC-0004](../rfcs/0004-canonical-pim.md), [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.4, §6, [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md), [`docs/design/canonical-automation-module-surface.md`](canonical-automation-module-surface.md) (sibling template)
+**Builds on:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md), [RFC-0003](../rfcs/0003-validation-library-adoption.md), [RFC-0004](../rfcs/0004-canonical-pim.md), [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.4, §6, [`packages/modules/module-sdk/README.md`](../../packages/modules/module-sdk/README.md), [`docs/design/canonical-automation-module-surface.md`](canonical-automation-module-surface.md) (sibling template)
 
 > **Disclaimer.** Documents the as-built shape of canonical `pim` after the Phase A+B+C+D tranche. Does not allocate the canonical code (RFC-0004 did that), does not change licenses, and does not pre-commit any other canonical module's shape. The "Open work" section explicitly distinguishes "done" from "deferred" from "queued tech debt" — read it before assuming any expected surface is already shipped.
 
@@ -16,7 +16,7 @@
 
 | Layer | β-layout location | Shipped today |
 |---|---|---|
-| Contracts | [`packages/pim-contracts/`](../../packages/pim-contracts/) | `CONTRACT_VERSION 0.1.0-alpha.1`, 6 entity-family Zod schemas (Product, Variant, AttributeSet, Attribute, Category, MediaAssetRef), create/update request schemas, response envelopes, delete envelope |
+| Contracts | [`packages/modules/pim-contracts/`](../../packages/modules/pim-contracts/) | `CONTRACT_VERSION 0.1.0-alpha.1`, 6 entity-family Zod schemas (Product, Variant, AttributeSet, Attribute, Category, MediaAssetRef), create/update request schemas, response envelopes, delete envelope |
 | API | [`services/api/src/modules/pim/`](../../services/api/src/modules/pim/) | `registerPimModule(app)`, 6 workspace-scoped services, read/write routes for all six entity families, 1 channel-feed job route (`POST /pim/channel-feeds/product-catalog-csv/jobs`) |
 | AI tools | [`services/api/src/services/ai/tools/pim/`](../../services/api/src/services/ai/tools/pim/) | 4 read-only tools (`pim.searchProducts`, `pim.getProductDetail`, `pim.listCategories`, `pim.listAttributeSets`) registered alongside brewery + automation tools |
 | Web admin | [`apps/web/app/[locale]/(pim)/`](../../apps/web/app/%5Blocale%5D/%28pim%29/) | 5 Tamagui pages (product list/create at `/en/products`, product detail at `/en/products/<id>`, categories tree at `/en/categories`, attribute-set list at `/en/attribute-sets`, attribute-set detail at `/en/attribute-sets/<id>`), `pim.*` i18n namespace (en + it). Aligned with Week-1 audit (RFC-0006 + [`web-route-group-audit.md`](web-route-group-audit.md)). |
@@ -79,7 +79,7 @@ PIM and `automation` are sibling canonicals with **zero shared schema**. The arc
 
 ## 4. As-built surface — Phase A contracts
 
-[`packages/pim-contracts/`](../../packages/pim-contracts/) — Zod-only contracts package, MIT-licensed, ESM+CJS dual emit per [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md) Decision C.
+[`packages/modules/pim-contracts/`](../../packages/modules/pim-contracts/) — Zod-only contracts package, MIT-licensed, ESM+CJS dual emit per [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md) Decision C.
 
 Public exports (six surface families):
 
@@ -207,7 +207,7 @@ Registered in `app.ts` alongside brewery + automation tools — see Phase D §"i
 | Attribute-set list | `/{locale}/attribute-sets` | `(pim)/attribute-sets/page.tsx` |
 | Attribute-set detail | `/{locale}/attribute-sets/{setId}` | `(pim)/attribute-sets/[setId]/page.tsx` |
 
-i18n namespace: `pim.*` in [`packages/i18n/src/en.json`](../../packages/i18n/src/en.json) and [`packages/i18n/src/it.json`](../../packages/i18n/src/it.json), dist artifacts rebuilt.
+i18n namespace: `pim.*` in [`packages/platform/i18n/src/en.json`](../../packages/platform/i18n/src/en.json) and [`packages/platform/i18n/src/it.json`](../../packages/platform/i18n/src/it.json), dist artifacts rebuilt.
 
 **Closed (Week 1 audit) — route-group layout aligned.** The original directory was `pim/` (URL-axis) rather than the canonical `(pim)/` route-group convention. Both that and the `(automation)/` reference's group-root `page.tsx` collision were resolved by the Week-1 audit ([`web-route-group-audit.md`](web-route-group-audit.md)) + [RFC-0006](../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md). Current state: PIM lives at `(pim)/` with three static sub-segments owned via `registerWebModule({ ownedUrlSegments: ["products", "categories", "attribute-sets"] })`; automation lives at `(automation)/vessels/` (no group-root page, no group-root dynamic segment) with `ownedUrlSegments: ["vessels"]`. The two β disciplines (no `(<code>)/page.tsx`, no `(<code>)/[<dynamic>]/page.tsx` at the group root) are enforced by `scripts/check-web-url-segments.ts` in CI.
 
@@ -253,11 +253,11 @@ PIM Phase E wires `POST/PATCH/DELETE` for all six entity families and adds a min
 
 **Partially shipped by RFC-0007 PR7.** The first feed is vendor-neutral `pim:product-catalog-csv@v1`, submitted via `POST /pim/channel-feeds/product-catalog-csv/jobs` and rendered through the canonical rendering pipeline.
 
-Vendor-specific storefront / marketplace projections are still out of scope. When they land, they belong in either a sibling commerce canonical (preferred) or a `pim-feeds/` submodule — **not** inside `packages/pim-contracts/` (which must stay vendor-agnostic).
+Vendor-specific storefront / marketplace projections are still out of scope. When they land, they belong in either a sibling commerce canonical (preferred) or a `pim-feeds/` submodule — **not** inside `packages/modules/pim-contracts/` (which must stay vendor-agnostic).
 
 ### 8.4 Nav-menu entry — CLOSED
 
-PIM now carries a "Products" entry in [`apps/web/app/_components/PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) (`href: "/products"`, `label: t("pim")`) wired in by the Week-1 audit (RFC-0006 Phase 5). The audit also added the `nav.pim` translation key to `packages/i18n/src/{en,it}.json`. Adding the nav entry was deferred at PIM Phase C only because the route-group shape was still in flux; with the audit closed, the entry is in place.
+PIM now carries a "Products" entry in [`apps/web/app/_components/PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) (`href: "/products"`, `label: t("pim")`) wired in by the Week-1 audit (RFC-0006 Phase 5). The audit also added the `nav.pim` translation key to `packages/platform/i18n/src/{en,it}.json`. Adding the nav entry was deferred at PIM Phase C only because the route-group shape was still in flux; with the audit closed, the entry is in place.
 
 ### 8.5 Cross-module FK columns to other canonicals
 
@@ -291,7 +291,7 @@ When `mrp`, `wms`, or `crm` land, they will need columns referencing `pim.produc
 - [RFC-0004](../rfcs/0004-canonical-pim.md) — canonical PIM allocation, phasing, YAGNI-stretch rationale.
 - [`docs/design/canonical-automation-module-surface.md`](canonical-automation-module-surface.md) — sibling surface doc; structural template for this one.
 - [`docs/design/canonical-pim-build-log.md`](canonical-pim-build-log.md) — implementation log (executor, model, timing, gate-skill outputs, lessons learned).
-- [`packages/pim-contracts/`](../../packages/pim-contracts/) — Phase A contracts.
+- [`packages/modules/pim-contracts/`](../../packages/modules/pim-contracts/) — Phase A contracts.
 - [`services/api/src/modules/pim/`](../../services/api/src/modules/pim/) — Phase B API slice.
 - [`apps/web/app/[locale]/pim/`](../../apps/web/app/%5Blocale%5D/pim/) — Phase C web admin.
 - [`services/api/src/tests/pimBreweryIntegration.test.ts`](../../services/api/src/tests/pimBreweryIntegration.test.ts) — Phase D integration test.

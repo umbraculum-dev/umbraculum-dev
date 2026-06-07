@@ -18,7 +18,7 @@ on:
     branches: [master]
     paths:
       - "apps/web/app/**"
-      - "packages/module-sdk/**"
+      - "packages/modules/module-sdk/**"
       - "scripts/check-web-url-segments.ts"
       - ".github/workflows/check-web-url-segments.yml"
       - "package.json"
@@ -27,7 +27,7 @@ on:
     branches: [master]
     paths:
       - "apps/web/app/**"
-      - "packages/module-sdk/**"
+      - "packages/modules/module-sdk/**"
       - "scripts/check-web-url-segments.ts"
       - ".github/workflows/check-web-url-segments.yml"
       - "package.json"

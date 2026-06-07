@@ -31,7 +31,7 @@
 No live production API keys found in tracked TS/JS/YML. Expected dev-only values:
 
 - `docker-compose.yml` — `postgres` / `pgpooladmin` passwords (local dev)
-- `packages/i18n` — `sk-ant-…` placeholder string for BYOK UI
+- `packages/platform/i18n` — `sk-ant-…` placeholder string for BYOK UI
 - `services/api/src/tests` — `sk-ant-test-1` test fixture
 
 **Maintainer still required:** gitleaks / trufflehog history scan (checklist 2.2).

@@ -1,4 +1,4 @@
-# PR 1 (packages/contracts → Zod) — migration handoff
+# PR 1 (packages/platform/contracts → Zod) — migration handoff
 
 **Tier:** Internal
 **Status:** In progress — worked example landed; remaining 4 parsers + tests scheduled for next session under container access.
@@ -15,16 +15,16 @@ PR 1 has a scope envelope of ~50 file changes (5 parser source files + 5 test fi
 
 | Artifact | Status |
 |---|---|
-| `packages/contracts/package.json` — added `zod: ^4.3.6` dependency | Landed |
-| `packages/contracts/src/auth/meResponse.ts` — full Zod v4 migration (worked example, behavior-preserving via preprocess + per-field soft transforms) | Landed |
-| `packages/contracts/src/auth/meResponse.test.ts` — rewritten assertions via `ZodError` + `expectFirstIssuePathStartsWith` helper; behavior tests preserved 1:1 | Landed |
+| `packages/platform/contracts/package.json` — added `zod: ^4.3.6` dependency | Landed |
+| `packages/platform/contracts/src/auth/meResponse.ts` — full Zod v4 migration (worked example, behavior-preserving via preprocess + per-field soft transforms) | Landed |
+| `packages/platform/contracts/src/auth/meResponse.test.ts` — rewritten assertions via `ZodError` + `expectFirstIssuePathStartsWith` helper; behavior tests preserved 1:1 | Landed |
 | `eslint.config.mjs` — added `no-restricted-syntax` rule for `packages/*-contracts/**/*.{ts,tsx}` forbidding hand-rolled `function isX(v: unknown): v is X` drift | Landed |
 | `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` — rewritten from "do NOT introduce Zod" to "Zod v4 is the project's strategy", with library-agnostic SDK interface + backward-compat tunnel + soft-tolerance patterns documented | Landed |
 
 ## Mandatory prep before any consumer-side verification (containerized rebuild)
 
 > [!IMPORTANT]
-> Hit this gotcha during the 2026-05-19 Phase B-2 boot-fail incident — committed `packages/*/dist/**` is the contract surface that consumers actually import, NOT `packages/*/src/**`. Any time `packages/contracts/src/**` (or any other workspace package's `src/`) gains a new export, the committed `dist/` MUST be regenerated before downstream containers (api, web, native) can resolve the new symbol.
+> Hit this gotcha during the 2026-05-19 Phase B-2 boot-fail incident — committed `packages/*/dist/**` is the contract surface that consumers actually import, NOT `packages/*/src/**`. Any time `packages/platform/contracts/src/**` (or any other workspace package's `src/`) gains a new export, the committed `dist/` MUST be regenerated before downstream containers (api, web, native) can resolve the new symbol.
 
 After completing each parser migration (or batching 2–3) and BEFORE restarting the `api` / `web` containers to verify, do BOTH of these in order:
 
@@ -46,14 +46,14 @@ After completing each parser migration (or batching 2–3) and BEFORE restarting
 
 | File | Action | Pattern |
 |---|---|---|
-| `packages/contracts/src/water/waterProfile.ts` | Migrate `parseWaterProfile` + `parseWaterProfilesResponse` to Zod schemas | Mirror `meResponse.ts` pattern. Preserve dual-key tunnel (`workspace ↔ account`, `workspaceId ↔ accountId`). Preserve soft defaults (scope/type/verificationStatus fall back; missing ions default to 0; non-string ph collapses to undefined). |
-| `packages/contracts/src/water/waterProfile.test.ts` | Rewrite assertions to use `expectFirstIssuePathStartsWith` helper | Mirror `meResponse.test.ts`. Behavior tests preserved 1:1. Phase 4b regression-pin (`account → workspace` legacy key) MUST be preserved. |
-| `packages/contracts/src/analysis/parseGravityAnalysis.ts` | Migrate `parseGravityAnalysisResponseV1` + helpers (`parseCanonicalModels`, `parseNumberFormatHintV1`, `parseDerivationLineValue`, `parseDerivation`) | Discriminated unions: use `z.discriminatedUnion("kind", [...])` for `WaterCalcDerivationValue` (number/string/boolean/null variants). Drop-on-error semantics for invalid `derivations[k]` / `formatHints[k]` entries → preserve via per-entry `safeParse` in a thin wrapper, not as part of the top-level schema. |
-| `packages/contracts/src/analysis/parseGravityAnalysis.test.ts` | Rewrite assertions | Mirror `meResponse.test.ts` pattern. |
-| `packages/contracts/src/water/parseComputeAndSave.ts` | Migrate 3 top-level parsers (`parseMashComputeAndSaveResponse`, `parseSpargeComputeAndSaveResponse`, `parseBoilComputeAndSaveResponse`) + ~12 helper parsers (`parseIonProfilePpm`, `parseAcidificationResult`, `parseAcidificationManualResult`, `parseMashTargetMashPhResult`, `parseSaltAdditionsResult`, `parseOverallResult`, `parseMashAcidBlock`, `parseSpargeAcidBlock`, `parseBoilAcidBlock`, `parseDerivation`, `parseDerivationLine`, `parseDerivationValue`) | Largest file in the migration (387 LoC). The spike at `spike/validation-library/zod/parse-mash-acid-block.ts` is the working template for the discriminated-union pattern. The 3 acid-block discriminated unions (mash/sparge/boil) share `WaterAcidificationManualResultSchema` and `WaterAcidificationResultSchema` — extract these as module-level constants, do not re-inline per variant. |
-| `packages/contracts/src/water/parseComputeAndSave.test.ts` | Rewrite assertions | Largest test file in the migration. Likely 80+ assertion sites. |
-| `packages/contracts/src/water/parseHubSummary.ts` | Migrate `parseRecipeWaterHubSummaryResponse` + helpers (`parseIonProfilePpm`, `parseExpectedRaRange`, `parseStream`) | The stream-array helpers drop invalid entries silently (`filter(Boolean)` after `parseStream`). Preserve via per-entry `safeParse` + filter, not via top-level schema. |
-| `packages/contracts/src/water/parseHubSummary.test.ts` | Rewrite assertions | Mirror `meResponse.test.ts` pattern. |
+| `packages/platform/contracts/src/water/waterProfile.ts` | Migrate `parseWaterProfile` + `parseWaterProfilesResponse` to Zod schemas | Mirror `meResponse.ts` pattern. Preserve dual-key tunnel (`workspace ↔ account`, `workspaceId ↔ accountId`). Preserve soft defaults (scope/type/verificationStatus fall back; missing ions default to 0; non-string ph collapses to undefined). |
+| `packages/platform/contracts/src/water/waterProfile.test.ts` | Rewrite assertions to use `expectFirstIssuePathStartsWith` helper | Mirror `meResponse.test.ts`. Behavior tests preserved 1:1. Phase 4b regression-pin (`account → workspace` legacy key) MUST be preserved. |
+| `packages/platform/contracts/src/analysis/parseGravityAnalysis.ts` | Migrate `parseGravityAnalysisResponseV1` + helpers (`parseCanonicalModels`, `parseNumberFormatHintV1`, `parseDerivationLineValue`, `parseDerivation`) | Discriminated unions: use `z.discriminatedUnion("kind", [...])` for `WaterCalcDerivationValue` (number/string/boolean/null variants). Drop-on-error semantics for invalid `derivations[k]` / `formatHints[k]` entries → preserve via per-entry `safeParse` in a thin wrapper, not as part of the top-level schema. |
+| `packages/platform/contracts/src/analysis/parseGravityAnalysis.test.ts` | Rewrite assertions | Mirror `meResponse.test.ts` pattern. |
+| `packages/platform/contracts/src/water/parseComputeAndSave.ts` | Migrate 3 top-level parsers (`parseMashComputeAndSaveResponse`, `parseSpargeComputeAndSaveResponse`, `parseBoilComputeAndSaveResponse`) + ~12 helper parsers (`parseIonProfilePpm`, `parseAcidificationResult`, `parseAcidificationManualResult`, `parseMashTargetMashPhResult`, `parseSaltAdditionsResult`, `parseOverallResult`, `parseMashAcidBlock`, `parseSpargeAcidBlock`, `parseBoilAcidBlock`, `parseDerivation`, `parseDerivationLine`, `parseDerivationValue`) | Largest file in the migration (387 LoC). The spike at `spike/validation-library/zod/parse-mash-acid-block.ts` is the working template for the discriminated-union pattern. The 3 acid-block discriminated unions (mash/sparge/boil) share `WaterAcidificationManualResultSchema` and `WaterAcidificationResultSchema` — extract these as module-level constants, do not re-inline per variant. |
+| `packages/platform/contracts/src/water/parseComputeAndSave.test.ts` | Rewrite assertions | Largest test file in the migration. Likely 80+ assertion sites. |
+| `packages/platform/contracts/src/water/parseHubSummary.ts` | Migrate `parseRecipeWaterHubSummaryResponse` + helpers (`parseIonProfilePpm`, `parseExpectedRaRange`, `parseStream`) | The stream-array helpers drop invalid entries silently (`filter(Boolean)` after `parseStream`). Preserve via per-entry `safeParse` + filter, not via top-level schema. |
+| `packages/platform/contracts/src/water/parseHubSummary.test.ts` | Rewrite assertions | Mirror `meResponse.test.ts` pattern. |
 
 ## Per-file migration checklist (use for each of the 4 remaining files)
 
@@ -73,7 +73,7 @@ After completing each parser migration (or batching 2–3) and BEFORE restarting
    rg 'parseAuthMeResponse|parseWaterProfileItem|parseWaterProfilesResponse|parseGravityAnalysisResponseV1|parseMashComputeAndSaveResponse|parseSpargeComputeAndSaveResponse|parseBoilComputeAndSaveResponse|parseRecipeWaterHubSummaryResponse' apps/
    ```
    Call sites continue to work unchanged because `parseX(unknown): X` signature is preserved. If a consumer accesses error details (`catch (e) { if (e.message.includes(...)) ...}`), update it to `if (e instanceof ZodError) { e.issues[0].path... }`.
-6. Run `npm run typecheck` (container) and `npm run test` (container) inside `packages/contracts`. Fix any issues surfaced.
+6. Run `npm run typecheck` (container) and `npm run test` (container) inside `packages/platform/contracts`. Fix any issues surfaced.
 7. Run `npm run lint` (container) at repo root to verify the new lint rule doesn't false-positive on remaining hand-rolled type-guards in unmigrated areas. If false-positive, scope the rule down or add per-file disable comments.
 
 ## Container session checklist
@@ -84,7 +84,7 @@ Before merging PR 1:
 # In api/node container (see DEVELOPMENT.md):
 cd /workspace
 npm install                             # installs zod ^4.3.6
-cd packages/contracts
+cd packages/platform/contracts
 npm run typecheck                       # confirms all 5 parser files type-clean
 npm run test                            # confirms 38 → ~40 tests green (test count grows slightly because the worked example added schema-export smoke tests)
 cd /workspace

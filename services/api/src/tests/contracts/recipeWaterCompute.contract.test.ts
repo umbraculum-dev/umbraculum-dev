@@ -10,7 +10,7 @@
  * result on the corresponding water-calc page.
  *
  * These three endpoints already have COMPANION L1 PARSER TESTS at
- * `packages/contracts/src/water/parseComputeAndSave.test.ts` covering
+ * `packages/platform/contracts/src/water/parseComputeAndSave.test.ts` covering
  * `parseMashComputeAndSaveResponse`, `parseSpargeComputeAndSaveResponse`,
  * and `parseBoilComputeAndSaveResponse`. The L4 snapshots here pin the
  * WIRE SHAPE those parsers consume, closing the L1+L4 alignment for the

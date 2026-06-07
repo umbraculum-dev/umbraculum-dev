@@ -7,7 +7,7 @@ Canonical `mrp` API slice for Wave 1.
 
 ## What this is
 
-The API companion to [`@umbraculum/mrp-contracts`](../../../../../packages/mrp-contracts/README.md) and the public [canonical MRP surface design](../../../../../docs/design/canonical-mrp-module-surface.md).
+The API companion to [`@umbraculum/mrp-contracts`](../../../../../packages/modules/mrp-contracts/README.md) and the public [canonical MRP surface design](../../../../../docs/design/canonical-mrp-module-surface.md).
 
 ## Routes
 

@@ -6,7 +6,7 @@ import { getRecipe } from "@umbraculum/api-client/brewery";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { ManualCellCountHelpBox, RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
-import { isMediaAssetKey } from "@umbraculum/media";
+import { isMediaAssetKey } from "@umbraculum/brewery-media-assets";
 
 import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";

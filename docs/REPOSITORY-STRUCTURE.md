@@ -4,7 +4,7 @@
 **Status:** v0.1 — first iteration 2026-05-20 (living document; updated as new workspaces, modules, or vertical configurations land)
 **Audience:** new contributors, evaluators preparing to adopt Umbraculum as an operational dependency, prospective module developers, future maintainers running an orientation pass.
 **Owners:** maintainers
-**Related:** [`GLOSSARY.md`](GLOSSARY.md) (onboarding terminology — *vertical*, *canonical*, brewery reference vertical), [`MODULES.md`](MODULES.md) (ecosystem vocabulary + catalog + decision tree), [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §3 (current-state audit) + §4 (target architecture), [`rfcs/0002-canonical-module-physical-layout.md`](rfcs/0002-canonical-module-physical-layout.md) (the authoritative β-layout commitment), [`packages/module-sdk/README.md`](../packages/module-sdk/README.md) (what the SDK is *not* — where module code actually lives).
+**Related:** [`GLOSSARY.md`](GLOSSARY.md) (onboarding terminology — *vertical*, *canonical*, brewery reference vertical), [`MODULES.md`](MODULES.md) (ecosystem vocabulary + catalog + decision tree), [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §3 (current-state audit) + §4 (target architecture), [`rfcs/0002-canonical-module-physical-layout.md`](rfcs/0002-canonical-module-physical-layout.md) (the authoritative β-layout commitment), [`packages/modules/module-sdk/README.md`](../packages/modules/module-sdk/README.md) (what the SDK is *not* — where module code actually lives).
 
 > [!NOTE]
 > Part of [Umbraculum](../README.md) — an open-source toolset for building workspace-shaped operational applications. This doc is the **spatial map** of the monorepo: an inventory of every workspace + which layer it sits in + what depends on it. It complements [`MODULES.md`](MODULES.md) (which is the *ecosystem* view) and [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) (which is the *architectural* view).
@@ -79,14 +79,14 @@ Industry-agnostic. No module knowledge. Consumed by every app and the API servic
 
 | Path | npm name | Role |
 |---|---|---|
-| `packages/ui/` | `@umbraculum/ui` | Cross-platform UI primitive layer built on Tamagui — design tokens, platform-forking primitives (Button/Input/BrewCheckbox), AI chat panel, hydrometer chart. **The package that makes "native out of the box" work** — one component tree, real DOM on web, real React Native on device. |
-| `packages/navigation/` | `@umbraculum/navigation` | Cross-platform routing-policy framework — route ID system, RouteRef type, web/native target mappers. Framework-agnostic (does not import React Navigation or Next.js types). |
-| `packages/i18n/` | `@umbraculum/i18n` | Generic locale-bundle framework — JSON message catalogs + copy-json build step. Current content is brewery-flavored; content split deferred per sub-plan #9 §1.4. |
-| `packages/i18n-react/` | `@umbraculum/i18n-react` | React + next-intl bindings — the universal `useTranslator` hook used by both web and native. Dual entry points (default + `./next-intl`). |
-| `packages/api-client/` | `@umbraculum/api-client` | Typed fetch + auth boundary — cookie sessions on web, bearer tokens on native, runtime-validated payloads from `@umbraculum/contracts`. |
-| `packages/media/` | `@umbraculum/media` | Shared media assets framework (manifest + asset loader). Asset content is currently brewery-flavored; content split deferred to second-vertical landing. |
-| `packages/test-mcp/` | `@umbraculum/test-mcp` | Small HTTP server exposing testing tools (smoke / seed / vitest / Playwright / contracts) for Cursor MCP and shell consumers. Developer tooling, not runtime. |
-| [`packages/rendering/`](../packages/rendering/README.md) | `@umbraculum/rendering` | Centralized document / file rendering pipeline: Gotenberg sidecar for HTML→PDF + DOCX/ODT→PDF; in-process exceljs / fast-csv / bwip-js / xmlbuilder2; eta + MJML template engines; async-via-BullMQ on existing Redis. Industry-agnostic. Allocated by [RFC-0007](rfcs/0007-canonical-document-rendering.md); RFC-0007 PR1-PR7 have landed the package scaffold, engine adapters, job-runner wiring, sync BeerJSON proof, platform `render_document` AI tool, and the first async PIM channel-feed consumer. |
+| `packages/platform/ui/` | `@umbraculum/ui` | Cross-platform UI primitive layer built on Tamagui — design tokens, platform-forking primitives (Button/Input/BrewCheckbox), AI chat panel, hydrometer chart. **The package that makes "native out of the box" work** — one component tree, real DOM on web, real React Native on device. |
+| `packages/platform/navigation/` | `@umbraculum/navigation` | Cross-platform routing-policy framework — route ID system, RouteRef type, web/native target mappers. Framework-agnostic (does not import React Navigation or Next.js types). |
+| `packages/platform/i18n/` | `@umbraculum/i18n` | Generic locale-bundle framework — JSON message catalogs + copy-json build step. Current content is brewery-flavored; content split deferred per sub-plan #9 §1.4. |
+| `packages/platform/i18n-react/` | `@umbraculum/i18n-react` | React + next-intl bindings — the universal `useTranslator` hook used by both web and native. Dual entry points (default + `./next-intl`). |
+| `packages/platform/api-client/` | `@umbraculum/api-client` | Typed fetch + auth boundary — cookie sessions on web, bearer tokens on native, runtime-validated payloads from `@umbraculum/contracts`. |
+| `packages/platform/media/` | `@umbraculum/media` | Shared media assets framework (manifest + asset loader). Asset content is currently brewery-flavored; content split deferred to second-vertical landing. |
+| `packages/platform/test-mcp/` | `@umbraculum/test-mcp` | Small HTTP server exposing testing tools (smoke / seed / vitest / Playwright / contracts) for Cursor MCP and shell consumers. Developer tooling, not runtime. |
+| [`packages/platform/rendering/`](../packages/platform/rendering/README.md) | `@umbraculum/rendering` | Centralized document / file rendering pipeline: Gotenberg sidecar for HTML→PDF + DOCX/ODT→PDF; in-process exceljs / fast-csv / bwip-js / xmlbuilder2; eta + MJML template engines; async-via-BullMQ on existing Redis. Industry-agnostic. Allocated by [RFC-0007](rfcs/0007-canonical-document-rendering.md); RFC-0007 PR1-PR7 have landed the package scaffold, engine adapters, job-runner wiring, sync BeerJSON proof, platform `render_document` AI tool, and the first async PIM channel-feed consumer. |
 
 ### 3.4 Contracts packages (layer 4)
 
@@ -94,18 +94,18 @@ One per module. Typed DTOs, Zod schemas (per [RFC-0003](rfcs/0003-validation-lib
 
 | Path | npm name | Module | Role |
 |---|---|---|---|
-| `packages/contracts/` | `@umbraculum/contracts` | Platform-wide | Auth, workspaces, billing, ads, AI, integrations, webhooks, rendering job shapes, shared format hints. Cross-cutting only — brewery/water/gravity wire types live in `@umbraculum/brewery-contracts` (RFC-0011 Wave 3b). |
-| `packages/brewery-contracts/` | `@umbraculum/brewery-contracts` | `brewery` vertical (tier 6) | Recipe, brew-session, water-chemistry, and gravity-analysis schemas + parsers. RFC-0002 β fourth slice; extracted from platform contracts per RFC-0011 Decision F. |
-| `packages/automation-contracts/` | `@umbraculum/automation-contracts` | `automation` canonical | Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. |
-| `packages/pim-contracts/` | `@umbraculum/pim-contracts` | `pim` canonical | Products, variants, attribute sets, attributes, categories, media asset refs, contract-version handshake. RFC-0004. |
+| `packages/platform/contracts/` | `@umbraculum/contracts` | Platform-wide | Auth, workspaces, billing, ads, AI, integrations, webhooks, rendering job shapes, shared format hints. Cross-cutting only — brewery/water/gravity wire types live in `@umbraculum/brewery-contracts` (RFC-0011 Wave 3b). |
+| `packages/verticals/brewery/contracts/` | `@umbraculum/brewery-contracts` | `brewery` vertical (tier 6) | Recipe, brew-session, water-chemistry, and gravity-analysis schemas + parsers. RFC-0002 β fourth slice; extracted from platform contracts per RFC-0011 Decision F. |
+| `packages/modules/automation-contracts/` | `@umbraculum/automation-contracts` | `automation` canonical | Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. |
+| `packages/modules/pim-contracts/` | `@umbraculum/pim-contracts` | `pim` canonical | Products, variants, attribute sets, attributes, categories, media asset refs, contract-version handshake. RFC-0004. |
 
 ### 3.5 Module SDK (layer 5)
 
 | Path | npm name | Role |
 |---|---|---|
-| `packages/module-sdk/` | `@umbraculum/module-sdk` | The MIT-licensed registration contract: `registerModule()`, `registerWebModule()`, `RESERVED_CANONICAL_MODULE_CODES`, the library-agnostic `ValidatedSchema<T>` interface. **Contract-only — no UI, no Prisma, no native code.** Per-module code lives in the β slices, not in this package — see [`packages/module-sdk/README.md`](../packages/module-sdk/README.md) §"What this SDK is *not*". |
-| `packages/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | The MIT-licensed AI-tool contract: `AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`. **Type-only, zero runtime dependencies, library-agnostic** — third-party tool authors may use any validation library that produces a JSON Schema for `inputSchema`. Extracted from `@umbraculum/contracts` on 2026-05-21 to realize the [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.4 published-SDK surface. |
-| `packages/i18n-keys/` | `@umbraculum/i18n-keys` | The MIT-licensed i18n **key convention** contract: `ModuleNavLabelKey`, `moduleMessageRoot`, `RESERVED_PLATFORM_MESSAGE_ROOTS`, `composeModuleMessageKey`. **Zero locale JSON** — bundles stay in `@umbraculum/i18n`; React bindings in `@umbraculum/i18n-react`. Greenfield package landed 2026-05-27; brewery **content** split remains deferred per brewery-scope-migration §1.4. |
+| `packages/modules/module-sdk/` | `@umbraculum/module-sdk` | The MIT-licensed registration contract: `registerModule()`, `registerWebModule()`, `RESERVED_CANONICAL_MODULE_CODES`, the library-agnostic `ValidatedSchema<T>` interface. **Contract-only — no UI, no Prisma, no native code.** Per-module code lives in the β slices, not in this package — see [`packages/modules/module-sdk/README.md`](../packages/modules/module-sdk/README.md) §"What this SDK is *not*". |
+| `packages/modules/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | The MIT-licensed AI-tool contract: `AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`. **Type-only, zero runtime dependencies, library-agnostic** — third-party tool authors may use any validation library that produces a JSON Schema for `inputSchema`. Extracted from `@umbraculum/contracts` on 2026-05-21 to realize the [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.4 published-SDK surface. |
+| `packages/modules/i18n-keys/` | `@umbraculum/i18n-keys` | The MIT-licensed i18n **key convention** contract: `ModuleNavLabelKey`, `moduleMessageRoot`, `RESERVED_PLATFORM_MESSAGE_ROOTS`, `composeModuleMessageKey`. **Zero locale JSON** — bundles stay in `@umbraculum/i18n`; React bindings in `@umbraculum/i18n-react`. Greenfield package landed 2026-05-27; brewery **content** split remains deferred per brewery-scope-migration §1.4. |
 
 ### 3.6 Vertical-flavored packages (layer 5)
 
@@ -113,9 +113,9 @@ Brewery-vertical packages carry the `@umbraculum/brewery-` prefix per RFC-0002 �
 
 | Path | npm name | Role |
 |---|---|---|
-| `packages/core/` | `@umbraculum/brewery-core` | Brewing-domain math — gravity (OG / FG / ABV / SG↔Plato), water chemistry, brewing-specific unit conversions. Not loaded by non-brewery verticals. The `@umbraculum/core` bare name is reserved for a future platform-core framework package — see sub-plan #9 §1.3 trap-avoidance. |
-| `packages/beerjson/` | `@umbraculum/brewery-beerjson` | BeerJSON adaptation layer — typed BeerJSON wrappers, editor-row helpers, re-exports from `@umbraculum/brewery-core`. |
-| `packages/recipes-ui/` | `@umbraculum/brewery-recipes-ui` | Brewery-vertical domain UI — recipe / mash / water / yeast editors. Cross-platform (web + native) via injected-adapter pattern. Sits one tier above `@umbraculum/ui` (platform-neutral primitives). |
+| `packages/verticals/brewery/core/` | `@umbraculum/brewery-core` | Brewing-domain math — gravity (OG / FG / ABV / SG↔Plato), water chemistry, brewing-specific unit conversions. Not loaded by non-brewery verticals. The `@umbraculum/core` bare name is reserved for a future platform-core framework package — see sub-plan #9 §1.3 trap-avoidance. |
+| `packages/verticals/brewery/beerjson/` | `@umbraculum/brewery-beerjson` | BeerJSON adaptation layer — typed BeerJSON wrappers, editor-row helpers, re-exports from `@umbraculum/brewery-core`. |
+| `packages/verticals/brewery/recipes-ui/` | `@umbraculum/brewery-recipes-ui` | Brewery-vertical domain UI — recipe / mash / water / yeast editors. Cross-platform (web + native) via injected-adapter pattern. Sits one tier above `@umbraculum/ui` (platform-neutral primitives). |
 
 ---
 

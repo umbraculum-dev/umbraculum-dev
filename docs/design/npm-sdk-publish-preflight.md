@@ -13,20 +13,20 @@
 
 | Order | Package | Path | On npm (latest) |
 |-------|---------|------|-----------------|
-| 1 | `@umbraculum/ai-tool-sdk` | `packages/ai-tool-sdk/` | `0.1.1` |
-| 2 | `@umbraculum/i18n-keys` | `packages/i18n-keys/` | `0.1.1` |
-| 3 | `@umbraculum/module-sdk` | `packages/module-sdk/` | `0.0.2` |
-| 4 | `@umbraculum/automation-contracts` | `packages/automation-contracts/` | `0.0.2` |
-| 5 | `@umbraculum/pim-contracts` | `packages/pim-contracts/` | `0.0.2` |
-| 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.2` |
-| 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.2` |
+| 1 | `@umbraculum/ai-tool-sdk` | `packages/modules/ai-tool-sdk/` | `0.1.1` |
+| 2 | `@umbraculum/i18n-keys` | `packages/modules/i18n-keys/` | `0.1.1` |
+| 3 | `@umbraculum/module-sdk` | `packages/modules/module-sdk/` | `0.0.2` |
+| 4 | `@umbraculum/automation-contracts` | `packages/modules/automation-contracts/` | `0.0.2` |
+| 5 | `@umbraculum/pim-contracts` | `packages/modules/pim-contracts/` | `0.0.2` |
+| 6 | `@umbraculum/mrp-contracts` | `packages/modules/mrp-contracts/` | `0.0.2` |
+| 7 | `@umbraculum/crp-contracts` | `packages/modules/crp-contracts/` | `0.0.2` |
 
 **Phase E extension (published 2026-06-02):**
 
 | Order | Package | Path | On npm (latest) |
 |-------|---------|------|-----------------|
-| 8 | `@umbraculum/contracts` | `packages/contracts/` | `0.0.1` — OIDC via `publish-contracts-api-client.yml` → `sdk-contracts-v*` |
-| 9 | `@umbraculum/api-client` | `packages/api-client/` | `0.0.1` — same workflow (deps rewritten at publish time) |
+| 8 | `@umbraculum/contracts` | `packages/platform/contracts/` | `0.0.1` — OIDC via `publish-contracts-api-client.yml` → `sdk-contracts-v*` |
+| 9 | `@umbraculum/api-client` | `packages/platform/api-client/` | `0.0.1` — same workflow (deps rewritten at publish time) |
 
 **Not in npm batch (monorepo-only):** `@umbraculum/ui`, `@umbraculum/i18n`, `@umbraculum/navigation`, `@umbraculum/rendering`, brewery packages, etc.
 

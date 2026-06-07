@@ -30,5 +30,5 @@ Document templates: `pim:product-catalog-csv@v1` renders active products and var
 ## Cross-references
 
 - [RFC-0004](../../../../../docs/rfcs/0004-canonical-pim.md)
-- [`@umbraculum/pim-contracts`](../../../../../packages/pim-contracts/)
+- [`@umbraculum/pim-contracts`](../../../../../packages/modules/pim-contracts/)
 - [`services/api/prisma/schema.prisma`](../../../prisma/schema.prisma) — `pim` schema models

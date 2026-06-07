@@ -53,8 +53,8 @@ Module services under `services/api/src/modules/<code>/services/` use the **shar
 
 ### Web and native
 
-- **Transport:** [`packages/api-client`](../packages/api-client/README.md) — `createApiClient(baseUrl, auth)`
-- **DTOs + runtime parsers:** [`packages/contracts`](../packages/contracts/README.md)
+- **Transport:** [`packages/platform/api-client`](../packages/platform/api-client/README.md) — `createApiClient(baseUrl, auth)`
+- **DTOs + runtime parsers:** [`packages/platform/contracts`](../packages/platform/contracts/README.md)
 - **Auth split:** cookie (`sid`) on web, bearer on native — [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md), [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md) §5
 
 Clients **render and validate**; for server-centralized domains (water chemistry, analysis, …) they do **not** re-implement canonical formulas. See [`CODING-STANDARDS.md`](CODING-STANDARDS.md) (“API centralization guardrails”).
@@ -86,7 +86,7 @@ Brew-day reliability targets **write locally first**, sync when online ([`module
 | `services/api` | Yes | N/A (is the API) |
 | `apps/web`, `apps/native` | **No** | Yes (`@umbraculum/api-client`) |
 | `packages/*-contracts` | **No** | N/A (types + parsers only) |
-| `packages/api-client` | **No** | Yes (implements fetch) |
+| `packages/platform/api-client` | **No** | Yes (implements fetch) |
 | Third-party npm module | **No** | Yes |
 
 ### Client-safe vertical packages (apps/web, apps/native)
@@ -95,8 +95,8 @@ These brewery-vertical packages contain **no Prisma, no `services/api` imports, 
 
 | Package | Role |
 |---|---|
-| `@umbraculum/brewery-beerjson` | BeerJSON adaptation helpers (`packages/beerjson`) |
-| `@umbraculum/brewery-recipes-ui` | Cross-platform recipe/water UI (`packages/recipes-ui`) |
+| `@umbraculum/brewery-beerjson` | BeerJSON adaptation helpers (`packages/verticals/brewery/beerjson`) |
+| `@umbraculum/brewery-recipes-ui` | Cross-platform recipe/water UI (`packages/verticals/brewery/recipes-ui`) |
 
 Allowlist source of truth: [`scripts/eslint/appClientPackageAllowlist.mjs`](../scripts/eslint/appClientPackageAllowlist.mjs). ESLint burn-in: [`docs/design/solid-client-safe-imports-spike.md`](design/solid-client-safe-imports-spike.md) (WS6).
 

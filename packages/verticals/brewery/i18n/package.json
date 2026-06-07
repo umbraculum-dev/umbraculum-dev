@@ -1,0 +1,27 @@
+{
+  "name": "@umbraculum/brewery-i18n",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Brewery-vertical locale bundles (en/it JSON). Merged into app-facing catalogs by @umbraculum/i18n getSharedMessages(); omit when UMBRACULUM_MODULE_PROFILE=platform.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json && node scripts/copy-json.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./en": {
+      "default": "./dist/en.json"
+    },
+    "./it": {
+      "default": "./dist/it.json"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts"
+}

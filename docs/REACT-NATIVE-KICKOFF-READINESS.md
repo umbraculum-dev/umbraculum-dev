@@ -16,7 +16,7 @@ Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMEN
   - `./scripts/build-packages-in-docker.sh`
 - [x] Verify `packages/*/dist/**` reflects the latest source changes (these outputs are committed in this repo).
 
-## Shared UI design system (`packages/ui`)
+## Shared UI design system (`packages/platform/ui`)
 
 - [x] `@umbraculum/ui` exports initial shared primitives (Tamagui-based):
   - `Button`, `Text`, `Heading`, `Card`, `Screen`, `Spinner`
@@ -26,8 +26,8 @@ Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMEN
 ## i18n (no hard-coded strings)
 
 - [x] New user-facing strings are added only to:
-  - `packages/i18n/src/en.json`
-  - `packages/i18n/src/it.json`
+  - `packages/platform/i18n/src/en.json`
+  - `packages/platform/i18n/src/it.json`
 - [x] Native i18n guardrail passes:
   - `npm run i18n:guardrail -w @umbraculum/native` (run in a Node container per repo policy)
 - [x] Native screens use `useT()` from `@umbraculum/i18n-react` for user-visible text and accessibility labels.
@@ -42,7 +42,7 @@ Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMEN
   - `POST /auth/webview-exchange` (bearer) → returns `bridgeUrl` (relative)
   - open `bridgeUrl` in system browser → cookie minted → redirect to locale-prefixed `next`
 - [x] Shared navigation supports locale-prefixed web paths via:
-  - `packages/navigation/src/index.ts` `routeToLocalePath(ref, locale)`
+  - `packages/platform/navigation/src/index.ts` `routeToLocalePath(ref, locale)`
 - [x] Native has a small helper to open a whitelisted web flow via system browser:
   - `apps/native/src/navigation/openWebFallback.ts` `openWebFallbackRoute(...)`
 
@@ -61,6 +61,6 @@ Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMEN
 | Native platform SoT, alpha scope, route matrix | [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) |
 | Ubuntu Touch workspace web UI (web slice + Click) | [`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) |
 | EAS internal alpha (July 2026) | Same doc §5; `apps/native/eas.json` |
-| `registerNativeModule` | [`packages/module-sdk`](../../packages/module-sdk/README.md) |
+| `registerNativeModule` | [`packages/modules/module-sdk`](../../packages/modules/module-sdk/README.md) |
 | Validation debt on brewery screens | Native surface doc §6 |
 

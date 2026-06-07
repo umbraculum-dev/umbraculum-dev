@@ -51,7 +51,7 @@ Operations appear in a committed spec only when the Fastify route carries an Ope
 | `platform` | Health, auth, workspaces | Yes (15 ops) | — | [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md) |
 | `billing` | Workspace billing | Yes | — | [`services/api/README.md`](../services/api/README.md) |
 | `ads` | Public ad slots | Yes | — | same |
-| `ai` | Proposals, settings, usage | Yes (not `/ai/chat` SSE) | — | [`packages/contracts/src/ai/`](../packages/contracts/src/ai/) |
+| `ai` | Proposals, settings, usage | Yes (not `/ai/chat` SSE) | — | [`packages/platform/contracts/src/ai/`](../packages/platform/contracts/src/ai/) |
 | `platform-admin` | Platform ads + recipes | Yes | — | same |
 | `integrations` | Tilt / iSpindel / RAPT | Yes | — | same |
 | `webhooks` | Stripe, RevenueCat | Yes | — | same |
@@ -95,7 +95,7 @@ cp services/api/openapi/openapi.json docs-site/static/openapi/openapi.json
 cp services/api/openapi/brewery.json docs-site/static/openapi/brewery.json
 ```
 
-Rebuild `@umbraculum/contracts` dist when adding route schemas under `packages/contracts/src/`.
+Rebuild `@umbraculum/contracts` dist when adding route schemas under `packages/platform/contracts/src/`.
 
 CI fails if either committed file drifts from a fresh generate (`openapi:check`).
 
@@ -113,7 +113,7 @@ Browsable specs on **docs.umbraculum.dev** are **Redoc standalone** inside Docus
 2. **Browse machine-readable paths** — [platform Redoc on docs.umbraculum.dev](https://docs.umbraculum.dev/openapi-platform) or [brewery add-on Redoc](https://docs.umbraculum.dev/openapi-brewery); filter by tag in Swagger UI locally (`http://localhost:18080/api/documentation`).
 3. **Pick the module** — [`MODULES.md`](MODULES.md) + per-module route tables.
 4. **Pin types** — `@umbraculum/<code>-contracts` for canonical domains; `@umbraculum/contracts` for platform auth/workspaces/rendering parsers.
-5. **Call the API (optional)** — `@umbraculum/api-client` typed facades over raw `fetch` (OpenAPI path types + contracts parsers). Subpaths: `/brewery`, `/automation`, `/pim`, `/mrp`, `/crp`. See [`packages/api-client/README.md`](../packages/api-client/README.md).
+5. **Call the API (optional)** — `@umbraculum/api-client` typed facades over raw `fetch` (OpenAPI path types + contracts parsers). Subpaths: `/brewery`, `/automation`, `/pim`, `/mrp`, `/crp`. See [`packages/platform/api-client/README.md`](../packages/platform/api-client/README.md).
 6. **Auth** — cookie `sid` (web) or bearer (native); auth paths are in the platform spec under tag `platform`.
 7. **Automation adapters** — `CONTRACT_VERSION` remains authoritative over OpenAPI for mailbox semantics.
 
@@ -125,14 +125,14 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 
 - **F1 closure** — **175 documented operations** (~97%). One handler exempt: `POST /ai/chat` SSE (see §Streaming endpoints).
 - **BeerJSON / complex JSON** — OpenAPI may show loose object schemas; contracts + route tables win.
-- **Binary / stream responses** — routes that `reply.send(Buffer)` use `z.custom<Buffer>` in contracts (e.g. [`BeerJsonExportResponseSchema`](../packages/contracts/src/brewery/routeSchemas.ts)); OpenAPI shows an empty JSON schema (`{}`) while runtime returns raw bytes with `Content-Type` / `Content-Disposition` headers. Human route tables and contracts win on wire format.
+- **Binary / stream responses** — routes that `reply.send(Buffer)` use `z.custom<Buffer>` in contracts (e.g. [`BeerJsonExportResponseSchema`](../packages/platform/contracts/src/brewery/routeSchemas.ts)); OpenAPI shows an empty JSON schema (`{}`) while runtime returns raw bytes with `Content-Type` / `Content-Disposition` headers. Human route tables and contracts win on wire format.
 - **Codegen + facades (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **types** plus typed **facades** (`listWorkspaces`, `listRecipes`, rendering helpers, …). Subpath `@umbraculum/api-client/brewery` for add-on SKU. Regenerate types: `npm run openapi:codegen -w @umbraculum/api-client`. Runtime validation remains `@umbraculum/contracts` parsers inside each facade.
 
 ---
 
 ## Streaming endpoints (SSE)
 
-`POST /ai/chat` streams Server-Sent Events and is **not** included in `openapi.json` (OpenAPI 3.0 cannot describe the event stream usefully). Integrators and agents should use this section plus [`packages/contracts/src/ai/aiChat.ts`](../packages/contracts/src/ai/aiChat.ts).
+`POST /ai/chat` streams Server-Sent Events and is **not** included in `openapi.json` (OpenAPI 3.0 cannot describe the event stream usefully). Integrators and agents should use this section plus [`packages/platform/contracts/src/ai/aiChat.ts`](../packages/platform/contracts/src/ai/aiChat.ts).
 
 | Item | Detail |
 |------|--------|
@@ -141,7 +141,7 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 | Request body | `AiChatRequestBodySchema`: `{ message: string (1–8000), sessionId?: string, routeId?: string }` |
 | Response | `Content-Type: text/event-stream` — each event: `event: <type>\ndata: <json>\n\n` |
 | Event union | `assistant_chunk`, `tool_call`, `tool_result`, `proposal`, `complete`, `error` — see `AiSseEventSchema` in contracts |
-| Client | [`packages/ui/src/ai/useAiChatStream.ts`](../packages/ui/src/ai/useAiChatStream.ts) mirrors the wire format |
+| Client | [`packages/platform/ui/src/ai/useAiChatStream.ts`](../packages/platform/ui/src/ai/useAiChatStream.ts) mirrors the wire format |
 
 ---
 
@@ -207,7 +207,7 @@ E7-follow-up completes deferred catalog facades for canonical modules (MRP, PIM,
 | `@umbraculum/api-client/pim` | `listAttributes`, `createAttribute`, `getAttribute`, `patchAttribute`, `deleteAttribute`; `listProductMediaAssetRefs`, `createProductMediaAssetRef`, `getMediaAssetRef`, `patchMediaAssetRef`, `deleteMediaAssetRef` | `@umbraculum/pim-contracts` |
 | `@umbraculum/api-client/crp` | `submitCapacityLoadRenderJob`, `submitScheduleRenderJob`, `submitResourcesCalendarRenderJob`, `submitConflictsRenderJob` (+ `run*RenderJobExport` helpers on `planning.ts`) | `@umbraculum/contracts` (`RenderJobSubmitResponseSchema`) + `@umbraculum/crp-contracts` for GET planning |
 
-Module render-job POSTs delegate to `platform/rendering` (`submitRenderJob` / `runAsyncRenderJobExport`) with `toClientPath()`-resolved URLs. Parser map: `MRP_FACADE_PARSER_MAP`, `PIM_FACADE_PARSER_MAP`, `CRP_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/api-client/src/facadeParserMap.ts).
+Module render-job POSTs delegate to `platform/rendering` (`submitRenderJob` / `runAsyncRenderJobExport`) with `toClientPath()`-resolved URLs. Parser map: `MRP_FACADE_PARSER_MAP`, `PIM_FACADE_PARSER_MAP`, `CRP_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/platform/api-client/src/facadeParserMap.ts).
 
 **Note:** MRP BOM mutate routes (`POST`/`PATCH`/`DELETE` `/mrp/boms`) are facaded for catalog completeness; the API currently exposes `GET` only on those paths until server routes land.
 
@@ -272,7 +272,7 @@ Phase E10 completes the native app migration off raw HTTP for the last two platf
 | `apps/native/src/components/AdSlot.tsx` | `getAdSlot` (`platform/ads`) |
 | `apps/native/src/navigation/openWebFallback.ts` | `exchangeWebviewToken` (`platform/auth`) |
 
-**Ads platform note:** Native previously sent `?platform=native`, but [`AdPlatformSchema`](../packages/contracts/src/ads/routeSchemas.ts) and the Prisma `AdPlatform` enum coerce to `web` only. E10 calls `getAdSlot` without a platform override — same effective server behavior. A future product tranche can add `native` to Prisma + contracts if native-specific ad inventory is needed.
+**Ads platform note:** Native previously sent `?platform=native`, but [`AdPlatformSchema`](../packages/platform/contracts/src/ads/routeSchemas.ts) and the Prisma `AdPlatform` enum coerce to `web` only. E10 calls `getAdSlot` without a platform override — same effective server behavior. A future product tranche can add `native` to Prisma + contracts if native-specific ad inventory is needed.
 
 **Grep gate:** zero raw `api.(get|post|patch|delete|put)(` under `apps/native/src/`.
 
@@ -328,7 +328,7 @@ E8-follow-up adds brewery catalog facades deferred from E8 (BeerJSON export down
 | `brewery/recipeExport` | `exportRecipeBeerJson`, `exportAllRecipesBeerJson`, `recipeBeerJsonExportPath`, `allRecipesBeerJsonExportPath` (GET binary via `BeerJsonExportResponseSchema`) |
 | `brewery/ingredientAdmin` | `listIngredientSyncRuns`, `runIngredientSync` |
 
-Parser map entries live in `BREWERY_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/api-client/src/facadeParserMap.ts).
+Parser map entries live in `BREWERY_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/platform/api-client/src/facadeParserMap.ts).
 
 ---
 

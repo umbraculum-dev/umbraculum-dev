@@ -140,7 +140,7 @@ Integrators and module authors should not need a **partner badge** or a **vendor
 
 | Layer | What it guards | Where (starting points) |
 |-------|----------------|---------------------------|
-| L1 unit | Parsers, domain math | `packages/contracts`, `packages/core` — vitest on every push |
+| L1 unit | Parsers, domain math | `packages/platform/contracts`, `packages/verticals/brewery/core` — vitest on every push |
 | L2 API integration | Routes, ACL, workspace isolation | `services/api/src/tests/` — vitest + real Postgres in CI |
 | L3 smoke | nginx → web → api path alive | [`scripts/smoke.sh`](../scripts/smoke.sh) |
 | Static analysis | Lint, types, docs structure | `.github/workflows/` — `web-lint.yml`, `typecheck.yml`, `docs-readmes.yml` |

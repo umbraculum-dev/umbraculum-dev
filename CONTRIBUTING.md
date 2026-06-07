@@ -254,10 +254,10 @@ See [`DEVELOPMENT.md`](./DEVELOPMENT.md) and the project-local addendum
 - `apps/web/` — Next.js + React + Tamagui web app.
 - `apps/native/` — React Native + Expo + Tamagui native app.
 - `services/api/` — Fastify + Prisma API service.
-- `packages/contracts/` — typed shared contracts between API and clients.
-- `packages/ui/` — cross-platform Tamagui primitives + shared
+- `packages/platform/contracts/` — typed shared contracts between API and clients.
+- `packages/platform/ui/` — cross-platform Tamagui primitives + shared
   components (e.g. `AiChatPanel`).
-- `packages/i18n/` + `packages/i18n-react/` — translations and React hooks.
+- `packages/platform/i18n/` + `packages/platform/i18n-react/` — translations and React hooks.
 - `docs/` — public-facing docs (architecture, licensing, testing, etc.).
 - `internal/` — internal-only docs (strategy, monetization, moat,
   business plans). **Not part of the public release.** When the public

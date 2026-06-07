@@ -11,8 +11,8 @@ on:
     branches: [master]
     paths:
       - "services/api/**"
-      - "packages/contracts/**"
-      - "packages/core/**"
+      - "packages/platform/contracts/**"
+      - "packages/verticals/brewery/core/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/api.yml"
@@ -20,8 +20,8 @@ on:
     branches: [master]
     paths:
       - "services/api/**"
-      - "packages/contracts/**"
-      - "packages/core/**"
+      - "packages/platform/contracts/**"
+      - "packages/verticals/brewery/core/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/api.yml"

@@ -1,6 +1,6 @@
 /**
  * Valibot equivalent of `parseMashAcidBlock` in
- * packages/contracts/src/water/parseComputeAndSave.ts lines 207-235.
+ * packages/platform/contracts/src/water/parseComputeAndSave.ts lines 207-235.
  *
  * Paper-design spike per docs/rfcs/0003-validation-library-adoption.md §15
  * — comparison axis to the Zod v4 implementation in

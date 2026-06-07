@@ -52,7 +52,7 @@
 | Phase | Status | Files / artifacts | Verification |
 |---|---|---|---|
 | Phase 0 — build log | Shipped | This file | — |
-| Phase A — contracts | Shipped | `packages/mrp-contracts`, `packages/crp-contracts` `documentTemplates.ts` + dist | `npm run test -w @umbraculum/mrp-contracts` / `crp-contracts` in container |
+| Phase A — contracts | Shipped | `packages/modules/mrp-contracts`, `packages/modules/crp-contracts` `documentTemplates.ts` + dist | `npm run test -w @umbraculum/mrp-contracts` / `crp-contracts` in container |
 | Phase B — payload builders | Shipped | `workOrderDocumentService.ts`, `capacityExportService.ts` | Covered by render integration tests |
 | Phase C — templates + registration | Shipped | `mrp/documentTemplates.ts`, `crp/documentTemplates.ts`, `htmlToPdf.ts` | `mrpCrpModuleRegistration.test.ts` (8 refs) |
 | Phase D — HTTP routes | Shipped | `workOrdersRoutes.ts`, `capacityRenderRoutes.ts` | `mrpCrpRendering.test.ts` |

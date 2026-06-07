@@ -1,6 +1,6 @@
 /**
  * Zod v4 equivalent of `parseMashAcidBlock` in
- * packages/contracts/src/water/parseComputeAndSave.ts lines 207-235,
+ * packages/platform/contracts/src/water/parseComputeAndSave.ts lines 207-235,
  * plus the shared parsers it depends on
  * (parseAcidificationManualResult, parseMashTargetMashPhResult,
  * parseAcidificationResult, parseDerivation).

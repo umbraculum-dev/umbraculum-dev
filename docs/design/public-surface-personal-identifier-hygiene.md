@@ -29,8 +29,8 @@ On failure, violations name the file and line and report `path pattern` or `deny
 - `docs/**` (selected audit docs excluded)
 - Module READMEs under `apps/`, `services/`, `packages/` (skips `node_modules`)
 - Root `DEVELOPMENT*.md`, `apps/native/EAS-DEMO-SETUP.md`
-- `packages/i18n/src/en.json` and `it.json`
-- `packages/test-mcp/README.md` and `src/server.ts`
+- `packages/platform/i18n/src/en.json` and `it.json`
+- `packages/platform/test-mcp/README.md` and `src/server.ts`
 
 Use `$REPO_ROOT` in prose instead of absolute clone paths (see [`DEVELOPMENT.md`](../../DEVELOPMENT.md)).
 

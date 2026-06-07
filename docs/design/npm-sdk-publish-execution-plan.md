@@ -45,13 +45,13 @@ This plan converts [`npm-sdk-publish-preflight.md`](npm-sdk-publish-preflight.md
 
 | Order | Package | Path | Initial version |
 |-------|---------|------|-----------------|
-| 1 | `@umbraculum/ai-tool-sdk` | `packages/ai-tool-sdk/` | `0.1.0` (already in manifest) |
-| 2 | `@umbraculum/i18n-keys` | `packages/i18n-keys/` | `0.1.0` |
-| 3 | `@umbraculum/module-sdk` | `packages/module-sdk/` | `0.0.1` |
-| 4 | `@umbraculum/automation-contracts` | `packages/automation-contracts/` | `0.0.1` |
-| 5 | `@umbraculum/pim-contracts` | `packages/pim-contracts/` | `0.0.1` |
-| 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.1` |
-| 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.1` |
+| 1 | `@umbraculum/ai-tool-sdk` | `packages/modules/ai-tool-sdk/` | `0.1.0` (already in manifest) |
+| 2 | `@umbraculum/i18n-keys` | `packages/modules/i18n-keys/` | `0.1.0` |
+| 3 | `@umbraculum/module-sdk` | `packages/modules/module-sdk/` | `0.0.1` |
+| 4 | `@umbraculum/automation-contracts` | `packages/modules/automation-contracts/` | `0.0.1` |
+| 5 | `@umbraculum/pim-contracts` | `packages/modules/pim-contracts/` | `0.0.1` |
+| 6 | `@umbraculum/mrp-contracts` | `packages/modules/mrp-contracts/` | `0.0.1` |
+| 7 | `@umbraculum/crp-contracts` | `packages/modules/crp-contracts/` | `0.0.1` |
 
 **Publish tag (proposed):** `sdk-batch-v0.1.0` — one tag drives the ordered batch workflow.
 
@@ -169,13 +169,13 @@ Only maintainers push `sdk-batch-v*` tags. Executor must not tag without maintai
 
 Copy standard MIT license text into each package directory:
 
-- `packages/ai-tool-sdk/LICENSE`
-- `packages/i18n-keys/LICENSE`
-- `packages/module-sdk/LICENSE`
-- `packages/automation-contracts/LICENSE`
-- `packages/pim-contracts/LICENSE`
-- `packages/mrp-contracts/LICENSE`
-- `packages/crp-contracts/LICENSE`
+- `packages/modules/ai-tool-sdk/LICENSE`
+- `packages/modules/i18n-keys/LICENSE`
+- `packages/modules/module-sdk/LICENSE`
+- `packages/modules/automation-contracts/LICENSE`
+- `packages/modules/pim-contracts/LICENSE`
+- `packages/modules/mrp-contracts/LICENSE`
+- `packages/modules/crp-contracts/LICENSE`
 
 Copyright holder: **Umbraculum contributors** (or legal name maintainer confirms).
 
@@ -207,13 +207,13 @@ Adjust relative link depth per package README location.
 
 | Path |
 |------|
-| `packages/ai-tool-sdk/package.json`, `LICENSE`, `README.md` |
-| `packages/i18n-keys/package.json`, `LICENSE`, `README.md` |
-| `packages/module-sdk/package.json`, `LICENSE`, `README.md` |
-| `packages/automation-contracts/package.json`, `LICENSE`, `README.md` |
-| `packages/pim-contracts/package.json`, `LICENSE`, `README.md` |
-| `packages/mrp-contracts/package.json`, `LICENSE`, `README.md` |
-| `packages/crp-contracts/package.json`, `LICENSE`, `README.md` |
+| `packages/modules/ai-tool-sdk/package.json`, `LICENSE`, `README.md` |
+| `packages/modules/i18n-keys/package.json`, `LICENSE`, `README.md` |
+| `packages/modules/module-sdk/package.json`, `LICENSE`, `README.md` |
+| `packages/modules/automation-contracts/package.json`, `LICENSE`, `README.md` |
+| `packages/modules/pim-contracts/package.json`, `LICENSE`, `README.md` |
+| `packages/modules/mrp-contracts/package.json`, `LICENSE`, `README.md` |
+| `packages/modules/crp-contracts/package.json`, `LICENSE`, `README.md` |
 | `docs/design/npm-sdk-publish-preflight.md` — status line → “prep in progress” |
 | `docs/design/npm-sdk-publish-execution-plan.md` — §12 sign-off when SP-1 merges |
 
@@ -247,7 +247,7 @@ on:
 7. **Publish leaves** (reuse OIDC exchange helper per package name):
    - `@umbraculum/ai-tool-sdk`
    - `@umbraculum/i18n-keys`
-8. **Publish `module-sdk`** — before `npm publish`, workflow **temporarily** rewrites `packages/module-sdk/package.json` dependencies:
+8. **Publish `module-sdk`** — before `npm publish`, workflow **temporarily** rewrites `packages/modules/module-sdk/package.json` dependencies:
 
 ```json
 "@umbraculum/ai-tool-sdk": "^0.1.0",

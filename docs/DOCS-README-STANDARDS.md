@@ -36,21 +36,21 @@ This standard governs the `README.md` at the root of every published workspace:
 | `apps/native/README.md` | Application |
 | `services/api/README.md` | Service |
 | `docs-site/README.md` | Documentation application |
-| `packages/ai-tool-sdk/README.md` | Package (TS, MIT SDK contract) |
-| `packages/i18n-keys/README.md` | Package (TS, MIT SDK contract) |
-| `packages/api-client/README.md` | Package (TS, npm-publishable) |
-| `packages/beerjson/README.md` | Package |
-| `packages/contracts/README.md` | Package |
-| `packages/module-sdk/README.md` | Package (TS, MIT SDK contract) |
-| `packages/i18n/README.md` | Package |
-| `packages/i18n-react/README.md` | Package |
-| `packages/media/README.md` | Package |
-| `packages/navigation/README.md` | Package |
-| `packages/rendering/README.md` | Package (document / file rendering scaffold) |
-| `packages/recipes-ui/README.md` | Package |
-| `packages/core/README.md` | Package (brewery-vertical, `@umbraculum/brewery-core`) |
-| `packages/test-mcp/README.md` | Package (developer-tooling, runtime tools server) |
-| `packages/ui/README.md` | Package |
+| `packages/modules/ai-tool-sdk/README.md` | Package (TS, MIT SDK contract) |
+| `packages/modules/i18n-keys/README.md` | Package (TS, MIT SDK contract) |
+| `packages/platform/api-client/README.md` | Package (TS, npm-publishable) |
+| `packages/verticals/brewery/beerjson/README.md` | Package |
+| `packages/platform/contracts/README.md` | Package |
+| `packages/modules/module-sdk/README.md` | Package (TS, MIT SDK contract) |
+| `packages/platform/i18n/README.md` | Package |
+| `packages/platform/i18n-react/README.md` | Package |
+| `packages/platform/media/README.md` | Package |
+| `packages/platform/navigation/README.md` | Package |
+| `packages/platform/rendering/README.md` | Package (document / file rendering scaffold) |
+| `packages/verticals/brewery/recipes-ui/README.md` | Package |
+| `packages/verticals/brewery/core/README.md` | Package (brewery-vertical, `@umbraculum/brewery-core`) |
+| `packages/platform/test-mcp/README.md` | Package (developer-tooling, runtime tools server) |
+| `packages/platform/ui/README.md` | Package |
 
 Sub-component READMEs (e.g. `services/api/src/seed/README.md`) are **lighter-scope** — they follow the *spirit* of the template (headline, one-paragraph "what / why", concrete next-step guidance) but do not need every section. The audit checklist marks which sections are required vs. optional for sub-component READMEs.
 

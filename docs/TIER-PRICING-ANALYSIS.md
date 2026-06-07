@@ -220,7 +220,7 @@ Flow:
 
 ### Shared logic
 
-- Put entitlement types and helpers in `packages/contracts` or `packages/api-client`.
+- Put entitlement types and helpers in `packages/platform/contracts` or `packages/platform/api-client`.
 - Web and native both call the same API and use the same response shape.
 
 ---
@@ -247,7 +247,7 @@ Flow:
 | Routes     | New `services/api/src/routes/billing.ts`, extend workspace/me if needed |
 | Web        | Recipe list, create buttons, upgrade modal/page |
 | Native     | Same pattern in recipe screens |
-| Shared     | `packages/contracts` or `packages/api-client` for entitlement types |
+| Shared     | `packages/platform/contracts` or `packages/platform/api-client` for entitlement types |
 
 ---
 

@@ -4,7 +4,7 @@
 **Status:** v1.2 — descriptive (not prescriptive). Living document. Updated 2026-05-21 — shorthand-prop tsc count refreshed post-web-route-shape audit (590 → 1086; the documented >1000 trigger has been crossed — see "When to revisit this doc" below). v1.1 (2026-05-16) revised the "Tamagui wall" framing post-HIGH-full landing (see triage block #3 below).
 **Audience:** maintainers, contributors authoring web/native UI code, anyone debugging Tamagui-related lint/TS noise.
 **Owners:** maintainers
-**Related:** `docs/LINTING.md` (the lint phase log, including the post-mortem revision of the Tamagui-wall framing), `packages/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
+**Related:** `docs/LINTING.md` (the lint phase log, including the post-mortem revision of the Tamagui-wall framing), `packages/platform/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
 
 ---
 
@@ -24,10 +24,10 @@ Concrete numbers (refreshed 2026-05-21):
 
 | Where | TS errors (`tsc --noEmit`) | Notes |
 |---|---|---|
-| `packages/ui` | 25 | Mostly `TS2322` (shorthand prop incompatibility) + `TS2590` (union too complex) — last measured 2026-05-16 |
+| `packages/platform/ui` | 25 | Mostly `TS2322` (shorthand prop incompatibility) + `TS2590` (union too complex) — last measured 2026-05-16 |
 | `apps/web` | 1086 (760 `TS2322` shorthand/token) | Refreshed 2026-05-21 (up from 590 on 2026-05-16). Top offenders by property: `mt` 311, `bg` 184, `minW` 163, `w` 125, `ai` 69, `as` 58, `items` 57, `mb` 54. Spread across 56 files. **Crosses the >1000 trigger documented in "When to revisit this doc" below**; status quo retained pending Tamagui v2 stable / intermediate RC bump (see that section for the deliberation). |
 | `apps/native` | 0 | Native side typically doesn't hit the web-DOM-shorthand collision — last measured 2026-05-16 |
-| `packages/recipes-ui` | 0 | Uses a curated subset of Tamagui surface — last measured 2026-05-16 |
+| `packages/verticals/brewery/recipes-ui` | 0 | Uses a curated subset of Tamagui surface — last measured 2026-05-16 |
 
 ---
 
@@ -99,7 +99,7 @@ This is a real value proposition (semantic HTML elements via `<Card as="aside">`
   ```tsx
   <Card {...(isWeb ? ({ as: "aside", "aria-label": label } as any) : { accessibilityLabel: label })} />
   ```
-- This is exactly the pattern in `packages/ui/src/primitives/AdSlotCard.tsx`.
+- This is exactly the pattern in `packages/platform/ui/src/primitives/AdSlotCard.tsx`.
 
 ### Caveat 4: `accessibilityLabel` vs `aria-label` (the original bug class)
 
@@ -113,7 +113,7 @@ This is the bug class our `no-restricted-imports` guardrail enforces against. Se
 
 **Our strategy:**
 
-- All cross-platform components (`packages/ui/src/{ai,charts}/**`) MUST import wrappers from `packages/ui/src/primitives/*`.
+- All cross-platform components (`packages/platform/ui/src/{ai,charts}/**`) MUST import wrappers from `packages/platform/ui/src/primitives/*`.
 - The primitives implement the platform fork explicitly: `Button.web.tsx` maps `accessibilityLabel` → `aria-label`; `Button.native.tsx` keeps it as `accessibilityLabel`.
 - New primitives that wrap Tamagui surface MUST follow the same pattern.
 
@@ -136,7 +136,7 @@ This is the documented Tamagui pattern, but `@typescript-eslint/no-empty-object-
 
 ### Caveat 6: `TS2590: Expression produces a union type that is too complex to represent`
 
-Tamagui's auto-generated types occasionally produce a union union union that TypeScript declines to fully infer. Example: `packages/ui/src/primitives/Spinner.tsx`. This is rare and tends to surface in deeply-nested Tamagui inheritance chains.
+Tamagui's auto-generated types occasionally produce a union union union that TypeScript declines to fully infer. Example: `packages/platform/ui/src/primitives/Spinner.tsx`. This is rare and tends to surface in deeply-nested Tamagui inheritance chains.
 
 **Our strategy:**
 
@@ -222,7 +222,7 @@ Recorded on the roadmap under standing principles: [`ROADMAP.md`](ROADMAP.md) §
 
 - [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — UT reuses Tamagui via `apps/web` (no native Tamagui on Lomiri)
 - `docs/LINTING.md` — the lint roadmap and full phase log; HIGH-full landed 2026-05-16 with the Tamagui-wall framing materially revised (see `docs/LINTING.md` "Realised output of HIGH-full" + the Phase 4b post-mortem for the stale-rename root-cause analysis).
-- `packages/ui/README.md` — `@umbraculum/ui` package overview, especially the platform-forking primitives in `src/primitives/*`.
-- `eslint.config.mjs` — the `no-restricted-imports` block for `packages/ui/src/{ai,charts}/**` that enforces "never import raw Tamagui Button/Input/Checkbox in cross-platform components".
-- `packages/ui/src/primitives/AdSlotCard.tsx` — canonical example of the caveat-3 (`as="aside"`) pattern.
-- `packages/ui/src/primitives/Button.web.tsx` / `Button.native.tsx` — canonical example of the caveat-4 (a11y prop fork) pattern.
+- `packages/platform/ui/README.md` — `@umbraculum/ui` package overview, especially the platform-forking primitives in `src/primitives/*`.
+- `eslint.config.mjs` — the `no-restricted-imports` block for `packages/platform/ui/src/{ai,charts}/**` that enforces "never import raw Tamagui Button/Input/Checkbox in cross-platform components".
+- `packages/platform/ui/src/primitives/AdSlotCard.tsx` — canonical example of the caveat-3 (`as="aside"`) pattern.
+- `packages/platform/ui/src/primitives/Button.web.tsx` / `Button.native.tsx` — canonical example of the caveat-4 (a11y prop fork) pattern.

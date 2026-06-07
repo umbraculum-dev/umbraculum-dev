@@ -15,10 +15,10 @@
 | Concern | Owner | Doc / code |
 |---------|-------|------------|
 | Native platform shared layout | `apps/native` | [`apps/native/README.md`](../../apps/native/README.md) |
-| Route policy | `@umbraculum/navigation` | [`packages/navigation/src/index.ts`](../../packages/navigation/src/index.ts) |
-| Module registration (native) | `@umbraculum/module-sdk` | `registerNativeModule()` — [`registerNativeModule.ts`](../../packages/module-sdk/src/registerNativeModule.ts) |
+| Route policy | `@umbraculum/navigation` | [`packages/platform/navigation/src/index.ts`](../../packages/platform/navigation/src/index.ts) |
+| Module registration (native) | `@umbraculum/module-sdk` | `registerNativeModule()` — [`registerNativeModule.ts`](../../packages/modules/module-sdk/src/registerNativeModule.ts) |
 | Auth transport | `@umbraculum/api-client` | `bearerTokenAuth` — [AUTH-STRATEGY.md](../AUTH-STRATEGY.md) |
-| Render jobs (client) | `@umbraculum/api-client` | [`renderJob.ts`](../../packages/api-client/src/renderJob.ts) |
+| Render jobs (client) | `@umbraculum/api-client` | [`renderJob.ts`](../../packages/platform/api-client/src/renderJob.ts) |
 | Validation | `@umbraculum/contracts` | [RFC-0003](../rfcs/0003-validation-library-adoption.md) — parse at HTTP boundaries |
 | File output | Platform rendering | [RFC-0007](../rfcs/0007-canonical-document-rendering.md) — **no** PDF/XLSX libs in native |
 
@@ -62,7 +62,7 @@ Route registration in the shell is **app-owned** ([`AppNavigator.tsx`](../../app
 
 ## 3. Route availability matrix
 
-Source: [`packages/navigation/src/index.ts`](../../packages/navigation/src/index.ts). Native uses **block by default**; routes promote to `available` via module registration + `configureNativeRoutePolicy()`.
+Source: [`packages/platform/navigation/src/index.ts`](../../packages/platform/navigation/src/index.ts). Native uses **block by default**; routes promote to `available` via module registration + `configureNativeRoutePolicy()`.
 
 ### 3.1 Native-available (`getRouteAvailability(id, "native") === "available"`)
 
@@ -112,7 +112,7 @@ iOS/Android obligations in §3–§4 apply to **`apps/native` (Expo)** only. **U
 1. **RFC-0003:** Treat API JSON as `unknown`; validate with `parseXxx()` from `@umbraculum/contracts` (or module contract packages when native consumes them). Avoid `as SomeDto` on wire payloads.
 2. **RFC-0007:** Submit render jobs via API; poll job status; download via signed URL with bearer auth. Use `@umbraculum/api-client` `runAsyncRenderJobExport` / `resolveArtifactDownloadUrl`.
 3. **RFC-0002:** New module UI lives under `apps/native/src/modules/<code>/`; register with `registerNativeModule`.
-4. **i18n:** User-visible strings only in `packages/i18n` catalogs; `npm run i18n:guardrail -w @umbraculum/native`.
+4. **i18n:** User-visible strings only in `packages/platform/i18n` catalogs; `npm run i18n:guardrail -w @umbraculum/native`.
 5. **No parallel stacks:** No module-owned PDF/XLSX/barcode libraries on device.
 
 ---

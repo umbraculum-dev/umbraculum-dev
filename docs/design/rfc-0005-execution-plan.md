@@ -349,7 +349,7 @@ DO NOT:
 
 1. **File diff review.** Only §5.2 inventory touched.
 2. **Re-run all six §5.5 acceptance criteria** independently.
-3. **Visual smoke check.** Navigate to: Reference → packages/ui → packages/automation-contracts → services/api. Confirm rendering + cross-link resolution.
+3. **Visual smoke check.** Navigate to: Reference → packages/platform/ui → packages/modules/automation-contracts → services/api. Confirm rendering + cross-link resolution.
 4. **CI workflow dry-run.** Open a no-op PR in a feature branch touching `docs/REPOSITORY-STRUCTURE.md` (whitespace edit). Confirm the workflow triggers, builds, passes, and posts a check.
 5. **`docs-readmes.yml` regression check.** Confirm the existing structural checker workflow still passes — composer must not have broken it.
 6. **Hand back to maintainer for visual sign-off.** Brief summary + the screenshot from composer + the workflow-trigger evidence.

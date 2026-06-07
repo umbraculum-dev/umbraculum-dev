@@ -130,8 +130,8 @@ See [`CI-PARITY.md`](CI-PARITY.md) job `dogfood-npm-smoke`.
 
 | Topic | Document |
 |-------|----------|
-| Full facade inventory | [`packages/api-client/README.md`](../packages/api-client/README.md) |
-| Contract parsers | [`packages/contracts/README.md`](../packages/contracts/README.md) |
+| Full facade inventory | [`packages/platform/api-client/README.md`](../packages/platform/api-client/README.md) |
+| Contract parsers | [`packages/platform/contracts/README.md`](../packages/platform/contracts/README.md) |
 | Module registration (not HTTP) | [`third-party-module.md`](modules/contribute/third-party-module.md) |
 | OpenAPI maintainer runbook | [`API-OPENAPI.md`](API-OPENAPI.md) |
 | Building a non-brewery vertical | [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) |

@@ -26,8 +26,8 @@
 
 | Path | LoC | Slice | Principles | Severity | Signal | Suggested action |
 |------|-----|-------|------------|----------|--------|------------------|
-| `packages/api-client/src/generated/platform.openapi.ts` | 10161 | Packages | S, I | P1 | file size 10161 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
-| `packages/api-client/src/generated/brewery.openapi.ts` | 4895 | Packages | S, I | P1 | file size 4895 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
+| `packages/platform/api-client/src/generated/platform.openapi.ts` | 10161 | Packages | S, I | P1 | file size 10161 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
+| `packages/platform/api-client/src/generated/brewery.openapi.ts` | 4895 | Packages | S, I | P1 | file size 4895 LoC | Split by reason-to-change; see Tier B in solid-decoupling-audit.md |
 
 ---
 

@@ -18,7 +18,7 @@ This section describes decisions that are now **implemented in the repo**.
 
 ### 0.1 Supported locales are single-source-of-truth
 
-- **Canonical locale ownership**: `packages/i18n` (`@umbraculum/i18n`)
+- **Canonical locale ownership**: `packages/platform/i18n` (`@umbraculum/i18n`)
 - Implemented exports:
   - `locales` (readonly tuple)
   - `SupportedLocale`
@@ -37,7 +37,7 @@ We do **not** try to share Next.js routes or file-based routing across web/nativ
 - explicit policy for “ported vs not ported” flows
 
 Implemented package:
-- `packages/navigation` (`@umbraculum/navigation`)
+- `packages/platform/navigation` (`@umbraculum/navigation`)
   - `RouteId`, `RouteParamsById`, `RouteRef`
   - `routeToPath(RouteRef)` produces a **non-locale** web path (e.g. `/inventory`, `/recipes/:id/water/mash`)
   - `getRouteAvailability(id, platform)` returns:
@@ -58,7 +58,7 @@ Implemented package:
 To share screens across web and native while keeping message syntax consistent, shared code must not import `next-intl` directly.
 
 Implemented package:
-- `packages/i18n-react` (`@umbraculum/i18n-react`)
+- `packages/platform/i18n-react` (`@umbraculum/i18n-react`)
   - Universal runtime:
     - `LocaleProvider({ locale, messages })`
     - `useT(namespace)` returning `{ t(key, values), rich(key, values) }`
@@ -78,7 +78,7 @@ Implemented file:
 ### 0.6 Cross-platform API client (fetch boundary + auth)
 
 Implemented package:
-- `packages/api-client` (`@umbraculum/api-client`)
+- `packages/platform/api-client` (`@umbraculum/api-client`)
   - Uses a minimal cross-platform fetch contract (injectable `fetch`) and avoids DOM-only typing in its public API.
   - **Auth direction (current)**:
     - Web: cookie sessions (`sid`) via `cookieAuth()`
@@ -223,9 +223,9 @@ Instead it depends on small shared interfaces:
 - i18n: `@umbraculum/i18n` + `@umbraculum/i18n-react`
 
 #### Implemented boundary modules (source of truth)
-- **Locales + messages**: `packages/i18n` (`@umbraculum/i18n`)
-- **Universal translation hook**: `packages/i18n-react` (`@umbraculum/i18n-react`)
-- **Universal route IDs + policy**: `packages/navigation` (`@umbraculum/navigation`)
+- **Locales + messages**: `packages/platform/i18n` (`@umbraculum/i18n`)
+- **Universal translation hook**: `packages/platform/i18n-react` (`@umbraculum/i18n-react`)
+- **Universal route IDs + policy**: `packages/platform/navigation` (`@umbraculum/navigation`)
 - **Web adapter**: `apps/web/src/navigation/appRouter.ts` (`useAppRouter()`)
 
 #### Route policy: avoid accidental “not ported” drift
@@ -433,7 +433,7 @@ This is a key product differentiator and a strong reason to prefer native apps.
 - Put correctness into **core domain library** (pure functions).
 
 ### Stack
-- **Unit tests:** Vitest (packages/core, services/api)
+- **Unit tests:** Vitest (packages/verticals/brewery/core, services/api)
 - **Integration tests:** API + DB (compose-based test DB or testcontainers later)
 - **E2E tests:** Playwright (web)
 - **Mobile:** start with unit + a small number of integration tests; add heavier mobile e2e after flows stabilize
@@ -488,7 +488,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
   - universal translation hook: `@umbraculum/i18n-react`
   - web adapter: `apps/web/src/navigation/appRouter.ts`
 - Shared UI direction:
-  - Keep Tamagui tokens/config/components in `packages/ui`
+  - Keep Tamagui tokens/config/components in `packages/platform/ui`
   - Split Tamagui config into web vs native entrypoints to avoid importing web-only drivers in native (e.g. CSS animations)
 - Shared TS configs + linting
 - CI skeleton (typecheck + unit)
@@ -509,7 +509,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
 - Enforce ACL centrally in service layer.
 
 ### Phase 3 - Domain core + first features
-- `packages/core`:
+- `packages/verticals/brewery/core`:
   - brewing calculations (pure functions)
   - validation and unit conversions
   - strong unit tests

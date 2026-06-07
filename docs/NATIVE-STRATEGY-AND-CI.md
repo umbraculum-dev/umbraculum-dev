@@ -39,7 +39,7 @@ Using **Expo Go** on a physical device with **documented** version pins and **do
 
 1. The divergence is **explicit** (documented baseline table + exception in `DEVELOPMENT-LOCAL.md`).
 2. Everyone touching native deps knows to run **`expo install --check`** (and `--fix` when needed) before merging.
-3. Shared packages (`packages/ui`, `packages/recipes-ui`, etc.) avoid relying on **React patch/minor-only internals** that differ between 19.1 and 19.2—stick to public, stable APIs.
+3. Shared packages (`packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, etc.) avoid relying on **React patch/minor-only internals** that differ between 19.1 and 19.2—stick to public, stable APIs.
 4. You keep the **triage order** in `docs/DEVELOPMENT-NATIVE-LOCAL.md` (API → LAN → phone browser → versions → cache → device log).
 
 That is **controlled technical debt**, not gambling. The debt becomes expensive only if you **stop maintaining** those guardrails or if you need capabilities Expo Go cannot provide (custom native code, store-grade signing workflows, etc.).
@@ -48,7 +48,7 @@ That is **controlled technical debt**, not gambling. The debt becomes expensive 
 
 - **Shared UI packages:** If a change assumes web-only behavior or a newer React feature, native can fail at runtime with crypt errors. Mitigation: discipline in reviews + optional lightweight checks (see §5).
 - **Implicit coupling to Expo’s schedule:** A future Expo SDK upgrade might force a coordinated bump across native **and** possibly web. Mitigation: upgrade in a dedicated branch; run `expo install --check` + manual smoke on device before merge.
-- **Operational fragility:** Anything that restarts the API watcher after `packages/contracts` rebuilds can expose missing `node_modules` (the `esbuild` incident). Mitigation: documented recovery (`docker compose exec api npm install`, restart); optionally a tiny smoke script or CI job hitting `/api/health`.
+- **Operational fragility:** Anything that restarts the API watcher after `packages/platform/contracts` rebuilds can expose missing `node_modules` (the `esbuild` incident). Mitigation: documented recovery (`docker compose exec api npm install`, restart); optionally a tiny smoke script or CI job hitting `/api/health`.
 
 So: you are **not** condemned to disaster by staying on Expo Go short-term. You **are** vulnerable if mitigations exist only in chat history instead of **repo docs + habits (+ optional lean CI)**.
 
@@ -104,7 +104,7 @@ These are the **minimum** professional bar for the current stack:
 | API `/api/health` triage + esbuild recovery doc | Prevents false “native bugs” when API is 502 |
 | “Quick triage order” in native doc | Reduces random debugging |
 | Shared packages: avoid React internals / version-sensitive APIs | Reduces silent breakage across web vs native |
-| `@umbraculum/brewery-beerjson` is in `build:packages` (before `@umbraculum/brewery-recipes-ui`) | Prevents stale `packages/beerjson/dist/*` from silently breaking `apps/native` and `packages/recipes-ui` consumers (see `DEVELOPMENT-LOCAL.md` → "Shared packages build") |
+| `@umbraculum/brewery-beerjson` is in `build:packages` (before `@umbraculum/brewery-recipes-ui`) | Prevents stale `packages/verticals/brewery/beerjson/dist/*` from silently breaking `apps/native` and `packages/verticals/brewery/recipes-ui` consumers (see `DEVELOPMENT-LOCAL.md` → "Shared packages build") |
 | `./scripts/check-packages-dist-up-to-date.sh` before pushing | Catches any `packages/*/dist` drift automatically. Now actually covers beerjson too (it didn't before this commit, because beerjson wasn't in the upstream `build:packages` chain). |
 
 Optional enhancements (nice-to-have, not required for solo honesty):

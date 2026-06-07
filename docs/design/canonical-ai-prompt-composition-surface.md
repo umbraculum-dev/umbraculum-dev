@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** Shipped at public-alpha hardening (2026-05)  
 **Audience:** module authors, API maintainers, AI consultant implementors, reviewers  
-**Related:** [`AI-CONSULTANT.md`](../AI-CONSULTANT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.3, [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md)
+**Related:** [`AI-CONSULTANT.md`](../AI-CONSULTANT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.3, [`packages/modules/module-sdk/README.md`](../../packages/modules/module-sdk/README.md)
 
 ---
 
@@ -101,7 +101,7 @@ Web clients may pass `routeId` via query `?fromRoute=productionOrders` on `/ai`.
 ## 6. Maintenance
 
 - When adding a module overlay or route map, update the module's `services/api/src/services/ai/prompts/<code>.ts` and `services/api/src/modules/<code>/index.ts`.  
-- When adding a new `RouteId` with a dedicated AI hint, extend the module's `aiPrompts.routes` and [`packages/navigation`](../../packages/navigation/src/index.ts).  
+- When adding a new `RouteId` with a dedicated AI hint, extend the module's `aiPrompts.routes` and [`packages/platform/navigation`](../../packages/platform/navigation/src/index.ts).  
 - Operator-facing examples: [`help/asking-umbraculum.md`](../help/asking-umbraculum.md).  
 - Feature-level explainer: [`AI-CONSULTANT.md`](../AI-CONSULTANT.md).
 

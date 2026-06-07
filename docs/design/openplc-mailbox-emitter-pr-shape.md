@@ -4,7 +4,7 @@
 **Status:** Draft 2026-05-19 — handoff to OpenPLC sister-repo maintainer
 **Audience:** OpenPLC sister-repo maintainer (project lead is the same person as the platform `automation` module owner; this doc exists so the work can be picked up later without re-deriving context)
 **Builds on:** [`canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) §12.2 (B1), §12.5 (Phase A entry checklist step 4)
-**Pairs with:** [`@umbraculum/automation-contracts`](../../packages/automation-contracts/) — the platform mirror that will consume this artifact (renamed from `@brewery/automation-contracts` as sub-plan #9 slot 4 on 2026-05-19; sister-repo emits JSON-only artifacts so this is a doc-only update on the sister side)
+**Pairs with:** [`@umbraculum/automation-contracts`](../../packages/modules/automation-contracts/) — the platform mirror that will consume this artifact (renamed from `@brewery/automation-contracts` as sub-plan #9 slot 4 on 2026-05-19; sister-repo emits JSON-only artifacts so this is a doc-only update on the sister side)
 
 > **Disclaimer.** This document describes the *shape* of the sister-repo PR — what files to emit, how the platform will consume them, and what gates the platform side waits for. It does not specify alarm-layer behavior, PLC ladder structure, or `PI_*` semantic content. Those remain owned by the sister repo.
 
@@ -53,7 +53,7 @@ A single artifact — JSON is the canonical form; a TS export is convenience.
 }
 ```
 
-Field shapes match the [`MailboxSpec`](../../packages/automation-contracts/src/mailbox.ts) type so the platform mirror is a no-op `JSON.parse` on the platform side. No nested objects beyond `entries[]`.
+Field shapes match the [`MailboxSpec`](../../packages/modules/automation-contracts/src/mailbox.ts) type so the platform mirror is a no-op `JSON.parse` on the platform side. No nested objects beyond `entries[]`.
 
 ### 2.2 Generation
 
@@ -92,7 +92,7 @@ The integrated-release-baseline rule already moves `integrated_release_tag`, PLC
 - `mailbox.json.contractVersion` — same string the sister repo already publishes as `contract_version` (sister-repo `pyproject.toml` is canonical).
 - `mailbox.json.integratedReleaseTag` — optional; copy from the same baseline if available.
 
-The platform's `CONTRACT_VERSION` constant in [`packages/automation-contracts/src/version.ts`](../../packages/automation-contracts/src/version.ts) tracks this string. Phase A starts at `0.0.0-dev`; the first agreed non-`-dev` version is set when this PR merges.
+The platform's `CONTRACT_VERSION` constant in [`packages/modules/automation-contracts/src/version.ts`](../../packages/modules/automation-contracts/src/version.ts) tracks this string. Phase A starts at `0.0.0-dev`; the first agreed non-`-dev` version is set when this PR merges.
 
 ## 5. CI / verification on the sister-repo side (recommended)
 
@@ -108,7 +108,7 @@ The platform side will mirror the artifact with its own typecheck + vitest gate 
 
 After this PR merges, the platform side does **one** PR to `umbraculum-dev`:
 
-1. Drop the emitted `mailbox.json` into `packages/automation-contracts/data/mailbox.json` (or sibling `.ts`); add a small loader.
+1. Drop the emitted `mailbox.json` into `packages/modules/automation-contracts/data/mailbox.json` (or sibling `.ts`); add a small loader.
 2. Bump `CONTRACT_VERSION` from `0.0.0-dev` to the agreed value.
 3. Add a vitest assertion that the loaded artifact has `PI_FIRMWARE_VERSION` and parses cleanly into `MailboxSpec`.
 4. Commit + push.
@@ -125,8 +125,8 @@ That's Phase A step 5. Phase B (Prisma schema + read path) starts after that.
 ## 8. References
 
 - [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) §12.2 (B1), §12.5 step 4
-- [`packages/automation-contracts/src/mailbox.ts`](../../packages/automation-contracts/src/mailbox.ts) — `MailboxSpec` type the artifact must conform to
-- [`packages/automation-contracts/src/version.ts`](../../packages/automation-contracts/src/version.ts) — `CONTRACT_VERSION` and `classifyContractVersionSkew`
+- [`packages/modules/automation-contracts/src/mailbox.ts`](../../packages/modules/automation-contracts/src/mailbox.ts) — `MailboxSpec` type the artifact must conform to
+- [`packages/modules/automation-contracts/src/version.ts`](../../packages/modules/automation-contracts/src/version.ts) — `CONTRACT_VERSION` and `classifyContractVersionSkew`
 - OpenPLC sister-repo `DEVELOPMENT.md` — `PI_*` prefix convention, `prepare_openplc_runtime_upload.py`, alarm-layer stability, integrated-release baseline
 
 ---

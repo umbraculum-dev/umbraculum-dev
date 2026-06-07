@@ -120,7 +120,7 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 | Layer | Default (`reference` profile) | Platform opt-out (`UMBRACULUM_MODULE_PROFILE=platform` or [`docker-compose.platform.yml`](../../docker-compose.platform.yml)) |
 |---|---|---|
 | **API** | `registerBreweryModule(app)` when profile is `reference` ([`services/api/src/app.ts`](../../services/api/src/app.ts)) | Brewery module + `/platform/recipes/*` not registered |
-| **Web nav** | `brewery` in [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/module-sdk/src/builtinWebModules.ts) | Brewery segments omitted |
+| **Web nav** | `brewery` in [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/modules/module-sdk/src/builtinWebModules.ts) | Brewery segments omitted |
 | **Native** | Brewery routes in [`registerPlatformNativeModules`](../../apps/native/src/navigation/registerPlatformNativeModules.ts) | Brewery native module skipped |
 | **Database** | `brewery.*` schema always migrated | Same — runtime opt-out only; schema remains |
 | **Workspace UI toggle** | **None** — deploy profile + optional add-on rows | `WorkspaceBillingAddon` + `tier_and_addons` enforcement (Phase 3 slice); full purchase UI deferred H1 2027 |
@@ -129,7 +129,7 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 
 **Integrator without brewery:** set `UMBRACULUM_MODULE_PROFILE=platform` in `.env` or `docker compose -f docker-compose.yml -f docker-compose.platform.yml up -d`.
 
-**OpenAPI:** ISVs on the platform profile should consume [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) only — the brewery add-on spec (`openapi/brewery.json`) documents the reference vertical and is omitted from platform-profile generation. Browse interactively on [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform) (platform) or [docs.umbraculum.dev/openapi-brewery](https://docs.umbraculum.dev/openapi-brewery) (reference vertical). For typed HTTP calls from your repo, prefer [`@umbraculum/api-client`](../../packages/api-client/README.md) facades over raw `fetch`. See [`API-OPENAPI.md`](API-OPENAPI.md).
+**OpenAPI:** ISVs on the platform profile should consume [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) only — the brewery add-on spec (`openapi/brewery.json`) documents the reference vertical and is omitted from platform-profile generation. Browse interactively on [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform) (platform) or [docs.umbraculum.dev/openapi-brewery](https://docs.umbraculum.dev/openapi-brewery) (reference vertical). For typed HTTP calls from your repo, prefer [`@umbraculum/api-client`](../../packages/platform/api-client/README.md) facades over raw `fetch`. See [`API-OPENAPI.md`](API-OPENAPI.md).
 
 **Workspace-level omit (hosted):** seed `brewery_module` on demo workspaces; enable `ENTITLEMENTS_ENFORCEMENT_MODE=tier_and_addons` when testing omit semantics ([RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)).
 

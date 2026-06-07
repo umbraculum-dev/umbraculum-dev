@@ -7,7 +7,7 @@
 #   1. Sister repo `brewery-alarms-tanks-supervisor` emits
 #      `out/mailbox.json` from `tools/build_mailbox_artifact.py`.
 #   2. This script copies that file into
-#      `packages/automation-contracts/data/mailbox.json`.
+#      `packages/modules/automation-contracts/data/mailbox.json`.
 #   3. `src/mailbox-data.ts` validates the mirror at module-load time;
 #      vitest covers the same checks at CI time.
 #
@@ -33,7 +33,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SISTER_REPO="${SISTER_REPO:-}"
 SISTER_ARTIFACT="${SISTER_REPO}/out/mailbox.json"
-MIRROR="${REPO_ROOT}/packages/automation-contracts/data/mailbox.json"
+MIRROR="${REPO_ROOT}/packages/modules/automation-contracts/data/mailbox.json"
 
 mode="copy"
 if [[ "${1:-}" == "--check" ]]; then

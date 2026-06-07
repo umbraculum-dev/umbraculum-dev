@@ -101,14 +101,14 @@ jobs:
             echo "::endgroup::"
           }
 
-          publish_npm_oidc packages/contracts "${CONTRACTS_ESCAPED}" "@umbraculum/contracts"
+          publish_npm_oidc packages/platform/contracts "${CONTRACTS_ESCAPED}" "@umbraculum/contracts"
 
           echo "Rewriting api-client dependencies to registry semver for publish tarball only"
           jq '.dependencies["@umbraculum/contracts"] = "^0.0.1" | .dependencies["@umbraculum/automation-contracts"] = "^0.0.2" | .dependencies["@umbraculum/pim-contracts"] = "^0.0.2" | .dependencies["@umbraculum/mrp-contracts"] = "^0.0.2" | .dependencies["@umbraculum/crp-contracts"] = "^0.0.2"' \
-            packages/api-client/package.json > /tmp/api-client-package.json
-          mv /tmp/api-client-package.json packages/api-client/package.json
+            packages/platform/api-client/package.json > /tmp/api-client-package.json
+          mv /tmp/api-client-package.json packages/platform/api-client/package.json
 
-          publish_npm_oidc packages/api-client "${API_CLIENT_ESCAPED}" "@umbraculum/api-client"
+          publish_npm_oidc packages/platform/api-client "${API_CLIENT_ESCAPED}" "@umbraculum/api-client"
 
       - name: Published versions summary
         run: |

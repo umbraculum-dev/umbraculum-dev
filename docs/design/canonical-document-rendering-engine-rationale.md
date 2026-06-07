@@ -110,7 +110,7 @@ HTML→PDF was tested on three axes specific to this slot:
 
 **Gotenberg** wins on all three axes:
 
-- **Layout vocabulary:** HTML + CSS (via headless Chromium) is the maximum-coverage shape — same engine that renders every modern web page also renders to PDF. Boring 50-page documents, branded marketing PDFs, accessibility-checked compliance documents — all work in the same vocabulary the project's frontend already uses ([`@umbraculum/ui`](../../packages/ui/) Tamagui primitives compile to HTML/CSS on web; template authors can reuse familiar primitives).
+- **Layout vocabulary:** HTML + CSS (via headless Chromium) is the maximum-coverage shape — same engine that renders every modern web page also renders to PDF. Boring 50-page documents, branded marketing PDFs, accessibility-checked compliance documents — all work in the same vocabulary the project's frontend already uses ([`@umbraculum/ui`](../../packages/platform/ui/) Tamagui primitives compile to HTML/CSS on web; template authors can reuse familiar primitives).
 - **Self-host security:** Chromium is contained inside the Gotenberg image with its own sandboxing; the API container doesn't need any kernel-feature special-casing. The Docker default-runtime gives Gotenberg the kernel features it needs; the API container doesn't have to.
 - **Memory and image size:** Chromium memory is paid for in one place, in proportion to the rendering workload. The API container stays small (the existing Node image, ~150 MB).
 - **DOCX/ODT bonus:** Gotenberg's LibreOffice route handles DOCX/ODT/RTF → PDF as a sub-route of the same HTTP API, no separate engine. Two render kinds, one sidecar.
@@ -523,7 +523,7 @@ The following candidate decisions came up during analysis but were **explicitly 
 
 ### 11.1 Image processing
 
-Image resizing, format conversion (PNG → JPEG → WebP → AVIF), thumbnailing, EXIF stripping — these are real cross-cutting concerns but they belong to **[@umbraculum/media](../../packages/media/)**, not to the rendering pipeline. RFC-0007's `RenderKind` set explicitly excludes image processing.
+Image resizing, format conversion (PNG → JPEG → WebP → AVIF), thumbnailing, EXIF stripping — these are real cross-cutting concerns but they belong to **[@umbraculum/media](../../packages/platform/media/)**, not to the rendering pipeline. RFC-0007's `RenderKind` set explicitly excludes image processing.
 
 If a render-time concern requires image manipulation (e.g., "this PDF needs the workspace's brand logo inlined as base64"), the rendering template requests the image asset from `@umbraculum/media`'s resolver — `@umbraculum/media` handles the resize / format-conversion, and the rendering pipeline uses the result.
 
@@ -587,4 +587,4 @@ The two-document split is intentional: RFC-0007 is a stable, easily-cited commit
 - [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2 — the consumption-contract row for document/file rendering that RFC-0007 added, this document operationalizes.
 - [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §4 convention 4 — Prisma multi-schema convention that the §10 BullMQ pick's Postgres-as-source-of-truth shape follows.
 - [`docs/rfcs/0003-validation-library-adoption.md`](../rfcs/0003-validation-library-adoption.md) — the precedent for "library choice committed inside the RFC" (Decision B) which RFC-0007 §6 mirrors. The validation audit is this document's parallel.
-- [`packages/media/`](../../packages/media/) — the asset pipeline that §11.1 image-processing concerns route through; rendering is a producer for `@umbraculum/media`.
+- [`packages/platform/media/`](../../packages/platform/media/) — the asset pipeline that §11.1 image-processing concerns route through; rendering is a producer for `@umbraculum/media`.

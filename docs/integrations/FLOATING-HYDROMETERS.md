@@ -165,8 +165,8 @@ Implementation detail:
 
 Charts are implemented in `@umbraculum/ui` for reuse:
 
-- Web implementation: `packages/ui/src/charts/HydrometerChart.web.tsx`
-- Native implementation: `packages/ui/src/charts/HydrometerChart.native.tsx`
+- Web implementation: `packages/platform/ui/src/charts/HydrometerChart.web.tsx`
+- Native implementation: `packages/platform/ui/src/charts/HydrometerChart.native.tsx`
 
 Design notes:
 

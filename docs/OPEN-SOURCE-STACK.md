@@ -276,7 +276,7 @@ brevity is the gate that keeps the page maintainable.
 
 ### Tamagui
 
-- **Role.** Cross-platform UI primitives — the `packages/ui/`
+- **Role.** Cross-platform UI primitives — the `packages/platform/ui/`
   building blocks that work on both web (DOM) and native (React
   Native). See [`TAMAGUI.md`](TAMAGUI.md) for the type-system
   caveats and the platform's adaptation strategy.

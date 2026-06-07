@@ -1,6 +1,6 @@
 import React from "react";
 
-import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
+import { HydrometerChart } from "@umbraculum/brewery-recipes-ui/charts/HydrometerChart";
 
 import type { IntegrationDevice } from "../../../hooks/fermIntegration/fermIntegrationTypes";
 import type { NativeFermDataIntegrationScreenModel } from "../../../hooks/fermIntegration/useNativeFermDataIntegrationScreen";

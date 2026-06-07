@@ -70,8 +70,8 @@ export default function ContributingPage() {
             <ul>
               <li>{tI18n("howItWorks1")}</li>
               <li>
-                {tI18n("howItWorks2Prefix")} <code>packages/i18n/src/en.json</code> {tI18n("howItWorks2Middle")}{" "}
-                <code>packages/i18n/src/it.json</code>.
+                {tI18n("howItWorks2Prefix")} <code>packages/platform/i18n/src/en.json</code> {tI18n("howItWorks2Middle")}{" "}
+                <code>packages/platform/i18n/src/it.json</code>.
               </li>
               <li>{tI18n("howItWorks3")}</li>
             </ul>

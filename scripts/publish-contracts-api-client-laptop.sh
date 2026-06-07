@@ -38,18 +38,18 @@ publish_pkg() {
 }
 
 echo "1. @umbraculum/contracts"
-publish_pkg packages/contracts "@umbraculum/contracts"
+publish_pkg packages/platform/contracts "@umbraculum/contracts"
 
 echo "2. Rewrite api-client deps for registry tarball"
-cp packages/api-client/package.json /tmp/api-client-package.json.bak
+cp packages/platform/api-client/package.json /tmp/api-client-package.json.bak
 jq '.dependencies["@umbraculum/contracts"] = "^0.0.1" | .dependencies["@umbraculum/automation-contracts"] = "^0.0.2" | .dependencies["@umbraculum/pim-contracts"] = "^0.0.2" | .dependencies["@umbraculum/mrp-contracts"] = "^0.0.2" | .dependencies["@umbraculum/crp-contracts"] = "^0.0.2"' \
-  packages/api-client/package.json > /tmp/api-client-package.json
-mv /tmp/api-client-package.json packages/api-client/package.json
+  packages/platform/api-client/package.json > /tmp/api-client-package.json
+mv /tmp/api-client-package.json packages/platform/api-client/package.json
 
 echo "3. @umbraculum/api-client"
-publish_pkg packages/api-client "@umbraculum/api-client"
+publish_pkg packages/platform/api-client "@umbraculum/api-client"
 
-mv /tmp/api-client-package.json.bak packages/api-client/package.json
+mv /tmp/api-client-package.json.bak packages/platform/api-client/package.json
 
 echo "OK: contracts + api-client publish step complete"
 echo "Next: npx npm@11.16.0 trust github … (see npm-sdk-trusted-publishing.md)"

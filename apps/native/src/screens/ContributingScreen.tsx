@@ -105,11 +105,11 @@ export function ContributingScreen() {
                   <Bullet>
                     {tI18n("howItWorks2Prefix")}{" "}
                     <Text fontSize={12} opacity={0.9}>
-                      packages/i18n/src/en.json
+                      packages/platform/i18n/src/en.json
                     </Text>{" "}
                     {tI18n("howItWorks2Middle")}{" "}
                     <Text fontSize={12} opacity={0.9}>
-                      packages/i18n/src/it.json
+                      packages/platform/i18n/src/it.json
                     </Text>
                     .
                   </Bullet>

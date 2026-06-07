@@ -78,11 +78,11 @@ Commands and gate-skill results will be appended here as implementation proceeds
 - `./scripts/build-packages-in-docker.sh` — passed; rebuilt package `dist/` outputs after i18n changes.
 - `docker run --rm -v "$PWD:/repo" -w /repo node:20-slim bash -lc "npm run check-web-url-segments"` — passed, 0 violations.
 - Targeted ESLint over Wave 4 API/web/E2E files — passed.
-- First focused Playwright run exposed expected dev-watcher drift after package rebuild (`tsx` preload / `packages/rendering` realpath dependency issue). Services were restarted and `packages/rendering` dependencies were bootstrapped with `npm install --no-package-lock`; the E2E seed then passed again.
+- First focused Playwright run exposed expected dev-watcher drift after package rebuild (`tsx` preload / `packages/platform/rendering` realpath dependency issue). Services were restarted and `packages/platform/rendering` dependencies were bootstrapped with `npm install --no-package-lock`; the E2E seed then passed again.
 - `docker run --rm --network host -e E2E_BASE_URL=http://localhost:18080 -v "$PWD/apps/web/e2e:/e2e" -w /e2e mcr.microsoft.com/playwright:v1.60.0-noble bash -lc "npm install --no-audit --no-fund && npx playwright test smoke/mrp-crp-read-only-alpha.spec.ts --project=smoke"` — passed on rerun, 4/4.
 - `python3 scripts/docs/check-readmes.py` — passed, 19/19 OK.
 - `git diff --check` — passed.
-- `docker compose exec -T web npm run typecheck` — exits non-zero on the existing Tamagui baseline; targeted search found no Wave 4 touched-file matches in the command output. `types-baseline-verifier` confirmed `services/api`, `apps/web/e2e`, and `packages/i18n` typecheck clean; `apps/web` still fails on the documented Tamagui baseline, with no Wave 4-introduced changed-line type issues.
+- `docker compose exec -T web npm run typecheck` — exits non-zero on the existing Tamagui baseline; targeted search found no Wave 4 touched-file matches in the command output. `types-baseline-verifier` confirmed `services/api`, `apps/web/e2e`, and `packages/platform/i18n` typecheck clean; `apps/web` still fails on the documented Tamagui baseline, with no Wave 4-introduced changed-line type issues.
 - Public endpoint verification on `http://localhost:18080`: `/api/health`, `/en/production-orders`, `/en/resources`, `/en/capacity`, and `/en/schedule` all returned HTTP 200.
 - `e2e-smoke` non-blocking signal was skipped by the subagent because no agentic control-panel CLI/container inputs were discoverable in this checkout or running stack.
 - Verification-time lockfile drift in `apps/web/e2e/package-lock.json` and `services/api/package-lock.json` was manually restored; those files are not part of the Wave 4 diff.

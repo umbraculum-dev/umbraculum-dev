@@ -33,13 +33,13 @@
 
 | Area | Paths |
 |------|--------|
-| SDK scope | [`packages/ai-tool-sdk/src/aiTool.ts`](../../packages/ai-tool-sdk/src/aiTool.ts) |
+| SDK scope | [`packages/modules/ai-tool-sdk/src/aiTool.ts`](../../packages/modules/ai-tool-sdk/src/aiTool.ts) |
 | Prisma | `AiProposal` in [`services/api/prisma/schema.prisma`](../../services/api/prisma/schema.prisma) |
 | Service | [`services/api/src/services/ai/proposalService.ts`](../../services/api/src/services/ai/proposalService.ts) |
 | Tools | [`services/api/src/services/ai/tools/mrp/proposeOrderAdjustment.ts`](../../services/api/src/services/ai/tools/mrp/proposeOrderAdjustment.ts) |
 | Routes | [`services/api/src/routes/ai.ts`](../../services/api/src/routes/ai.ts) |
-| Contracts | [`packages/contracts/src/ai/aiProposals.ts`](../../packages/contracts/src/ai/aiProposals.ts) |
-| UI | [`packages/ui/src/ai/useAiChatStream.ts`](../../packages/ui/src/ai/useAiChatStream.ts), [`AiChatPanel.tsx`](../../packages/ui/src/ai/AiChatPanel.tsx) |
+| Contracts | [`packages/platform/contracts/src/ai/aiProposals.ts`](../../packages/platform/contracts/src/ai/aiProposals.ts) |
+| UI | [`packages/platform/ui/src/ai/useAiChatStream.ts`](../../packages/platform/ui/src/ai/useAiChatStream.ts), [`AiChatPanel.tsx`](../../packages/platform/ui/src/ai/AiChatPanel.tsx) |
 
 ---
 
@@ -77,9 +77,9 @@
 ## 7. Verification
 
 ```bash
-cd packages/ai-tool-sdk && npm run build
-cd packages/contracts && npm run build
-cd packages/ui && npm run build
+cd packages/modules/ai-tool-sdk && npm run build
+cd packages/platform/contracts && npm run build
+cd packages/platform/ui && npm run build
 cd services/api && npm run typecheck
 docker compose exec -T api sh -c 'cd /app && npm test -- src/tests/ai/'
 ```

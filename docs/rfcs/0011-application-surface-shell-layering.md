@@ -41,7 +41,7 @@ RFC-0002 answered “where does my module's **pages** go?” It intentionally de
 - `apps/web/app/_lib/breweryWaterClient.ts` beside `webApiClient.ts`
 - `[locale]/ai` at the same structural level as `(pim)/` without indicating platform ownership
 - `@umbraculum/contracts` exports brewery, water, and gravity-analysis schemas from the **platform** contracts package — while RFC-0002 names `@umbraculum/brewery-contracts`, that package was never created
-- `packages/core/` on disk vs `@umbraculum/brewery-core` on npm; `BrewCheckbox` in `@umbraculum/ui`
+- `packages/verticals/brewery/core/` on disk vs `@umbraculum/brewery-core` on npm; `BrewCheckbox` in `@umbraculum/ui`
 
 [`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md) teaches Magento's core vs sample-data vs agency-module story, but the repo tree contradicts that story in **platform shared layout folders and platform npm packages alike**. Pre-flip is the last low-cost window to fix paths before external forks copy the wrong shape.
 

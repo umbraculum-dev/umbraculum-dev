@@ -1,6 +1,6 @@
 "use client";
 
-import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
+import { HydrometerChart } from "@umbraculum/brewery-recipes-ui/charts/HydrometerChart";
 
 import type { UseFermDataIntegrationPageModel } from "../../_hooks/useFermDataIntegrationPage";
 import type { HydrometerReadingPoint } from "../../_lib/fermIntegrationTypes";

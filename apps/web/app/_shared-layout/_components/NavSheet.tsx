@@ -2,6 +2,7 @@
 
 import type { MouseEvent, ReactNode } from "react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button, Sheet, Text, useMedia, YStack } from "tamagui";
 
 export interface NavSheetProps {
@@ -39,6 +40,7 @@ export function NavSheet({
   triggerVariant = "hamburger",
   mode = "auto",
 }: NavSheetProps) {
+  const t = useTranslations("common");
   const [open, setOpen] = useState(false);
   const media = useMedia();
   const narrow = media.narrow;
@@ -111,7 +113,7 @@ export function NavSheet({
             cursor="pointer"
             fontSize={18}
             onPress={() => setOpen(false)}
-            aria-label="Close"
+            aria-label={t("close")}
           >
             ×
           </Button>

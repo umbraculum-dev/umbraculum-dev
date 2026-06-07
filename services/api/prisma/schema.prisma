@@ -1336,7 +1336,7 @@ model WorkspaceAiMemory {
  *   - future credit-resale reconciliation (deferred to v1.5)
  *
  * `toolCalls` is the ordered list of tool invocations during the turn; see
- * `packages/contracts/src/ai/aiUsage.ts` `AiToolCallRecord` for the shape.
+ * `packages/platform/contracts/src/ai/aiUsage.ts` `AiToolCallRecord` for the shape.
  */
 model AiUsageLedger {
   id                String  @id @default(uuid())

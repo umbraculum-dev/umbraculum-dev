@@ -61,7 +61,7 @@ Both disciplines are interpretive clarifications of RFC-0002 B, not amendments. 
 
 ### 2.4 Three problems with the current registration surface
 
-`packages/module-sdk/src/registerWebModule.ts` is a stub: it accepts only the module `code` and tracks it in a `Set<string>`. The docstring says "navigation metadata land with the H1 2027 migration" — stale because PIM shipped without the H1 2027 work being done, leaving PIM's nav entry to be hand-coded in `apps/web/app/_components/PrimaryNav.tsx`. Three concrete problems:
+`packages/modules/module-sdk/src/registerWebModule.ts` is a stub: it accepts only the module `code` and tracks it in a `Set<string>`. The docstring says "navigation metadata land with the H1 2027 migration" — stale because PIM shipped without the H1 2027 work being done, leaving PIM's nav entry to be hand-coded in `apps/web/app/_components/PrimaryNav.tsx`. Three concrete problems:
 
 - **No URL-segment registration.** Modules can claim arbitrary URL segments by adding folders; the second module to want `/inventory` silently shadows the first.
 - **No nav-entry registration.** Every new module requires editing `PrimaryNav.tsx` by hand, contradicting RFC-0002's "modules are self-contained" goal.
@@ -89,7 +89,7 @@ apps/web/app/[locale]/(automation)/vessels/[vesselCode]/page.tsx
 
 ### 3.2 The URL-segment registry surface
 
-`packages/module-sdk/src/registerWebModule.ts` extends to:
+`packages/modules/module-sdk/src/registerWebModule.ts` extends to:
 
 ```ts
 export interface RegisterWebModuleOptions {
@@ -250,7 +250,7 @@ Rejected: α (URL-axis), γ (route group + literal segment), δ (bespoke).
 
 ### 6.2 D2 — URL-segment registry shape
 
-**Verdict: D2c (full URL-segment reservation + build-time CI collision check).** Extend `registerWebModule({ ownedUrlSegments, navEntry })` in `packages/module-sdk/`; write `scripts/check-web-url-segments.ts` that fails build on (a) any segment registered by two modules, (b) any `(code)/<static-segment>/` folder not registered, (c) any `(code)/page.tsx` existing (Discipline 1 violation), (d) any `(code)/[<dynamic>]/page.tsx` at group root (Discipline 2 violation).
+**Verdict: D2c (full URL-segment reservation + build-time CI collision check).** Extend `registerWebModule({ ownedUrlSegments, navEntry })` in `packages/modules/module-sdk/`; write `scripts/check-web-url-segments.ts` that fails build on (a) any segment registered by two modules, (b) any `(code)/<static-segment>/` folder not registered, (c) any `(code)/page.tsx` existing (Discipline 1 violation), (d) any `(code)/[<dynamic>]/page.tsx` at group root (Discipline 2 violation).
 
 Rejected: D2a (defer registry — leaves discipline unenforced); D2b (registry without build-time check — registry's value IS the check).
 

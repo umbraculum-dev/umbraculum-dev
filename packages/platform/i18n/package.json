@@ -1,0 +1,30 @@
+{
+  "name": "@umbraculum/i18n",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Generic locale-bundle framework (TypeScript types + JSON bundles + copy-json build step). Platform + canonical namespaces only; brewery-vertical strings live in @umbraculum/brewery-i18n and merge in getSharedMessages().",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json && node scripts/copy-json.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./en": {
+      "default": "./dist/en.json"
+    },
+    "./it": {
+      "default": "./dist/it.json"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@umbraculum/brewery-i18n": "file:../../verticals/brewery/i18n"
+  }
+}

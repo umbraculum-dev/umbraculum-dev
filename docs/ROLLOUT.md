@@ -18,12 +18,12 @@ Each phase was built to be mergeable on its own. Recommended slice order = phase
 
 | Slice | Files | Risk | Reversibility | Value if merged alone |
 |---|---|---|---|---|
-| **S1 — Docs + rule pre-align** | `docs/TESTING.md`, `docs/TESTING-DECISION.md`, `docs/AGENTIC-JOBS.md`, `docs/ROLLOUT.md`, `CURSOR-RULES-SKILLS-TODO.md`, packages/test-mcp/README + src comment updates, `apps/web/e2e/brewday/recipe-create.spec.ts` + `apps/web/e2e/support/locators.ts` comment updates. (`.cursor/*` is gitignored.) | Zero (docs only) | Trivial (revert .md files) | Policy is now written; agent already starts proposing test diffs |
-| **S2 — L1 unit** | `packages/contracts/vitest.config.ts`, `packages/contracts/src/**/*.test.ts`, `packages/core/vitest.config.ts`, `packages/core/src/**/*.test.ts`, packages' `package.json` dev-dep + `test` script, root `test:packages`/`test:all` scripts | Very low (vitest added as dev dep; existing runtime code untouched) | `npm uninstall vitest -w ...` | L1 layer functional |
+| **S1 — Docs + rule pre-align** | `docs/TESTING.md`, `docs/TESTING-DECISION.md`, `docs/AGENTIC-JOBS.md`, `docs/ROLLOUT.md`, `CURSOR-RULES-SKILLS-TODO.md`, packages/platform/test-mcp/README + src comment updates, `apps/web/e2e/brewday/recipe-create.spec.ts` + `apps/web/e2e/support/locators.ts` comment updates. (`.cursor/*` is gitignored.) | Zero (docs only) | Trivial (revert .md files) | Policy is now written; agent already starts proposing test diffs |
+| **S2 — L1 unit** | `packages/platform/contracts/vitest.config.ts`, `packages/platform/contracts/src/**/*.test.ts`, `packages/verticals/brewery/core/vitest.config.ts`, `packages/verticals/brewery/core/src/**/*.test.ts`, packages' `package.json` dev-dep + `test` script, root `test:packages`/`test:all` scripts | Very low (vitest added as dev dep; existing runtime code untouched) | `npm uninstall vitest -w ...` | L1 layer functional |
 | **S3 — L3 smoke + seeder** | `scripts/smoke.sh`, `services/api/src/cli/seedE2eFixture.ts`, `services/api/package.json` (`seed:e2e` script), root `smoke`/`seed:e2e` scripts | Low (idempotent seeder; only writes `e2e-*` rows) | `npm run seed:e2e -- --clean` | L3 functional; manual stack-up workflows get a `./scripts/smoke.sh` gate |
 | **S4 — L2 + L4 + CI gate** | `.github/workflows/api.yml`, `services/api/package.json` (`test:db:prepare`, `contracts:check`, `contracts:update`), `services/api/src/tests/contracts/**` | **Medium** — CI becomes blocking on PRs touching `services/api/**` or `packages/**` | Disable the workflow file | L1+L2+L4 gate every PR; biggest payoff |
 | **S5 — L5 Playwright** | `apps/web/e2e/**`, `apps/web/e2e/.gitignore`, `apps/web/e2e/README.md` | Low (separate workspace; nothing imports from it) | Delete the directory | L5 reproducible locally via `docker run` |
-| **S6 — `@umbraculum/test-mcp`** | `packages/test-mcp/**` + workspace registration | Low (new package; opt-in for agentic surface) | Remove the package | Lets agents one-shot smoke/seed/run without re-implementing |
+| **S6 — `@umbraculum/test-mcp`** | `packages/platform/test-mcp/**` + workspace registration | Low (new package; opt-in for agentic surface) | Remove the package | Lets agents one-shot smoke/seed/run without re-implementing |
 
 Natural stopping point: **after S4**. That's the "deterministic CI gate is in place" moment. S5+S6 are amplifiers.
 
@@ -36,7 +36,7 @@ Before considering a slice done, verify it works **locally** (no merge required 
 - **S3**: stack up → `docker compose exec api npm run seed:e2e` → `./scripts/smoke.sh` exit 0. Then `npm run seed:e2e` again (idempotency check — second run reports "already present").
 - **S4**: open a no-op PR touching `services/api/src/**` (e.g. comment) on a throwaway branch → workflow runs → both jobs green. Revert.
 - **S5**: `docker run --rm --network host -v "$PWD/apps/web/e2e:/e2e" -w /e2e mcr.microsoft.com/playwright:v1.60.0-noble bash -lc "npm install --no-audit --no-fund && npx playwright test --project=smoke"` → green.
-- **S6**: `cd packages/test-mcp && npm install && npm run start`; `curl -fsS http://localhost:8932/` lists tools; `curl -fsS -X POST http://localhost:8932/smokeStack -H 'content-type: application/json' --data '{}'` returns `runDir` + `pass`.
+- **S6**: `cd packages/platform/test-mcp && npm install && npm run start`; `curl -fsS http://localhost:8932/` lists tools; `curl -fsS -X POST http://localhost:8932/smokeStack -H 'content-type: application/json' --data '{}'` returns `runDir` + `pass`.
 
 ### Out of scope (deliberately, for now)
 
@@ -68,7 +68,7 @@ Install / refresh the plugin pack using [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGIN
 
 ### Troubleshooting / rollback
 
-Plugin rollback is handled by disabling or reverting the plugin install in Cursor, not by running an npm package-sync cleanup. Brewery's project-local files in `docs/AGENTIC-JOBS.md` and `packages/test-mcp/` are unaffected by plugin enablement either way.
+Plugin rollback is handled by disabling or reverting the plugin install in Cursor, not by running an npm package-sync cleanup. Brewery's project-local files in `docs/AGENTIC-JOBS.md` and `packages/platform/test-mcp/` are unaffected by plugin enablement either way.
 
 Repo-local `.cursor/rules/` remains available only as the troubleshooting fallback documented in [`AGENTS.md`](../AGENTS.md): if a plugin-shipped `alwaysApply: true` rule is present but not reliably enforced, copy that rule from `~/.cursor/plugins/local/<plugin-name>/rules/` into `.cursor/rules/` and report the enforcement gap upstream.
 

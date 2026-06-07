@@ -52,7 +52,7 @@ For reference, the packages currently in the horizontal set (as catalogued in [`
 | `@umbraculum/media` | Shared assets framework. |
 | `@umbraculum/test-mcp` | Test-MCP HTTP server (developer tooling). |
 
-If your package fits alongside this list naturally — read [`@umbraculum/i18n`'s README](../../../packages/i18n/README.md) and [`@umbraculum/ui`'s README](../../../packages/ui/README.md) as the "what a horizontal package looks like" worked examples — you're on the right path.
+If your package fits alongside this list naturally — read [`@umbraculum/i18n`'s README](../../../packages/platform/i18n/README.md) and [`@umbraculum/ui`'s README](../../../packages/platform/ui/README.md) as the "what a horizontal package looks like" worked examples — you're on the right path.
 
 ---
 
@@ -95,7 +95,7 @@ If the cells for your package come out as anything other than `Consume` or `No i
 For each row marked `Consume`, your package's runtime imports the platform's implementation rather than wrapping or paralleling it. Examples from the existing horizontal-package set:
 
 - [`@umbraculum/rendering`](../../rfcs/0007-canonical-document-rendering.md) §9 — consumes `@umbraculum/media` for asset persistence (`Consume`), consumes the platform Prisma client for the `rendering` schema (`Consume`), consumes the existing Redis for BullMQ (`Consume`), does not implement its own auth / billing / secrets surface (`Consume` for each).
-- [`@umbraculum/i18n`](../../../packages/i18n/README.md) — consumes Node 20+ runtime, does not implement its own logger (consumes the platform structured logger when used from API; does not log directly on web/native), does not implement its own storage (consumes whatever the consumer wires).
+- [`@umbraculum/i18n`](../../../packages/platform/i18n/README.md) — consumes Node 20+ runtime, does not implement its own logger (consumes the platform structured logger when used from API; does not log directly on web/native), does not implement its own storage (consumes whatever the consumer wires).
 
 `No intersection` is the right answer for rows that genuinely don't touch your package — e.g. a static-asset framework probably has `No intersection` for billing, AI, secrets.
 

@@ -146,7 +146,7 @@ Record last green run date here when executed: **2026-05-27** (agent): `check-pa
 
 **Implication:** Demo rendering / Gotenberg / MRP work-order templates are OK. The gap is **native-only**: async render job + artifact URL for `platform: "native"` + `Linking.openURL` (Bearer client), not demo VPS.
 
-**Code path:** [`apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx`](../../apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx) → `runAsyncRenderJobExport` → [`packages/api-client/src/platform/rendering.ts`](../../packages/api-client/src/platform/rendering.ts).
+**Code path:** [`apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx`](../../apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx) → `runAsyncRenderJobExport` → [`packages/platform/api-client/src/platform/rendering.ts`](../../packages/platform/api-client/src/platform/rendering.ts).
 
 **Scope:** Optional §5.1 row 6 — does not reopen G1 core closure. Fix deferred.
 

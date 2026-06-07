@@ -86,7 +86,7 @@ Committed logical model (Prisma names may adjust at implementation):
 - Module entitlements: `<module_code>_module` (e.g. `automation_module`, `wms_module`).
 - Managed-AI packs (reserved, not sold in v1): `managed_ai_credits_<allowance>` (e.g. `managed_ai_credits_5k`).
 
-Boot-time registry MUST reject duplicate `addonCodes` across modules ([`packages/module-sdk`](../../packages/module-sdk/) — shipped with this RFC).
+Boot-time registry MUST reject duplicate `addonCodes` across modules ([`packages/modules/module-sdk`](../../packages/modules/module-sdk/) — shipped with this RFC).
 
 ---
 
@@ -154,7 +154,7 @@ This RFC extends [RFC-0001](0001-modules-tiers-governance-and-automation-placeme
 
 Amendments require a successor RFC at `docs/rfcs/NNNN-<title>.md` with migration plan. Material changes to the `WorkspaceBillingAddon` shape or to managed-AI credit economics re-trigger the 30-day public-comment window post-public-alpha per [`LICENSING.md`](../LICENSING.md) §10.
 
-**Touched docs:** [`docs/rfcs/README.md`](README.md), [`docs/design/canonical-workspace-billing-addons-surface.md`](../design/canonical-workspace-billing-addons-surface.md), [`docs/design/rfc-companion-documentation-audit.md`](../design/rfc-companion-documentation-audit.md), [`docs/ROADMAP.md`](../ROADMAP.md), [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §8.2, [`docs/README.md`](../README.md), [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md).
+**Touched docs:** [`docs/rfcs/README.md`](README.md), [`docs/design/canonical-workspace-billing-addons-surface.md`](../design/canonical-workspace-billing-addons-surface.md), [`docs/design/rfc-companion-documentation-audit.md`](../design/rfc-companion-documentation-audit.md), [`docs/ROADMAP.md`](../ROADMAP.md), [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §8.2, [`docs/README.md`](../README.md), [`packages/modules/module-sdk/README.md`](../../packages/modules/module-sdk/README.md).
 
 ---
 

@@ -34,4 +34,4 @@ HTTP paths are unchanged — this wave is filesystem clarity only.
 
 - [`docs/modules/verticals/brewery/README.md`](../../../../../docs/modules/verticals/brewery/README.md) §3.1
 - [`docs/rfcs/0011-application-surface-shell-layering.md`](../../../../../docs/rfcs/0011-application-surface-shell-layering.md) §10
-- [`@umbraculum/brewery-contracts`](../../../../../packages/brewery-contracts/README.md)
+- [`@umbraculum/brewery-contracts`](../../../../../packages/verticals/brewery/contracts/README.md)

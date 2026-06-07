@@ -229,32 +229,32 @@ The flat `packages/` tree repeats the shell-layer confusion at the **npm workspa
 
 | On-disk path | npm name | Declared layer | Actual ownership signal |
 |--------------|----------|----------------|-------------------------|
-| `packages/ui/` | `@umbraculum/ui` | Horizontal (L3) | **Leaked:** `BrewCheckbox`, `HydrometerChart` |
-| `packages/navigation/` | `@umbraculum/navigation` | Horizontal (L3) | Clean |
-| `packages/i18n/` | `@umbraculum/i18n` | Horizontal (L3) | **Leaked:** brewery + MRP/CRP copy in same `en.json` |
-| `packages/i18n-react/` | `@umbraculum/i18n-react` | Horizontal (L3) | Clean (bindings only) |
-| `packages/i18n-keys/` | `@umbraculum/i18n-keys` | SDK (L5) | Clean |
-| `packages/api-client/` | `@umbraculum/api-client` | Horizontal (L3) | Clean |
-| `packages/media/` | `@umbraculum/media` | Horizontal (L3) | **Leaked:** brewery asset content (documented deferral) |
-| `packages/rendering/` | `@umbraculum/rendering` | Horizontal (L3) | Clean (BeerJSON proof is consumer, not owner) |
-| `packages/test-mcp/` | `@umbraculum/test-mcp` | Dev tooling | Clean |
-| `packages/contracts/` | `@umbraculum/contracts` | Platform contracts (L4) | **Was leaked** — `src/brewery/`, `src/water/`, `src/analysis/` moved to `@umbraculum/brewery-contracts` (Wave 3b, 2026-06-06) |
-| `packages/brewery-contracts/` | `@umbraculum/brewery-contracts` | Vertical contracts (L4) | **Clean** — RFC-0002 β fourth slice for `brewery` |
-| `packages/module-sdk/` | `@umbraculum/module-sdk` | SDK (L5) | Clean |
-| `packages/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | SDK (L5) | Clean |
-| `packages/automation-contracts/` | `@umbraculum/automation-contracts` | Canonical (L4) | Clean — **good pattern** |
-| `packages/pim-contracts/` | `@umbraculum/pim-contracts` | Canonical (L4) | Clean |
-| `packages/mrp-contracts/` | `@umbraculum/mrp-contracts` | Canonical (L4) | Clean |
-| `packages/crp-contracts/` | `@umbraculum/crp-contracts` | Canonical (L4) | Clean |
-| `packages/core/` | `@umbraculum/brewery-core` | Vertical (L5) | **Trap:** folder says `core`, npm says `brewery-core` |
-| `packages/beerjson/` | `@umbraculum/brewery-beerjson` | Vertical (L5) | **Trap:** folder omits `brewery-` prefix |
-| `packages/recipes-ui/` | `@umbraculum/brewery-recipes-ui` | Vertical (L5) | **Trap:** folder omits `brewery-` prefix |
+| `packages/platform/ui/` | `@umbraculum/ui` | Horizontal (L3) | **Leaked:** `BrewCheckbox`, `HydrometerChart` |
+| `packages/platform/navigation/` | `@umbraculum/navigation` | Horizontal (L3) | Clean |
+| `packages/platform/i18n/` | `@umbraculum/i18n` | Horizontal (L3) | **Leaked:** brewery + MRP/CRP copy in same `en.json` |
+| `packages/platform/i18n-react/` | `@umbraculum/i18n-react` | Horizontal (L3) | Clean (bindings only) |
+| `packages/modules/i18n-keys/` | `@umbraculum/i18n-keys` | SDK (L5) | Clean |
+| `packages/platform/api-client/` | `@umbraculum/api-client` | Horizontal (L3) | Clean |
+| `packages/platform/media/` | `@umbraculum/media` | Horizontal (L3) | **Leaked:** brewery asset content (documented deferral) |
+| `packages/platform/rendering/` | `@umbraculum/rendering` | Horizontal (L3) | Clean (BeerJSON proof is consumer, not owner) |
+| `packages/platform/test-mcp/` | `@umbraculum/test-mcp` | Dev tooling | Clean |
+| `packages/platform/contracts/` | `@umbraculum/contracts` | Platform contracts (L4) | **Was leaked** — `src/brewery/`, `src/water/`, `src/analysis/` moved to `@umbraculum/brewery-contracts` (Wave 3b, 2026-06-06) |
+| `packages/verticals/brewery/contracts/` | `@umbraculum/brewery-contracts` | Vertical contracts (L4) | **Clean** — RFC-0002 β fourth slice for `brewery` |
+| `packages/modules/module-sdk/` | `@umbraculum/module-sdk` | SDK (L5) | Clean |
+| `packages/modules/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | SDK (L5) | Clean |
+| `packages/modules/automation-contracts/` | `@umbraculum/automation-contracts` | Canonical (L4) | Clean — **good pattern** |
+| `packages/modules/pim-contracts/` | `@umbraculum/pim-contracts` | Canonical (L4) | Clean |
+| `packages/modules/mrp-contracts/` | `@umbraculum/mrp-contracts` | Canonical (L4) | Clean |
+| `packages/modules/crp-contracts/` | `@umbraculum/crp-contracts` | Canonical (L4) | Clean |
+| `packages/verticals/brewery/core/` | `@umbraculum/brewery-core` | Vertical (L5) | **Trap:** folder says `core`, npm says `brewery-core` |
+| `packages/verticals/brewery/beerjson/` | `@umbraculum/brewery-beerjson` | Vertical (L5) | **Trap:** folder omits `brewery-` prefix |
+| `packages/verticals/brewery/recipes-ui/` | `@umbraculum/brewery-recipes-ui` | Vertical (L5) | **Trap:** folder omits `brewery-` prefix |
 
 **Magento parallel:** this is like finding `Magento\Catalog` classes under `vendor/magento/framework/` because “we haven't split the package yet.” Canonical modules already follow the right pattern (`pim-contracts/` → `@umbraculum/pim-contracts`). Brewery and platform do not.
 
 ### 6.2 Failure modes (why this blocks integrators)
 
-1. **Path vs npm cognitive load.** `cd packages/core` installs `@umbraculum/brewery-core` — the bare `@umbraculum/core` name is *reserved* for future platform-core ([trap-avoidance](../REPOSITORY-STRUCTURE.md) §3.6). New contributors grep `packages/core` expecting platform backbone.
+1. **Path vs npm cognitive load.** `cd packages/verticals/brewery/core` installs `@umbraculum/brewery-core` — the bare `@umbraculum/core` name is *reserved* for future platform-core ([trap-avoidance](../REPOSITORY-STRUCTURE.md) §3.6). New contributors grep `packages/verticals/brewery/core` expecting platform backbone.
 
 2. **Platform contracts absorb vertical DTOs.** ~~`@umbraculum/contracts` exports brewery route schemas…~~ **Resolved Wave 3b** — brewery wire types now live in `@umbraculum/brewery-contracts`; platform `@umbraculum/contracts` is cross-cutting only (no re-export shims). Remaining symmetry gap: **`services/api/src/services/` and `domain/`** still host brewery logic outside `modules/brewery/` (§6.8).
 
@@ -289,7 +289,7 @@ packages/
     crp-contracts/
   verticals/
     brewery/                        # Tier-6 reference vertical — ALL brewery npm packages here
-      core/                         # @umbraculum/brewery-core  (rename from packages/core)
+      core/                         # @umbraculum/brewery-core  (rename from packages/verticals/brewery/core)
       beerjson/                     # @umbraculum/brewery-beerjson
       recipes-ui/                   # @umbraculum/brewery-recipes-ui
       contracts/                    # @umbraculum/brewery-contracts  (NEW — see §6.4)
@@ -346,7 +346,7 @@ Add `eslint-plugin-boundaries` elements on `packages/**`:
 | `pkg-module-contracts` | `packages/modules/*-contracts/**` | Must not import `pkg-vertical` |
 | `pkg-vertical` | `packages/verticals/**` | May import `pkg-platform` + relevant `pkg-module-contracts`; never sibling vertical |
 
-Spike doc: `docs/design/solid-boundaries-eslint-packages-spike.md` (to author in Wave 3d).
+Spike doc: [`docs/design/solid-boundaries-eslint-packages-spike.md`](./solid-boundaries-eslint-packages-spike.md) (Wave 3d, 2026-06-07).
 
 ### 6.8 `services/api` — brewery service colocation (Wave 3e — complete)
 
@@ -465,10 +465,10 @@ flowchart TB
 | **0** | RFC-0011 + this doc reviewed | 1–2d | No — but sets backbone |
 | **1** | Move brewery files out of `app/_components`, `app/_lib`; introduce `app/_shared-layout/` | 2–4d | **Done (2026-06-06)** — child plan `rfc-0011_wave_1_web_shell_3435eb19.plan.md` |
 | **2** | `(platform-layout)/` route group; move ai/accessibility/about/contact | 1–2d | **Done (2026-06-07)** — absorbed into Wave 3f |
-| **3a** | Physical move to `packages/{platform,modules,verticals}/`; workspace globs | 2–3d | Optional pre-flip |
-| **3b** | Create `@umbraculum/brewery-contracts`; migrate `contracts/src/{brewery,water,analysis}` | 3–5d | **Recommended** — closes RFC-0002 gap |
-| **3c** | Purge vertical leakage from `@umbraculum/ui`, split `@umbraculum/i18n` content | 2–4d | Recommended |
-| **3d** | Package-layer eslint boundaries + spike doc | 1–2d | Follows 3a |
+| **3a** | Physical move to `packages/{platform,modules,verticals}/`; workspace globs | 2–3d | **Done (2026-06-07)** |
+| **3b** | Create `@umbraculum/brewery-contracts`; migrate `contracts/src/{brewery,water,analysis}` | 3–5d | **Done (2026-06-06)** — closes RFC-0002 gap |
+| **3c** | Purge vertical leakage from `@umbraculum/ui`, split `@umbraculum/i18n` content | 2–4d | **Done (2026-06-07)** |
+| **3d** | Package-layer eslint boundaries + spike doc | 1–2d | **Done (2026-06-07)** |
 | **3e** | Colocate brewery API services — move `src/services/recipeWaterHub*`, `recipeWaterCompute/`, `domain/waterCalc/`, `domain/recipeAnalysis/` under `modules/brewery/services/` (§6.8) | 2–3d | **Done (2026-06-06)** — Phase 1; Phase 2 flat orchestrators deferred |
 | **3f** | **Shared layout nomenclature + path rename:** `_shared-layout/`, `(platform-layout)/`, `web-platform-shared-layout`; glossary + BUILDING-YOUR-VERTICAL decision tree | 1–2d | **Done (2026-06-07)** |
 | **4** | `@umbraculum/native-shell` + `apps/native/brewery/` | 3–5d | Optional pre-flip — scaffold second app README |

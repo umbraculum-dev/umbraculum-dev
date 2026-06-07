@@ -124,7 +124,7 @@ export function registerAutomationModule(app: FastifyInstance): void {
 
 - Seed data goes in your vertical's `services/api/src/modules/<your-code>/seed/` (or equivalent under the migrated brewery shape).
 - AI prompts and knowledge sources register through the AI tool SDK ([RFC-0001 §8.2](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) AI platform row).
-- i18n strings land in `packages/i18n/src/<locale>.json` under a vertical-prefixed namespace (e.g. `distillery.*`, `cosmetics.*`).
+- i18n strings land in `packages/platform/i18n/src/<locale>.json` under a vertical-prefixed namespace (e.g. `distillery.*`, `cosmetics.*`).
 
 ### Step 7 — Ship
 
@@ -202,5 +202,5 @@ Read [`verticals/brewery/README.md`](../verticals/brewery/README.md) end-to-end 
 - [`verticals/brewery/README.md`](../verticals/brewery/README.md) — the worked example.
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6 row), §8 (consumption contract).
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3 (β layout), §4 (naming), §6 (Decision D — brewery sequencing).
-- [`packages/module-sdk/README.md`](../../../packages/module-sdk/README.md) — the SDK you pin.
+- [`packages/modules/module-sdk/README.md`](../../../packages/modules/module-sdk/README.md) — the SDK you pin.
 - [`docs/MODULES.md`](../../MODULES.md) §3.2, §4.2 — catalog of vertical configurations and decision-tree row.

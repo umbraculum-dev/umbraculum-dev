@@ -14,13 +14,13 @@ Rule:
   - app code must import from the package **exports**, not from `packages/*/src/**`
 
 Current buildable packages (native-consumed):
-- `packages/i18n` (`@umbraculum/i18n`)
-- `packages/i18n-react` (`@umbraculum/i18n-react`)
-- `packages/navigation` (`@umbraculum/navigation`)
-- `packages/contracts` (`@umbraculum/contracts`)
-- `packages/api-client` (`@umbraculum/api-client`)
-- `packages/ui` (`@umbraculum/ui`)
-- `packages/recipes-ui` (`@umbraculum/brewery-recipes-ui`)
+- `packages/platform/i18n` (`@umbraculum/i18n`)
+- `packages/platform/i18n-react` (`@umbraculum/i18n-react`)
+- `packages/platform/navigation` (`@umbraculum/navigation`)
+- `packages/platform/contracts` (`@umbraculum/contracts`)
+- `packages/platform/api-client` (`@umbraculum/api-client`)
+- `packages/platform/ui` (`@umbraculum/ui`)
+- `packages/verticals/brewery/recipes-ui` (`@umbraculum/brewery-recipes-ui`)
 
 Build workflow:
 - When you change any of the packages above, rebuild `dist/` and commit the updated `dist/` outputs.
@@ -101,10 +101,10 @@ The web app uses two CSS sources: `apps/web/app/globals.css` (imports) and `apps
 **Where to add new styles:** Variables → `variables.css`; layout/shell → `layout.css`; component classes → `components.css`.
 
 ### Shared media assets (MANDATORY)
-All shared images and media must live in `packages/media` (`@umbraculum/media`). Do not commit duplicates under `apps/web/public/` or app-local folders.
+All shared images and media must live in `packages/platform/media` (`@umbraculum/media`). Do not commit duplicates under `apps/web/public/` or app-local folders.
 
-- **Folder conventions**: `packages/media/assets/<domain>/...` (e.g. `assets/yeast/`, `assets/hops/`).
-- **Web**: reference assets as `/media/<domain>/<filename>` (e.g. `/media/yeast/dilution-1-100.png`). The sync script (`apps/web/scripts/sync-media.mjs`) copies from `packages/media/assets/**` into `apps/web/public/media/**` before dev/build/start.
+- **Folder conventions**: `packages/platform/media/assets/<domain>/...` (e.g. `assets/yeast/`, `assets/hops/`).
+- **Web**: reference assets as `/media/<domain>/<filename>` (e.g. `/media/yeast/dilution-1-100.png`). The sync script (`apps/web/scripts/sync-media.mjs`) copies from `packages/platform/media/assets/**` into `apps/web/public/media/**` before dev/build/start.
 - **Native (future)**: when a React Native / Expo app exists, import assets from `@umbraculum/media` (e.g. `require('@umbraculum/media/assets/yeast/dilution-1-100.png')` or equivalent bundler support). Do not duplicate assets in app-local folders.
 
 ### TypeScript: `interface` vs `type`
@@ -212,7 +212,7 @@ Guardrails:
   - Web/native should consume `result` + `derivation` and render it, with runtime parsing of network payloads (`unknown` → `parseXxx()`).
 
 ### Shared contracts (`@umbraculum/contracts`) + versioning (MANDATORY for native-ready endpoints)
-We treat `@umbraculum/contracts` (`$REPO_ROOT/packages/contracts/`) as the **single source of DTO truth** for endpoints that must stay stable across **web + native**.
+We treat `@umbraculum/contracts` (`$REPO_ROOT/packages/platform/contracts/`) as the **single source of DTO truth** for endpoints that must stay stable across **web + native**.
 
 Standards:
 - **Type-only imports** for TS safety without runtime coupling:
@@ -261,8 +261,8 @@ Derivation contract:
 Web rendering rules:
 - Use `apps/web/app/[locale]/(brewery)/recipes/[id]/water/_lib/mathBodies.ts` as the shared renderer.
 - Labels/copy live under:
-  - `packages/i18n/src/en.json` → `math.derivation.*`
-  - `packages/i18n/src/it.json` → `math.derivation.*`
+  - `packages/platform/i18n/src/en.json` → `math.derivation.*`
+  - `packages/platform/i18n/src/it.json` → `math.derivation.*`
 - Prefer showing:
   - the formula skeleton (from `derivation.formulas.<formulaId>`)
   - the minimal inputs + intermediates needed to follow the computation
@@ -281,7 +281,7 @@ Adding a new “math topic” end-to-end:
 We do **not** ship localized numeric strings from the API. Values remain numeric. To keep rendering consistent across web/native, the API may include **format hints** (non-localized) alongside results.
 
 Standard:
-- Use `@umbraculum/contracts` `NumberFormatHintV1` (`packages/contracts/src/format/numberFormat.ts`).
+- Use `@umbraculum/contracts` `NumberFormatHintV1` (`packages/platform/contracts/src/format/numberFormat.ts`).
 - Hints must be **optional** and safe to ignore by older clients.
 - Clients apply hints when present; otherwise use existing local formatting defaults.
 
@@ -320,7 +320,7 @@ Normalization must happen in exactly one place:
 
 - **API boundary normalization**: the API converts incoming BeerJSON amounts into canonical units **before** domain validation/persistence.
   - This enables BeerJSON imports and future native clients to send US customary values without changing the stored canonical representation.
-- **Shared conversion library**: conversion factors and rounding helpers live in `packages/core/src/units/` and are reused by API + web (and later native).
+- **Shared conversion library**: conversion factors and rounding helpers live in `packages/verticals/brewery/core/src/units/` and are reused by API + web (and later native).
 
 #### Canonical targets per BeerJSON field (v1)
 When normalizing BeerJSON recipes, enforce these canonical targets:

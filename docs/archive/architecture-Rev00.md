@@ -237,7 +237,7 @@ This is a key product differentiator and a strong reason to prefer native apps.
 - Put correctness into **core domain library** (pure functions).
 
 ### Stack
-- **Unit tests:** Vitest (packages/core, services/api)
+- **Unit tests:** Vitest (packages/verticals/brewery/core, services/api)
 - **Integration tests:** API + DB (compose-based test DB or testcontainers later)
 - **E2E tests:** Playwright (web)
 - **Mobile:** start with unit + a small number of integration tests; add heavier mobile e2e after flows stabilize
@@ -301,7 +301,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
 - Enforce ACL centrally in service layer.
 
 ### Phase 3 - Domain core + first features
-- `packages/core`:
+- `packages/verticals/brewery/core`:
   - brewing calculations (pure functions)
   - validation and unit conversions
   - strong unit tests

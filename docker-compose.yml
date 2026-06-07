@@ -79,41 +79,43 @@ services:
       - ./apps/web:/app
       - web_node_modules:/app/node_modules
       - npm_cache:/root/.npm
-      - ./packages/beerjson:/packages/beerjson:ro
-      - ./packages/brewery-contracts:/packages/brewery-contracts:ro
-      - ./packages/contracts:/packages/contracts:ro
-      - ./packages/core:/packages/core:ro
-      - ./packages/i18n:/packages/i18n:ro
-      - ./packages/i18n-react:/packages/i18n-react:ro
-      - ./packages/media:/packages/media:ro
+      - ./packages/verticals/brewery/beerjson:/packages/verticals/brewery/beerjson:ro
+      - ./packages/verticals/brewery/contracts:/packages/verticals/brewery/contracts:ro
+      - ./packages/platform/contracts:/packages/platform/contracts:ro
+      - ./packages/verticals/brewery/core:/packages/verticals/brewery/core:ro
+      - ./packages/platform/i18n:/packages/platform/i18n:ro
+      - ./packages/verticals/brewery/i18n:/packages/verticals/brewery/i18n:ro
+      - ./packages/platform/i18n-react:/packages/platform/i18n-react:ro
+      - ./packages/platform/media:/packages/platform/media:ro
+      - ./packages/verticals/brewery/media-assets:/packages/verticals/brewery/media-assets:ro
       # Week 1 audit (RFC-0006) wires apps/web/app/_shared-layout/_lib/registerPlatformSegments.ts
       # into apps/web/app/layout.tsx; the layout imports @umbraculum/module-sdk
       # to register platform-owned URL segments with the same web registry that
       # canonical modules (automation/brewery/pim) write to from the api side.
       # Without this bind mount the web container's symlink at
-      # node_modules/@umbraculum/module-sdk -> ../../../packages/module-sdk
-      # resolves to /packages/module-sdk which does not exist (compare with
+      # node_modules/@umbraculum/module-sdk -> ../../../packages/modules/module-sdk
+      # resolves to /packages/modules/module-sdk which does not exist (compare with
       # the api service's existing module-sdk mount further down).
-      - ./packages/module-sdk:/packages/module-sdk:ro
+      - ./packages/modules/module-sdk:/packages/modules/module-sdk:ro
       # ai-tool-sdk landed 2026-05-21 as a peer of module-sdk on the published-SDK
       # surface (PLATFORM-ARCHITECTURE.md §4.4); extracted from @umbraculum/contracts.
       # module-sdk's dist/*.d.ts now references @umbraculum/ai-tool-sdk, so the
       # same bind-mount discipline applies even though apps/web has no direct
       # import — TS resolution can chase the transitive declaration.
-      - ./packages/ai-tool-sdk:/packages/ai-tool-sdk:ro
-      - ./packages/i18n-keys:/packages/i18n-keys:ro
-      - ./packages/navigation:/packages/navigation:ro
-      - ./packages/recipes-ui:/packages/recipes-ui:ro
-      - ./packages/ui:/packages/ui:ro
+      - ./packages/modules/ai-tool-sdk:/packages/modules/ai-tool-sdk:ro
+      - ./packages/modules/i18n-keys:/packages/modules/i18n-keys:ro
+      - ./packages/platform/navigation:/packages/platform/navigation:ro
+      - ./packages/verticals/brewery/recipes-ui:/packages/verticals/brewery/recipes-ui:ro
+      - ./packages/platform/ui:/packages/platform/ui:ro
       # Phase B-3 prep: web pages under (automation)/ will consume the
       # mailbox-mirror types (MailboxSpec, MAILBOX_SPEC) via this package.
       # Mounted now so Phase B-3 PRs only have to add imports, not compose.
       # MRP/CRP async export (renderJobClient.ts) uses cookie-auth helpers from api-client.
-      - ./packages/api-client:/packages/api-client:ro
-      - ./packages/automation-contracts:/packages/automation-contracts:ro
-      - ./packages/pim-contracts:/packages/pim-contracts:ro
-      - ./packages/mrp-contracts:/packages/mrp-contracts:ro
-      - ./packages/crp-contracts:/packages/crp-contracts:ro
+      - ./packages/platform/api-client:/packages/platform/api-client:ro
+      - ./packages/modules/automation-contracts:/packages/modules/automation-contracts:ro
+      - ./packages/modules/pim-contracts:/packages/modules/pim-contracts:ro
+      - ./packages/modules/mrp-contracts:/packages/modules/mrp-contracts:ro
+      - ./packages/modules/crp-contracts:/packages/modules/crp-contracts:ro
 
   docs-site:
     image: node:20-slim
@@ -172,10 +174,10 @@ services:
       - ./services/api:/app
       - api_node_modules:/app/node_modules
       - npm_cache:/root/.npm
-      - ./packages/contracts:/packages/contracts:ro
-      - ./packages/brewery-contracts:/packages/brewery-contracts:ro
-      - ./packages/core:/packages/core:ro
-      - ./packages/media:/packages/media:ro
+      - ./packages/platform/contracts:/packages/platform/contracts:ro
+      - ./packages/verticals/brewery/contracts:/packages/verticals/brewery/contracts:ro
+      - ./packages/verticals/brewery/core:/packages/verticals/brewery/core:ro
+      - ./packages/platform/media:/packages/platform/media:ro
       # Phase B-1: api consumes @umbraculum/module-sdk via registerModule()
       # and @umbraculum/automation-contracts for the typed mailbox mirror.
       # Both packages already follow the file:../../packages/<name> npm
@@ -185,20 +187,22 @@ services:
       # (rename history: slot 2 media → @umbraculum/media; slot 6 core →
       # @umbraculum/brewery-core; slot 9 contracts → @umbraculum/contracts;
       # sub-plan #9 closed slot 14 — all @brewery/* now @umbraculum/*).
-      - ./packages/module-sdk:/packages/module-sdk:ro
-      - ./packages/rendering:/packages/rendering:ro
-      - ./packages/automation-contracts:/packages/automation-contracts:ro
-      - ./packages/pim-contracts:/packages/pim-contracts:ro
-      - ./packages/mrp-contracts:/packages/mrp-contracts:ro
-      - ./packages/crp-contracts:/packages/crp-contracts:ro
+      - ./packages/modules/module-sdk:/packages/modules/module-sdk:ro
+      # Legacy symlink target (pre-3a api node_modules volume): ../../../packages/module-sdk
+      - ./packages/modules/module-sdk:/packages/module-sdk:ro
+      - ./packages/platform/rendering:/packages/platform/rendering:ro
+      - ./packages/modules/automation-contracts:/packages/modules/automation-contracts:ro
+      - ./packages/modules/pim-contracts:/packages/modules/pim-contracts:ro
+      - ./packages/modules/mrp-contracts:/packages/modules/mrp-contracts:ro
+      - ./packages/modules/crp-contracts:/packages/modules/crp-contracts:ro
       # ai-tool-sdk landed 2026-05-21 as the dedicated home for the AI-tool SDK
       # contract (PLATFORM-ARCHITECTURE.md §4.4); extracted from @umbraculum/contracts.
       # The api consumes it directly (services/api/src/services/ai/**) and
       # transitively via @umbraculum/module-sdk's RegisterModuleOptions.registerAiTools.
-      - ./packages/ai-tool-sdk:/packages/ai-tool-sdk:ro
+      - ./packages/modules/ai-tool-sdk:/packages/modules/ai-tool-sdk:ro
       # i18n-keys landed 2026-05-27; module-sdk dist/*.d.ts references
       # @umbraculum/i18n-keys for ModuleNavLabelKey on nav/tab entries.
-      - ./packages/i18n-keys:/packages/i18n-keys:ro
+      - ./packages/modules/i18n-keys:/packages/modules/i18n-keys:ro
       # RAG D1 ingest reads docs/help and surface markdown (read-only).
       - .:/umbraculum:ro
 
@@ -224,8 +228,8 @@ services:
       - ./services/api:/app
       - api_node_modules:/app/node_modules
       - npm_cache:/root/.npm
-      - ./packages/contracts:/packages/contracts:ro
-      - ./packages/core:/packages/core:ro
+      - ./packages/platform/contracts:/packages/platform/contracts:ro
+      - ./packages/verticals/brewery/core:/packages/verticals/brewery/core:ro
 
   # pgvector/pgvector:pg16 (not stock postgres:16): AI Layer C RAG needs the `vector`
   # extension (ai.doc_chunks). Image swap + force-recreate keeps pgdata volumes.

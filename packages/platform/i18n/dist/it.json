@@ -1,0 +1,819 @@
+{
+  "pim": {
+    "title": "Product Information Management",
+    "subtitle": "Catalogo master di prodotti, varianti, attributi e categorie.",
+    "products": {
+      "title": "Prodotti",
+      "listTitle": "Prodotti",
+      "noProducts": "Nessun prodotto in questo workspace.",
+      "loading": "Caricamento…",
+      "refresh": "Aggiorna",
+      "refreshing": "Aggiornamento…",
+      "create": "Crea prodotto",
+      "creating": "Creazione…",
+      "createSuccess": "Prodotto creato.",
+      "createError": "Impossibile creare il prodotto.",
+      "createRequired": "SKU e nome sono obbligatori.",
+      "openDetail": "Apri prodotto",
+      "back": "Torna ai prodotti",
+      "searchPlaceholder": "Cerca per SKU o nome…",
+      "attributeSetPlaceholder": "ID set attributi opzionale",
+      "notFound": "Prodotto non trovato in questo workspace."
+    },
+    "variants": {
+      "title": "Varianti",
+      "noVariants": "Nessuna variante per questo prodotto."
+    },
+    "categories": {
+      "title": "Categorie",
+      "noCategories": "Nessuna categoria in questo workspace.",
+      "back": "Torna ai prodotti"
+    },
+    "attributeSets": {
+      "title": "Set di attributi",
+      "noSets": "Nessun set di attributi in questo workspace.",
+      "openDetail": "Apri set",
+      "back": "Torna ai set di attributi"
+    },
+    "fields": {
+      "sku": "SKU",
+      "name": "Nome",
+      "status": "Stato",
+      "description": "Descrizione",
+      "attributeSet": "Set attributi",
+      "code": "Codice",
+      "label": "Etichetta"
+    },
+    "values": {
+      "draft": "Bozza",
+      "active": "Attivo",
+      "archived": "Archiviato",
+      "none": "—"
+    }
+  },
+  "automation": {
+    "title": "Automazione",
+    "subtitle": "Stato in tempo reale del controllore per i vessel di questo workspace. (Pianificazione, capacità e utilizzo appartengono al futuro modulo di capacity-resource-planning — non a questa superficie.)",
+    "listTitle": "Vessel",
+    "noVessels": "Nessun vessel in questo workspace. I vessel appaiono qui dopo il primo snapshot dell'adapter.",
+    "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "openDetail": "Vedi dettagli",
+    "back": "Torna ai vessel",
+    "error": "Impossibile caricare i vessel.",
+    "notFound": "Vessel non trovato in questo workspace.",
+    "fields": {
+      "code": "Codice",
+      "displayName": "Nome",
+      "vesselKind": "Tipo",
+      "mode": "Modalità",
+      "currentTempC": "Temperatura attuale (°C)",
+      "targetTempC": "Temperatura target (°C)",
+      "alarmActive": "Allarme",
+      "lastSeenAt": "Ultimo aggiornamento",
+      "equipmentProfileId": "Profilo attrezzatura",
+      "adapterConnectionId": "Connessione adapter"
+    },
+    "values": {
+      "alarmOn": "Attivo",
+      "alarmOff": "Nessuno",
+      "never": "Mai",
+      "none": "—"
+    }
+  },
+  "mrp": {
+    "title": "Pianificazione produzione",
+    "subtitle": "Vista alpha MRP in sola lettura su ricette e sessioni di cotta esistenti.",
+    "alphaNote": "Le righe marcate come proiettate sono read model. Brewery resta la fonte autorevole; questa pagina non crea righe MRP.",
+    "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "error": "Impossibile caricare i dati di pianificazione produzione.",
+    "noProductionOrders": "Nessun ordine di produzione o proiezione brewery in questo workspace.",
+    "noMaterialRequirements": "Nessun fabbisogno materiali visibile.",
+    "export": {
+      "workOrderPdf": "Esporta ordine di lavoro (PDF)",
+      "routeCardPdf": "Esporta scheda percorso (PDF)",
+      "materialRequirementsXlsx": "Esporta fabbisogni materiali (XLSX)",
+      "productionOrdersCsv": "Esporta ordini di produzione (CSV)",
+      "working": "Preparazione export…",
+      "download": "Scarica export",
+      "error": "Export non riuscito"
+    },
+    "productionOrders": {
+      "listTitle": "Ordini di produzione",
+      "openDetail": "Apri ordine",
+      "back": "Torna agli ordini di produzione",
+      "materialRequirements": "Fabbisogni materiali",
+      "operations": "Operazioni",
+      "capacityLink": "Apri vista capacità",
+      "scheduleLink": "Apri schedule CRP"
+    },
+    "materialRequirements": {
+      "title": "Fabbisogni materiali",
+      "subtitle": "Punto di ingresso in sola lettura per i fabbisogni materiali per ordine. Apri un ordine per vedere i fabbisogni derivati dagli ingredienti.",
+      "openOrder": "Apri fabbisogni ordine"
+    },
+    "fields": {
+      "orderNumber": "Numero ordine",
+      "status": "Stato",
+      "quantity": "Quantità",
+      "plannedStartAt": "Inizio pianificato",
+      "dueAt": "Scadenza",
+      "createdAt": "Creato",
+      "source": "Fonte",
+      "sourceRefId": "Riferimento fonte",
+      "debugId": "ID debug",
+      "outputProductId": "Prodotto in uscita",
+      "lineCount": "Righe",
+      "operationCode": "Codice operazione",
+      "operationName": "Operazione",
+      "duration": "Durata",
+      "earliestStartAt": "Primo inizio",
+      "availability": "Disponibilità",
+      "availabilityNote": "Nota disponibilità",
+      "material": "Materiale",
+      "requiredQuantity": "Quantità richiesta",
+      "productionOrder": "Ordine di produzione"
+    },
+    "values": {
+      "none": "—",
+      "unknownDate": "Non schedulato",
+      "canonicalMrpRow": "Riga MRP canonica",
+      "projectedFromBrewery": "Proiettato da brewery",
+      "projectedFromModule": "Proiettato da {module}"
+    }
+  },
+  "crp": {
+    "title": "Pianificazione capacità",
+    "subtitle": "Vista alpha CRP in sola lettura su vessel di automazione, attrezzatura brewery e step di cotta temporizzati.",
+    "alphaNote": "Le righe marcate come proiettate sono read model. Automation e brewery restano le fonti autorevoli; questa pagina non crea righe CRP.",
+    "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "error": "Impossibile caricare i dati di pianificazione capacità.",
+    "noResources": "Nessuna risorsa di capacità o proiezione automation in questo workspace.",
+    "noWorkCenters": "Nessuna proiezione di centro di lavoro in questo workspace.",
+    "noCapacity": "Nessun bucket di carico capacità visibile.",
+    "noSchedule": "Nessuna operazione schedulata visibile.",
+    "noConflicts": "Nessun avviso di capacità visibile.",
+    "resources": {
+      "listTitle": "Risorse",
+      "openDetail": "Apri risorsa",
+      "workCentersTitle": "Centri di lavoro",
+      "workCentersNote": "I centri di lavoro sono proiezioni in sola lettura dei profili attrezzatura brewery. Spiegano il contesto di capacità senza spostare la proprietà fuori da brewery.",
+      "openRelatedResource": "Apri risorsa collegata",
+      "automationSourceLink": "Apri vessel automation",
+      "back": "Torna alle risorse",
+      "capacityLink": "Apri vista capacità",
+      "scheduleLink": "Apri schedule"
+    },
+    "export": {
+      "capacityLoadXlsx": "Esporta carico capacità (XLSX)",
+      "schedulePdf": "Esporta schedule (PDF)",
+      "conflictReportPdf": "Esporta report conflitti (PDF)",
+      "resourceCalendarCsv": "Esporta calendario risorse (CSV)",
+      "working": "Preparazione export…",
+      "download": "Scarica export",
+      "error": "Export non riuscito"
+    },
+    "capacity": {
+      "title": "Carico capacità",
+      "note": "I bucket alpha con 0 minuti disponibili sono evidenza del read model, non la capacità calendario finale del CRP.",
+      "resourceLink": "Apri dettaglio risorsa"
+    },
+    "schedule": {
+      "title": "Schedule",
+      "conflictsTitle": "Avvisi in sola lettura",
+      "resourcesLink": "Apri risorse",
+      "capacityLink": "Apri capacità"
+    },
+    "fields": {
+      "resource": "Risorsa",
+      "code": "Codice",
+      "name": "Nome",
+      "kind": "Tipo",
+      "status": "Stato",
+      "source": "Fonte",
+      "sourceRefId": "Riferimento fonte",
+      "createdAt": "Creato",
+      "updatedAt": "Aggiornato",
+      "debugId": "ID debug",
+      "bucketStartAt": "Inizio bucket",
+      "bucketEndAt": "Fine bucket",
+      "availableMinutes": "Minuti disponibili",
+      "plannedMinutes": "Minuti pianificati",
+      "overloadMinutes": "Minuti sovraccarico",
+      "operationCode": "Codice operazione",
+      "productionOrder": "Ordine di produzione",
+      "workCenter": "Centro di lavoro",
+      "startsAt": "Inizia",
+      "endsAt": "Finisce",
+      "duration": "Durata",
+      "conflict": "Conflitto",
+      "severity": "Severità"
+    },
+    "values": {
+      "none": "—",
+      "canonicalCrpRow": "Riga CRP canonica",
+      "projectedFromAutomationVessel": "Proiettato da vessel automation",
+      "projectedFromBrewery": "Proiettato da brewery",
+      "projectedFromModule": "Proiettato da {module}",
+      "zeroAvailabilityAlpha": "0 minuti disponibili (read model alpha)"
+    }
+  },
+  "common": {
+    "backToDashboard": "Torna alla Dashboard",
+    "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "close": "Chiudi",
+    "remove": "Rimuovi",
+    "dateLabel": "Data",
+    "timeLabel": "Ora",
+    "localeLabel": "Lingua",
+    "toggle": "Cambia",
+    "changeLanguage": "Cambia lingua",
+    "toggleLanguage": "Cambia lingua",
+    "dilutionDiagramLabel": "Diagramma diluizione 1:100",
+    "imageUnavailable": "Immagine non disponibile"
+  },
+  "locales": {
+    "en": "Inglese",
+    "it": "Italiano",
+    "de": "Tedesco",
+    "es": "Spagnolo"
+  },
+  "units": {
+    "C": "°C",
+    "L": "L",
+    "count": "pz",
+    "g": "g",
+    "mL": "mL",
+    "kg": "kg",
+    "lovibond": "°L",
+    "LPerKg": "L/kg",
+    "LPerG": "L/g",
+    "ppm": "ppm",
+    "ppmAsCaCO3": "ppm come CaCO3",
+    "tsp": "cucch. da tè",
+    "pH": "pH"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "recipes": "Ricette",
+    "inventory": "Inventario",
+    "waterProfiles": "Profili acqua",
+    "equipment": "Attrezzatura",
+    "automation": "Automazione",
+    "pim": "Prodotti",
+    "mrp": "Pianificazione produzione",
+    "crp": "Pianificazione capacità",
+    "ai": "AI",
+    "about": "Info",
+    "language": "Lingua",
+    "accessibility": "Accessibilità",
+    "login": "Accedi",
+    "logout": "Esci",
+    "notAvailableOnMobileYet": "Non ancora disponibile su mobile.",
+    "openOnWeb": "Apri sul web",
+    "missingApiBaseUrl": "Base URL API mancante (EXPO_PUBLIC_API_BASE_URL).",
+    "signedInAs": "Accesso come",
+    "activeWorkspace": "Workspace attivo",
+    "switchWorkspace": "Cambia workspace",
+    "activeAccount": "Workspace attivo",
+    "switchAccount": "Cambia workspace",
+    "ariaPrimary": "Principale",
+    "ariaSession": "Sessione",
+    "menu": "Menu"
+  },
+  "ads": {
+    "ariaLabel": "Pubblicità",
+    "contactLine": "Contattaci per ospitare qui la tua pubblicità.",
+    "upgradeLine": "Passa a un piano a pagamento per rimuoverle."
+  },
+  "platformAds": {
+    "title": "Pubblicità piattaforma",
+    "subtitle": "Gestisci le pubblicità a livello piattaforma (web). Visibili su tutti gli account, salvo disattivazione per uno specifico workspace.",
+    "hint": "Suggerimento: per vedere i posizionamenti apri una pagina e fai un hard reload (lingua: {locale}).",
+    "globalBottomNote": "Nota: il posizionamento Globale: in basso è nascosto nella pagina di modifica ricetta per evitare salti di layout su mobile.",
+    "loading": "Caricamento…",
+    "notAuthorized": "Non sei autorizzato a gestire le pubblicità piattaforma.",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "create": "Crea pubblicità",
+    "creating": "Creazione…",
+    "listTitle": "Pubblicità",
+    "noAds": "Ancora nessuna pubblicità.",
+    "form": {
+      "placement": "Posizionamento",
+      "priority": "Priorità",
+      "imageUrl": "URL immagine",
+      "linkUrl": "URL link",
+      "altText": "Testo alt",
+      "isActive": "Attiva"
+    },
+    "placements": {
+      "globalTop": "Globale: in alto",
+      "globalBottom": "Globale: in basso",
+      "recipeEditAfterFermentables": "Modifica ricetta: dopo Fermentabili",
+      "recipeEditAfterHops": "Modifica ricetta: dopo Luppoli",
+      "recipeEditAfterYeast": "Modifica ricetta: dopo Lievito"
+    },
+    "table": {
+      "placement": "Posizionamento",
+      "imageUrl": "Immagine",
+      "linkUrl": "Link",
+      "active": "Attiva",
+      "actions": "Azioni",
+      "open": "Apri",
+      "yes": "sì",
+      "no": "no",
+      "delete": "Elimina",
+      "toggleActiveAria": "Attiva/disattiva la pubblicità {id}"
+    }
+  },
+  "platform": {
+    "navLabel": "Admin piattaforma",
+    "ads": "Pubblicità",
+    "recipes": "Ricette"
+  },
+  "platformRecipes": {
+    "title": "Import/export ricette piattaforma",
+    "subtitle": "Importa o esporta ricette per qualsiasi workspace. Seleziona prima un workspace.",
+    "loading": "Caricamento…",
+    "notAuthorized": "Non sei autorizzato a gestire le ricette piattaforma.",
+    "workspaceLabel": "Workspace",
+    "workspacePlaceholder": "Seleziona workspace…",
+    "workspaceRequired": "Seleziona un workspace per importare o esportare.",
+    "accountLabel": "Workspace",
+    "accountPlaceholder": "Seleziona workspace…",
+    "accountRequired": "Seleziona un workspace per importare o esportare.",
+    "exportSectionTitle": "Export (BeerJSON completo)",
+    "exportSingleLabel": "Esporta singola ricetta",
+    "exportSingleCta": "Scarica selezionata",
+    "exportBulkCta": "Esporta tutte le ricette",
+    "exportNoneAvailable": "Nessuna ricetta",
+    "exportFullNote": "L'export piattaforma include BeerJSON completo e recipeExtJson."
+  },
+  "accessibility": {
+    "title": "Accessibilità",
+    "subtitle": "Regola contrasto, dimensione del testo e spaziatura. Salvato su questo dispositivo; se hai effettuato l’accesso, le impostazioni si sincronizzano anche con il tuo account.",
+    "loading": "Caricamento…",
+    "themePreset": "Tema",
+    "fontScale": "Dimensione testo",
+    "density": "Spaziatura",
+    "saving": "Salvataggio…",
+    "savingHint": "Le modifiche si applicano subito.",
+    "theme": {
+      "default": "Predefinito",
+      "hcDark": "Alto contrasto (scuro)",
+      "hcLight": "Alto contrasto (chiaro)"
+    },
+    "font": {
+      "sm": "Piccolo (90%)",
+      "md": "Normale (100%)",
+      "lg": "Grande (110%)",
+      "xl": "Molto grande (125%)"
+    },
+    "densityOptions": {
+      "comfortable": "Confortevole",
+      "compact": "Compatto"
+    },
+    "note": "Suggerimento: funziona anche lo zoom del browser e rispetta la lingua ({locale})."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Web app desktop-first + app mobile native, log del brew-day offline-first.",
+    "links": {
+      "title": "Brew day e dati di produzione",
+      "fermDataIntegration": "Dati fermentazione e integrazione",
+      "brewdayStepsSettings": "Impostazioni step brewday",
+      "waterProfiles": "Profili acqua",
+      "brewery": "Birrificio",
+      "equipment": "Attrezzatura",
+      "inventory": "Inventario",
+      "ai": "Consulente AI"
+    },
+    "importExport": {
+      "title": "Import / Export",
+      "supportedNote": "L’interoperabilità di import/export ricette è centrata su BeerJSON (canonico).",
+      "importFormats": "Import: BeerJSON (.json) e BeerXML (.xml).",
+      "exportFormats": "Export: BeerJSON (.json).",
+      "actionsLiveInRecipes": "Le azioni di import/export sono in Ricette:",
+      "actionsCta": "Vai alle Ricette",
+      "customImportNote": "Hai bisogno di un altro sistema?",
+      "customImportCta": "Contattaci per un import personalizzato a un costo accessibile."
+    },
+    "fermDataIntegration": {
+      "title": "Dati fermentazione e integrazione",
+      "subtitle": "Integrazioni e dati di fermentazione (statistiche e insight).",
+      "backToDashboard": "Torna alla dashboard",
+      "sections": {
+        "integration": {
+          "title": "Integrazioni idrometri galleggianti",
+          "empty": "Nessuna integrazione per ora.",
+          "error": "Errore:",
+          "intro": "Ogni integrazione ha la propria Cloud URL. Scegli il tipo di dispositivo e segui i passaggi.",
+          "tiltTitle": "Tilt Hydrometer",
+          "tiltSupportedNotice": "Supportata.",
+          "tiltSubtitle": "Usa questa integrazione se hai un gateway Tilt o TiltPi.",
+          "stepsLabel": "Passi:",
+          "step1": "1) Mostra token + Cloud URL",
+          "step2": "2) Incolla la Cloud URL in TiltPi o nell’app Tilt",
+          "step3": "3) Dopo il primo invio, collega il dispositivo a una sessione di brew.",
+          "ispindelTitle": "iSpindel",
+          "ispindelWarning": "Non ancora supportata (in arrivo).",
+          "ispindelSubtitle": "La gestione dei token sarà disponibile a breve.",
+          "raptTitle": "RAPT",
+          "raptWarning": "Non ancora supportata (in arrivo).",
+          "raptSubtitle": "La gestione dei token sarà disponibile a breve.",
+          "configured": "Configurata.",
+          "notConfigured": "Non configurata.",
+          "working": "Operazione in corso…",
+          "cloudUrlLabel": "Cloud URL",
+          "cloudUrlAria": "Cloud URL",
+          "cloudUrlAriaTilt": "Cloud URL (da copiare nel gateway Tilt)",
+          "cloudUrlAriaGeneric": "Cloud URL (da copiare nel gateway)",
+          "cloudUrlHelp": "Usa questa URL nel gateway.",
+          "cloudUrlHelpTilt": "Usa questa URL in TiltPi / Tilt 2 “Custom Cloud URL”.",
+          "cloudUrlHelpGeneric": "Usa questa URL nel gateway del dispositivo quando sarà supportato.",
+          "tokenLabel": "Token (una sola volta)",
+          "tokenAria": "Token integrazione (mostrato una sola volta)",
+          "tokenHelp": "Questo token viene mostrato una sola volta. Salvalo se devi riconfigurare; altrimenti ruota un nuovo token più avanti.",
+          "copy": "Copia",
+          "copied": "Copiato",
+          "copyUrlAria": "Copia Cloud URL",
+          "copyTokenAria": "Copia token",
+          "devicesTitle": "Dispositivi Tilt collegati",
+          "noDevices": "Nessun dispositivo Tilt ha ancora inviato dati.",
+          "device": "Dispositivo",
+          "deviceKey": "Chiave",
+          "deviceChartTitle": "Letture recenti",
+          "chartGravity": "Gravità",
+          "chartTemperature": "Temperatura",
+          "chartXAxis": "Orario",
+          "chartGravityAxis": "Gravità (SG)",
+          "chartTemperatureAxis": "Temperatura (°C)",
+          "lastReading": "Ultima lettura",
+          "noReadingsYet": "Nessuna lettura per ora.",
+          "attachedTo": "Collegato a",
+          "notAttached": "Non collegato",
+          "attachLabel": "Collega a sessione brew",
+          "attachPlaceholder": "Seleziona…",
+          "attach": "Collega",
+          "detach": "Scollega",
+          "actions": {
+            "create": "Crea integrazione",
+            "createAgain": "Genera nuovo token",
+            "reveal": "Mostra Cloud URL",
+            "rotate": "Ruota token",
+            "revoke": "Revoca",
+            "createAria": "Crea integrazione Tilt",
+            "rotateAria": "Ruota token integrazione Tilt",
+            "revokeAria": "Revoca integrazione Tilt",
+            "createAriaGeneric": "Crea integrazione",
+            "rotateAriaGeneric": "Ruota token integrazione",
+            "revokeAriaGeneric": "Revoca integrazione"
+          }
+        }
+      }
+    },
+    "brewdayStepsSettings": {
+      "title": "Impostazioni step brewday",
+      "subtitle": "Configura step del brew day, timer e tipo di birra.",
+      "backToDashboard": "Torna alla dashboard",
+      "brewingTypeAllGrain": "All grain",
+      "brewingTypeExtractPartialBiab": "Extract/Partial-mash/BIAB (homebrewing)",
+      "saveSuccess": "Salvato.",
+      "loading": "Caricamento…",
+      "saving": "Salvataggio…",
+      "accountRequired": "Seleziona un account per continuare.",
+      "exclude": "Escludi",
+      "addCustomSection": "Aggiungi sezione personalizzata",
+      "addCustomBrewingMethod": "Aggiungi metodo di birra personalizzato",
+      "addCustomStep": "Aggiungi step personalizzato",
+      "assignedSection": "Sezione assegnata",
+      "minutes": "Minuti",
+      "presetSections": {
+        "preparation": "Preparazione",
+        "pre_mash": "Pre mash",
+        "mash": "Mash",
+        "lauter": "Lauter",
+        "sparge": "Sparge",
+        "boil": "Bollitura",
+        "post_boil": "Post bollitura",
+        "fermentor": "Fermentatore",
+        "cleanup": "Pulizia",
+        "quality": "Qualità",
+        "miscellaneous": "Varie"
+      },
+      "defaultSectionNote": "Sezioni step brew: aggiungi alla tua configurazione predefinita: puoi escluderle nel brew day se le usi solo per ricette specifiche ma non puoi aggiungerle nel flusso brew day se non aggiunte qui.",
+      "customSectionNote": "Aggiungi step personalizzati con nome, minuti opzionali e sezione assegnata.",
+      "add": "Aggiungi",
+      "save": "Salva",
+      "name": "Nome",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
+      "remove": "Rimuovi",
+      "sections": {
+        "brewdayStepsRecap": {
+          "title": "Riepilogo step brewday",
+          "empty": "Nessuno step per ora."
+        },
+        "brewingType": {
+          "title": "Metodi di birra",
+          "label": "Metodo di birra"
+        },
+        "brewdayStepsSections": {
+          "title": "Step brewday - sezioni",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayStepsDefault": {
+          "title": "Step brewday - predefinito",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayStepsCustom": {
+          "title": "Step brewday - personalizzato",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayNotes": {
+          "title": "Note brewday"
+        }
+      }
+    }
+  },
+  "contact": {
+    "title": "Contatti",
+    "subtitle": "Per richieste di import personalizzati, scrivici: risponderemo con i prossimi passi e una stima.",
+    "emailHeading": "Email",
+    "emailLabel": "Email:",
+    "emailAddress": "demo@umbraculum.dev",
+    "mailtoSubject": "Richiesta import personalizzato",
+    "emailCta": "Scrivici"
+  },
+  "health": {
+    "title": "Stato API",
+    "subtitle": "Richiesta di {url} dal browser (via Nginx).",
+    "appPermissions": {
+      "title": "Permessi app",
+      "subtitle": "User = identità di accesso. Workspace = confine di condivisione/tenant. Ruoli (brewery_admin/member/viewer) e ACL determinano cosa puoi fare.",
+      "userLabel": "User",
+      "activeWorkspaceLabel": "Workspace attivo",
+      "roleLabel": "Il tuo ruolo in questo workspace",
+      "roleUnknown": "sconosciuto",
+      "selectWorkspaceCta": "Seleziona workspace"
+    }
+  },
+  "contributing": {
+    "title": "Contribuire",
+    "subtitle": "Aiuta a migliorare traduzioni e dataset di birrificazione usati dall’app.",
+    "sections": {
+      "i18n": {
+        "title": "Aiuta a tradurre (i18n contributing)"
+      },
+      "rawMaterials": {
+        "title": "Aiuta a migliorare il database materie prime",
+        "subtitle": "Se trovi fermentabili/luppoli/lieviti/altri ingredienti mancanti o errati (o profili acqua), segnalacelo per migliorare il dataset canonico.",
+        "step1": "Annota cosa manca o cosa è errato (nome, produttore, specifiche chiave come colore/resa/AA% quando applicabile).",
+        "step2": "Se possibile includi uno screenshot o i valori esatti (aiuta a evitare ambiguità).",
+        "step3": "Apri una segnalazione usando il nostro template GitHub “Raw materials” (in arrivo).",
+        "issueTemplateNote": "Aggiungeremo un link diretto quando il workflow di contribuzione su GitHub sarà finalizzato."
+      }
+    }
+  },
+  "ui": {
+    "addSalt": "Aggiungi sale",
+    "amountLabel": "Quantità ({unit})",
+    "salt": "Sale",
+    "noSaltsAddedYet": "Nessun sale aggiunto.",
+    "fx": "fx"
+  },
+  "about": {
+    "title": "Info",
+    "subtitle": "Brewery App è uno strumento interno per lo sviluppo ricette e il logging del brew-day, con un calcolatore di chimica dell’acqua ispirato a BrunWater, Troester e altri. Supporto completo allo schema Beer.json. Il database materie prime scelto per la v0 è BeerProto.",
+    "translationsRowPrefix": "I contributi alle traduzioni sono benvenuti e gestiti tramite il nostro workflow (vedi",
+    "translationsRowLinkText": "Aiuta a tradurre",
+    "translationsRowSuffix": ").",
+    "translationsSideNote": "Nota: è solo un’introduzione — il workflow di contributo traduzioni è pianificato, ma non è ancora pienamente operativo."
+  },
+  "auth": {
+    "selectAccount": {
+      "title": "Seleziona workspace",
+      "subtitle": "Scegli su quale workspace vuoi lavorare.",
+      "loading": "Caricamento…",
+      "noAccountsFound": "Nessun workspace trovato."
+    },
+    "selectWorkspace": {
+      "title": "Seleziona workspace",
+      "subtitle": "Scegli su quale workspace vuoi lavorare.",
+      "loading": "Caricamento…",
+      "noWorkspacesFound": "Nessun workspace trovato."
+    },
+    "loginTitle": "Accedi",
+    "signupTitle": "Crea account",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "workspaceNameLabel": "Nome workspace (opzionale)",
+    "accountNameLabel": "Nome workspace (opzionale)",
+    "submitLogin": "Accedi",
+    "submitSignup": "Crea account",
+    "submitting": "Invio…",
+    "languageLabel": "Lingua",
+    "noteTitle": "Stato traduzioni",
+    "noteBody": "L’inglese è la lingua originale. Le altre lingue (a partire dall’italiano) saranno presto supportate al 100%. Spagnolo e tedesco arriveranno presto.",
+    "helpTranslate": "Aiuta a tradurre (contributi i18n)",
+    "sessionExpired": {
+      "title": "Sessione scaduta",
+      "body": "Sei stato disconnesso. Reindirizzamento alla pagina di accesso.",
+      "cta": "Accedi ora",
+      "countdown": "Reindirizzamento tra {seconds}s…"
+    }
+  },
+  "i18nContributing": {
+    "title": "Aiuta a tradurre (i18n contributing)",
+    "subtitle": "Accettiamo volentieri contributi alle traduzioni. L’inglese è la fonte; l’italiano è la prima lingua community.",
+    "howItWorksTitle": "Come funzionano le traduzioni",
+    "howItWorks1": "La web app usa URL con prefisso lingua (es. /en/..., /it/...).",
+    "howItWorks2Prefix": "Le traduzioni stanno in",
+    "howItWorks2Middle": "e",
+    "howItWorks3": "Le chiavi devono restare stabili. Non cambiare le chiavi a meno di un refactor intenzionale.",
+    "recommendedToolTitle": "Strumento consigliato (più semplice)",
+    "recommendedToolBody": "Consigliamo Weblate (interfaccia web) collegato a GitHub. Permette a chiunque di tradurre senza usare git e apre PR automaticamente.",
+    "recommendedTool1": "Traduci dal browser (senza git).",
+    "recommendedTool2": "I maintainer revisionano e mergiano le PR di Weblate.",
+    "githubFallbackTitle": "Alternativa GitHub",
+    "githubFallbackBody": "Se sei a tuo agio con git/GitHub, puoi aprire una PR modificando direttamente i file JSON delle traduzioni.",
+    "rulesTitle": "Regole",
+    "rule1": "Mantieni intatti i placeholder (es. {url}).",
+    "rule2": "Mantieni il significato; evita traduzioni troppo letterali se suonano innaturali.",
+    "rule3": "Non tradurre identificatori tecnici come path di file, path API o codice.",
+    "backToLogin": "Torna ad Accedi"
+  },
+  "ai": {
+    "title": "Consulente AI",
+    "subtitle": "Fai domande su ricette, chimica dell’acqua, attrezzature, sessioni di cotta e magazzino del tuo birrificio.",
+    "composer": {
+      "placeholder": "Fai una domanda sul tuo birrificio…",
+      "send": "Invia",
+      "sendAriaLabel": "Invia messaggio",
+      "thinking": "Sto pensando…",
+      "streamingAriaLabel": "Risposta dell’assistente in corso"
+    },
+    "messages": {
+      "empty": "Inizia una conversazione facendo una domanda qui sotto.",
+      "you": "Tu",
+      "assistant": "Consulente",
+      "toolCall": "Sto consultando: {tool}",
+      "toolError": "Errore strumento: {message}"
+    },
+    "errors": {
+      "subscriptionRequired": "Il consulente AI è disponibile sui piani a pagamento.",
+      "subscriptionRequiredCta": "Aggiorna per sbloccare",
+      "notEnabled": "Il consulente AI non è attivo in questo workspace. Chiedi a un amministratore di attivarlo.",
+      "noKey": "Nessuna chiave AI configurata. Un amministratore deve aggiungerla nelle impostazioni AI.",
+      "dataEgressNotAccepted": "Un amministratore deve accettare l’informativa sul trasferimento dati prima di poter usare l’AI.",
+      "rateLimit": "Limite di uso AI raggiunto. Riprova più tardi.",
+      "rateLimitRole": "Il limite mensile del tuo ruolo per l’uso dell’AI è stato raggiunto.",
+      "rateLimitUserDaily": "Il tuo limite giornaliero di uso dell’AI è stato raggiunto.",
+      "internal": "Qualcosa è andato storto. Riprova."
+    },
+    "settings": {
+      "title": "Impostazioni AI",
+      "subtitle": "Configura il consulente AI per questo workspace. Solo amministratori.",
+      "memberOnlyNotice": "Solo gli amministratori del workspace possono modificare le impostazioni AI. Puoi comunque usare il consulente una volta che è stato attivato.",
+      "enableLabel": "Attiva consulente AI",
+      "enableHint": "Quando attivo, i membri possono usare il consulente AI in questo workspace.",
+      "providerLabel": "Fornitore AI",
+      "providerHint": "Attualmente è supportato solo Anthropic Claude.",
+      "apiKeyLabel": "Chiave API Anthropic",
+      "apiKeyHint": "Memorizzata cifrata. Non mostriamo mai la chiave; salva un valore vuoto per rimuoverla.",
+      "apiKeyConfigured": "Una chiave è attualmente configurata.",
+      "apiKeyMissing": "Nessuna chiave configurata.",
+      "apiKeyPlaceholder": "sk-ant-…",
+      "apiKeyClearLabel": "Rimuovi chiave memorizzata",
+      "dataEgressLabel": "Capisco che i messaggi e i risultati degli strumenti saranno inviati ad Anthropic per l’elaborazione.",
+      "dataEgressHint": "Richiesto dalle normative privacy UE + USA. I risultati possono includere dati di ricette, attrezzature e magazzino di questo workspace.",
+      "dataEgressAcceptedAt": "Accettata il {date}.",
+      "roleLimitsTitle": "Limiti mensili token per ruolo",
+      "roleLimitsHint": "Somma dei token in entrata + uscita negli ultimi 30 giorni. 0 = nessun limite.",
+      "perUserDailyCapLabel": "Limite giornaliero token per utente",
+      "perUserDailyCapHint": "Somma dei token in entrata + uscita di oggi (UTC). 0 = nessun limite.",
+      "saveButton": "Salva modifiche",
+      "savingButton": "Salvataggio…",
+      "savedMessage": "Impostazioni salvate.",
+      "saveError": "Impossibile salvare le impostazioni: {message}",
+      "concierge": {
+        "title": "Hai bisogno di aiuto per la configurazione?",
+        "body": "Prenota una chiamata di 15 minuti con il nostro team. Disponibile in italiano e inglese.",
+        "cta": "Prenota una chiamata"
+      },
+      "roles": {
+        "brewery_admin": "Amministratore",
+        "member": "Membro",
+        "viewer": "Osservatore"
+      }
+    },
+    "upgrade": {
+      "title": "Sblocca il consulente AI",
+      "body": "Il consulente AI è incluso nel piano a pagamento. Aggiorna il workspace per fare domande in linguaggio naturale su ricette, attrezzature, sessioni di cotta e magazzino — con risposte basate sui dati reali del tuo workspace.",
+      "bullet1": "Accesso in sola lettura ai dati del workspace",
+      "bullet2": "Limiti configurabili per ruolo e per utente",
+      "bullet3": "Chiave fornitore cifrata (BYOK)",
+      "ctaButton": "Aggiorna workspace",
+      "ctaLoading": "Preparazione del checkout…",
+      "ctaError": "Impossibile avviare il checkout: {message}",
+      "concierge": {
+        "title": "Vuoi aiuto per iniziare?",
+        "body": "Dopo l’aggiornamento del workspace, prenota una chiamata di 15 minuti con il nostro team. Disponibile in italiano e inglese.",
+        "cta": "Prenota una chiamata"
+      }
+    },
+    "usage": {
+      "title": "Utilizzo AI",
+      "description": "Spesa di token aggregata, attività per utente e limiti di ruolo per questo workspace.",
+      "monthlyTokensIn": "Token in entrata (mese corrente)",
+      "monthlyTokensOut": "Token in uscita (mese corrente)",
+      "monthlyCallCount": "Chiamate (mese corrente)",
+      "perUserTitle": "Per utente (mese corrente)",
+      "userColumn": "Utente",
+      "todayColumn": "Oggi (in + out)",
+      "monthColumn": "Mese (in + out)",
+      "monthCallsColumn": "Chiamate",
+      "empty": "Nessun utilizzo AI registrato.",
+      "monthly": {
+        "callCount": "Chiamate (mese)",
+        "tokensIn": "Token in entrata (mese)",
+        "tokensOut": "Token in uscita (mese)",
+        "total": "Token totali (mese)"
+      },
+      "chart": {
+        "title": "Spesa di token — ultimi 30 giorni",
+        "ariaLabel": "Grafico a barre della spesa di token giornaliera negli ultimi 30 giorni"
+      },
+      "table": {
+        "title": "Dettaglio per utente",
+        "empty": "Nessun utilizzo AI registrato.",
+        "user": "Utente",
+        "role": "Ruolo",
+        "today": "Oggi",
+        "month": "Mese",
+        "roleLimit": "Limite ruolo",
+        "rolePercent": "% del limite ruolo"
+      },
+      "alerts": {
+        "heading": "Limiti in avvicinamento",
+        "roleApproachingLimit": "Il ruolo '{role}' è al {percent} del limite mensile ({used}/{limit}).",
+        "userApproachingDailyCap": "L'utente '{user}' è al {percent} del limite giornaliero ({used}/{cap})."
+      }
+    },
+    "actions": {
+      "openSettings": "Impostazioni AI",
+      "openUsage": "Vedi utilizzo",
+      "tryAgain": "Riprova"
+    }
+  },
+  "sharedLayoutNotice": {
+    "demo": {
+      "ariaLabel": "Avviso ambiente demo",
+      "summaryLine": "Ambiente di dimostrazione pubblico su demo.umbraculum.dev — dati solo dimostrativi; possono essere reimpostati senza preavviso.",
+      "dataLossWarning": "Non conservare dati che non puoi permetterti di perdere.",
+      "expanderLabel": "Informazioni su questa demo e su Umbraculum",
+      "platformIntro": "Umbraculum è una piattaforma open source per applicazioni operative organizzate per workspace — backbone condiviso (autenticazione, workspace, fatturazione, AI, rendering) più moduli canonici (PIM, MRP, CRP, automazione, …) che i prodotti verticali compongono.",
+      "referenceVertical": "Questa demo esegue il vertical di riferimento brewery: un esempio di prodotto manifatturiero che il team core di Umbraculum distribuisce nel monorepo per mostrare come un team costruisce un vertical specifico sulla piattaforma. È una vetrina, non la prova che Umbraculum sia solo per birrifici.",
+      "credentialsHeading": "Accesso demo",
+      "roleAdmin": "Amministratore birrificio (principale)",
+      "roleMember": "Membro",
+      "roleViewer": "Visualizzatore",
+      "roleMultiAdmin": "Amministratore multi-workspace",
+      "columnRole": "Ruolo",
+      "columnEmail": "Email",
+      "columnPassword": "Password",
+      "emailAdmin": "e2e-admin@brewery.local",
+      "passwordAdmin": "e2e-admin-pw!",
+      "emailMember": "e2e-member@brewery.local",
+      "passwordMember": "e2e-member-pw!",
+      "emailViewer": "e2e-viewer@brewery.local",
+      "passwordViewer": "e2e-viewer-pw!",
+      "emailMultiAdmin": "e2e-multi-admin@brewery.local",
+      "passwordMultiAdmin": "e2e-multi-admin-pw!",
+      "fixtureWorkspace": "Workspace di fixture: {workspaceId} (admin principale).",
+      "linkGettingStarted": "Primi passi",
+      "linkGettingStartedDesc": "setup, vocabolario, percorso per il primo contributo",
+      "linkBuildingVertical": "Costruire il tuo vertical",
+      "linkBuildingVerticalDesc": "come ISV/integratori realizzano il proprio prodotto su Umbraculum",
+      "linkGlossary": "Glossario",
+      "linkGlossaryDesc": "vertical vs modulo canonico (definizioni precise)",
+      "unsurePrefix": "Dubbi? Leggi la documentazione sopra, poi chiedi sul ",
+      "unsureForumLink": "forum della community",
+      "unsureSuffix": ".",
+      "nativeIntro": "Mobile (native brewery): le build interne EAS preview puntano allo stesso host (https://demo.umbraculum.dev). Accedi con gli stessi account demo sopra. I flussi brew-day girano sul dispositivo; MRP, CRP, PIM e inventario usano Apri sul web (browser su questo host).",
+      "nativeLinkNativeCi": "Strategia native e CI",
+      "nativeLinkDemoRunbook": "Runbook host demo",
+      "nativeLinkSmoke": "Superficie piattaforma native canonica §5.1",
+      "nativeBulletOperators": "Operatori / contributor:",
+      "nativeBulletSmokeLabel": "Checklist smoke su dispositivo:",
+      "nativeBulletApk": "Build/installazione APK: percorso repo apps/native/EAS-DEMO-SETUP.md (monorepo umbraculum-dev su GitHub) oppure workflow native-eas-build con profilo preview."
+    }
+  }
+}

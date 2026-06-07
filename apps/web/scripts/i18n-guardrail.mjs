@@ -13,8 +13,23 @@ import path from "node:path";
  * This is intentionally heuristic (fast + low-maintenance).
  */
 
-const repoRoot = path.resolve(import.meta.dirname, "..");
-const appDir = path.join(repoRoot, "app");
+const webRoot = path.resolve(import.meta.dirname, "..");
+const appDir = path.join(webRoot, "app");
+
+function resolveMonorepoRoot() {
+  if (fs.existsSync("/repo/package.json")) return "/repo";
+  return path.resolve(webRoot, "..", "..");
+}
+
+/** @param {string} pkgRel e.g. packages/platform/i18n */
+function resolvePkgRoot(pkgRel) {
+  const shortPath = pkgRel.replace(/^packages\//, "");
+  const containerPath = path.join("/packages", shortPath);
+  if (fs.existsSync(path.join(containerPath, "package.json"))) {
+    return containerPath;
+  }
+  return path.join(resolveMonorepoRoot(), pkgRel);
+}
 
 /** @param {string} dir */
 function walk(dir) {
@@ -35,7 +50,7 @@ function hasLetters(s) {
 
 /** @param {string} file */
 function checkFile(file) {
-  const rel = path.relative(repoRoot, file);
+  const rel = path.relative(webRoot, file);
   const src = fs.readFileSync(file, "utf8");
 
   /** @type {Array<{line:number, kind:string, text:string}>} */
@@ -81,6 +96,71 @@ function main() {
   if (!fs.existsSync(appDir)) {
     console.error(`Missing app dir: ${appDir}`);
     process.exit(2);
+  }
+
+  const monorepoRoot = resolveMonorepoRoot();
+  void monorepoRoot; // reserved for future guardrail checks
+  const breweryKeys = new Set([
+    "recipes",
+    "equipment",
+    "inventory",
+    "waterHub",
+    "waterProfiles",
+    "salts",
+    "math",
+    "devDashboard",
+  ]);
+
+  /** @param {string} pkgRel */
+  function loadLocaleTopKeys(pkgRel) {
+    /** @type {Record<string, Set<string>>} */
+    const out = {};
+    const pkgRoot = resolvePkgRoot(pkgRel);
+    for (const locale of ["en", "it"]) {
+      const p = path.join(pkgRoot, "src", `${locale}.json`);
+      if (!fs.existsSync(p)) {
+        console.error(`i18n-guardrail: missing locale file: ${p}`);
+        process.exit(2);
+      }
+      const data = JSON.parse(fs.readFileSync(p, "utf8"));
+      out[locale] = new Set(Object.keys(data));
+    }
+    return out;
+  }
+
+  const platformKeys = loadLocaleTopKeys("packages/platform/i18n");
+  const breweryLocaleKeys = loadLocaleTopKeys("packages/verticals/brewery/i18n");
+
+  /** @type {string[]} */
+  const localeProblems = [];
+
+  for (const locale of ["en", "it"]) {
+    for (const key of breweryKeys) {
+      if (platformKeys[locale].has(key)) {
+        localeProblems.push(
+          `platform i18n ${locale}.json must not contain brewery namespace "${key}" (belongs in @umbraculum/brewery-i18n)`,
+        );
+      }
+      if (!breweryLocaleKeys[locale].has(key)) {
+        localeProblems.push(`brewery i18n ${locale}.json missing brewery namespace "${key}"`);
+      }
+    }
+    const platformOnly = [...platformKeys.en].sort().join(",");
+    const platformIt = [...platformKeys.it].sort().join(",");
+    if (locale === "en" && platformOnly !== platformIt) {
+      localeProblems.push("platform i18n en/it top-level namespace keys differ");
+    }
+    const breweryEn = [...breweryLocaleKeys.en].sort().join(",");
+    const breweryIt = [...breweryLocaleKeys.it].sort().join(",");
+    if (locale === "en" && breweryEn !== breweryIt) {
+      localeProblems.push("brewery i18n en/it top-level namespace keys differ");
+    }
+  }
+
+  if (localeProblems.length) {
+    console.error("i18n-guardrail: locale bundle problems:");
+    for (const p of localeProblems) console.error(`- ${p}`);
+    process.exit(1);
   }
 
   const files = walk(appDir).filter((f) => f.endsWith(".tsx"));

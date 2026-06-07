@@ -98,7 +98,7 @@ Backup discipline for billing DDL: same as [platform-brewery-postgres-schema-spl
 - [RFC-0009](../rfcs/0009-workspace-billing-addons-and-entitlements.md)
 - [`services/api/src/routes/billing.ts`](../../services/api/src/routes/billing.ts)
 - [`services/api/src/services/workspaceBillingService.ts`](../../services/api/src/services/workspaceBillingService.ts)
-- [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md) — `addonCodes` + collision rules
+- [`packages/modules/module-sdk/README.md`](../../packages/modules/module-sdk/README.md) — `addonCodes` + collision rules
 
 ---
 

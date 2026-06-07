@@ -14,7 +14,9 @@
   "workspaces": [
     "apps/*",
     "services/*",
-    "packages/*",
+    "packages/platform/*",
+    "packages/modules/*",
+    "packages/verticals/*/*",
     "docs-site"
   ],
   "scripts": {

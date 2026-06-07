@@ -3,7 +3,7 @@
 **Tier:** Internal
 **Status:** In progress — handoff doc landed; route migration scheduled for next session under container access.
 **Owners:** project lead
-**Related:** [RFC-0003](../rfcs/0003-validation-library-adoption.md) Decisions D + F, PR 1 worked example at [`packages/contracts/src/auth/meResponse.ts`](../../packages/contracts/src/auth/meResponse.ts), PR 2 at [`packages/automation-contracts/src/mailbox.ts`](../../packages/automation-contracts/src/mailbox.ts).
+**Related:** [RFC-0003](../rfcs/0003-validation-library-adoption.md) Decisions D + F, PR 1 worked example at [`packages/platform/contracts/src/auth/meResponse.ts`](../../packages/platform/contracts/src/auth/meResponse.ts), PR 2 at [`packages/modules/automation-contracts/src/mailbox.ts`](../../packages/modules/automation-contracts/src/mailbox.ts).
 
 ---
 
@@ -31,7 +31,7 @@ Doing all of this as a single agent-session bulk edit is unsafe without per-rout
 > ```
 > Failure mode if skipped: `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'zod' imported from /app/src/...` on api boot, with the api process exiting and nginx returning 502 on every request that proxies to it.
 >
-> **Pair with the package-dist rebuild gotcha** (also documented in [`pr1-contracts-migration-handoff.md`](pr1-contracts-migration-handoff.md) §"Mandatory prep before any consumer-side verification"): if PR 3 starts importing new Zod schemas from `packages/contracts` or `packages/automation-contracts` (which it will — route bodies reference contracts schemas), the consumer-visible `dist/` MUST be regenerated via `bash scripts/build-packages-in-docker.sh` BEFORE the api container is restarted. Otherwise api boots with `SyntaxError: The requested module '@umbraculum/contracts' does not provide an export named 'XSchema'`.
+> **Pair with the package-dist rebuild gotcha** (also documented in [`pr1-contracts-migration-handoff.md`](pr1-contracts-migration-handoff.md) §"Mandatory prep before any consumer-side verification"): if PR 3 starts importing new Zod schemas from `packages/platform/contracts` or `packages/modules/automation-contracts` (which it will — route bodies reference contracts schemas), the consumer-visible `dist/` MUST be regenerated via `bash scripts/build-packages-in-docker.sh` BEFORE the api container is restarted. Otherwise api boots with `SyntaxError: The requested module '@umbraculum/contracts' does not provide an export named 'XSchema'`.
 
 1. Add deps to [`services/api/package.json`](../../services/api/package.json):
    ```json

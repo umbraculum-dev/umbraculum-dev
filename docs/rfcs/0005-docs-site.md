@@ -106,7 +106,7 @@ docs-site/
 
 **Why a workspace, not a sibling repo.** A sibling repo (`github.com/umbraculum-dev/umbraculum-docs`) was considered and rejected because:
 
-1. **Per-workspace READMEs are content.** `packages/automation-contracts/README.md` is part of the docs surface — it needs to render under the same site, under a "Reference" section, with the same theme. A sibling repo would either require a content-sync step (brittle) or duplicate READMEs (drift-prone).
+1. **Per-workspace READMEs are content.** `packages/modules/automation-contracts/README.md` is part of the docs surface — it needs to render under the same site, under a "Reference" section, with the same theme. A sibling repo would either require a content-sync step (brittle) or duplicate READMEs (drift-prone).
 2. **The docs site builds against the current state of the monorepo.** When a contracts package's README changes, the docs site rebuild happens in the same PR. A sibling repo would split the change across two PRs in two repos, which the project's discipline ([`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md), the structural-check CI gate) explicitly avoids.
 3. **No deployment-coupling concern.** `docs-site/` does not import from `apps/web`, `apps/native`, `services/api`, or any `packages/*`. It is build-isolated. The "co-located in monorepo" argument therefore has no cost on the runtime side.
 

@@ -4,7 +4,7 @@
 **Status:** As-built post RFC-0007 PR1–7 (2026-05-25); registry updated for MRP/CRP Wave 6 (2026-05-27)  
 **Audience:** module authors, API maintainers, AI consultant implementors, reviewers  
 **Resolves:** [RFC-0007](../rfcs/0007-canonical-document-rendering.md) — operational companion to governance text (RFC-0003 shape: commitment in RFC, engines in rationale, as-built here)  
-**Builds on:** [`canonical-document-rendering-engine-rationale.md`](canonical-document-rendering-engine-rationale.md), [`packages/rendering/README.md`](../../packages/rendering/README.md), [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md)
+**Builds on:** [`canonical-document-rendering-engine-rationale.md`](canonical-document-rendering-engine-rationale.md), [`packages/platform/rendering/README.md`](../../packages/platform/rendering/README.md), [`packages/modules/module-sdk/README.md`](../../packages/modules/module-sdk/README.md)
 
 > **Disclaimer.** This is the single source of truth for registered `module:template@version` refs, delivery-mode behavior, and the module-author checklist. RFC-0007 commits obligations; this doc tracks what ships. Update §2 in the same PR as any new `documentTemplates` registration.
 
@@ -16,8 +16,8 @@
 |---------|-------|------------|
 | Governance | RFC-0007 | [`docs/rfcs/0007-canonical-document-rendering.md`](../rfcs/0007-canonical-document-rendering.md) |
 | Engine picks | Rationale | [`canonical-document-rendering-engine-rationale.md`](canonical-document-rendering-engine-rationale.md) |
-| Adapter package | `@umbraculum/rendering` | [`packages/rendering/`](../../packages/rendering/) |
-| Template registration | `registerModule({ documentTemplates })` | [`packages/module-sdk/src/moduleRegistry.ts`](../../packages/module-sdk/src/moduleRegistry.ts) |
+| Adapter package | `@umbraculum/rendering` | [`packages/platform/rendering/`](../../packages/platform/rendering/) |
+| Template registration | `registerModule({ documentTemplates })` | [`packages/modules/module-sdk/src/moduleRegistry.ts`](../../packages/modules/module-sdk/src/moduleRegistry.ts) |
 | Job orchestration | API service | [`services/api/src/services/rendering/`](../../services/api/src/services/rendering/) |
 | Platform AI tool | `render_document` | [`docs/AI-CONSULTANT.md`](../AI-CONSULTANT.md) |
 

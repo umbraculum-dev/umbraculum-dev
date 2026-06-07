@@ -86,7 +86,7 @@ The convictions Umbraculum is built around — Total Quality with capital Q (Gal
 - **Operators / IT teams** — single-tenant self-host is a first-class
   deployment target. Hosted SaaS will be offered alongside, not instead.
 - **Developers and integrators** — every public-facing surface is
-  contract-typed (`packages/contracts`), every module is registered
+  contract-typed (`packages/platform/contracts`), every module is registered
   through the same horizontal platform layer, the Cursor apparatus is
   part of the expected authoring path, and the AI consultant exposes a
   stable tool-protocol per

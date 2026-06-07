@@ -21,7 +21,7 @@ This RFC commits to **five decisions** and explicitly defers two clusters of fol
 
 - **Decision D — Engine selection (the stack pick).** **PDF + DOCX/ODT→PDF**: Gotenberg sidecar (Chromium HTML→PDF; LibreOffice for DOCX/ODT). **XLSX**: exceljs in-process. **CSV**: `@fast-csv/format` streaming. **Barcode / QR**: bwip-js. **XML feeds**: xmlbuilder2. **HTML / email template engine**: eta. **Email HTML composition**: MJML → HTML through the same pipeline. Rationale + rejected alternatives in §6.
 
-- **Decision E — Async job runner.** Default delivery mode is **async-via-BullMQ on the existing Redis** ([`docs/REDIS-ARCHITECTURE.md`](../REDIS-ARCHITECTURE.md)). Sync mode (`delivery.mode: "stream-response"`) is restricted to small renders (single label, single small JSON, the existing BeerJSON export — anything that completes well under a second). Job state persists in Postgres under a new `rendering` schema (per [RFC-0002](0002-canonical-module-physical-layout.md) §4 convention 4 — Prisma multiSchema). PR3 kept v1 artifact persistence API-owned in that schema with signed-URL retrieval; a future media-layer follow-up can move the persistence handoff behind [`@umbraculum/media`](../../packages/media/) once that package exposes the needed surface.
+- **Decision E — Async job runner.** Default delivery mode is **async-via-BullMQ on the existing Redis** ([`docs/REDIS-ARCHITECTURE.md`](../REDIS-ARCHITECTURE.md)). Sync mode (`delivery.mode: "stream-response"`) is restricted to small renders (single label, single small JSON, the existing BeerJSON export — anything that completes well under a second). Job state persists in Postgres under a new `rendering` schema (per [RFC-0002](0002-canonical-module-physical-layout.md) §4 convention 4 — Prisma multiSchema). PR3 kept v1 artifact persistence API-owned in that schema with signed-URL retrieval; a future media-layer follow-up can move the persistence handoff behind [`@umbraculum/media`](../../packages/platform/media/) once that package exposes the needed surface.
 
 The **implementation closure / deferred clusters** (§12):
 
@@ -95,13 +95,13 @@ The self-host story is preserved end-to-end: one new sidecar (Gotenberg) for the
 
 The row is committed by this RFC and lands physically in `docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md` §8.2 as a same-PR cross-doc update (§10), with an italic-paragraph footer at the end of §8 recording this RFC's extension event (same shape [RFC-0004](0004-canonical-pim.md) §6 + RFC-0001 §4 footer used for the `pim` allocation).
 
-**Why this row, not "documents" or "exports" or "files":** the term *document / file rendering* is chosen for the same reason [RFC-0001 §4.3](0001-modules-tiers-governance-and-automation-placement.md) prefers `privacy` and `notifications` as §8.2-shaped concerns (every module participates uniformly) rather than as canonical codes. Rendering crosses every module that emits a file. *Documents* alone reads too narrow (excludes XLSX / CSV / XML feeds); *exports* reads too narrow (excludes inbound HTML emails, branded one-page artifacts); *files* alone reads too broad (would absorb [@umbraculum/media](../../packages/media/)'s asset-pipeline scope, which is a different concern). *Document / file rendering* is the narrowest precise framing.
+**Why this row, not "documents" or "exports" or "files":** the term *document / file rendering* is chosen for the same reason [RFC-0001 §4.3](0001-modules-tiers-governance-and-automation-placement.md) prefers `privacy` and `notifications` as §8.2-shaped concerns (every module participates uniformly) rather than as canonical codes. Rendering crosses every module that emits a file. *Documents* alone reads too narrow (excludes XLSX / CSV / XML feeds); *exports* reads too narrow (excludes inbound HTML emails, branded one-page artifacts); *files* alone reads too broad (would absorb [@umbraculum/media](../../packages/platform/media/)'s asset-pipeline scope, which is a different concern). *Document / file rendering* is the narrowest precise framing.
 
 ---
 
 ## 4. Decision B — `@umbraculum/rendering` as a new layer-3 horizontal package (commit)
 
-**Allocate `packages/rendering/` → `@umbraculum/rendering`** as the layer-3 horizontal infrastructure package that owns the engines. Per [`docs/REPOSITORY-STRUCTURE.md`](../REPOSITORY-STRUCTURE.md) §2, this sits at **layer 3** (cross-cutting infrastructure, industry-agnostic). Per [RFC-0002 §4](0002-canonical-module-physical-layout.md), it carries the unprefixed `@umbraculum/<name>` scope — vertical-prefixed `@umbraculum/<vertical>-<name>` is reserved for vertical-scoped packages, which rendering is not.
+**Allocate `packages/platform/rendering/` → `@umbraculum/rendering`** as the layer-3 horizontal infrastructure package that owns the engines. Per [`docs/REPOSITORY-STRUCTURE.md`](../REPOSITORY-STRUCTURE.md) §2, this sits at **layer 3** (cross-cutting infrastructure, industry-agnostic). Per [RFC-0002 §4](0002-canonical-module-physical-layout.md), it carries the unprefixed `@umbraculum/<name>` scope — vertical-prefixed `@umbraculum/<vertical>-<name>` is reserved for vertical-scoped packages, which rendering is not.
 
 ### 4.1 Surface sketch
 
@@ -160,20 +160,20 @@ export interface RenderContext {
 
 ### 4.2 License posture
 
-- **Package implementation** (`packages/rendering/src/**`, engine adapters, BullMQ wiring): **AGPLv3** per [LICENSING.md](../LICENSING.md) §6.1 (horizontal platform code default; same as every other workspace, all of which inherit from the repo-root `LICENSE`).
+- **Package implementation** (`packages/platform/rendering/src/**`, engine adapters, BullMQ wiring): **AGPLv3** per [LICENSING.md](../LICENSING.md) §6.1 (horizontal platform code default; same as every other workspace, all of which inherit from the repo-root `LICENSE`).
 - **SDK-side types** (`RenderJob<TData>`, `DocumentTemplate<TData>`, `RenderResult`, `RenderKind`, `RenderDelivery`, `RenderContext`): **re-exported from `@umbraculum/module-sdk`** and remain **MIT** per [LICENSING.md](../LICENSING.md) §6.2's MIT-SDK enumeration. Same pattern the AI-tool surface follows — [`docs/LICENSING.md`](../LICENSING.md) §6.2 already lists *"the AI tool interface (`AiTool<I, O>`, scope types, and `AiToolContext` definitions)"* as MIT; rendering types join that list.
 
 The reason for the split is identical to the AI-tool case: a third-party module developer (closed-source consultancy vertical, indie contributor, customer in-house team) needs to write `DocumentTemplate<TheirData>` without their module source becoming AGPLv3 by virtue of importing the type. The *runtime* dependency from a module to the rendering implementation is mediated by the SDK's typed surface; the *source-level* dependency is via types and interfaces, which is the MIT scope.
 
 ### 4.3 Distribution shape
 
-ESM + CJS dual emit per [RFC-0002](0002-canonical-module-physical-layout.md) Decision C (the same dual-emit pattern every existing layer-3 package follows; see [`packages/i18n/package.json`](../../packages/i18n/package.json) `exports` field for the canonical shape). `"private": true` workspace-internal until the public flip — no npm-registry publish before the [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 cutover.
+ESM + CJS dual emit per [RFC-0002](0002-canonical-module-physical-layout.md) Decision C (the same dual-emit pattern every existing layer-3 package follows; see [`packages/platform/i18n/package.json`](../../packages/platform/i18n/package.json) `exports` field for the canonical shape). `"private": true` workspace-internal until the public flip — no npm-registry publish before the [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 cutover.
 
 ---
 
 ## 5. Decision C — SDK extension point `registerDocumentTemplate` (commit)
 
-**Add a `documentTemplates` slot to `registerModule()` in `@umbraculum/module-sdk`,** alongside the existing `registerAiTools` / `addonCodes` / `tierLimits` / `routes` slots ([`packages/module-sdk/src/types.ts`](../../packages/module-sdk/src/types.ts) — surface published with the SDK extension follow-on PR per §12).
+**Add a `documentTemplates` slot to `registerModule()` in `@umbraculum/module-sdk`,** alongside the existing `registerAiTools` / `addonCodes` / `tierLimits` / `routes` slots ([`packages/modules/module-sdk/src/types.ts`](../../packages/modules/module-sdk/src/types.ts) — surface published with the SDK extension follow-on PR per §12).
 
 **Sketch:**
 
@@ -242,13 +242,13 @@ The comparative shopping behind each pick — surveyed candidates, trade-off fra
 
 Engine major versions are pinned in `@umbraculum/rendering`'s `package.json` (per [RFC-0003 §4](0003-validation-library-adoption.md) precedent for the `zod ^4.x` pin). Minor / patch versions float per standard SemVer caret. Engine **major-version bumps** require:
 
-1. A short tracker entry in `packages/rendering/CHANGELOG.md` or an equivalent engine-versions subsection in `packages/rendering/README.md`.
+1. A short tracker entry in `packages/platform/rendering/CHANGELOG.md` or an equivalent engine-versions subsection in `packages/platform/rendering/README.md`.
 2. Output-equivalence regression tests against the previous major's golden fixtures (the test discipline lands with the engine-adapter PRs).
 3. A note in the next-released contracts version's `CONTRACT_VERSION` rationale if any template kind's wire format changes — applies particularly to PDF reproducibility (Gotenberg ↔ Chromium version interactions can affect glyph rendering and PDF byte output).
 
 ### 6.3 The split this preserves with `@umbraculum/media`
 
-[`@umbraculum/media`](../../packages/media/) is the existing layer-3 horizontal package owning the asset pipeline (uploads, transforms, CDN, manifest, asset loader). `@umbraculum/rendering` is a **producer** for the media layer; it is not a parallel asset surface. The implemented v1 keeps rendered-artifact persistence API-owned in the `rendering` Prisma schema with signed-URL retrieval. A future media-layer follow-up can move that persistence handoff behind `@umbraculum/media` once the package exposes the needed API.
+[`@umbraculum/media`](../../packages/platform/media/) is the existing layer-3 horizontal package owning the asset pipeline (uploads, transforms, CDN, manifest, asset loader). `@umbraculum/rendering` is a **producer** for the media layer; it is not a parallel asset surface. The implemented v1 keeps rendered-artifact persistence API-owned in the `rendering` Prisma schema with signed-URL retrieval. A future media-layer follow-up can move that persistence handoff behind `@umbraculum/media` once the package exposes the needed API.
 
 - Rendering owns: engines, templates registry, render job orchestration, format serialization.
 - Media owns: persistent storage, transformation pipeline, CDN, asset manifest, public/private visibility, signed URLs.
@@ -322,7 +322,7 @@ Every render job emits structured-log events per the [RFC-0001 §8.2](0001-modul
 
 Per [RFC-0001 §8.4](0001-modules-tiers-governance-and-automation-placement.md)'s *"What this rule explicitly does NOT prohibit"* precedent — pinning the split out loud so the rule reads as enabling, not constraining.
 
-- **Templates themselves stay module-owned.** A packing list is a WMS concern; a recipe spec sheet is brewery; a Google Shopping feed is PIM (or a future commerce canonical). The platform owns *how to render*; the module owns *what an invoice looks like*. The split is identical to the one [`@umbraculum/i18n`](../../packages/i18n/) already enforces: mechanism platform-owned, strings module-owned.
+- **Templates themselves stay module-owned.** A packing list is a WMS concern; a recipe spec sheet is brewery; a Google Shopping feed is PIM (or a future commerce canonical). The platform owns *how to render*; the module owns *what an invoice looks like*. The split is identical to the one [`@umbraculum/i18n`](../../packages/platform/i18n/) already enforces: mechanism platform-owned, strings module-owned.
 - **Data shapes stay contracts-package-owned.** Template input shapes are typed in `packages/<code>-contracts/` per [RFC-0002 §3](0002-canonical-module-physical-layout.md), validated by the contracts package's chosen `ValidatedSchema<T>` per [RFC-0003](0003-validation-library-adoption.md). `@umbraculum/rendering` does not introduce a parallel typing surface for template data.
 - **Document semantics stay with their owning module.** Invoice numbering, retention policy, archival format requirements (e.g. PDF/A-3 for regulated industries), legal validity of an invoice in jurisdiction X — those are billing-adjacent / compliance-adjacent concerns, owned by the canonical module (billing-system-of-record) or by a future `compliance` Tier 3/4 module if one ships. The rendering pipeline produces bytes; it does not arbitrate what those bytes mean.
 - **Label printers and other physical-output devices.** The rendering pipeline produces the renderable artifact (a 4×6 PDF, a ZPL-shaped barcode, a printable label image); the *transport to a physical printer* belongs to the existing integrations framework ([RFC-0001 §8.2](0001-modules-tiers-governance-and-automation-placement.md) integrations row), the same way device readings flow through the integrations framework today. This split surfaces when WMS lands and is not load-bearing on this RFC.
@@ -367,7 +367,7 @@ Per [RFC-0004 §8](0004-canonical-pim.md) precedent (a consumption-contract-exte
 - [`docs/REPOSITORY-STRUCTURE.md`](../REPOSITORY-STRUCTURE.md) §3.3 — add an `@umbraculum/rendering` row to the layer-3 horizontal infrastructure packages table; after PR1-PR7 it links to the shipped package and records the implemented pipeline.
 - [`docs/rfcs/README.md`](README.md) §2 — add the RFC-0007 row to the index table with the one-line commitment from §1.
 
-**No code changes in this PR.** The `packages/module-sdk/src/types.ts` `documentTemplates` slot addition is deliberately deferred to the §12 follow-on package-scaffold PR — committing a SDK type without the runtime that gives it meaning is the kind of partial commit [`docs/LICENSING.md`](../LICENSING.md) §6.2 / [RFC-0002](0002-canonical-module-physical-layout.md) Decision C's "SDK is published, downstream consumers pin it" framing wants the project to avoid.
+**No code changes in this PR.** The `packages/modules/module-sdk/src/types.ts` `documentTemplates` slot addition is deliberately deferred to the §12 follow-on package-scaffold PR — committing a SDK type without the runtime that gives it meaning is the kind of partial commit [`docs/LICENSING.md`](../LICENSING.md) §6.2 / [RFC-0002](0002-canonical-module-physical-layout.md) Decision C's "SDK is published, downstream consumers pin it" framing wants the project to avoid.
 
 ---
 
@@ -437,9 +437,9 @@ A model where this RFC commits Decisions A + B + C + E (obligation + package + S
 
 At acceptance time, the core implementation surface was intentionally sequenced as follow-on work so the RFC could commit the platform contract and engine choices before code landed. That follow-on sequence is now closed: each item below has shipped. Order is the dependency-order; later items depended on earlier items having landed.
 
-1. **[Implemented — PR1] Package scaffold** — `packages/rendering/` → `@umbraculum/rendering`. README per [`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md); `package.json` with pinned engine versions per §6.1; surface types matching §4.1; no implementation yet.
+1. **[Implemented — PR1] Package scaffold** — `packages/platform/rendering/` → `@umbraculum/rendering`. README per [`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md); `package.json` with pinned engine versions per §6.1; surface types matching §4.1; no implementation yet.
    - Note: PR1 also recorded the MJML v5 correction after dependency-audit review found MJML v4's transitive advisory posture unacceptable.
-2. **[Implemented — PR1] SDK extension** — add the `documentTemplates` slot to [`packages/module-sdk/src/types.ts`](../../packages/module-sdk/src/types.ts) + the runtime collection in `registerModule()`. Same shape as the existing `registerAiTools` slot collection. Re-export the SDK-side types from `@umbraculum/module-sdk` per §4.2 MIT split.
+2. **[Implemented — PR1] SDK extension** — add the `documentTemplates` slot to [`packages/modules/module-sdk/src/types.ts`](../../packages/modules/module-sdk/src/types.ts) + the runtime collection in `registerModule()`. Same shape as the existing `registerAiTools` slot collection. Re-export the SDK-side types from `@umbraculum/module-sdk` per §4.2 MIT split.
 3. **[Implemented — PR2] Engine adapters** — Gotenberg HTTP client, exceljs adapter, bwip-js adapter, `@fast-csv/format` adapter, eta integration, MJML integration, xmlbuilder2 integration. Acceptable to land one PR per engine if dependency volume warrants it.
 4. **[Implemented — PR3] Job-runner wiring** — BullMQ + Postgres job-state model (new `rendering` Prisma schema per §7.2) + Fastify routes for submit / status / cancel / signed-URL retrieval inside [`services/api`](../../services/api/). Self-host docs update: Gotenberg sidecar entry in `docker-compose.yml`; [`docs/GETTING-STARTED.md`](../GETTING-STARTED.md) section explaining the new sidecar; [`docs/REDIS-ARCHITECTURE.md`](../REDIS-ARCHITECTURE.md) update noting BullMQ's coexistence with the existing session cache.
    - Note: PR3 keeps v1 artifact persistence API-owned in the `rendering` Prisma schema and signed retrieval route. A future media-layer follow-up can move artifact storage behind `@umbraculum/media` once that package exposes the needed persistence surface.
@@ -461,7 +461,7 @@ Same audience-impact shape [RFC-0004 §6](0004-canonical-pim.md) used.
 ### 13.1 Contributors
 
 - One more cross-cutting concern to be aware of: when adding a new module slice (canonical, vertical, third-party), the module's file outputs go through `renderJob.submit()`; templates register via `registerDocumentTemplate()`.
-- Contributor guides under [`docs/modules/contribute/`](../modules/contribute/) can point at this RFC and [`packages/rendering/README.md`](../../packages/rendering/README.md) when a guide needs to discuss module-owned file outputs. Further guide expansion is documentation polish, not a core RFC-0007 blocker.
+- Contributor guides under [`docs/modules/contribute/`](../modules/contribute/) can point at this RFC and [`packages/platform/rendering/README.md`](../../packages/platform/rendering/README.md) when a guide needs to discuss module-owned file outputs. Further guide expansion is documentation polish, not a core RFC-0007 blocker.
 - No new contributor process. The consumption-contract pattern is familiar from auth / billing / i18n / observability rows; rendering joins the same shape.
 
 ### 13.2 Self-hosters
@@ -501,9 +501,9 @@ Same audience-impact shape [RFC-0004 §6](0004-canonical-pim.md) used.
 - [`docs/LICENSING.md`](../LICENSING.md) §6.1 — AGPLv3 horizontal-platform-code default.
 - [`docs/LICENSING.md`](../LICENSING.md) §6.2 — MIT SDK-package enumeration that §4.2 extends with rendering types.
 - [`docs/REDIS-ARCHITECTURE.md`](../REDIS-ARCHITECTURE.md) — the Redis BullMQ rides on per §7 / §6.1.
-- [`packages/module-sdk/`](../../packages/module-sdk/) — the SDK the new extension point lives in.
-- [`packages/media/`](../../packages/media/) — the asset pipeline `RenderResult` hands off to.
-- [`packages/i18n/`](../../packages/i18n/) — the locale pipeline `RenderContext.locale` feeds.
+- [`packages/modules/module-sdk/`](../../packages/modules/module-sdk/) — the SDK the new extension point lives in.
+- [`packages/platform/media/`](../../packages/platform/media/) — the asset pipeline `RenderResult` hands off to.
+- [`packages/platform/i18n/`](../../packages/platform/i18n/) — the locale pipeline `RenderContext.locale` feeds.
 - [`services/api/src/modules/brewery/routes/recipesExport.ts`](../../services/api/src/modules/brewery/routes/recipesExport.ts) — the first sync-mode proof per §12 PR #5.
 - [`docs/design/canonical-pim-module-surface.md`](../design/canonical-pim-module-surface.md) §3.2, §8.3 — the PIM Phase E channel-feed deferral that becomes the first heavy-render consumer per §12 PR #7.
 - [`docs/design/canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md) — horizontal as-built surface: template registry, delivery modes, module author checklist (update §2 when adding `documentTemplates`).
@@ -530,7 +530,7 @@ New `RenderKind` values (e.g. `pdf-a-3` for archival compliance, `xlsx-pivot-tem
 
 1. The new kind is an additional engine surface (extending §6.1), not a replacement of an existing one.
 2. The new engine satisfies the §2.4 self-host posture (zero new native deps OR a single-image sidecar at most).
-3. The tracker entry lives at `packages/rendering/RENDER-KINDS.md` (created with §12 follow-on PR #1) and records: the new kind name, the engine, the rationale, the date added.
+3. The tracker entry lives at `packages/platform/rendering/RENDER-KINDS.md` (created with §12 follow-on PR #1) and records: the new kind name, the engine, the rationale, the date added.
 
 A *replacement* of an existing engine (e.g. swapping Gotenberg for a different sidecar; swapping exceljs for a different XLSX library) is **not** in the lightweight path — that is a §6 table amendment and requires the full RFC procedure per §15.2.
 

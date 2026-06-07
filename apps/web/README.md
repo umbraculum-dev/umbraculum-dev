@@ -40,7 +40,7 @@ Per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor
 
 ## Platform shared layout notice
 
-The locale layout always mounts [`app/_shared-layout/_components/WebSharedLayoutNotice.tsx`](app/_shared-layout/_components/WebSharedLayoutNotice.tsx). [`resolveWebSharedLayoutNotice()`](../../packages/module-sdk/src/resolveWebSharedLayoutNotice.ts) returns a preset only when `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID` is set at **build** time (demo VPS: `demo`). Local dev omits the env var — no banner. Preset copy is in `@umbraculum/i18n` (`sharedLayoutNotice.demo.*`, `en` + `it`); demo shows a collapsed-by-default expander for long prose. Policy: [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md).
+The locale layout always mounts [`app/_shared-layout/_components/WebSharedLayoutNotice.tsx`](app/_shared-layout/_components/WebSharedLayoutNotice.tsx). [`resolveWebSharedLayoutNotice()`](../../packages/modules/module-sdk/src/resolveWebSharedLayoutNotice.ts) returns a preset only when `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID` is set at **build** time (demo VPS: `demo`). Local dev omits the env var — no banner. Preset copy is in `@umbraculum/i18n` (`sharedLayoutNotice.demo.*`, `en` + `it`); demo shows a collapsed-by-default expander for long prose. Policy: [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md).
 
 ## App tree (platform shared layout vs routes)
 
