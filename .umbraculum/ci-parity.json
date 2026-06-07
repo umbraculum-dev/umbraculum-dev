@@ -19,6 +19,12 @@
     "root": "npm ci --no-audit --no-fund --prefer-offline --workspaces --include-workspace-root",
     "nested": [
       {
+        "path": ".",
+        "command": "npm run build:packages",
+        "afterJob": "lint",
+        "beforeJob": "typecheck"
+      },
+      {
         "path": "apps/web/e2e",
         "command": "npm ci --no-audit --no-fund",
         "afterJob": "lint",
@@ -48,7 +54,6 @@
       "id": "typecheck",
       "needsRootInstall": true,
       "needsNestedInstall": true,
-      "command": "npm run build:packages",
       "workspaces": [
         { "path": "services/api", "mode": "npm" },
         { "path": "services/api/prisma", "mode": "tsc" },
