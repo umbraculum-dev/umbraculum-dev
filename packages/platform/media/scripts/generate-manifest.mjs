@@ -31,11 +31,7 @@ function listFiles(dir) {
   return out;
 }
 
-if (!fs.existsSync(assetsDir)) {
-  throw new Error(`assets dir not found: ${assetsDir}`);
-}
-
-const files = listFiles(assetsDir).sort();
+const files = fs.existsSync(assetsDir) ? listFiles(assetsDir).sort() : [];
 
 /** @type {Record<string, { publicPath: string; sha256: string; bytes: number }>} */
 const manifest = {};
