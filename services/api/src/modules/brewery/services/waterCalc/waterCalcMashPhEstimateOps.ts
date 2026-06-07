@@ -1,6 +1,6 @@
 import { BadRequestError } from "../../../../errors.js";
-import { mashPhEstimate as mashPhEstimateCalc, type MashPhEstimateInput } from "../../../../domain/waterCalc/mashPhEstimate.js";
-import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "../../../../domain/waterCalc/mashPhDefaultsV1.js";
+import { mashPhEstimate as mashPhEstimateCalc, type MashPhEstimateInput } from "./mashPhEstimate.js";
+import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "./mashPhDefaultsV1.js";
 import {
   colorLovibondToEbc,
   mashPhModelKeyFromMaltClass,

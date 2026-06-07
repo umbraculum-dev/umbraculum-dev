@@ -2,7 +2,7 @@ import type { BrewSessionLogKind, BrewSessionStatus, BrewSessionStepStatus, Brew
 import { BadRequestError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 import { BrewdaySettingsService } from "./brewdaySettingsService.js";
-import { RecipeWaterSettingsService } from "./recipeWaterSettingsService.js";
+import { RecipeWaterSettingsService } from "../modules/brewery/services/recipeWaterSettingsService.js";
 import { RecipesService } from "./recipesService.js";
 import {
   buildRecipeDrivenSteps,

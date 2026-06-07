@@ -1,6 +1,6 @@
 import { BadRequestError } from "../../../../errors.js";
-import { applySaltAdditions } from "../../../../domain/waterCalc/saltAdditions.js";
-import { buildSaltAdditionsDerivation } from "../../../../domain/waterCalc/derivation/saltAdditionsDerivation.js";
+import { applySaltAdditions } from "./saltAdditions.js";
+import { buildSaltAdditionsDerivation } from "./derivation/saltAdditionsDerivation.js";
 import {
   parseBaseProfile,
   parseSaltAdditions,

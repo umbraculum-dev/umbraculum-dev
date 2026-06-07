@@ -1,11 +1,11 @@
 import type { RecipeWaterComputeDeps, SpargeComputeAndSaveInput } from "../recipeWaterComputeAndSaveService.js";
-import { BadRequestError } from "../../errors.js";
-import { applySaltAdditions, type IonProfilePpm } from "../../domain/waterCalc/saltAdditions.js";
-import { spargeAcidification, type SpargeAcidificationResult } from "../../domain/waterCalc/spargeAcidification.js";
-import { spargeAcidificationManual, type SpargeAcidificationManualResult } from "../../domain/waterCalc/spargeAcidificationManual.js";
-import { buildSaltAdditionsDerivation } from "../../domain/waterCalc/derivation/saltAdditionsDerivation.js";
-import { buildAcidificationDerivation } from "../../domain/waterCalc/derivation/acidificationDerivation.js";
-import type { WaterCalcDerivation } from "../../domain/waterCalc/derivation/types.js";
+import { BadRequestError } from "../../../../errors.js";
+import { applySaltAdditions, type IonProfilePpm } from "../waterCalc/saltAdditions.js";
+import { spargeAcidification, type SpargeAcidificationResult } from "../waterCalc/spargeAcidification.js";
+import { spargeAcidificationManual, type SpargeAcidificationManualResult } from "../waterCalc/spargeAcidificationManual.js";
+import { buildSaltAdditionsDerivation } from "../waterCalc/derivation/saltAdditionsDerivation.js";
+import { buildAcidificationDerivation } from "../waterCalc/derivation/acidificationDerivation.js";
+import type { WaterCalcDerivation } from "../waterCalc/derivation/types.js";
 import {
   ensureFinite,
   parseAcidType,

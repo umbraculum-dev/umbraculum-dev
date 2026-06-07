@@ -1,9 +1,9 @@
 import { BadRequestError } from "../../../../errors.js";
 import {
   spargeAcidification as spargeAcidificationCalc,
-} from "../../../../domain/waterCalc/spargeAcidification.js";
-import { spargeAcidificationManual as spargeAcidificationManualCalc } from "../../../../domain/waterCalc/spargeAcidificationManual.js";
-import { buildAcidificationDerivation } from "../../../../domain/waterCalc/derivation/acidificationDerivation.js";
+} from "./spargeAcidification.js";
+import { spargeAcidificationManual as spargeAcidificationManualCalc } from "./spargeAcidificationManual.js";
+import { buildAcidificationDerivation } from "./derivation/acidificationDerivation.js";
 import {
   parseAcidTypeAndStrength,
   validateOptionalCalciumMagnesiumPpm,

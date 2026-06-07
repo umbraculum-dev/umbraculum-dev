@@ -2,7 +2,7 @@ import type {
   BoilComputeAndSaveInput,
   MashComputeAndSaveInput,
   SpargeComputeAndSaveInput,
-} from "../../../services/recipeWaterComputeAndSaveService.js";
+} from "../services/recipeWaterComputeAndSaveService.js";
 
 export function mapMashComputeAndSaveBody(body: Record<string, unknown>): MashComputeAndSaveInput {
   return {

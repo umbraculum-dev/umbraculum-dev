@@ -1,7 +1,7 @@
 import type { AiTool } from "@umbraculum/ai-tool-sdk";
 import type { PrismaClient } from "@prisma/client";
 
-import { RecipeWaterSettingsService } from "../../../recipeWaterSettingsService.js";
+import { RecipeWaterSettingsService } from "../../../../modules/brewery/services/recipeWaterSettingsService.js";
 
 interface RecipeWaterStateInput {
   recipeId: string;

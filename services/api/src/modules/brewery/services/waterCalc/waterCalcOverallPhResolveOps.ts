@@ -1,11 +1,11 @@
 import {
   spargeAcidification as spargeAcidificationCalc,
-} from "../../../../domain/waterCalc/spargeAcidification.js";
-import { spargeAcidificationManual } from "../../../../domain/waterCalc/spargeAcidificationManual.js";
-import { mashAcidificationManual } from "../../../../domain/waterCalc/mashAcidificationManual.js";
-import { mashPhEstimate, type MashPhEstimateInput } from "../../../../domain/waterCalc/mashPhEstimate.js";
-import { mashAcidificationTargetMashPh } from "../../../../domain/waterCalc/mashAcidificationTargetMashPh.js";
-import { applySaltAdditions } from "../../../../domain/waterCalc/saltAdditions.js";
+} from "./spargeAcidification.js";
+import { spargeAcidificationManual } from "./spargeAcidificationManual.js";
+import { mashAcidificationManual } from "./mashAcidificationManual.js";
+import { mashPhEstimate, type MashPhEstimateInput } from "./mashPhEstimate.js";
+import { mashAcidificationTargetMashPh } from "./mashAcidificationTargetMashPh.js";
+import { applySaltAdditions } from "./saltAdditions.js";
 import { parseAcidTypeAndStrength } from "./waterCalcHelpers.js";
 import type { OverallGristRow } from "./waterCalcOverallPhParseOps.js";
 import type { toMashPhEstimateGrist } from "./waterCalcOverallPhParseOps.js";

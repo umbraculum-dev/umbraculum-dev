@@ -1,15 +1,15 @@
 import type { MashComputeAndSaveInput } from "../../recipeWaterComputeAndSaveService.js";
-import { spargeAcidification, type SpargeAcidificationResult } from "../../../domain/waterCalc/spargeAcidification.js";
-import { mashAcidificationManual, type MashAcidificationManualResult } from "../../../domain/waterCalc/mashAcidificationManual.js";
+import { spargeAcidification, type SpargeAcidificationResult } from "../../waterCalc/spargeAcidification.js";
+import { mashAcidificationManual, type MashAcidificationManualResult } from "../../waterCalc/mashAcidificationManual.js";
 import {
   mashAcidificationTargetMashPh,
   type MashAcidificationTargetMashPhResult,
-} from "../../../domain/waterCalc/mashAcidificationTargetMashPh.js";
-import { buildAcidificationDerivation } from "../../../domain/waterCalc/derivation/acidificationDerivation.js";
-import { mashPhEstimate, type MashPhEstimateInput } from "../../../domain/waterCalc/mashPhEstimate.js";
-import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "../../../domain/waterCalc/mashPhDefaultsV1.js";
-import type { WaterCalcDerivation } from "../../../domain/waterCalc/derivation/types.js";
-import type { applySaltAdditions } from "../../../domain/waterCalc/saltAdditions.js";
+} from "../../waterCalc/mashAcidificationTargetMashPh.js";
+import { buildAcidificationDerivation } from "../../waterCalc/derivation/acidificationDerivation.js";
+import { mashPhEstimate, type MashPhEstimateInput } from "../../waterCalc/mashPhEstimate.js";
+import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "../../waterCalc/mashPhDefaultsV1.js";
+import type { WaterCalcDerivation } from "../../waterCalc/derivation/types.js";
+import type { applySaltAdditions } from "../../waterCalc/saltAdditions.js";
 import {
   ensureFinite,
   parseAcidType,

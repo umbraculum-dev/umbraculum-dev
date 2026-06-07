@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { spargeAcidification } from "../domain/waterCalc/spargeAcidification.js";
+import { spargeAcidification } from "../modules/brewery/services/waterCalc/spargeAcidification.js";
 
 describe("waterCalc.spargeAcidification (BrunWater 1.25 parity)", () => {
   it("matches BrunWater sheet2 default scenario (phosphoric, 1% strength, 1 gal)", () => {

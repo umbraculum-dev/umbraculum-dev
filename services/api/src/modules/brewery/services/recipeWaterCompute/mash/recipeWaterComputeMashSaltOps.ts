@@ -1,10 +1,10 @@
 import type { MashComputeAndSaveInput, RecipeWaterComputeDeps } from "../../recipeWaterComputeAndSaveService.js";
-import { BadRequestError } from "../../../errors.js";
+import { BadRequestError } from "../../../../../errors.js";
 import {
   applySaltAdditions,
   type IonProfilePpm,
-} from "../../../domain/waterCalc/saltAdditions.js";
-import { buildSaltAdditionsDerivation } from "../../../domain/waterCalc/derivation/saltAdditionsDerivation.js";
+} from "../../waterCalc/saltAdditions.js";
+import { buildSaltAdditionsDerivation } from "../../waterCalc/derivation/saltAdditionsDerivation.js";
 import {
   ensureFinite,
   mixIonProfilesByVolume,

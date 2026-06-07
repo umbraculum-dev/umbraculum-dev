@@ -1,5 +1,5 @@
 import type { ExpectedRaRange, RecipeWaterHubStreamSummary } from "@umbraculum/brewery-contracts";
-import type { IonProfilePpm } from "../../domain/waterCalc/saltAdditions.js";
+import type { IonProfilePpm } from "../waterCalc/saltAdditions.js";
 import {
   calcResidualAlkalinityPpmCaCO3,
   displayAlkalinityPpmCaCO3,

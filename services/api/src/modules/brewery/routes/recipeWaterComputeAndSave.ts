@@ -5,7 +5,7 @@ import { BoilComputeAndSaveRequestSchema, BoilComputeAndSaveResponseSchema, IdPa
 import { waterFormatHints } from "@umbraculum/contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import { RecipeWaterComputeAndSaveService } from "../../../services/recipeWaterComputeAndSaveService.js";
+import { RecipeWaterComputeAndSaveService } from "../services/recipeWaterComputeAndSaveService.js";
 import {
   mapBoilComputeAndSaveBody,
   mapMashComputeAndSaveBody,

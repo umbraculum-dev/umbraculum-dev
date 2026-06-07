@@ -125,7 +125,7 @@ Per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3, every canonic
 
 | Slice | Path | What it owns |
 |---|---|---|
-| **API** | `services/api/src/modules/<code>/` | Fastify route plugins, services, AI tool handlers, Prisma slice (when `multiSchema` is enabled), module-local tests. |
+| **API** | `services/api/src/modules/<code>/` | Fastify route plugins under `routes/`, module-owned services under `services/` (brewery Wave **3e** colocated water/recipe domain here), AI tool handlers, Prisma slice (when `multiSchema` is enabled), module-local tests. |
 | **Web** | `apps/web/app/[locale]/(<code>)/` | Next.js App Router pages + layouts. Route group `(<code>)/` — no URL prefix change. |
 | **Native** | `apps/native/src/modules/<code>/` | React Native screens, navigation entries, native-only components (required for native-mandatory modules per [`ROADMAP.md`](ROADMAP.md); pending for others). |
 | **Contracts** | `packages/<code>-contracts/` → `@umbraculum/<code>-contracts` | DTOs, route IDs, Zod schemas, contract-version handshake. The only slice a third-party pins. |

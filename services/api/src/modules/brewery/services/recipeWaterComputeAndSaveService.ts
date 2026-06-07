@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
-import { BadRequestError } from "../errors.js";
-import { WorkspacesService } from "./workspacesService.js";
-import { RecipesService } from "./recipesService.js";
+import { BadRequestError } from "../../../errors.js";
+import { WorkspacesService } from "../../../services/workspacesService.js";
+import { RecipesService } from "../../../services/recipesService.js";
 import { RecipeWaterSettingsService } from "./recipeWaterSettingsService.js";
 import { type WaterProfileLite } from "./recipeWaterCompute/recipeWaterComputeHelpers.js";
 import * as mashOps from "./recipeWaterCompute/recipeWaterComputeMashOps.js";

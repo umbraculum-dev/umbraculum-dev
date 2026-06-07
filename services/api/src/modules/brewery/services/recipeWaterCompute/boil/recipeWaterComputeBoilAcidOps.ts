@@ -2,14 +2,14 @@ import type { BoilComputeAndSaveInput } from "../../recipeWaterComputeAndSaveSer
 import {
   spargeAcidification,
   type SpargeAcidificationResult,
-} from "../../../domain/waterCalc/spargeAcidification.js";
+} from "../../waterCalc/spargeAcidification.js";
 import {
   spargeAcidificationManual,
   type SpargeAcidificationManualResult,
-} from "../../../domain/waterCalc/spargeAcidificationManual.js";
-import { buildAcidificationDerivation } from "../../../domain/waterCalc/derivation/acidificationDerivation.js";
-import type { WaterCalcDerivation } from "../../../domain/waterCalc/derivation/types.js";
-import type { applySaltAdditions } from "../../../domain/waterCalc/saltAdditions.js";
+} from "../../waterCalc/spargeAcidificationManual.js";
+import { buildAcidificationDerivation } from "../../waterCalc/derivation/acidificationDerivation.js";
+import type { WaterCalcDerivation } from "../../waterCalc/derivation/types.js";
+import type { applySaltAdditions } from "../../waterCalc/saltAdditions.js";
 import {
   ensureFinite,
   parseAcidType,

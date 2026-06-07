@@ -1,5 +1,5 @@
 import { BadRequestError } from "../../../../errors.js";
-import { mashAcidificationTargetMashPh as mashAcidificationTargetMashPhCalc } from "../../../../domain/waterCalc/mashAcidificationTargetMashPh.js";
+import { mashAcidificationTargetMashPh as mashAcidificationTargetMashPhCalc } from "./mashAcidificationTargetMashPh.js";
 import {
   parseAcidTypeAndStrength,
   validateOptionalCalciumMagnesiumPpm,

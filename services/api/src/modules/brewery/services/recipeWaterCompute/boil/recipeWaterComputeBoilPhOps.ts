@@ -2,10 +2,10 @@ import type { BoilComputeAndSaveInput } from "../../recipeWaterComputeAndSaveSer
 import {
   alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult,
   combineAfterSaltsAndAcid,
-} from "../../../domain/waterCalc/overall.js";
-import type { SpargeAcidificationResult } from "../../../domain/waterCalc/spargeAcidification.js";
-import type { WaterCalcDerivation } from "../../../domain/waterCalc/derivation/types.js";
-import type { applySaltAdditions } from "../../../domain/waterCalc/saltAdditions.js";
+} from "../../waterCalc/overall.js";
+import type { SpargeAcidificationResult } from "../../waterCalc/spargeAcidification.js";
+import type { WaterCalcDerivation } from "../../waterCalc/derivation/types.js";
+import type { applySaltAdditions } from "../../waterCalc/saltAdditions.js";
 import { parseAcidType, parseSaltAdditions, parseStrengthKind, type Mode } from "../recipeWaterComputeHelpers.js";
 import type { BoilAcidResult } from "./recipeWaterComputeBoilAcidOps.js";
 

@@ -3,9 +3,9 @@ import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
 import { BadRequestError } from "../../../../errors.js";
 import {
   spargeAcidification as spargeAcidificationCalc,
-} from "../../../../domain/waterCalc/spargeAcidification.js";
-import { mashAcidificationManual as mashAcidificationManualCalc } from "../../../../domain/waterCalc/mashAcidificationManual.js";
-import { buildAcidificationDerivation } from "../../../../domain/waterCalc/derivation/acidificationDerivation.js";
+} from "./spargeAcidification.js";
+import { mashAcidificationManual as mashAcidificationManualCalc } from "./mashAcidificationManual.js";
+import { buildAcidificationDerivation } from "./derivation/acidificationDerivation.js";
 import {
   parseAcidTypeAndStrength,
   waterCalcWithDerivationResponse,

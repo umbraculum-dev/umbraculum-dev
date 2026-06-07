@@ -1,7 +1,7 @@
 import type { BillingTier, PrismaClient } from "@prisma/client";
 
 import { BadRequestError, NotFoundError } from "../../errors.js";
-import { computeRecipeGravityAnalysis } from "../../domain/recipeAnalysis/gravityAnalysis.js";
+import { computeRecipeGravityAnalysis } from "../../modules/brewery/services/recipeAnalysis/gravityAnalysis.js";
 import type { WorkspacesService } from "../workspacesService.js";
 
 export async function getWorkspaceTier(prisma: PrismaClient, workspaceId: string): Promise<BillingTier> {

@@ -1,8 +1,8 @@
-import { applySaltAdditions } from "../../../../domain/waterCalc/saltAdditions.js";
+import { applySaltAdditions } from "./saltAdditions.js";
 import {
   alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult,
   combineAfterSaltsAndAcid,
-} from "../../../../domain/waterCalc/overall.js";
+} from "./overall.js";
 import { parseBaseProfile, parseSaltAdditions, waterCalcWithDerivationResponse } from "./waterCalcHelpers.js";
 
 export function prepareOverallSalts(body: Record<string, unknown>, volumeLiters: number) {

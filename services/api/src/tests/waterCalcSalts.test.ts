@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applySaltAdditions } from "../domain/waterCalc/saltAdditions.js";
+import { applySaltAdditions } from "../modules/brewery/services/waterCalc/saltAdditions.js";
 
 describe("applySaltAdditions", () => {
   it("scales ppm with grams and volume", () => {

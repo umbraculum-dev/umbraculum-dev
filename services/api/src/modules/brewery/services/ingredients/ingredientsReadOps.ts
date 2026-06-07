@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 
-import { getMashPhModelDefaultsV1 } from "../../../../domain/waterCalc/mashPhDefaultsV1.js";
+import { getMashPhModelDefaultsV1 } from "../waterCalc/mashPhDefaultsV1.js";
 
 import {
   getQueryString,

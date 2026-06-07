@@ -1,6 +1,6 @@
 import type { ExpectedRaRange } from "@umbraculum/brewery-contracts";
-import type { IonProfilePpm } from "../../domain/waterCalc/saltAdditions.js";
-import { isObject, isFiniteNumber } from "../../lib/typeGuards.js";
+import type { IonProfilePpm } from "../waterCalc/saltAdditions.js";
+import { isObject, isFiniteNumber } from "../../../../lib/typeGuards.js";
 
 export type MashOverallLastResultJson = {
   ionsPpm: IonProfilePpm;

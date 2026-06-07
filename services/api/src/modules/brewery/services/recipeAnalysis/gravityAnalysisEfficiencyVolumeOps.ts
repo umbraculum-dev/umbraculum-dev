@@ -1,4 +1,4 @@
-import { isObject } from "../../lib/typeGuards.js";
+import { isObject } from "../../../../lib/typeGuards.js";
 import { extractFirstRecipe, extractTotalGrainKg } from "./gravityAnalysisExtractors.js";
 import type { ExtractedEquipment, GravityAnalysisWarning } from "./gravityAnalysisHelpers.js";
 import { clamp, safeNum } from "./gravityAnalysisHelpers.js";

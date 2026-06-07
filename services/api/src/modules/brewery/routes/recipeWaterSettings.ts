@@ -4,7 +4,7 @@ import { ErrorResponseSchema } from "@umbraculum/contracts";
 import { IdParamsSchema, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutRequestSchema, RecipeWaterSettingsPutResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import { RecipeWaterSettingsService } from "../../../services/recipeWaterSettingsService.js";
+import { RecipeWaterSettingsService } from "../services/recipeWaterSettingsService.js";
 
 export function recipeWaterSettingsRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();

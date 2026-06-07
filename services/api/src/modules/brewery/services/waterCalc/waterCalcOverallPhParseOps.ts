@@ -1,7 +1,7 @@
 import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
 
 import { BadRequestError } from "../../../../errors.js";
-import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "../../../../domain/waterCalc/mashPhDefaultsV1.js";
+import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "./mashPhDefaultsV1.js";
 import {
   colorLovibondToEbc,
   mashPhModelKeyFromMaltClass,

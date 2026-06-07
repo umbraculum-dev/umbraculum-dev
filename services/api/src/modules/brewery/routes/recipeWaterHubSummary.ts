@@ -5,7 +5,7 @@ import { IdParamsSchema, RecipeWaterHubSummaryResponseSchema } from "@umbraculum
 import { waterFormatHints } from "@umbraculum/contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import { RecipeWaterHubSummaryService } from "../../../services/recipeWaterHubSummaryService.js";
+import { RecipeWaterHubSummaryService } from "../services/recipeWaterHubSummaryService.js";
 
 export function recipeWaterHubSummaryRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();

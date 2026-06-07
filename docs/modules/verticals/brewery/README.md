@@ -53,7 +53,7 @@ For brewery: the brewery is the vertical; production planning (`mrp`), inventory
 | `ingredients.ts` / `styles.ts` / `inventory.ts` | Brewery ingredient catalogs, BJCP styles, on-hand inventory. |
 | `integrationsTilt.ts` / `integrationsTiltIngest.ts` / `integrationsReveal.ts` | Brewing-device integrations through the platform integrations framework. |
 
-Routes are registered from [`services/api/src/modules/brewery/index.ts`](../../../../services/api/src/modules/brewery/index.ts). Brewery domain tables live in the Prisma `brewery` schema (`registerModule({ code: "brewery", prismaSchema: "brewery" })` per [RFC-0010](../../../rfcs/0010-platform-brewery-postgres-schema-split.md)).
+Routes are registered from [`services/api/src/modules/brewery/index.ts`](../../../../services/api/src/modules/brewery/index.ts). Brewery **domain services** (water calc math, recipe analysis, water-hub/compute orchestrators) live under [`services/api/src/modules/brewery/services/`](../../../../services/api/src/modules/brewery/services/) per RFC-0011 Wave **3e** ([backbone §6.8](../../../design/pre-flip-application-surface-backbone.md)). Brewery domain tables live in the Prisma `brewery` schema (`registerModule({ code: "brewery", prismaSchema: "brewery" })` per [RFC-0010](../../../rfcs/0010-platform-brewery-postgres-schema-split.md)).
 
 ### 3.2 Web — brewery-vertical route group ([`apps/web/app/[locale]/(brewery)/`](../../../../apps/web/app/[locale]/(brewery)/))
 

@@ -1,6 +1,6 @@
-import { BadRequestError } from "../../errors.js";
-import type { IonProfilePpm, SaltAddition, SaltKey } from "../../domain/waterCalc/saltAdditions.js";
-import type { AcidStrength, SpargeAcidType } from "../../domain/waterCalc/spargeAcidification.js";
+import { BadRequestError } from "../../../../errors.js";
+import type { IonProfilePpm, SaltAddition, SaltKey } from "../waterCalc/saltAdditions.js";
+import type { AcidStrength, SpargeAcidType } from "../waterCalc/spargeAcidification.js";
 
 type StrengthKind = "percent" | "normality" | "molarity" | "solid";
 export type Mode = "targetPh" | "manual";

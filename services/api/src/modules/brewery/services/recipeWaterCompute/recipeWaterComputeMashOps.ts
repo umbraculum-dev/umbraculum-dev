@@ -1,5 +1,5 @@
 import type { MashComputeAndSaveInput, RecipeWaterComputeDeps } from "../recipeWaterComputeAndSaveService.js";
-import { BadRequestError } from "../../errors.js";
+import { BadRequestError } from "../../../../errors.js";
 import { ensureFinite, parseSaltAdditions } from "./recipeWaterComputeHelpers.js";
 import { computeMashSaltStage } from "./mash/recipeWaterComputeMashSaltOps.js";
 import { computeMashAcidStage } from "./mash/recipeWaterComputeMashAcidOps.js";

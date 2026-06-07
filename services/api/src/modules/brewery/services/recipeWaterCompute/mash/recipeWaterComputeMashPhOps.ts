@@ -1,9 +1,9 @@
 import type { MashComputeAndSaveInput } from "../../recipeWaterComputeAndSaveService.js";
-import { alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult, combineAfterSaltsAndAcid } from "../../../domain/waterCalc/overall.js";
-import type { SpargeAcidificationResult } from "../../../domain/waterCalc/spargeAcidification.js";
-import type { MashAcidificationTargetMashPhResult } from "../../../domain/waterCalc/mashAcidificationTargetMashPh.js";
-import type { WaterCalcDerivation } from "../../../domain/waterCalc/derivation/types.js";
-import type { applySaltAdditions } from "../../../domain/waterCalc/saltAdditions.js";
+import { alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult, combineAfterSaltsAndAcid } from "../../waterCalc/overall.js";
+import type { SpargeAcidificationResult } from "../../waterCalc/spargeAcidification.js";
+import type { MashAcidificationTargetMashPhResult } from "../../waterCalc/mashAcidificationTargetMashPh.js";
+import type { WaterCalcDerivation } from "../../waterCalc/derivation/types.js";
+import type { applySaltAdditions } from "../../waterCalc/saltAdditions.js";
 import {
   ensureFinite,
   parseAcidType,

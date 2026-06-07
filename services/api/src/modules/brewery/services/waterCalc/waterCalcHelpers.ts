@@ -1,8 +1,8 @@
 import { WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { BadRequestError } from "../../../../errors.js";
-import type { AcidStrength, SpargeAcidType } from "../../../../domain/waterCalc/spargeAcidification.js";
-import type { IonProfilePpm, SaltAddition, SaltKey } from "../../../../domain/waterCalc/saltAdditions.js";
+import type { AcidStrength, SpargeAcidType } from "./spargeAcidification.js";
+import type { IonProfilePpm, SaltAddition, SaltKey } from "./saltAdditions.js";
 
 export function colorLovibondToEbc(colorLovibond: number | null): number | null {
   if (colorLovibond === null) return null;

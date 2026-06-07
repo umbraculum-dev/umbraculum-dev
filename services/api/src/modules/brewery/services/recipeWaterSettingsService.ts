@@ -1,4 +1,4 @@
 export {
   RecipeWaterSettingsService,
   type UpsertRecipeWaterSettingsInput,
-} from "./recipeWaterSettings/recipeWaterSettingsService.js";
+} from "../../../services/recipeWaterSettings/recipeWaterSettingsService.js";

@@ -1,5 +1,5 @@
 import type { BrewdaySettingsService } from "../brewdaySettingsService.js";
-import type { RecipeWaterSettingsService } from "../recipeWaterSettingsService.js";
+import type { RecipeWaterSettingsService } from "../../modules/brewery/services/recipeWaterSettingsService.js";
 
 /**
  * Loose structural shapes for the BeerJSON document and related extension JSON

@@ -1,6 +1,6 @@
 import type { RecipeWaterHubStreamSummary } from "@umbraculum/brewery-contracts";
 import type { Prisma } from "@prisma/client";
-import { combineAfterSaltsAndAcid } from "../../domain/waterCalc/overall.js";
+import { combineAfterSaltsAndAcid } from "../waterCalc/overall.js";
 import { parseSaltsBreakdown, parseSaltsResultingProfile } from "./recipeWaterHubSummaryTypes.js";
 
 export function buildSpargeStreamSummary(

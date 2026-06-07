@@ -347,28 +347,31 @@ Add `eslint-plugin-boundaries` elements on `packages/**`:
 
 Spike doc: `docs/design/solid-boundaries-eslint-packages-spike.md` (to author in Wave 3d).
 
-### 6.8 `services/api` — the same mixing problem (symmetry with §6)
+### 6.8 `services/api` — brewery service colocation (Wave 3e — Phase 1 done)
 
-RFC-0002 β layout landed **module routes** under `services/api/src/modules/<code>/`, but brewery **domain services** still sit in legacy horizontal trees beside platform code — the same category mistake as `@umbraculum/contracts` owning brewery wire types before Wave 3b.
+RFC-0002 β layout landed **module routes** under `services/api/src/modules/<code>/`. Wave **3e** (2026-06-06) colocated brewery **domain math and water/recipe orchestrators** under `modules/brewery/services/` — the same category fix as Wave **3b** (`@umbraculum/brewery-contracts`).
 
-#### 6.8.1 Inventory — brewery code outside `modules/brewery/`
+#### 6.8.1 Inventory — Phase 1 (resolved)
 
-| On-disk path | Declared owner | Actual signal |
-|--------------|----------------|---------------|
-| `services/api/src/modules/brewery/routes/` | Brewery module | **Correct** — Fastify route registration |
-| `services/api/src/modules/brewery/services/` | Brewery module | **Partial** — e.g. `waterCalcService.ts`, `waterCalc/*` live here |
-| `services/api/src/services/recipeWaterHub/` | *(none — flat `services/`)* | **Leaked:** hub-summary builders (`recipeWaterHubBoilSummary.ts`, mash/sparge/merged, …) — brewery-only |
-| `services/api/src/services/recipeWaterHubSummaryService.ts` | *(flat `services/`)* | **Leaked:** orchestrates brewery water-hub reads |
-| `services/api/src/services/recipeWaterCompute/` | *(flat `services/`)* | **Leaked:** mash/sparge/boil compute-and-save ops — brewery-only |
-| `services/api/src/domain/waterCalc/` | *(flat `domain/`)* | **Leaked:** shared water-chemistry math consumed by brewery routes **and** by `recipeWaterHub` / `recipeWaterCompute` under `services/` |
-| `services/api/src/domain/recipeAnalysis/` | *(flat `domain/`)* | **Leaked:** gravity / efficiency analysis attached to `GET /recipes/:id` |
+| On-disk path | Status |
+|--------------|--------|
+| `modules/brewery/routes/` | **Correct** — Fastify route registration |
+| `modules/brewery/services/waterCalc/` | **Done** — merged pure math (former `domain/waterCalc/`) + route ops |
+| `modules/brewery/services/recipeWaterHub/` | **Done** — former `services/recipeWaterHub/` |
+| `modules/brewery/services/recipeWaterCompute/` | **Done** — former `services/recipeWaterCompute/` |
+| `modules/brewery/services/recipeAnalysis/` | **Done** — former `domain/recipeAnalysis/` |
+| `modules/brewery/services/recipeWaterHubSummaryService.ts` | **Done** |
+| `modules/brewery/services/recipeWaterComputeAndSaveService.ts` | **Done** |
+| `modules/brewery/services/recipeWaterSettingsService.ts` | **Done** (barrel; impl still under `services/recipeWaterSettings/` until Phase 2) |
 
-**Magento parallel:** routes live under `module-catalog`, but half the catalog service layer still sits under `app/code/Magento/Framework/` because the split stopped at controllers — integrators grep `src/services/` expecting platform-only helpers and hit brewery math.
+#### 6.8.1b Phase 2 — flat brewery orchestrators (deferred)
 
-#### 6.8.2 Failure modes
+Still under legacy `services/api/src/services/`: `recipes/`, `brewSessions*.ts`, `waterProfilesService.ts`, `recipesImportService.ts`, `brewdaySettingsService.ts`, and `services/recipeWaterSettings/` implementation tree.
 
-1. **Dual homes for the same vertical.** Water calc exists under both `modules/brewery/services/waterCalc/` and `domain/waterCalc/` + `services/recipeWaterCompute/` — no single “brewery module service root.”
-2. **F-mod opt-out is incomplete at the filesystem layer.** `UMBRACULUM_MODULE_PROFILE=platform` can skip brewery route registration, but `src/services/recipeWaterHub/` and `src/domain/recipeAnalysis/` remain visible in tree listings and import graphs.
+#### 6.8.2 Failure modes (remaining)
+
+1. **Dual homes for water calc — resolved (Phase 1).** Single folder: `modules/brewery/services/waterCalc/`.
+2. **F-mod opt-out filesystem leak — reduced.** Phase 1 brewery subtrees no longer under flat `domain/` or `services/recipeWater*`. Phase 2 flat orchestrators remain under `src/services/`.
 3. **Boundary enforcement gap.** WS5 covers `apps/**`; there is no **`services/api/src/modules/**` vs `services/api/src/{services,domain}/**` eslint fence** preventing new brewery helpers from landing in flat trees “because it's closer to the route.”
 
 #### 6.8.3 Target shape (filesystem clarity — HTTP paths unchanged)
@@ -389,7 +392,7 @@ services/api/src/
   routes/                # legacy platform route entry files — migrate toward platform/ over time
 ```
 
-**Explicit non-goals for Wave 3b:** moving these trees — Wave 3b only extracted `@umbraculum/brewery-contracts`. Service colocation is a **follow-on wave** (proposed **3e** in §9).
+**Wave 3e Phase 1 landed (2026-06-06).** Phase 2 (remaining flat `services/` orchestrators) deferred — see §6.8.1b.
 
 No change to HTTP paths — filesystem clarity only.
 
@@ -455,7 +458,7 @@ flowchart TB
 | **3b** | Create `@umbraculum/brewery-contracts`; migrate `contracts/src/{brewery,water,analysis}` | 3–5d | **Recommended** — closes RFC-0002 gap |
 | **3c** | Purge vertical leakage from `@umbraculum/ui`, split `@umbraculum/i18n` content | 2–4d | Recommended |
 | **3d** | Package-layer eslint boundaries + spike doc | 1–2d | Follows 3a |
-| **3e** | Colocate brewery API services — move `src/services/recipeWaterHub*`, `recipeWaterCompute/`, `domain/waterCalc/`, `domain/recipeAnalysis/` under `modules/brewery/services/` (§6.8) | 2–3d | Recommended — same integrator confusion as pre-3b packages |
+| **3e** | Colocate brewery API services — move `src/services/recipeWaterHub*`, `recipeWaterCompute/`, `domain/waterCalc/`, `domain/recipeAnalysis/` under `modules/brewery/services/` (§6.8) | 2–3d | **Done (2026-06-06)** — Phase 1; Phase 2 flat orchestrators deferred |
 | **3f** | **Documentation vocabulary + optional path rename:** sunset slang (`operator shell`, `operator chrome`, prose uses of “shell”) per §3.5; adopt conventional terms in BUILDING-YOUR-VERTICAL; optionally rename `apps/web/app/_shell/` to a self-explanatory path | 0.5–1d | No — docs-first; folder rename optional |
 | **4** | `@umbraculum/native-shell` + `apps/native/brewery/` | 3–5d | Optional pre-flip — scaffold second app README |
 | **5** | E2E folder taxonomy | 1d | No |

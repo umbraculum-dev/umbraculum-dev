@@ -1,4 +1,4 @@
-import { isFiniteNumber, isObject } from "../../lib/typeGuards.js";
+import { isFiniteNumber, isObject } from "../../../../lib/typeGuards.js";
 import {
   safeNum,
   type ExtractedFermentableForColor,

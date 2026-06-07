@@ -1,5 +1,5 @@
 import type { BoilComputeAndSaveInput, RecipeWaterComputeDeps } from "../recipeWaterComputeAndSaveService.js";
-import { BadRequestError } from "../../errors.js";
+import { BadRequestError } from "../../../../errors.js";
 import { ensureFinite, parseSaltAdditions } from "./recipeWaterComputeHelpers.js";
 import { computeBoilSaltStage } from "./boil/recipeWaterComputeBoilSaltOps.js";
 import { computeBoilAcidStage } from "./boil/recipeWaterComputeBoilAcidOps.js";
