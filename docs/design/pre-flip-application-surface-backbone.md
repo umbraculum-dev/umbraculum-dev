@@ -17,7 +17,7 @@
 | **Shared layout helpers (web)** | **`app/_shared-layout/`** (platform) + `(brewery)/{_components,_lib}/` | **Done (Wave 1 + 3f, 2026-06-07)** | Keep; WS5 `web-platform-shared-layout` |
 | **Platform pages (web)** | `(platform-layout)/{ai,accessibility,about,…}` | **Done (Wave 3f, 2026-06-07)** | Keep grouping; `platform/` admin unchanged |
 | **Native apps** | Single `apps/native/` Expo workspace | Name implies one app; ERP/manufacturing needs PIM scanner, warehouse handheld, brew-day, … | Multi-app under `apps/native/<app-code>/` + shared `@umbraculum/native-shell` package |
-| **E2E** | Flat `smoke/` + `brewday/` | No ownership signal for platform vs canonical vs vertical | Mirror module taxonomy under `e2e/{platform,canonical,verticals}/` |
+| **E2E** | `platform/`, `canonical/`, `verticals/brewery/` | **Done (Wave 5, 2026-06-07)** | Mirror module taxonomy under `e2e/{platform,canonical,verticals}/` |
 | **Packages (on disk)** | Flat `packages/*` (19 siblings) | Horizontal, SDK, canonical contracts, and brewery vertical at same level; folder names disagree with npm names | On-disk tiers + align paths with npm + split brewery out of platform packages |
 | **Packages (content)** | Brewery DTOs in `@umbraculum/contracts`; `BrewCheckbox` in `@umbraculum/ui` | Platform packages contain vertical logic/content — same class of bug as `app/_components` | `@umbraculum/brewery-contracts`; purge vertical leakage from platform packages |
 | **Website** | `apps/website/` in monorepo | Wrong audience for forkable product repo | Sister repo **`umbraculum-website`** (private OK pre-flip) — see website extraction plan |
@@ -198,26 +198,22 @@ RFC-0002 native slice path **`apps/native/src/modules/<code>/`** becomes **`apps
 
 ## 5. `apps/web/e2e` — test ownership mirrors product layers
 
-### 5.1 Today
-
-```
-apps/web/e2e/
-  smoke/          # mixed: auth, dashboard, mrp-crp, recipes, water, ai
-  brewday/        # brewery vertical
-```
-
-### 5.2 Target
+### 5.1 Today (Wave 5 complete, 2026-06-07)
 
 ```text
 apps/web/e2e/
   platform/       # auth, select-workspace, dashboard, ai-pages
-  canonical/      # mrp-crp-read-only, mrp-crp-export, pim-when-added
+  canonical/      # mrp-crp-read-only, mrp-crp-export
   verticals/
-    brewery/      # recipe-list, water-*, brewday/*
+    brewery/      # recipe-list, water-*, recipe-create, brew-session
   support/        # unchanged fixtures
 ```
 
-Playwright config uses projects/tags matching folders. **Not a flip blocker** if deferred — log in [public-flip-deferral-register.md](public-flip-deferral-register.md) with **R-SCOPE** if needed.
+Playwright projects: `platform`, `canonical`, `verticals-brewery`.
+
+### 5.2 Target
+
+Same as §5.1 — **landed Wave 5 (2026-06-07)**.
 
 ---
 
@@ -229,13 +225,13 @@ The flat `packages/` tree repeats the shell-layer confusion at the **npm workspa
 
 | On-disk path | npm name | Declared layer | Actual ownership signal |
 |--------------|----------|----------------|-------------------------|
-| `packages/platform/ui/` | `@umbraculum/ui` | Horizontal (L3) | **Leaked:** `BrewCheckbox`, `HydrometerChart` |
+| `packages/platform/ui/` | `@umbraculum/ui` | Horizontal (L3) | **Clean (Wave 3c, 2026-06-07)** — brewery widgets moved to `@umbraculum/brewery-recipes-ui` |
 | `packages/platform/navigation/` | `@umbraculum/navigation` | Horizontal (L3) | Clean |
-| `packages/platform/i18n/` | `@umbraculum/i18n` | Horizontal (L3) | **Leaked:** brewery + MRP/CRP copy in same `en.json` |
+| `packages/platform/i18n/` | `@umbraculum/i18n` | Horizontal (L3) | **Clean (Wave 3c)** — brewery copy in `@umbraculum/brewery-i18n`; platform merges at runtime |
 | `packages/platform/i18n-react/` | `@umbraculum/i18n-react` | Horizontal (L3) | Clean (bindings only) |
 | `packages/modules/i18n-keys/` | `@umbraculum/i18n-keys` | SDK (L5) | Clean |
 | `packages/platform/api-client/` | `@umbraculum/api-client` | Horizontal (L3) | Clean |
-| `packages/platform/media/` | `@umbraculum/media` | Horizontal (L3) | **Leaked:** brewery asset content (documented deferral) |
+| `packages/platform/media/` | `@umbraculum/media` | Horizontal (L3) | **Clean (Wave 3c)** — brewery assets in `@umbraculum/brewery-media-assets`; platform manifest empty |
 | `packages/platform/rendering/` | `@umbraculum/rendering` | Horizontal (L3) | Clean (BeerJSON proof is consumer, not owner) |
 | `packages/platform/test-mcp/` | `@umbraculum/test-mcp` | Dev tooling | Clean |
 | `packages/platform/contracts/` | `@umbraculum/contracts` | Platform contracts (L4) | **Was leaked** — `src/brewery/`, `src/water/`, `src/analysis/` moved to `@umbraculum/brewery-contracts` (Wave 3b, 2026-06-06) |
@@ -472,7 +468,7 @@ flowchart TB
 | **3e** | Colocate brewery API services — move `src/services/recipeWaterHub*`, `recipeWaterCompute/`, `domain/waterCalc/`, `domain/recipeAnalysis/` under `modules/brewery/services/` (§6.8) | 2–3d | **Done (2026-06-06)** — Phase 1; Phase 2 flat orchestrators deferred |
 | **3f** | **Shared layout nomenclature + path rename:** `_shared-layout/`, `(platform-layout)/`, `web-platform-shared-layout`; glossary + BUILDING-YOUR-VERTICAL decision tree | 1–2d | **Done (2026-06-07)** |
 | **4** | `@umbraculum/native-shell` + `apps/native/brewery/` | 3–5d | Optional pre-flip — scaffold second app README |
-| **5** | E2E folder taxonomy | 1d | No |
+| **5** | E2E folder taxonomy | 1d | No — **Done (2026-06-07)** |
 | **6** | Docs + eslint + module READMEs | 1d | Yes for changed waves — **Done (2026-06-07)** |
 
 **Parallel track:** website → `umbraculum-website` extraction (existing plan).

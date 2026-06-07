@@ -6,7 +6,7 @@
  * browser-MCP layer (see the plugin-shipped agentic-browser-web-app skill + docs/AGENTIC-JOBS.md ->
  * agenticCreateRecipe). Playwright keeps the deterministic shape contract.
  */
-import { test, expect } from "../support/auth-fixture";
+import { test, expect } from "../../support/auth-fixture";
 
 const SPEC_RECIPE_NAME = "E2E Playwright Recipe (create.spec)";
 

@@ -45,7 +45,7 @@ export async function runPlaywrightSmoke(args: { baseUrl?: string } = {}): Promi
       "-w", "/e2e",
       "mcr.microsoft.com/playwright:v1.60.0-noble",
       "bash", "-lc",
-      "npm install --no-audit --no-fund && npx playwright test --project=smoke",
+      "npm install --no-audit --no-fund && npx playwright test --project=platform",
     ],
     { timeoutMs: 20 * 60_000 },
   );
@@ -53,7 +53,7 @@ export async function runPlaywrightSmoke(args: { baseUrl?: string } = {}): Promi
 
 export async function runPlaywrightSpec(args: { spec: string; baseUrl?: string }): Promise<ToolResult> {
   if (!args.spec || typeof args.spec !== "string") {
-    throw new Error("runPlaywrightSpec: 'spec' is required (e.g. 'smoke/auth.spec.ts')");
+    throw new Error("runPlaywrightSpec: 'spec' is required (e.g. 'platform/auth.spec.ts')");
   }
   const baseUrl = args.baseUrl ?? process.env['E2E_BASE_URL'] ?? "http://localhost:18080";
   return runCommand(

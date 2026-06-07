@@ -28,8 +28,8 @@ A developer-tooling HTTP server (and matching CLI) that wraps a fixed set of tes
 | `seedE2eFixture` | `{ clean? }` | Runs `docker compose exec api npm run seed:e2e [-- --clean]` |
 | `runApiTests` | `{ filter? }` | Runs `docker compose exec api npm test` (vitest filter via `-t`) |
 | `runContractsCheck` | `{ update? }` | Runs `npm run contracts:check` (or `contracts:update`) in the api container |
-| `runPlaywrightSmoke` | `{ baseUrl? }` | Runs the Playwright `smoke` project in a one-shot container |
-| `runPlaywrightSpec` | `{ spec, baseUrl? }` | Runs a single Playwright spec (e.g. `smoke/auth.spec.ts`) |
+| `runPlaywrightSmoke` | `{ baseUrl? }` | Runs the Playwright `platform` project in a one-shot container |
+| `runPlaywrightSpec` | `{ spec, baseUrl? }` | Runs a single Playwright spec (e.g. `platform/auth.spec.ts`) |
 | `loginAs` | `{ persona?, baseUrl? }` | Hits `POST /api/auth/login/native`, returns `{ token, cookie, activeWorkspaceId }` |
 
 Plus the read-only convenience endpoint:
@@ -75,7 +75,7 @@ curl -fsS -X POST http://localhost:8932/loginAs \
 # Run a single Playwright spec
 curl -fsS -X POST http://localhost:8932/runPlaywrightSpec \
   -H 'content-type: application/json' \
-  --data '{"spec":"smoke/auth.spec.ts"}'
+  --data '{"spec":"platform/auth.spec.ts"}'
 
 # What did the last smoke run produce?
 curl -fsS "http://localhost:8932/lastRunArtifacts?tool=smoke"
@@ -88,7 +88,7 @@ docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-m
   bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli smokeStack"
 
 docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:20-slim \
-  bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli runPlaywrightSpec --json '{\"spec\":\"smoke/auth.spec.ts\"}'"
+  bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli runPlaywrightSpec --json '{\"spec\":\"platform/auth.spec.ts\"}'"
 ```
 
 ## Cursor MCP wiring (manual; we don't touch your global config from this repo)

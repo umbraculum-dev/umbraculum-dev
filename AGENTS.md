@@ -439,7 +439,7 @@ mounts; tsx restarts mid-relink and the api process crashes with
 | **`smoke:stack`** | **After ci-parity or api/nginx drift** — proves login path through `:18080` |
 
 Optional full UI login (slower): Playwright
-[`apps/web/e2e/smoke/auth.spec.ts`](apps/web/e2e/smoke/auth.spec.ts)
+[`apps/web/e2e/platform/auth.spec.ts`](apps/web/e2e/platform/auth.spec.ts)
 (`npm run test:smoke` in `apps/web/e2e` workspace).
 
 ## GHA workflow authoring

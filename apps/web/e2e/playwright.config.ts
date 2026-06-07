@@ -27,14 +27,19 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "smoke",
-      testMatch: /smoke\/.*\.spec\.ts/,
+      name: "platform",
+      testMatch: /platform\/.*\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
       fullyParallel: false,
     },
     {
-      name: "brewday",
-      testMatch: /brewday\/.*\.spec\.ts/,
+      name: "canonical",
+      testMatch: /canonical\/.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "verticals-brewery",
+      testMatch: /verticals\/brewery\/.*\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
     },
   ],

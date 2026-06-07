@@ -182,7 +182,7 @@ See [`pre-flip-application-surface-backbone.md`](../design/pre-flip-application-
 | Wave 3b (landed) | **3e** | API brewery service colocation under `modules/brewery/services/` — **complete (2026-06-06)** |
 | **Wave 3e (complete)** | **3f** | **Shared layout nomenclature** — **complete (2026-06-07)** |
 | Wave 3f (complete) | **6** | Doc capstone — **complete (2026-06-07)** |
-| Wave 6 (complete) | **5** | E2E folder taxonomy — see §10.2 |
+| Wave 6 (complete) | **5** | E2E folder taxonomy — **complete (2026-06-07)** |
 
 ### 10.1 Wave 3f — shared layout nomenclature and path rename (complete 2026-06-07)
 
@@ -206,7 +206,15 @@ Integrator docs synced with post–Wave 3a/3c/3d reality:
 5. [`apps/web/README.md`](../../apps/web/README.md), [`apps/native/README.md`](../../apps/native/README.md) — layering tree; native multi-app target stub (Wave 4 deferred).
 6. Build log + §12 audit: [`rfc-0011-wave-6-doc-capstone-build-log.md`](../design/rfc-0011-wave-6-doc-capstone-build-log.md).
 
-**§11 companion artifacts (Wave 6):** all rows above ticked; Wave 5 E2E taxonomy remains.
+**§11 companion artifacts (Wave 6):** all rows above ticked.
+
+### 10.3 Wave 5 — E2E folder taxonomy (complete 2026-06-07)
+
+1. **`git mv`** 11 specs from `smoke/` + `brewday/` → `platform/`, `canonical/`, `verticals/brewery/`.
+2. Playwright projects: `platform`, `canonical`, `verticals-brewery`.
+3. [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md), [`docs/TESTING.md`](../TESTING.md) L5 layer map updated.
+4. [`packages/platform/test-mcp`](../../packages/platform/test-mcp/) — `--project=platform`, example `platform/auth.spec.ts`.
+5. Rule 63 b2c/b2b filename prefixes **deferred**.
 
 ---
 

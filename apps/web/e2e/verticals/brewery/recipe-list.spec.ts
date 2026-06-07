@@ -2,8 +2,8 @@
  * recipe-list.spec.ts - the seeded "E2E Pale Ale" recipe shows up in the list
  * and the workspace-scoped /api/recipes endpoint returns it for the admin persona.
  */
-import { test, expect } from "../support/auth-fixture";
-import { getFixtureIdentities } from "../support/personas";
+import { test, expect } from "../../support/auth-fixture";
+import { getFixtureIdentities } from "../../support/personas";
 
 test.describe("recipe list smoke (authenticated)", () => {
   test("seeded E2E Pale Ale appears in the recipe list UI", async ({ authenticatedPage }) => {

@@ -25,7 +25,7 @@ Each job has a deterministic Playwright counterpart. The agentic version **EXPLO
 ### `agenticCreateRecipe`
 
 - **Goal**: create a new BeerJSON recipe from scratch through the recipe edit UI.
-- **Deterministic counterpart**: [`apps/web/e2e/brewday/recipe-create.spec.ts`](../apps/web/e2e/brewday/recipe-create.spec.ts) (API-only round-trip).
+- **Deterministic counterpart**: [`apps/web/e2e/verticals/brewery/recipe-create.spec.ts`](../apps/web/e2e/verticals/brewery/recipe-create.spec.ts) (API-only round-trip).
 - **Steps**:
   1. Land on `/en/recipes`; verify the seeded `E2E Pale Ale` is visible in the list.
   2. Click "New recipe" (or equivalent CTA discovered via `getByRole('button', {name: /new recipe|create/i})`).
@@ -40,7 +40,7 @@ Each job has a deterministic Playwright counterpart. The agentic version **EXPLO
 ### `agenticBrewDay`
 
 - **Goal**: start a brew session from the seeded recipe and walk it through `draft -> running -> stopped` with at least two step logs in between.
-- **Deterministic counterpart**: [`apps/web/e2e/brewday/brew-session.spec.ts`](../apps/web/e2e/brewday/brew-session.spec.ts) (API-only lifecycle).
+- **Deterministic counterpart**: [`apps/web/e2e/verticals/brewery/brew-session.spec.ts`](../apps/web/e2e/verticals/brewery/brew-session.spec.ts) (API-only lifecycle).
 - **Steps**:
   1. Open the seeded recipe (`E2E Pale Ale`) at `/en/recipes/<fixtureRecipeId>` (see [`docs/TESTING.md`](TESTING.md) for the stable UUID).
   2. Click "Start brew session" (or equivalent CTA).
@@ -54,7 +54,7 @@ Each job has a deterministic Playwright counterpart. The agentic version **EXPLO
 ### `agenticWaterCalcSanity`
 
 - **Goal**: open the water hub for the seeded recipe and confirm predicted mash pH renders with the rule-of-thumb explainer, even when salt additions change.
-- **Deterministic counterpart**: [`apps/web/e2e/smoke/water-calc.spec.ts`](../apps/web/e2e/smoke/water-calc.spec.ts) (page-load smoke + API hub summary).
+- **Deterministic counterpart**: [`apps/web/e2e/verticals/brewery/water-calc.spec.ts`](../apps/web/e2e/verticals/brewery/water-calc.spec.ts) (page-load smoke + API hub summary).
 - **Steps**:
   1. Open `/en/recipes/<fixtureRecipeId>/water` for `E2E Pale Ale`.
   2. Add 1.0 g of gypsum to the mash addition slot.

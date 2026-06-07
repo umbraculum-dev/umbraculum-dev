@@ -25,7 +25,7 @@
  * `docker compose exec api npm run seed:e2e` before this spec if the
  * row goes missing.
  */
-import { test, expect } from "../support/auth-fixture";
+import { test, expect } from "../../support/auth-fixture";
 
 test.describe("water profiles list (Phase 4b L5 regression-pin)", () => {
   test("workspace-scoped 'E2E Tap Water' profile appears in /en/water-profiles", async ({

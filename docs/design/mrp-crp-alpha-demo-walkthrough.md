@@ -31,7 +31,9 @@
 | 3 | `/en/schedule` | Scheduled operations; read-only conflict text if fixture present |
 | 4 | `/en/capacity` | Capacity buckets; “0 available minutes (alpha read model)” possible |
 
-Playwright reference: [`apps/web/e2e/smoke/mrp-crp-read-only-alpha.spec.ts`](../../apps/web/e2e/smoke/mrp-crp-read-only-alpha.spec.ts) (read path); export smoke: [`mrp-crp-export-alpha.spec.ts`](../../apps/web/e2e/smoke/mrp-crp-export-alpha.spec.ts) (requires gotenberg + redis + Playwright chromium).
+Playwright reference: [`apps/web/e2e/canonical/mrp-crp-read-only-alpha.spec.ts`](../../apps/web/e2e/canonical/mrp-crp-read-only-alpha.spec.ts) (read path); export smoke: [`mrp-crp-export-alpha.spec.ts`](../../apps/web/e2e/canonical/mrp-crp-export-alpha.spec.ts) (requires gotenberg + redis + Playwright chromium).
+
+> **Path note (RFC-0011 Wave 5, 2026-06-07):** specs moved from `smoke/` to `platform/`, `canonical/`, `verticals/brewery/`.
 
 ---
 
@@ -121,7 +123,7 @@ docker run --rm --network host \
   -v "$PWD/apps/web/e2e:/e2e" \
   -w /e2e \
   mcr.microsoft.com/playwright:v1.60.0-noble \
-  bash -lc "npm install --no-audit --no-fund && npx playwright test --project=smoke smoke/mrp-crp-export-alpha.spec.ts --workers=1"
+  bash -lc "npm install --no-audit --no-fund && npx playwright test --project=canonical canonical/mrp-crp-export-alpha.spec.ts --workers=1"
 ```
 
 **Troubleshooting**

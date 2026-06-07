@@ -6,8 +6,8 @@
  * The session is created fresh per spec run (not reusing the seeded one) so
  * that the spec is deterministic even when re-run repeatedly.
  */
-import { test, expect } from "../support/auth-fixture";
-import { getFixtureIdentities } from "../support/personas";
+import { test, expect } from "../../support/auth-fixture";
+import { getFixtureIdentities } from "../../support/personas";
 
 test.describe("brew session lifecycle (API round-trip)", () => {
   test("creates, starts, and stops a brew session for the seeded recipe", async ({ authenticatedContext }) => {

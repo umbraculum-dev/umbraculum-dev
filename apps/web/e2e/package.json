@@ -6,8 +6,12 @@
   "description": "Umbraculum web E2E suite — Playwright tests for the @umbraculum/web storefront. Nested workspace (NOT in the root @umbraculum monorepo workspaces glob — Playwright + browser binaries are isolated per its own README and the slot-7 CI hygiene #2 lesson).",
   "scripts": {
     "test": "playwright test",
-    "test:smoke": "playwright test --project=smoke",
-    "test:brewday": "playwright test --project=brewday",
+    "test:all": "playwright test",
+    "test:platform": "playwright test --project=platform",
+    "test:canonical": "playwright test --project=canonical",
+    "test:verticals-brewery": "playwright test --project=verticals-brewery",
+    "test:smoke": "playwright test",
+    "test:brewday": "playwright test --project=verticals-brewery",
     "trace": "playwright show-trace",
     "install:browsers": "playwright install chromium",
     "typecheck": "tsc -p tsconfig.json --noEmit"

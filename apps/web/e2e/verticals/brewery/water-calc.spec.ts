@@ -5,8 +5,8 @@
  * explainer is shown alongside any pH-related copy (i18n bundle present + page
  * isn't a 5xx in disguise).
  */
-import { test, expect } from "../support/auth-fixture";
-import { getFixtureIdentities } from "../support/personas";
+import { test, expect } from "../../support/auth-fixture";
+import { getFixtureIdentities } from "../../support/personas";
 
 test.describe("water calc smoke (authenticated)", () => {
   test("water hub page loads for the seeded recipe", async ({ authenticatedPage }) => {
