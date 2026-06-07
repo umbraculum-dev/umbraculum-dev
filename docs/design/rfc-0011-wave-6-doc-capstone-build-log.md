@@ -10,7 +10,7 @@
 |-------|--------|
 | `operator shell` / `WebShellNotice` / `/_shell/` in `docs/` + `apps/web/` | 1 file only — backbone §12 self-reference (historical) |
 | `(brewery)/_components` imports outside `(brewery)/` | **0** (2026-06-07 backlog) |
-| `packages/platform/api-client/src/brewery/` | Deprecated re-export shim → `@umbraculum/brewery-api-client` |
+| `packages/platform/api-client/src/brewery/` | Removed (2026-06-07) — facades live in `@umbraculum/brewery-api-client` |
 
 ## §12 success criteria audit (post–Wave 6 + backlog)
 

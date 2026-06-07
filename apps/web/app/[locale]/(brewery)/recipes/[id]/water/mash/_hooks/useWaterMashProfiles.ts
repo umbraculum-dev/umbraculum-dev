@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { listWaterProfiles } from "@umbraculum/api-client/brewery";
+import { listWaterProfiles } from "@umbraculum/brewery-api-client";
 import type { AuthMeResponse } from "@umbraculum/contracts";
 import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 

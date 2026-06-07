@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getRecipe } from "@umbraculum/api-client/brewery";
+import { getRecipe } from "@umbraculum/brewery-api-client";
 import {
   editorStateFromBeerJson,
   mergeYeastAttenuationRangeFromExt,

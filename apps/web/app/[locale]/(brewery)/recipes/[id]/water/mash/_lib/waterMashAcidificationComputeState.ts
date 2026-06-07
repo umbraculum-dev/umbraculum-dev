@@ -1,4 +1,4 @@
-import type { computeAndSaveMash } from "@umbraculum/api-client/brewery";
+import type { computeAndSaveMash } from "@umbraculum/brewery-api-client";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import { asRecord } from "../../../../../../../_shared-layout/_lib/typeGuards";

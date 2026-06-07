@@ -11,7 +11,7 @@ import {
   listWaterProfiles,
   unverifyWaterProfile,
   verifyWaterProfile,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../../_shared-layout/_lib/fetchAuthMe";

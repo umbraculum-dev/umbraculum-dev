@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
-import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
+import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../../../_shared-layout/_lib/useRequireAuth";

@@ -2,7 +2,7 @@
 
 import { type FormEvent } from "react";
 
-import { createInventoryItem } from "@umbraculum/api-client/brewery";
+import { createInventoryItem } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import type { FermentableSearchItem } from "../_lib/inventoryTypes";

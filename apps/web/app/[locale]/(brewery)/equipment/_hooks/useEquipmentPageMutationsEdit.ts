@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 
-import { deleteEquipmentProfile, patchEquipmentProfile } from "@umbraculum/api-client/brewery";
+import { deleteEquipmentProfile, patchEquipmentProfile } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import { parseNullableNumber } from "../_lib/equipmentHelpers";

@@ -6,7 +6,7 @@ import {
   detachBrewSessionIntegration,
   listBrewSessionIntegrationAttachments,
   listBrewSessionIntegrationReadings,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 import { useT } from "@umbraculum/i18n-react";
 
 import type {

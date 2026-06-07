@@ -1,7 +1,7 @@
 import type { FormEvent, MutableRefObject } from "react";
 
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
-import { calcSpargeOverall, computeAndSaveSparge } from "@umbraculum/api-client/brewery";
+import { calcSpargeOverall, computeAndSaveSparge } from "@umbraculum/brewery-api-client";
 import type { WaterCalcDerivation, WaterOverallResult, WaterProfile } from "@umbraculum/brewery-contracts";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";

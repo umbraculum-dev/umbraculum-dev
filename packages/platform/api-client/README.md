@@ -29,19 +29,6 @@ First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI pa
 | `platform/ads` | `getAdSlot` | `AdSlotResponseSchema` |
 | `platform/platformAdmin` | `listPlatformWorkspaces`, `listPlatformRecipes`, platform recipe import, platform ads CRUD | `PlatformWorkspacesListResponseSchema`, `PlatformAdsListResponseSchema`, … |
 | `platform/rendering` | `submitRenderJob`, `runAsyncRenderJobExport`, … | `RenderJob*ResponseSchema` |
-| `brewery/recipes` | `listRecipes`, `getRecipe`, `patchRecipe`, `listBrewSessionsForRecipe`, `createBrewSession` | `parseRecipesListResponse`, `RecipeResponseSchema`, … |
-| `brewery/waterProfiles` | `listWaterProfiles`, `createWaterProfile`, `verifyWaterProfile`, `unverifyWaterProfile`, `deleteWaterProfile` | `parseWaterProfilesResponse`, `WaterProfileResponseSchema`, `OkResponseSchema` |
-| `brewery/waterSettings` | `getRecipeWaterSettings`, `updateRecipeWaterSettings` | `RecipeWaterSettings*ResponseSchema` |
-| `brewery/waterCompute` | `computeAndSaveMash`, `computeAndSaveSparge`, `computeAndSaveBoil` | `parseMashComputeAndSaveResponse`, … |
-| `brewery/waterCalc` | `calcSaltAdditions`, `estimateMashPh`, `calcMashOverall`, `calcSpargeOverall`, `calcBoilOverall`, … (10 `/water-calc/*` POSTs) | `WaterCalcWithDerivationResponseSchema`, `WaterCalcResultOnlyResponseSchema` |
-| `brewery/water` | `getRecipeWaterHubSummary` | `parseRecipeWaterHubSummaryResponse` |
-| `brewery/styles` | `listStyles` | `StylesListResponseSchema` |
-| `brewery/ingredients` | `searchFermentables`, `searchHops`, `searchYeasts` | `FermentablesListResponseSchema`, … |
-| `brewery/recipeImport` | `previewRecipeImport`, `importRecipe`, bulk preview/import | `RecipeImport*ResponseSchema` |
-| `brewery/brewSessions` | `getBrewSession`, session lifecycle, steps, integration attach/readings | `BrewSession*ResponseSchema`, `Integration*ResponseSchema` |
-| `brewery/inventory` | `listInventory`, `createInventoryItem`, `patchInventoryItem`, `deleteInventoryItem` | `Inventory*ResponseSchema` |
-| `brewery/equipmentProfiles` | list/create/patch/delete | `EquipmentProfile*ResponseSchema` |
-| `brewery/brewdaySettings` | `getBrewdaySettings`, `patchBrewdaySettings` | `BrewdaySettingsResponseSchema` |
 | `platform/integrations` | workspace integration CRUD, devices, tilt attach/detach, recent sessions | `@umbraculum/contracts` integrations schemas |
 | `automation/vessels` | `listVessels`, `getVessel` | `VesselListResponseSchema`, `VesselStateResponseSchema` |
 | `pim/products` | `listProducts`, `createProduct`, `getProduct`, `listProductVariants` | `Product*ResponseSchema`, `VariantListResponseSchema` |
@@ -50,11 +37,11 @@ First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI pa
 | `mrp/productionOrders` | `listProductionOrders`, `getProductionOrder`, `listMaterialRequirements` | `ProductionOrder*ResponseSchema`, `MaterialRequirementListResponseSchema` |
 | `crp/planning` | `listResources`, `getResource`, `listWorkCenters`, `listScheduledOperations`, `listCapacityConflicts`, `getCapacityLoad` | `@umbraculum/crp-contracts` response schemas |
 
-Full path → parser map: [`src/facadeParserMap.ts`](src/facadeParserMap.ts) (`PLATFORM_*`, `BREWERY_*`, `AUTOMATION_*`, `PIM_*`, `MRP_*`, `CRP_*` maps).
+Full path → parser map: [`src/facadeParserMap.ts`](src/facadeParserMap.ts) (`PLATFORM_*`, `AUTOMATION_*`, `PIM_*`, `MRP_*`, `CRP_*` maps). Brewery vertical facades live in [`@umbraculum/brewery-api-client`](../../verticals/brewery/api-client/README.md).
 
 ```typescript
 import { bearerTokenAuth, createApiClient, listWorkspaces } from "@umbraculum/api-client";
-import { listRecipes } from "@umbraculum/api-client/brewery";
+import { listRecipes } from "@umbraculum/brewery-api-client";
 import { listVessels } from "@umbraculum/api-client/automation";
 
 const client = createApiClient(baseUrl, bearerTokenAuth(() => token));
@@ -71,6 +58,8 @@ Install from npm (monorepo contributors use workspace `file:` links instead — 
 
 ```bash
 npm install @umbraculum/api-client@0.0.1 @umbraculum/contracts@0.0.1
+# brewery reference vertical (separate package):
+npm install @umbraculum/brewery-api-client@0.0.1 @umbraculum/brewery-contracts@0.0.1
 # plus @umbraculum/<code>-contracts@0.0.2 for each canonical domain you integrate with
 ```
 
@@ -86,7 +75,7 @@ Browse OpenAPI paths on the docs site before wiring calls:
 | Import | Use when |
 |--------|----------|
 | `@umbraculum/api-client` | Platform: auth, workspaces, health, billing, AI, ads, integrations, rendering |
-| `@umbraculum/api-client/brewery` | Reference vertical add-on |
+| `@umbraculum/brewery-api-client` | Reference brewery vertical add-on (recipes, water, brew sessions, …) |
 | `@umbraculum/api-client/automation` | Canonical automation hot paths |
 | `@umbraculum/api-client/pim` | Canonical PIM hot paths |
 | `@umbraculum/api-client/mrp` | Canonical MRP hot paths |
@@ -111,7 +100,6 @@ Wire authority remains `@umbraculum/contracts` parsers inside each facade — se
 - `bearerTokenAuth(getToken)` (native + Node)
 - Platform facades — see `src/platform/*` (re-exported from main entry)
 - `@umbraculum/api-client/transport` — shared JSON transport helpers for vertical facade packages
-- `@umbraculum/api-client/brewery` — **deprecated shim** re-exporting `@umbraculum/brewery-api-client` (prefer the vertical package for new code)
 - `@umbraculum/brewery-api-client` — brewery add-on facades ([`packages/verticals/brewery/api-client`](../../verticals/brewery/api-client/))
 - `@umbraculum/api-client/automation` — canonical automation facades
 - `@umbraculum/api-client/pim` — canonical PIM facades
@@ -146,7 +134,6 @@ This package ships runtime-safe JS + types:
 
 - Runtime entrypoint: `dist/index.js`
 - Type entrypoint: `dist/index.d.ts`
-- Brewery subpath: `dist/brewery/index.js`
 
 Commands (run from repo root, container-friendly per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`):
 

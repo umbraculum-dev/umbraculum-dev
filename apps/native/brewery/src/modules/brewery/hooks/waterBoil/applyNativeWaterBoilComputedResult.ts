@@ -1,4 +1,4 @@
-import type { computeAndSaveBoil } from "@umbraculum/api-client/brewery";
+import type { computeAndSaveBoil } from "@umbraculum/brewery-api-client";
 
 import type { NativeWaterBoilAcidificationState } from "./useNativeWaterBoilAcidificationState";
 

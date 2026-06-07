@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { getAuthMe } from "@umbraculum/api-client";
-import { getBrewSession } from "@umbraculum/api-client/brewery";
+import { getBrewSession } from "@umbraculum/brewery-api-client";
 
 import type { BrewSessionDetail } from "./brewSessionDetailTypes";
 

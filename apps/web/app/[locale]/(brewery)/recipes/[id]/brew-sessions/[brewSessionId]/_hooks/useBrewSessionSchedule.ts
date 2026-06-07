@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { patchBrewSession } from "@umbraculum/api-client/brewery";
+import { patchBrewSession } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import type { BrewSession } from "../_lib/brewSessionDetailUi";

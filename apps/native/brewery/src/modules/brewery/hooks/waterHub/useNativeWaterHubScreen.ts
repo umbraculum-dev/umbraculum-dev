@@ -5,7 +5,7 @@ import {
   getRecipe,
   getRecipeWaterHubSummary,
   listWaterProfiles,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 import type { RecipeWaterHubSummaryResponse } from "@umbraculum/brewery-contracts";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { useT } from "@umbraculum/i18n-react";

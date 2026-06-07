@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getRecipe, getRecipeWaterSettings, listWaterProfiles, updateRecipeWaterSettings } from "@umbraculum/api-client/brewery";
+import { getRecipe, getRecipeWaterSettings, listWaterProfiles, updateRecipeWaterSettings } from "@umbraculum/brewery-api-client";
 import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";

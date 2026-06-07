@@ -126,7 +126,7 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 - **F1 closure** — **175 documented operations** (~97%). One handler exempt: `POST /ai/chat` SSE (see §Streaming endpoints).
 - **BeerJSON / complex JSON** — OpenAPI may show loose object schemas; contracts + route tables win.
 - **Binary / stream responses** — routes that `reply.send(Buffer)` use `z.custom<Buffer>` in contracts (e.g. [`BeerJsonExportResponseSchema`](../packages/platform/contracts/src/brewery/routeSchemas.ts)); OpenAPI shows an empty JSON schema (`{}`) while runtime returns raw bytes with `Content-Type` / `Content-Disposition` headers. Human route tables and contracts win on wire format.
-- **Codegen + facades (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **types** plus typed **facades** (`listWorkspaces`, `listRecipes`, rendering helpers, …). Subpath `@umbraculum/api-client/brewery` for add-on SKU. Regenerate types: `npm run openapi:codegen -w @umbraculum/api-client`. Runtime validation remains `@umbraculum/contracts` parsers inside each facade.
+- **Codegen + facades (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **types** plus typed **platform facades** (`listWorkspaces`, rendering helpers, …). Brewery reference vertical facades live in **`@umbraculum/brewery-api-client`** (RFC-0011 extraction). Regenerate platform types: `npm run openapi:codegen -w @umbraculum/api-client`. Runtime validation remains `@umbraculum/contracts` / `@umbraculum/brewery-contracts` parsers inside each facade.
 
 ---
 
@@ -152,7 +152,7 @@ Phase E adds **hand-written facades** on `@umbraculum/api-client`: OpenAPI path 
 | Export | Scope |
 |--------|--------|
 | Main entry `@umbraculum/api-client` | Platform facades: auth, workspaces, health, billing, integrations list, rendering jobs |
-| Subpath `@umbraculum/api-client/brewery` | Brewery add-on: recipes, brew sessions, water profiles/settings/compute-and-save/calc preview, hub summary |
+| `@umbraculum/brewery-api-client` | Brewery add-on: recipes, brew sessions, water profiles/settings/compute-and-save/calc preview, hub summary |
 | Subpath `@umbraculum/api-client/automation` | Canonical automation hot paths: vessels list/detail |
 | Subpath `@umbraculum/api-client/pim` | Canonical PIM hot paths: products, variants, attribute-sets, categories |
 | Subpath `@umbraculum/api-client/mrp` | Canonical MRP hot paths: production orders, material requirements |
@@ -166,13 +166,13 @@ Phase E adds **hand-written facades** on `@umbraculum/api-client`: OpenAPI path 
 
 ## Phase E5 — brewery water facades (2026-06-01)
 
-Phase E5 completes deferred E2 PR2: typed `@umbraculum/api-client/brewery` facades for native water hot paths (`/water-profiles`, `/recipes/{id}/water-settings`, mash/sparge/boil compute-and-save). Standalone `/water-calc/*` (web interactive preview) remains Phase E6.
+Phase E5 completes deferred E2 PR2: typed `@umbraculum/brewery-api-client` facades for native water hot paths (`/water-profiles`, `/recipes/{id}/water-settings`, mash/sparge/boil compute-and-save). Standalone `/water-calc/*` (web interactive preview) remains Phase E6.
 
 ---
 
 ## Phase E6 — standalone water-calc facades + web migration (2026-06-01)
 
-Phase E6 adds all **10** `/water-calc/*` POST facades on `@umbraculum/api-client/brewery` (`waterCalc.ts`) and migrates web recipe water pages + standalone water-profiles page off raw `apiFetch` to typed facades via `apps/web/app/_lib/breweryWaterClient.ts` (`webBreweryApiClient()` + `cookieAuth()`). Completes the Phase E water family after E5 (native recipe-scoped paths).
+Phase E6 adds all **10** `/water-calc/*` POST facades on `@umbraculum/brewery-api-client` (`waterCalc.ts`) and migrates web recipe water pages + standalone water-profiles page off raw `apiFetch` to typed facades via `apps/web/app/_lib/breweryWaterClient.ts` (`webBreweryApiClient()` + `cookieAuth()`). Completes the Phase E water family after E5 (native recipe-scoped paths).
 
 ---
 
@@ -215,7 +215,7 @@ Module render-job POSTs delegate to `platform/rendering` (`submitRenderJob` / `r
 
 ## Phase E8 — brewery web tranche (2026-06-02)
 
-Phase E8 extends `@umbraculum/api-client/brewery` with recipes catalog (create/delete/versions/duplicate/import), styles, ingredients search, brew sessions (full lifecycle + integration attach/readings), inventory, equipment profiles, and brewday settings. Platform integration facades (`getWorkspaceIntegration`, `listIntegrationDevices` with query options, tilt attach/detach, recent brew sessions) live in `platform/integrations.ts`.
+Phase E8 extends `@umbraculum/brewery-api-client` with recipes catalog (create/delete/versions/duplicate/import), styles, ingredients search, brew sessions (full lifecycle + integration attach/readings), inventory, equipment profiles, and brewday settings. Platform integration facades (`getWorkspaceIntegration`, `listIntegrationDevices` with query options, tilt attach/detach, recent brew sessions) live in `platform/integrations.ts`.
 
 All brewery-vertical web pages under `(brewery)/` and `app/recipes/**` (except BeerJSON export download links) migrate off raw `apiFetch` to `webBreweryApiClient()` + typed facades. Auth, platform-admin, AI, and ads `apiFetch` call sites remain for E9.
 
@@ -240,7 +240,7 @@ Phase E6d-native migrates all brewery-domain screens under `apps/native/src/modu
 | Slice | Native screens | Facades |
 |-------|----------------|---------|
 | E6d-PR1 | `AuthProvider`, `DashboardScreen`, `SelectWorkspaceScreen` | `getAuthMe`, `loginNative`, `logout`, `setActiveWorkspace`, `getHealth` |
-| E6d-PR2 | `RecipesListScreen`, `RecipeEditScreen`, `YeastScreen`, `EquipmentScreen`, `BrewdayStepsSettingsScreen`, `WaterProfilesScreen` | `@umbraculum/api-client/brewery` recipes/styles/ingredients/equipment/brewday/water-settings |
+| E6d-PR2 | `RecipesListScreen`, `RecipeEditScreen`, `YeastScreen`, `EquipmentScreen`, `BrewdayStepsSettingsScreen`, `WaterProfilesScreen` | `@umbraculum/brewery-api-client` recipes/styles/ingredients/equipment/brewday/water-settings |
 | E6d-PR3 | `BrewSessionDetailScreen`, `FermDataIntegrationScreen` | `brewSessions` + `platform/integrations` |
 
 Completed in E10: `AdSlot.tsx`, `openWebFallback.ts` — see [Phase E10-native-tail](#phase-e10-native-tail--native-platform-migration-2026-06-02) below.

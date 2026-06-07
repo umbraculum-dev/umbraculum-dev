@@ -2,7 +2,7 @@
 
 import { useCallback, useState, type FormEvent } from "react";
 
-import { searchHops } from "@umbraculum/api-client/brewery";
+import { searchHops } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { newRowId } from "../_lib/recipeEditHelpers";

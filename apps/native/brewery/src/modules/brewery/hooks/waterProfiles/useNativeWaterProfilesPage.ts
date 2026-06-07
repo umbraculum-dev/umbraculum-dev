@@ -8,7 +8,7 @@ import {
   listWaterProfiles,
   unverifyWaterProfile,
   verifyWaterProfile,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 import type { AuthMeResponse } from "@umbraculum/contracts";
 import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 import { useT } from "@umbraculum/i18n-react";

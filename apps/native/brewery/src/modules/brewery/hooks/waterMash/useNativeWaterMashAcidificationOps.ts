@@ -1,6 +1,6 @@
 import { useCallback, type MutableRefObject } from "react";
 
-import { computeAndSaveMash } from "@umbraculum/api-client/brewery";
+import { computeAndSaveMash } from "@umbraculum/brewery-api-client";
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import { useT } from "@umbraculum/i18n-react";
 

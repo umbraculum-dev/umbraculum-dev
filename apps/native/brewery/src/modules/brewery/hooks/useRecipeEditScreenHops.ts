@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { searchHops as apiSearchHops } from "@umbraculum/api-client/brewery";
+import { searchHops as apiSearchHops } from "@umbraculum/brewery-api-client";
 import type { EditorHopRow } from "@umbraculum/brewery-beerjson";
 
 import { newRowId } from "../lib/recipeEditHelpers";

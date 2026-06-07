@@ -1,4 +1,4 @@
-import type { computeAndSaveSparge } from "@umbraculum/api-client/brewery";
+import type { computeAndSaveSparge } from "@umbraculum/brewery-api-client";
 
 import type { NativeWaterSpargeAcidificationState } from "./useNativeWaterSpargeAcidificationState";
 

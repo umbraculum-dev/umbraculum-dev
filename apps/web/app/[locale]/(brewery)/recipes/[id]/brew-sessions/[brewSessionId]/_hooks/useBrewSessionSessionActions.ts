@@ -7,7 +7,7 @@ import {
   pauseBrewSession,
   startBrewSession,
   stopBrewSession,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import type { BrewSession } from "../_lib/brewSessionDetailUi";

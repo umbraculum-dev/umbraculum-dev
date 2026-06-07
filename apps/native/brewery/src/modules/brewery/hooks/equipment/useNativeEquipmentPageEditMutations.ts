@@ -4,7 +4,7 @@ import { Alert } from "react-native";
 import {
   deleteEquipmentProfile,
   patchEquipmentProfile,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 
 import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import type { EquipmentProfile } from "../../lib/equipmentTypes";

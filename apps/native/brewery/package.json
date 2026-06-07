@@ -16,6 +16,7 @@
   "dependencies": {
     "@umbraculum/native-shell": "file:../../../packages/platform/native-shell",
     "@umbraculum/api-client": "^0.0.1",
+    "@umbraculum/brewery-api-client": "file:../../../packages/verticals/brewery/api-client",
     "@umbraculum/module-sdk": "^0.0.2",
     "@umbraculum/brewery-contracts": "file:../../../packages/verticals/brewery/contracts",
     "@umbraculum/brewery-beerjson": "file:../../../packages/verticals/brewery/beerjson",

@@ -138,7 +138,6 @@ Login / signup / workspace picker?             → app/[locale]/(auth)/
 
 **Known pre-flip gaps (documented, not fixed in Wave 6):**
 
-- **`packages/platform/api-client/src/brewery/`** — vertical HTTP facade in a platform package; extraction deferred.
 - **Cross-module `(brewery)/_components` imports** — some canonical module pages still import brewery shared UI; prefer `@umbraculum/brewery-recipes-ui` or module-local `_components/`.
 
 **Not** platform shared layout: a page's internal column/grid layout (recipe editor sections); Tamagui `layout` props; the POSIX command-line shell.

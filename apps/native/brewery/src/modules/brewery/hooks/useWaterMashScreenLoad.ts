@@ -5,7 +5,7 @@ import {
   listWaterProfiles,
   getRecipeWaterSettings,
   updateRecipeWaterSettings,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 

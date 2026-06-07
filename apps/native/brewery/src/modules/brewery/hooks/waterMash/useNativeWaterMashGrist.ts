@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { getRecipe } from "@umbraculum/api-client/brewery";
+import { getRecipe } from "@umbraculum/brewery-api-client";
 import { editorStateFromBeerJson } from "@umbraculum/brewery-beerjson";
 
 import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";

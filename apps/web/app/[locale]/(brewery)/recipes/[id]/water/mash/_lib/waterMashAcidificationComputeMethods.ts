@@ -2,7 +2,7 @@ import {
   calcMashOverall,
   computeAndSaveMash,
   estimateMashPh,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { searchYeasts } from "@umbraculum/api-client/brewery";
+import { searchYeasts } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";

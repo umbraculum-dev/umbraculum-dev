@@ -1,4 +1,4 @@
-import { computeAndSaveSparge } from "@umbraculum/api-client/brewery";
+import { computeAndSaveSparge } from "@umbraculum/brewery-api-client";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import type { WaterAcidResult, WaterManualCalcResult } from "../../_lib/waterCalcTypes";

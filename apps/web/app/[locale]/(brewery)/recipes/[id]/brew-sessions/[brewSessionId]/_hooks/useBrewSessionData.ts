@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { getBrewSession } from "@umbraculum/api-client/brewery";
+import { getBrewSession } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import { asRecord } from "../../../../../../../_shared-layout/_lib/typeGuards";

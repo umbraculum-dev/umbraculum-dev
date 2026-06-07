@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
+import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { asRecord } from "../../../../../../_shared-layout/_lib/typeGuards";

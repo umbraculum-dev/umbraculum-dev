@@ -5,7 +5,7 @@ import {
   importRecipesBulk,
   previewBulkRecipeImport,
   previewRecipeImport,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 import {
   ApiClientError,
   importPlatformRecipe,

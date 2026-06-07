@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import { getRecipe } from "@umbraculum/api-client/brewery";
+import { getRecipe } from "@umbraculum/brewery-api-client";
 
 import { parseGristJson, type GristRow } from "../../../../../_lib/grist";
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";

@@ -1,4 +1,4 @@
-import { patchRecipe } from "@umbraculum/api-client/brewery";
+import { patchRecipe } from "@umbraculum/brewery-api-client";
 import {
   replaceMashInBeerJsonDocument,
   validateMashBeforeSave,

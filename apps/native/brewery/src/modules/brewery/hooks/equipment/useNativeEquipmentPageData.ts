@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getAuthMe } from "@umbraculum/api-client";
-import { listEquipmentProfiles } from "@umbraculum/api-client/brewery";
+import { listEquipmentProfiles } from "@umbraculum/brewery-api-client";
 import type { AuthMeResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 

@@ -37,4 +37,4 @@ export {
   searchFermentables,
   searchHops,
   searchYeasts,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";

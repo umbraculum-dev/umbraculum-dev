@@ -14,7 +14,7 @@
 | 1 | Contributor can identify layout / module / vertical folders | **Met** |
 | 2 | Zero deprecated slang | **Met** |
 | 3 | Brewery naming only under `(brewery)/` or `@umbraculum/brewery-*` | **Met** |
-| 4 | No brewery under `packages/platform/` (shim only) | **Met** |
+| 4 | No brewery under `packages/platform/` | **Met** |
 | 5 | `@umbraculum/brewery-contracts`; platform contracts clean | **Met** |
 | 6 | Native README multi-app pattern | **Met** |
 | 7 | REPOSITORY-STRUCTURE ↔ RFC-0011 ↔ backbone linked | **Met** |
@@ -32,7 +32,7 @@ Full audit trail: [wave-6 build log §12 audit](rfc-0011-wave-6-doc-capstone-bui
 | Brewery contracts / purity | `@umbraculum/brewery-contracts`, `@umbraculum/brewery-i18n`, UI/i18n split |
 | API colocation | Brewery services under `modules/brewery/services/` (Wave 3e Phase 1 + 2) |
 | Cross-module UI | Generic components → `_shared-layout/_components/` |
-| `@umbraculum/brewery-api-client` | Facades extracted; platform `./brewery` shim deprecated |
+| `@umbraculum/brewery-api-client` | Facades extracted; platform `./brewery` shim removed (2026-06-07) |
 | Native multi-app | `apps/native/brewery/` + `@umbraculum/native-shell` |
 | E2E taxonomy | `e2e/{platform,canonical,verticals/brewery}/`; Rule 63 prefixes **closed** |
 | Brochure | `umbraculum-brochure` sister repo + `@umbraculum/brochure` vendor sync |
@@ -49,7 +49,7 @@ Full audit trail: [wave-6 build log §12 audit](rfc-0011-wave-6-doc-capstone-bui
 | **Second native app scaffold** | **Keep deferred** | Pattern in [`apps/native/README.md`](../../apps/native/README.md). **2026-06-07:** choose PIM vs quality module app **after** application-surface structure is stable — not pre-flip. |
 | **`docs-site/` extraction** | **Keep deferred** | R-POLICY — monorepo through public alpha; foundations pass pre-flip |
 | **API flat-services eslint fence** | **Land pre-flip (Phase 3)** | Prevents Wave 3e regression; see [backbone §13](pre-flip-application-surface-backbone.md) |
-| **Apps → `@umbraculum/brewery-api-client` direct imports** | **Post-flip opportunistic** | ~30 files still use `@umbraculum/api-client/brewery` shim; non-blocking |
+| **Apps → `@umbraculum/brewery-api-client` direct imports** | **Done pre-flip (2026-06-07)** | Web + native brewery migrated; platform `./brewery` shim deleted |
 | **Website / forum VPS automation** | **Done / sister repos** | Brochure extracted; forum/demo in hosting repos |
 
 ### “pim-floor” naming note

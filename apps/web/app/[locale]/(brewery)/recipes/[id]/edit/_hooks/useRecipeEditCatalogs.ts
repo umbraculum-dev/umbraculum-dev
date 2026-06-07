@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { listEquipmentProfiles, listStyles } from "@umbraculum/api-client/brewery";
+import { listEquipmentProfiles, listStyles } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import type { EquipmentProfile, StyleListItem } from "../_lib/recipeEditTypes";

@@ -14,7 +14,7 @@ This guide gets you from **zero** to a **validated HTTP round-trip** using publi
 | You integrate with… | OpenAPI catalog | npm subpaths |
 |---------------------|-----------------|--------------|
 | Platform only (auth, workspaces, automation, PIM, MRP, CRP, …) | [openapi-platform](https://docs.umbraculum.dev/openapi-platform) | `@umbraculum/api-client`, `@umbraculum/api-client/automation`, … |
-| Reference brewery vertical (recipes, water, styles, …) | [openapi-brewery](https://docs.umbraculum.dev/openapi-brewery) | `@umbraculum/api-client/brewery` |
+| Reference brewery vertical (recipes, water, styles, …) | [openapi-brewery](https://docs.umbraculum.dev/openapi-brewery) | `@umbraculum/brewery-api-client` (+ `@umbraculum/brewery-contracts`) |
 
 Wire-shape authority stays in **`@umbraculum/contracts`** parsers — facades call those parsers on every response.
 
@@ -86,7 +86,7 @@ See the script source for env vars (`UMBRACULUM_BASE_URL`, `UMBRACULUM_EMAIL`, `
 
 ### Optional — brewery add-on (reference vertical only)
 
-If your deployment includes the brewery module, add `@umbraculum/api-client/brewery` and call `listStyles` — see [openapi-brewery](https://docs.umbraculum.dev/openapi-brewery). Platform-only integrators can skip this ([`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md)).
+If your deployment includes the brewery module, add `@umbraculum/brewery-api-client` and `@umbraculum/brewery-contracts`, then call `listStyles` — see [openapi-brewery](https://docs.umbraculum.dev/openapi-brewery). Platform-only integrators can skip this ([`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md)).
 
 Errors on non-2xx responses surface as `ApiClientError` (status + parsed body).
 

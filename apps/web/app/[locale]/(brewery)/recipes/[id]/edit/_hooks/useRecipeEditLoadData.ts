@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
-import { getRecipe, listRecipeVersions } from "@umbraculum/api-client/brewery";
+import { getRecipe, listRecipeVersions } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import type { Recipe, RecipeVersionListItem } from "../_lib/recipeEditTypes";

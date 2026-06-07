@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 
-import { searchFermentables } from "@umbraculum/api-client/brewery";
+import { searchFermentables } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { newRowId } from "../_lib/recipeEditHelpers";

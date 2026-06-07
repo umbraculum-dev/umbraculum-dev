@@ -6,7 +6,7 @@ import {
   patchBrewSessionStep,
   postBrewSessionStepLog,
   postBrewSessionStepTimerAction,
-} from "@umbraculum/api-client/brewery";
+} from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import { isStepDirtyForLogs } from "../_lib/brewSessionDetailUi";

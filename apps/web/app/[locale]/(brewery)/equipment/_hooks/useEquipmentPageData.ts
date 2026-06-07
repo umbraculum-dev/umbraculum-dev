@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import type { AuthMeResponse } from "@umbraculum/contracts";
 
-import { listEquipmentProfiles } from "@umbraculum/api-client/brewery";
+import { listEquipmentProfiles } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../../_shared-layout/_lib/fetchAuthMe";

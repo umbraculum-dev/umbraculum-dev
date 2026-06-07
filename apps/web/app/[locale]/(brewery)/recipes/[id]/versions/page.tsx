@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
-import { listRecipeVersions } from "@umbraculum/api-client/brewery";
+import { listRecipeVersions } from "@umbraculum/brewery-api-client";
 
 import { Link } from "../../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";

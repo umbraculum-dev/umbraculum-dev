@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
-import { getRecipe } from "@umbraculum/api-client/brewery";
+import { getRecipe } from "@umbraculum/brewery-api-client";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";

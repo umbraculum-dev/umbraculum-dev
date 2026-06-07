@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { createEquipmentProfile } from "@umbraculum/api-client/brewery";
+import { createEquipmentProfile } from "@umbraculum/brewery-api-client";
 
 import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import { parseNullableNumber } from "../../lib/equipmentTypes";

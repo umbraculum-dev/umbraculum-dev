@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { listEquipmentProfiles, listStyles } from "@umbraculum/api-client/brewery";
+import { listEquipmentProfiles, listStyles } from "@umbraculum/brewery-api-client";
 
 import type { EquipmentProfile, StyleListItem } from "../../lib/recipeEditTypes";
 

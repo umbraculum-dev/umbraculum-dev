@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { computeAndSaveBoil } from "@umbraculum/api-client/brewery";
+import { computeAndSaveBoil } from "@umbraculum/brewery-api-client";
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 
 import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";

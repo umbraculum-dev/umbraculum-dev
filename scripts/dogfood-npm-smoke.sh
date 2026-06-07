@@ -40,10 +40,10 @@ echo "--- api-client dependencies ---"
 npm view "@umbraculum/api-client@${API_CLIENT_VERSION}" dependencies
 
 node --input-type=module -e "
-import('@umbraculum/api-client/brewery').then((m) => {
+import('@umbraculum/api-client').then((m) => {
   const keys = Object.keys(m).slice(0, 8);
-  console.log('brewery exports sample:', keys.join(', '));
-  if (!keys.length) throw new Error('no brewery exports');
+  console.log('api-client exports sample:', keys.join(', '));
+  if (!keys.length) throw new Error('no api-client exports');
 });
 "
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { listInventory, searchFermentables, searchHops } from "@umbraculum/api-client/brewery";
+import { listInventory, searchFermentables, searchHops } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import {

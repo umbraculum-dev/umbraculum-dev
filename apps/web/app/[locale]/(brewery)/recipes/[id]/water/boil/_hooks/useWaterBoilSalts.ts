@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
-import { calcSaltAdditions } from "@umbraculum/api-client/brewery";
+import { calcSaltAdditions } from "@umbraculum/brewery-api-client";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";

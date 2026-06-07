@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { patchRecipe } from "@umbraculum/api-client/brewery";
+import { patchRecipe } from "@umbraculum/brewery-api-client";
 import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,

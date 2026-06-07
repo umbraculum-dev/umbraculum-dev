@@ -1,6 +1,6 @@
 "use client";
 
-import { createInventoryItem, deleteInventoryItem, patchInventoryItem } from "@umbraculum/api-client/brewery";
+import { createInventoryItem, deleteInventoryItem, patchInventoryItem } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import { DEFAULT_UNIT, type InventoryCategory } from "../_lib/inventoryTypes";

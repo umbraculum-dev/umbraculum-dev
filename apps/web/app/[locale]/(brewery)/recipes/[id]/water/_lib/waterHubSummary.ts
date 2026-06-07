@@ -1,4 +1,4 @@
-import { getRecipeWaterHubSummary } from "@umbraculum/api-client/brewery";
+import { getRecipeWaterHubSummary } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 

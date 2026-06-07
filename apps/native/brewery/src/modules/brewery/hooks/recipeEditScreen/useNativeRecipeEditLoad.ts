@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 
-import { getRecipe, getRecipeWaterSettings } from "@umbraculum/api-client/brewery";
+import { getRecipe, getRecipeWaterSettings } from "@umbraculum/brewery-api-client";
 import type { EditorMashStep } from "@umbraculum/brewery-beerjson";
 
 import type { Recipe } from "../../lib/recipeEditTypes";

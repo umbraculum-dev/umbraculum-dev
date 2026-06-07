@@ -1,4 +1,4 @@
-import { computeAndSaveBoil } from "@umbraculum/api-client/brewery";
+import { computeAndSaveBoil } from "@umbraculum/brewery-api-client";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
 import type {

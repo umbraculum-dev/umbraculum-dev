@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { searchFermentables as apiSearchFermentables } from "@umbraculum/api-client/brewery";
+import { searchFermentables as apiSearchFermentables } from "@umbraculum/brewery-api-client";
 import type { EditorGristRow } from "@umbraculum/brewery-beerjson";
 
 import { newRowId, inferMaltClass } from "../lib/recipeEditHelpers";

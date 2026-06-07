@@ -56,4 +56,4 @@ From repo root (run Node/npm inside the project container, not on the host — s
 - [RFC-0003](../../../../docs/rfcs/0003-validation-library-adoption.md) — Zod-as-canonical-validator rule.
 - [`docs/design/pre-flip-application-surface-backbone.md`](../../../../docs/design/pre-flip-application-surface-backbone.md) §6.4 — migration table (no re-export shims from `@umbraculum/contracts`).
 - [`services/api/src/modules/brewery/`](../../../../services/api/src/modules/brewery/) — API slice consuming these schemas.
-- [`packages/verticals/brewery/api-client/`](../api-client/) — typed client helpers (`@umbraculum/brewery-api-client`; platform `@umbraculum/api-client/brewery` is a deprecated shim).
+- [`packages/verticals/brewery/api-client/`](../api-client/) — typed client helpers (`@umbraculum/brewery-api-client`).

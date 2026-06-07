@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
-import { listStyles } from "@umbraculum/api-client/brewery";
+import { listStyles } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import {

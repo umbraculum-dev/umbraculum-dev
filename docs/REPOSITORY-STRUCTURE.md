@@ -104,7 +104,7 @@ Industry-agnostic. Brewery **content** lives in `@umbraculum/brewery-i18n` and `
 | `packages/platform/i18n/` | `@umbraculum/i18n` | Platform + canonical locale bundles; merges `@umbraculum/brewery-i18n` in `getSharedMessages()` for reference profile. |
 | `packages/platform/i18n-react/` | `@umbraculum/i18n-react` | React + next-intl bindings (`useTranslator`). |
 | `packages/platform/native-shell/` | `@umbraculum/native-shell` | Shared Expo bootstrap — auth, locale, theme tokens, platform RN/Tamagui primitives (RFC-0011 Wave 4B). |
-| `packages/platform/api-client/` | `@umbraculum/api-client` | Typed fetch + auth (cookie web, bearer native). **Known gap:** vertical facade under `src/brewery/` — extraction deferred. |
+| `packages/platform/api-client/` | `@umbraculum/api-client` | Typed fetch + auth (cookie web, bearer native). Platform facades only — brewery HTTP facades live in `@umbraculum/brewery-api-client`. |
 | `packages/platform/media/` | `@umbraculum/media` | Media loader framework + empty platform manifest. |
 | `packages/platform/rendering/` | `@umbraculum/rendering` | Document rendering pipeline (RFC-0007). |
 | `packages/platform/test-mcp/` | `@umbraculum/test-mcp` | HTTP testing tools for Cursor MCP. |
@@ -132,6 +132,7 @@ Industry-agnostic. Brewery **content** lives in `@umbraculum/brewery-i18n` and `
 
 | Path | npm name | Role |
 |---|---|---|
+| `packages/verticals/brewery/api-client/` | `@umbraculum/brewery-api-client` | Brewery HTTP facades (recipes, water, brew sessions, …). |
 | `packages/verticals/brewery/core/` | `@umbraculum/brewery-core` | Brewing math (gravity, water chemistry). |
 | `packages/verticals/brewery/beerjson/` | `@umbraculum/brewery-beerjson` | BeerJSON adaptation layer. |
 | `packages/verticals/brewery/recipes-ui/` | `@umbraculum/brewery-recipes-ui` | Brewery domain UI (editors, charts, `BrewCheckbox`). |

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { getBrewdaySettings, patchBrewdaySettings } from "@umbraculum/api-client/brewery";
+import { getBrewdaySettings, patchBrewdaySettings } from "@umbraculum/brewery-api-client";
 import { useT } from "@umbraculum/i18n-react";
 
 import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";

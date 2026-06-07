@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { getRecipe, patchRecipe } from "@umbraculum/api-client/brewery";
+import { getRecipe, patchRecipe } from "@umbraculum/brewery-api-client";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { asRecord } from "../../../../../../_shared-layout/_lib/typeGuards";
 import {

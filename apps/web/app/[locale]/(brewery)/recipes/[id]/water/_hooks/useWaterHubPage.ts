@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 
 import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 
-import { getRecipe, listWaterProfiles } from "@umbraculum/api-client/brewery";
+import { getRecipe, listWaterProfiles } from "@umbraculum/brewery-api-client";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";

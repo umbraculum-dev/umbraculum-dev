@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import { getRecipe } from "@umbraculum/api-client/brewery";
+import { getRecipe } from "@umbraculum/brewery-api-client";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";

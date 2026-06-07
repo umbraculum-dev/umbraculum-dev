@@ -511,7 +511,7 @@ Audit (2026-06-07, Wave 6): full table in [`rfc-0011-wave-6-doc-capstone-build-l
 | 1 | Contributor can identify layout / module / vertical folders | **Met** — generic UI hoisted to `_shared-layout/_components/`; one `@arch-boundary` bridge at `platform/recipes/_components/RecipeImportForm.tsx` |
 | 2 | Zero deprecated slang | **Met** |
 | 3 | Brewery naming only under `(brewery)/` or `@umbraculum/brewery-*` | **Met** — cross-module `(brewery)/_components` imports cleared (2026-06-07 backlog) |
-| 4 | No brewery under `packages/platform/` | **Met** — `@umbraculum/brewery-api-client` extracted; platform keeps deprecated `./brewery` re-export shim only |
+| 4 | No brewery under `packages/platform/` | **Met** — `@umbraculum/brewery-api-client` extracted; platform `./brewery` re-export shim **removed** (2026-06-07) |
 | 5 | `@umbraculum/brewery-contracts`; platform contracts clean | **Met** |
 | 6 | Native README multi-app pattern | **Met** — Wave 4A umbrella + Wave 4B `@umbraculum/native-shell` |
 | 7 | REPOSITORY-STRUCTURE ↔ RFC-0011 ↔ backbone linked | **Met** |
@@ -526,8 +526,6 @@ These items **do not** block public-alpha flip. Land opportunistically on featur
 
 | Item | Notes |
 |------|-------|
-| **API flat-services eslint fence** | Landed pre-flip (2026-06-07) — [solid-boundaries-eslint-api-flat-services-spike.md](solid-boundaries-eslint-api-flat-services-spike.md); prevents Wave 3e regression |
-| **Apps → `@umbraculum/brewery-api-client`** | ~30 web files still import `@umbraculum/api-client/brewery` shim; migrate when touching those call sites |
 | **`platformRecipesService` refactor** | `@arch-boundary` allowlist — delegate path could move into module or platform route layer |
 | **Second native app scaffold** | Post-alpha — maintainer to choose **PIM handheld** (`apps/native/pim/`) vs **quality** app after structure is stable (2026-06-07 Step 4) |
 | **F-mod brewery-less product SKU** | Post-alpha — deferral register F-mod row |

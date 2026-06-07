@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getBrewdaySettings } from "@umbraculum/api-client/brewery";
+import { getBrewdaySettings } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import {

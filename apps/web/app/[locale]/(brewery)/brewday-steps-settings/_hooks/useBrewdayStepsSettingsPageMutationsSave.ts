@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 
-import { patchBrewdaySettings } from "@umbraculum/api-client/brewery";
+import { patchBrewdaySettings } from "@umbraculum/brewery-api-client";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import type {

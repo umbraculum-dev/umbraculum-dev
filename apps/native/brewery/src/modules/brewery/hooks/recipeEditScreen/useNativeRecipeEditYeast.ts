@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { searchYeasts as apiSearchYeasts } from "@umbraculum/api-client/brewery";
+import { searchYeasts as apiSearchYeasts } from "@umbraculum/brewery-api-client";
 import type { EditorYeastRow } from "@umbraculum/brewery-beerjson";
 
 import { formatFixed, newRowId } from "../../lib/recipeEditHelpers";
