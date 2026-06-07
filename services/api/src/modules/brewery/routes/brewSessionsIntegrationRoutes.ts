@@ -4,7 +4,7 @@ import { ErrorResponseSchema } from "@umbraculum/contracts";
 import { BrewSessionIdParamsSchema, IntegrationAttachRequestSchema, IntegrationAttachResponseSchema, IntegrationAttachmentsResponseSchema, IntegrationDetachRequestSchema, IntegrationDetachResponseSchema, IntegrationReadingsQuerySchema, IntegrationReadingsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import type { BrewSessionsRouteService } from "../../../services/brewSessionsRouteService.js";
+import type { BrewSessionsRouteService } from "../services/brewSessionsRouteService.js";
 
 export function registerBrewSessionsIntegrationRoutes(app: FastifyInstance, svc: BrewSessionsRouteService) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();

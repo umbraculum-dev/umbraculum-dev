@@ -6,13 +6,13 @@ import { RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, R
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { BadRequestError } from "../../../errors.js";
-import { RecipesService } from "../../../services/recipesService.js";
-import { RecipesImportService } from "../../../services/recipes/recipesImportOps.js";
+import { RecipesService } from "../services/recipesService.js";
+import { RecipesImportService } from "../services/recipes/recipesImportOps.js";
 import {
   parseSingleImportContent,
   parseBulkImportContent,
   type ImportFormat,
-} from "../../../services/recipesImportService.js";
+} from "../services/recipesImportService.js";
 import { validateBeerJsonDoc } from "../../../beerjson/index.js";
 
 const RECIPES_IMPORT_SINGLE_MAX_BYTES = 1 * 1024 * 1024;

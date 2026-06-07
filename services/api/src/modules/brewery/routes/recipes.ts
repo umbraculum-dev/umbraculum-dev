@@ -4,7 +4,7 @@ import { ErrorResponseSchema } from "@umbraculum/contracts";
 import { IdParamsSchema, OkResponseSchema, RecipeCreateRequestSchema, RecipeListResponseSchema, RecipePatchRequestSchema, RecipeResponseSchema, RecipeVersionsResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import { RecipesService } from "../../../services/recipesService.js";
+import { RecipesService } from "../services/recipesService.js";
 
 export function recipesRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();

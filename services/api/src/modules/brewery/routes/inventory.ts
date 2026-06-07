@@ -5,7 +5,7 @@ import { ErrorResponseSchema } from "@umbraculum/contracts";
 import { IdParamsSchema, InventoryCategoryQuerySchema, InventoryCreateRequestSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, OkResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import { InventoryService } from "../../../services/inventoryService.js";
+import { InventoryService } from "../services/inventoryService.js";
 
 function toItemPayload(item: InventoryItem) {
   return {

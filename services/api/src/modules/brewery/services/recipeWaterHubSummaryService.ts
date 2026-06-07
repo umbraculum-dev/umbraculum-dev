@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import type { RecipeWaterHubSummary } from "@umbraculum/brewery-contracts";
 import { WorkspacesService } from "../../../services/workspacesService.js";
-import { RecipesService } from "../../../services/recipesService.js";
+import { RecipesService } from "./recipesService.js";
 import { buildBoilStreamSummary } from "./recipeWaterHub/recipeWaterHubBoilSummary.js";
 import { buildFinalRecap, mergeStreamSummaries } from "./recipeWaterHub/recipeWaterHubMergedSummary.js";
 import {

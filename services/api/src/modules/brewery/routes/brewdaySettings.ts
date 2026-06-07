@@ -9,7 +9,7 @@ import {
   type BrewdayCustomStep,
   type BrewdayDefaultStep,
   type BrewdaySectionConfig,
-} from "../../../services/brewdaySettingsService.js";
+} from "../services/brewdaySettingsService.js";
 
 function parseSections(body: unknown): BrewdaySectionConfig {
   if (!body || typeof body !== "object" || !("presetExcludes" in body)) {

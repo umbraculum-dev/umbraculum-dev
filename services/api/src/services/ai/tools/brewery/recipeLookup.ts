@@ -1,7 +1,7 @@
 import type { AiTool } from "@umbraculum/ai-tool-sdk";
 import type { PrismaClient } from "@prisma/client";
 
-import { RecipesService } from "../../../recipesService.js";
+import { RecipesService } from "../../../../modules/brewery/services/recipesService.js";
 
 interface RecipeLookupInput {
   name?: string;

@@ -7,7 +7,7 @@ import { exportRecipeStrict } from "../../../beerjson/strictExport.js";
 import { BadRequestError } from "../../../errors.js";
 import { isObject } from "../../../lib/typeGuards.js";
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
-import { RecipesService } from "../../../services/recipesService.js";
+import { RecipesService } from "../services/recipesService.js";
 import { BREWERY_BEERJSON_EXPORT_TEMPLATE_REF } from "../documentTemplates.js";
 
 function safeFilenamePart(v: string) {

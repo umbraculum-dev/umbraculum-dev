@@ -1,7 +1,7 @@
 import type { AiTool } from "@umbraculum/ai-tool-sdk";
 import type { PrismaClient, InventoryCategory } from "@prisma/client";
 
-import { InventoryService } from "../../../inventoryService.js";
+import { InventoryService } from "../../../../modules/brewery/services/inventoryService.js";
 
 interface IngredientOnHandInput {
   /**

@@ -4,7 +4,7 @@ import { ErrorResponseSchema } from "@umbraculum/contracts";
 import { IdParamsSchema, OkResponseSchema, WaterProfileCreateRequestSchema, WaterProfilePatchRequestSchema, WaterProfileResponseSchema, WaterProfilesListResponseSchema } from "@umbraculum/brewery-contracts";
 
 import { requireActiveWorkspace, requireUser } from "../../../plugins/requestContext.js";
-import { WaterProfilesService } from "../../../services/waterProfilesService.js";
+import { WaterProfilesService } from "../services/waterProfilesService.js";
 
 function ionValue(v: unknown): unknown {
   return v;

@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 
-import { BrewSessionsRouteService } from "../../../services/brewSessionsRouteService.js";
+import { BrewSessionsRouteService } from "../services/brewSessionsRouteService.js";
 import { registerBrewSessionsCrudRoutes } from "./brewSessionsCrudRoutes.js";
 import { registerBrewSessionsIntegrationRoutes } from "./brewSessionsIntegrationRoutes.js";
 import { registerBrewSessionsStepsRoutes } from "./brewSessionsStepsRoutes.js";

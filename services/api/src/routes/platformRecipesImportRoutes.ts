@@ -19,7 +19,7 @@ import {
   RECIPES_IMPORT_SINGLE_MAX_BYTES,
 } from "../services/platformRecipesService.js";
 import type { PlatformRecipesService } from "../services/platformRecipesService.js";
-import type { ImportFormat } from "../services/recipesImportService.js";
+import type { ImportFormat } from "../modules/brewery/services/recipesImportService.js";
 
 export function registerPlatformRecipesImportRoutes(
   app: FastifyInstance,

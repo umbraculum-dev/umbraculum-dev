@@ -347,11 +347,11 @@ Add `eslint-plugin-boundaries` elements on `packages/**`:
 
 Spike doc: `docs/design/solid-boundaries-eslint-packages-spike.md` (to author in Wave 3d).
 
-### 6.8 `services/api` — brewery service colocation (Wave 3e — Phase 1 done)
+### 6.8 `services/api` — brewery service colocation (Wave 3e — complete)
 
-RFC-0002 β layout landed **module routes** under `services/api/src/modules/<code>/`. Wave **3e** (2026-06-06) colocated brewery **domain math and water/recipe orchestrators** under `modules/brewery/services/` — the same category fix as Wave **3b** (`@umbraculum/brewery-contracts`).
+RFC-0002 β layout landed **module routes** under `services/api/src/modules/<code>/`. Wave **3e** (2026-06-06) colocated **all brewery domain math and orchestrators** under `modules/brewery/services/` — the same category fix as Wave **3b** (`@umbraculum/brewery-contracts`).
 
-#### 6.8.1 Inventory — Phase 1 (resolved)
+#### 6.8.1 Inventory (resolved)
 
 | On-disk path | Status |
 |--------------|--------|
@@ -362,16 +362,19 @@ RFC-0002 β layout landed **module routes** under `services/api/src/modules/<cod
 | `modules/brewery/services/recipeAnalysis/` | **Done** — former `domain/recipeAnalysis/` |
 | `modules/brewery/services/recipeWaterHubSummaryService.ts` | **Done** |
 | `modules/brewery/services/recipeWaterComputeAndSaveService.ts` | **Done** |
-| `modules/brewery/services/recipeWaterSettingsService.ts` | **Done** (barrel; impl still under `services/recipeWaterSettings/` until Phase 2) |
+| `modules/brewery/services/recipeWaterSettings/` + barrel | **Done** — former `services/recipeWaterSettings/` |
+| `modules/brewery/services/recipes/` + barrels | **Done** — former `services/recipes/`, `recipesService.ts`, `recipesImportService.ts` |
+| `modules/brewery/services/brewSessions/` + barrels | **Done** — former `services/brewSessions/` and top-level `brewSessions*.ts` |
+| `modules/brewery/services/waterProfiles/` + barrel | **Done** |
+| `modules/brewery/services/brewdaySettings/` + barrel | **Done** |
+| `modules/brewery/services/inventoryService.ts` | **Done** |
 
-#### 6.8.1b Phase 2 — flat brewery orchestrators (deferred)
-
-Still under legacy `services/api/src/services/`: `recipes/`, `brewSessions*.ts`, `waterProfilesService.ts`, `recipesImportService.ts`, `brewdaySettingsService.ts`, and `services/recipeWaterSettings/` implementation tree.
+**Stays flat (horizontal platform admin):** `services/platformRecipesService.ts` — imports brewery `RecipesService` / `RecipesImportService` from the module tree.
 
 #### 6.8.2 Failure modes (remaining)
 
-1. **Dual homes for water calc — resolved (Phase 1).** Single folder: `modules/brewery/services/waterCalc/`.
-2. **F-mod opt-out filesystem leak — reduced.** Phase 1 brewery subtrees no longer under flat `domain/` or `services/recipeWater*`. Phase 2 flat orchestrators remain under `src/services/`.
+1. **Dual homes for water calc — resolved.** Single folder: `modules/brewery/services/waterCalc/`.
+2. **F-mod opt-out filesystem leak — resolved for brewery.** Brewery subtrees no longer under flat `domain/` or `services/{recipes,brewSessions,…}`.
 3. **Boundary enforcement gap.** WS5 covers `apps/**`; there is no **`services/api/src/modules/**` vs `services/api/src/{services,domain}/**` eslint fence** preventing new brewery helpers from landing in flat trees “because it's closer to the route.”
 
 #### 6.8.3 Target shape (filesystem clarity — HTTP paths unchanged)
@@ -382,17 +385,24 @@ services/api/src/
   modules/
     brewery/
       routes/            # exists today
-      services/          # consolidate ALL brewery service + domain logic here
+      services/          # ALL brewery service + domain logic
         waterCalc/
         recipeWaterHub/
         recipeWaterCompute/
         recipeAnalysis/
+        recipes/
+        brewSessions/
+        recipeWaterSettings/
+        waterProfiles/
+        brewdaySettings/
+        …
     pim/
     …
   routes/                # legacy platform route entry files — migrate toward platform/ over time
+  services/              # horizontal platform services only (e.g. platformRecipesService)
 ```
 
-**Wave 3e Phase 1 landed (2026-06-06).** Phase 2 (remaining flat `services/` orchestrators) deferred — see §6.8.1b.
+**Wave 3e complete (2026-06-06).** Next: Wave **3f** — documentation vocabulary and optional `app/_shell/` rename (RFC-0011 §10.1).
 
 No change to HTTP paths — filesystem clarity only.
 

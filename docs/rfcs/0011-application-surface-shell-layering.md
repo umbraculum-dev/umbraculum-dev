@@ -179,8 +179,8 @@ See [`pre-flip-application-surface-backbone.md`](../design/pre-flip-application-
 | After | Wave | Notes |
 |-------|------|-------|
 | Wave 1 (landed) | **2** | `(platform-shell)/` route group for `ai`, `accessibility`, … |
-| Wave 3b (landed) | **3e** | API brewery service colocation under `modules/brewery/services/` — **Phase 1 done (2026-06-06)** |
-| **Wave 3e** | **3f** | **Documentation vocabulary** — sunset slang (`operator shell`, `operator chrome`, unqualified “shell”); conventional terms only in integrator docs; optional `app/_shell/` path rename |
+| Wave 3b (landed) | **3e** | API brewery service colocation under `modules/brewery/services/` — **complete (2026-06-06)** |
+| **Wave 3e (complete)** | **3f** | **Documentation vocabulary** — sunset slang (`operator shell`, `operator chrome`, unqualified “shell”); conventional terms only in integrator docs; optional `app/_shell/` path rename |
 | Various | **6** | BUILDING-YOUR-VERTICAL + integrator glossary sync |
 
 ### 10.1 Wave 3f — documentation vocabulary and optional path rename (scheduled after 3e)

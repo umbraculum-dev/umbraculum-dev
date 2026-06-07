@@ -9,8 +9,8 @@ import {
   parseSingleImportContent,
   resolveBjcp2021Style,
   type ImportFormat,
-} from "./recipesImportService.js";
-import { RecipesService } from "./recipesService.js";
+} from "../modules/brewery/services/recipesImportService.js";
+import { RecipesService } from "../modules/brewery/services/recipesService.js";
 
 export const RECIPES_IMPORT_SINGLE_MAX_BYTES = 1 * 1024 * 1024;
 export const RECIPES_IMPORT_BULK_MAX_BYTES = 5 * 1024 * 1024;
