@@ -3,7 +3,7 @@
 Namespace conventions and key helpers for module-owned message keys in Umbraculum locale bundles.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications. Greenfield SDK package landed 2026-05-27; realizes the published-SDK commitment in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §4.4. This is **not** a carve-out from [`@umbraculum/i18n`](../i18n/) — that package keeps locale machinery and message **content**. Splitting brewery-flavored strings into a future vertical bundle is deferred per [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md) §1.4.
+> Part of [Umbraculum](../../../README.md) — an open-source toolset for building workspace-shaped operational applications. Greenfield SDK package landed 2026-05-27; realizes the published-SDK commitment in [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) §4.4. This is **not** a carve-out from [`@umbraculum/i18n`](../../platform/i18n/) — that package keeps locale machinery and message **content**. Splitting brewery-flavored strings into a future vertical bundle is deferred per [`docs/design/brewery-scope-migration-plan.md`](../../../docs/design/brewery-scope-migration-plan.md) §1.4.
 
 ## Install
 
@@ -11,7 +11,7 @@ Namespace conventions and key helpers for module-owned message keys in Umbraculu
 npm install @umbraculum/i18n-keys@^0.1.0
 ```
 
-Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+Public alpha — see [third-party-module.md](../../../docs/modules/contribute/third-party-module.md).
 
 ## What this is
 
@@ -26,7 +26,7 @@ Zero locale JSON, zero React, zero next-intl — only types and small pure helpe
 ## Scope
 
 - **Contains**: `ModuleNavLabelKey`, `ModuleScopedMessageKey`, `RESERVED_PLATFORM_MESSAGE_ROOTS`, validation helpers (`assertValidModuleMessageRoot`, `moduleMessageRoot`, `defaultModuleNavLabelKey`, `composeModuleMessageKey`), and error types for invalid or reserved roots.
-- **Does not contain**: locale files (`en.json` / `it.json` live in [`@umbraculum/i18n`](../i18n/)); React bindings ([`@umbraculum/i18n-react`](../i18n-react/)); proof that a key exists at runtime (apps merge bundles at load time — a future CI check may audit bundles separately).
+- **Does not contain**: locale files (`en.json` / `it.json` live in [`@umbraculum/i18n`](../../platform/i18n/)); React bindings ([`@umbraculum/i18n-react`](../../platform/i18n-react/)); proof that a key exists at runtime (apps merge bundles at load time — a future CI check may audit bundles separately).
 
 ## Conventions (authoritative for v0)
 
@@ -45,7 +45,7 @@ Zero locale JSON, zero React, zero next-intl — only types and small pure helpe
 |------|--------|
 | Shape | `ModuleNavLabelKey` = `` `nav.${string}` `` (Option A — v0). |
 | Default | `defaultModuleNavLabelKey("pim")` → `"nav.pim"`. |
-| Registration | Pass to `registerWebModule({ navEntry: { labelKey: … } })` or `registerNativeModule({ tabEntry: { labelKey: … } })` on [`@umbraculum/module-sdk`](../../modules/module-sdk/). |
+| Registration | Pass to `registerWebModule({ navEntry: { labelKey: … } })` or `registerNativeModule({ tabEntry: { labelKey: … } })` on [`@umbraculum/module-sdk`](../module-sdk/). |
 | Exception | When the product nav label is not named after `code`, use any `nav.<suffix>` that exists in the bundle (e.g. `nav.recipes` for brewery). |
 
 ### Reserved platform roots
@@ -114,24 +114,24 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 - **Build**: `npm run build:packages` (builds `@umbraculum/i18n-keys` before `@umbraculum/module-sdk`)
 - **Test**: `npm run test --workspace=@umbraculum/i18n-keys`
 - **Lint**: `npm run lint --workspace=@umbraculum/i18n-keys`
-- **Typecheck**: per-workspace CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md)
+- **Typecheck**: per-workspace CI gate; see [`docs/TYPING.md`](../../../docs/TYPING.md)
 
 ## How it fits in
 
-- **Consumed by**: [`@umbraculum/module-sdk`](../../modules/module-sdk/) (`navEntry.labelKey`, `tabEntry.labelKey` typed as `ModuleNavLabelKey`); third-party module repos (peer dependency); canonical module authors documenting key layout.
-- **Depends on**: nothing. Peer of [`@umbraculum/ai-tool-sdk`](../../modules/ai-tool-sdk/) on the MIT SDK surface.
-- **Sibling packages**: [`@umbraculum/i18n`](../i18n/) (bundles + `getSharedMessages`); [`@umbraculum/i18n-react`](../i18n-react/) (React hook).
+- **Consumed by**: [`@umbraculum/module-sdk`](../module-sdk/) (`navEntry.labelKey`, `tabEntry.labelKey` typed as `ModuleNavLabelKey`); third-party module repos (peer dependency); canonical module authors documenting key layout.
+- **Depends on**: nothing. Peer of [`@umbraculum/ai-tool-sdk`](../ai-tool-sdk/) on the MIT SDK surface.
+- **Sibling packages**: [`@umbraculum/i18n`](../../platform/i18n/) (bundles + `getSharedMessages`); [`@umbraculum/i18n-react`](../../platform/i18n-react/) (React hook).
 
 ## Status
 
-v0.1.0 is intentionally minimal: conventions + helpers, no bundle merger and no key-existence CI yet. Breaking changes follow PLATFORM-ARCHITECTURE §10 semver discipline at the SDK boundary. Published on the public npm registry — see [`docs/design/npm-sdk-publish-execution-plan.md`](../../docs/design/npm-sdk-publish-execution-plan.md).
+v0.1.0 is intentionally minimal: conventions + helpers, no bundle merger and no key-existence CI yet. Breaking changes follow PLATFORM-ARCHITECTURE §10 semver discipline at the SDK boundary. Published on the public npm registry — see [`docs/design/npm-sdk-publish-execution-plan.md`](../../../docs/design/npm-sdk-publish-execution-plan.md).
 
 ## Further reading
 
-- [`docs/design/i18n-keys-sdk-surface.md`](../../docs/design/i18n-keys-sdk-surface.md) — normative v0 conventions, dependency graph, maintainer checklist
-- [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §4.2 + §4.4 — module-owned i18n namespace + SDK surface
-- [`docs/LICENSING.md`](../../docs/LICENSING.md) §6.2 — MIT SDK posture
-- [`docs/I18N-AUDIT.md`](../../docs/I18N-AUDIT.md) — web UI i18n migration audit
-- [`docs/modules/contribute/third-party-module.md`](../../docs/modules/contribute/third-party-module.md) — stable surfaces to pin
-- [`packages/modules/module-sdk/README.md`](../../modules/module-sdk/README.md) — `registerWebModule` / `registerNativeModule`
-- [`packages/platform/i18n/README.md`](../i18n/README.md) — where locale JSON lives today
+- [`docs/design/i18n-keys-sdk-surface.md`](../../../docs/design/i18n-keys-sdk-surface.md) — normative v0 conventions, dependency graph, maintainer checklist
+- [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) §4.2 + §4.4 — module-owned i18n namespace + SDK surface
+- [`docs/LICENSING.md`](../../../docs/LICENSING.md) §6.2 — MIT SDK posture
+- [`docs/I18N-AUDIT.md`](../../../docs/I18N-AUDIT.md) — web UI i18n migration audit
+- [`docs/modules/contribute/third-party-module.md`](../../../docs/modules/contribute/third-party-module.md) — stable surfaces to pin
+- [`packages/modules/module-sdk/README.md`](../module-sdk/README.md) — `registerWebModule` / `registerNativeModule`
+- [`packages/platform/i18n/README.md`](../../platform/i18n/README.md) — where locale JSON lives today

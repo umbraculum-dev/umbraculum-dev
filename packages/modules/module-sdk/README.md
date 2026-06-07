@@ -3,7 +3,7 @@
 Module registration contract for the Umbraculum platform (`registerModule`, `registerAiTools`, reserved canonical codes, web registry, rendering template slot).
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications.
+> Part of [Umbraculum](../../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
 ## Install
 
@@ -11,20 +11,20 @@ Module registration contract for the Umbraculum platform (`registerModule`, `reg
 npm install @umbraculum/module-sdk@^0.0.1
 ```
 
-Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md). Peer packages: `@umbraculum/ai-tool-sdk`, `@umbraculum/i18n-keys`.
+Public alpha — see [third-party-module.md](../../../docs/modules/contribute/third-party-module.md). Peer packages: `@umbraculum/ai-tool-sdk`, `@umbraculum/i18n-keys`.
 
 ## What this is
 
-MIT-licensed SDK surface (per [`docs/LICENSING.md`](../../docs/LICENSING.md) §6.2) for third-party and first-party modules. Exposes `registerModule()` for Fastify route registration, module-owned AI-tool registration, and document-template registration, canonical-code validation aligned with [RFC-0001](../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) Decision B, and a parallel `registerWebModule()` (with URL-segment registration + nav-entry contributions) for the App Router route-group convention committed in [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision B and refined by [`docs/design/web-route-group-audit.md`](../../docs/design/web-route-group-audit.md).
+MIT-licensed SDK surface (per [`docs/LICENSING.md`](../../../docs/LICENSING.md) §6.2) for third-party and first-party modules. Exposes `registerModule()` for Fastify route registration, module-owned AI-tool registration, and document-template registration, canonical-code validation aligned with [RFC-0001](../../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) Decision B, and a parallel `registerWebModule()` (with URL-segment registration + nav-entry contributions) for the App Router route-group convention committed in [RFC-0002](../../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision B and refined by [`docs/design/web-route-group-audit.md`](../../../docs/design/web-route-group-audit.md).
 
 ## Scope
 
-- **Contains**: registration types, in-memory module registry (boot-time collision detection), `RESERVED_CANONICAL_MODULE_CODES`, `registerModule`, `registerRegisteredModuleAiTools`, `registerWebModule` (with `ownedUrlSegments` + `navEntry` whose `labelKey` is typed as `ModuleNavLabelKey` from [`@umbraculum/i18n-keys`](../../modules/i18n-keys/)), `registerNativeModule` (with optional `tabEntry.labelKey` of the same type), `DocumentTemplate<TData>` / `RenderJob<TData>` / `RenderResult` rendering types, and the **library-agnostic `ValidatedSchema<T>` interface** + `fromParser` adapter (per [RFC-0003](../../docs/rfcs/0003-validation-library-adoption.md) Decision C — third-party modules may use Zod, Valibot, TypeBox, or hand-rolled validators that satisfy the interface).
+- **Contains**: registration types, in-memory module registry (boot-time collision detection), `RESERVED_CANONICAL_MODULE_CODES`, `registerModule`, `registerRegisteredModuleAiTools`, `registerWebModule` (with `ownedUrlSegments` + `navEntry` whose `labelKey` is typed as `ModuleNavLabelKey` from [`@umbraculum/i18n-keys`](../i18n-keys/)), `registerNativeModule` (with optional `tabEntry.labelKey` of the same type), `DocumentTemplate<TData>` / `RenderJob<TData>` / `RenderResult` rendering types, and the **library-agnostic `ValidatedSchema<T>` interface** + `fromParser` adapter (per [RFC-0003](../../../docs/rfcs/0003-validation-library-adoption.md) Decision C — third-party modules may use Zod, Valibot, TypeBox, or hand-rolled validators that satisfy the interface).
 - **Does not contain**: Prisma models, Fastify plugins for auth/billing, AI orchestrator implementation, document-rendering engines, BullMQ workers, or `@umbraculum/rendering` runtime adapters. Every shipped canonical module — and the brewery vertical — registers via `registerModule()` + `registerWebModule()`.
 
 ## What this SDK is *not* (where module code actually lives)
 
-This package is **contract-only plus registration helpers**. The actual per-module code lives in the module's four β slices ([RFC-0002 §3](../../docs/rfcs/0002-canonical-module-physical-layout.md)):
+This package is **contract-only plus registration helpers**. The actual per-module code lives in the module's four β slices ([RFC-0002 §3](../../../docs/rfcs/0002-canonical-module-physical-layout.md)):
 
 | What | Where |
 |---|---|
@@ -33,7 +33,7 @@ This package is **contract-only plus registration helpers**. The actual per-modu
 | Module's **native** screens, navigation entries, native-only components | `apps/native/src/modules/<code>/` |
 | Module's DTO types, route ID constants, third-party-pinnable types | `packages/<code>-contracts/` → `@umbraculum/<code>-contracts` |
 
-The SDK is *only* the registration shape — `registerModule`, `registerWebModule`, and `registerNativeModule` (native route availability per module) exported from this same package per [RFC-0002 §5](../../docs/rfcs/0002-canonical-module-physical-layout.md). Native shell code lives in `apps/native/`; the brewery vertical calls `registerNativeModule({ code: "brewery", availableRouteIds: [...] })` at bootstrap. Cross-platform UI primitives live in `@umbraculum/ui` (industry-agnostic) and `@umbraculum/brewery-recipes-ui` (brewery-vertical); Prisma schemas live in `services/api/prisma/`. See [`docs/design/canonical-native-platform-surface.md`](../../docs/design/canonical-native-platform-surface.md) for the native operational SoT.
+The SDK is *only* the registration shape — `registerModule`, `registerWebModule`, and `registerNativeModule` (native route availability per module) exported from this same package per [RFC-0002 §5](../../../docs/rfcs/0002-canonical-module-physical-layout.md). Native shell code lives in `apps/native/`; the brewery vertical calls `registerNativeModule({ code: "brewery", availableRouteIds: [...] })` at bootstrap. Cross-platform UI primitives live in `@umbraculum/ui` (industry-agnostic) and `@umbraculum/brewery-recipes-ui` (brewery-vertical); Prisma schemas live in `services/api/prisma/`. See [`docs/design/canonical-native-platform-surface.md`](../../../docs/design/canonical-native-platform-surface.md) for the native operational SoT.
 
 ## Validated-schema contract
 
@@ -82,7 +82,7 @@ The API boot path creates an `AiToolRegistry` and calls `registerRegisteredModul
 
 ## AI prompt registration — `registerModule({ aiPrompts })`
 
-Modules contribute system-prompt overlays for the platform orchestrator. See [`docs/design/canonical-ai-prompt-composition-surface.md`](../../docs/design/canonical-ai-prompt-composition-surface.md).
+Modules contribute system-prompt overlays for the platform orchestrator. See [`docs/design/canonical-ai-prompt-composition-surface.md`](../../../docs/design/canonical-ai-prompt-composition-surface.md).
 
 ```typescript
 registerModule(app, {
@@ -116,7 +116,7 @@ The API's `getTierLimits(tier)` in `services/api/src/services/tierLimitsService.
 
 ## Add-on code registration — `registerModule({ addonCodes })`
 
-[RFC-0009](../../docs/rfcs/0009-workspace-billing-addons-and-entitlements.md) commits the entitlement contract; **purchase enforcement** is deferred H1 2027. Modules declare Stripe/RevenueCat SKU vocabulary (convention: `<code>_module`). Duplicate codes across modules fail at boot (`AddonCodeAlreadyRegisteredError`). The `managed_ai_credits_*` prefix is platform-reserved for future managed-AI packs.
+[RFC-0009](../../../docs/rfcs/0009-workspace-billing-addons-and-entitlements.md) commits the entitlement contract; **purchase enforcement** is deferred H1 2027. Modules declare Stripe/RevenueCat SKU vocabulary (convention: `<code>_module`). Duplicate codes across modules fail at boot (`AddonCodeAlreadyRegisteredError`). The `managed_ai_credits_*` prefix is platform-reserved for future managed-AI packs.
 
 ```typescript
 registerModule(app, {
@@ -125,11 +125,11 @@ registerModule(app, {
 });
 ```
 
-Hosted public α runs `EntitlementsService` in `tier_only` mode — tier limits remain the enforcement surface until `WorkspaceBillingAddon` lands. See [`canonical-workspace-billing-addons-surface.md`](../../docs/design/canonical-workspace-billing-addons-surface.md).
+Hosted public α runs `EntitlementsService` in `tier_only` mode — tier limits remain the enforcement surface until `WorkspaceBillingAddon` lands. See [`canonical-workspace-billing-addons-surface.md`](../../../docs/design/canonical-workspace-billing-addons-surface.md).
 
 ## Document-template registration — `registerModule({ documentTemplates })`
 
-[RFC-0007](../../docs/rfcs/0007-canonical-document-rendering.md) adds document / file rendering to the platform consumption contract. Modules contribute typed templates through the SDK; the platform-owned `@umbraculum/rendering` package owns the engines and job runner.
+[RFC-0007](../../../docs/rfcs/0007-canonical-document-rendering.md) adds document / file rendering to the platform consumption contract. Modules contribute typed templates through the SDK; the platform-owned `@umbraculum/rendering` package owns the engines and job runner.
 
 ```typescript
 import { registerModule, type DocumentTemplate } from "@umbraculum/module-sdk";
@@ -170,11 +170,11 @@ registerModule(app, {
 - Template refs are globally unique at boot.
 - Registration is atomic: if any template claim fails, no template from the failing registration is persisted.
 
-The rendering type source of truth lives here in `@umbraculum/module-sdk` so third-party modules can import the SDK surface under the MIT scope. [`@umbraculum/rendering`](../rendering/) re-exports these types for discoverability beside the future AGPLv3 implementation package.
+The rendering type source of truth lives here in `@umbraculum/module-sdk` so third-party modules can import the SDK surface under the MIT scope. [`@umbraculum/rendering`](../../platform/rendering/) re-exports these types for discoverability beside the future AGPLv3 implementation package.
 
 ## Web-side registration — `registerWebModule()`
 
-Each module's web slice declares the top-level URL segments it owns. The registry detects collisions at registration time AND is the source-of-truth for the build-time CI check `scripts/check-web-url-segments.ts` (per [`docs/design/web-route-group-audit.md`](../../docs/design/web-route-group-audit.md) §3.2).
+Each module's web slice declares the top-level URL segments it owns. The registry detects collisions at registration time AND is the source-of-truth for the build-time CI check `scripts/check-web-url-segments.ts` (per [`docs/design/web-route-group-audit.md`](../../../docs/design/web-route-group-audit.md) §3.2).
 
 ```typescript
 import { registerWebModule } from "@umbraculum/module-sdk";
@@ -186,7 +186,7 @@ registerWebModule({
 });
 ```
 
-**The two β disciplines** (codified in plugin rule `46-web-route-shape.mdc`; see [`docs/design/web-route-group-audit.md`](../../docs/design/web-route-group-audit.md) §3):
+**The two β disciplines** (codified in plugin rule `46-web-route-shape.mdc`; see [`docs/design/web-route-group-audit.md`](../../../docs/design/web-route-group-audit.md) §3):
 
 - **No `apps/web/app/[locale]/(<code>)/page.tsx`** — collides with `[locale]/page.tsx`; one or the other becomes silently unreachable.
 - **No `apps/web/app/[locale]/(<code>)/[<dynamicSegment>]/page.tsx`** at the route-group root — shadows every non-static URL under `/en/*`.
@@ -217,7 +217,7 @@ Optional top-of-shell banner for deployed environments (demo credentials, operat
 | `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID=demo` | `demo` | Non-dismissible notice; i18n copy in `@umbraculum/i18n` (`sharedLayoutNotice.demo.*`) |
 | unset / unknown | — | No banner (local dev, integrator stacks) |
 
-Demo VPS operators set the env in **umbraculum-hosting-demo** `docker-compose.demo.yml` only — see [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md).
+Demo VPS operators set the env in **umbraculum-hosting-demo** `docker-compose.demo.yml` only — see [`docs/design/demo-host-runbook.md`](../../../docs/design/demo-host-runbook.md).
 
 ```typescript
 import { resolveWebSharedLayoutNotice } from "@umbraculum/module-sdk";
@@ -228,7 +228,7 @@ const notice = resolveWebSharedLayoutNotice(process.env);
 
 ## Build / test / lint (local)
 
-From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):
+From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):
 
 - **Build**: `npm run build -w @umbraculum/module-sdk`
 - **Test**: `npm run test -w @umbraculum/module-sdk`
@@ -236,9 +236,9 @@ From repo root (run Node/npm inside the project container, not on the host — s
 
 ## Cross-references
 
-- [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §4.4 — registration sketch
-- [`docs/rfcs/0002-canonical-module-physical-layout.md`](../../docs/rfcs/0002-canonical-module-physical-layout.md) — `packages/modules/module-sdk/` placement (Decision C), web route-group convention (Decision B)
-- [`docs/rfcs/0007-canonical-document-rendering.md`](../../docs/rfcs/0007-canonical-document-rendering.md) — document-template registration + canonical rendering pipeline
-- [`docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md`](../../docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — calendar amendment to RFC-0002 D (brewery file-move pulled into Week 1 of late-H1-2026)
-- [`docs/design/web-route-group-audit.md`](../../docs/design/web-route-group-audit.md) — the two β disciplines (no group-root `page.tsx`, no group-root dynamic segment), the URL-segment registry surface, canonical good/bad examples
-- [`packages/platform/rendering/README.md`](../rendering/README.md) — scaffold package that re-exports the rendering SDK types
+- [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) §4.4 — registration sketch
+- [`docs/rfcs/0002-canonical-module-physical-layout.md`](../../../docs/rfcs/0002-canonical-module-physical-layout.md) — `packages/modules/module-sdk/` placement (Decision C), web route-group convention (Decision B)
+- [`docs/rfcs/0007-canonical-document-rendering.md`](../../../docs/rfcs/0007-canonical-document-rendering.md) — document-template registration + canonical rendering pipeline
+- [`docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md`](../../../docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — calendar amendment to RFC-0002 D (brewery file-move pulled into Week 1 of late-H1-2026)
+- [`docs/design/web-route-group-audit.md`](../../../docs/design/web-route-group-audit.md) — the two β disciplines (no group-root `page.tsx`, no group-root dynamic segment), the URL-segment registry surface, canonical good/bad examples
+- [`packages/platform/rendering/README.md`](../../platform/rendering/README.md) — scaffold package that re-exports the rendering SDK types

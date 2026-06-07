@@ -79,7 +79,7 @@ Browse OpenAPI paths on the docs site before wiring calls:
 - Platform catalog: [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform)
 - Brewery add-on (reference vertical): [docs.umbraculum.dev/openapi-brewery](https://docs.umbraculum.dev/openapi-brewery)
 
-**Runnable sample (no monorepo clone):** [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) — copy of [`scripts/integrator-bearer-smoke.mjs`](../../scripts/integrator-bearer-smoke.mjs). Maintainer sync: when api-client semver changes, update the sample repo `quickstart.mjs` and `@umbraculum/*` pins.
+**Runnable sample (no monorepo clone):** [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) — copy of [`scripts/integrator-bearer-smoke.mjs`](../../../scripts/integrator-bearer-smoke.mjs). Maintainer sync: when api-client semver changes, update the sample repo `quickstart.mjs` and `@umbraculum/*` pins.
 
 **Subpath imports** (tree-shaking friendly):
 

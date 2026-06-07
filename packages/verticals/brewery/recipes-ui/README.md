@@ -3,7 +3,7 @@
 Domain UI components for recipes and related brewing workflows (cross-platform: web + native).
 
 > [!NOTE]
-> Part of [Umbraculum](../../../README.md) — an open-source toolset for building workspace-shaped operational applications.
+> Part of [Umbraculum](../../../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
 ## What this is
 
@@ -28,9 +28,9 @@ Shared components accept injected functions/props for:
 This package ships runtime-safe JS + types under `dist/**` so it can be consumed by Metro (React Native) and Next.js without source-level transpilation.
 
 - **Build**: from repo root, `./scripts/build-packages-in-docker.sh` (Docker route — preferred per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`).
-- **Test**: `npm run test --workspace=@umbraculum/brewery-recipes-ui` (vitest in container; see [`docs/TESTING.md`](../../../docs/TESTING.md)).
+- **Test**: `npm run test --workspace=@umbraculum/brewery-recipes-ui` (vitest in container; see [`docs/TESTING.md`](../../../../docs/TESTING.md)).
 - **Lint**: `npm run lint --workspace=@umbraculum/brewery-recipes-ui`.
-- **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../../docs/TYPING.md) §"Per-workspace CI gate".
+- **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../../../docs/TYPING.md) §"Per-workspace CI gate".
 
 ## How it fits in
 
@@ -39,11 +39,11 @@ This package ships runtime-safe JS + types under `dist/**` so it can be consumed
 
 ## Status
 
-Recipe-centric by name and by intent. As new vertical domains land additional shared UI (e.g. `@umbraculum/brewery-inventory-ui`, `@umbraculum/brewery-wms-ui`), they should ship as separate packages rather than expanding this one — see [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level vertical-module shape.
+Recipe-centric by name and by intent. As new vertical domains land additional shared UI (e.g. `@umbraculum/brewery-inventory-ui`, `@umbraculum/brewery-wms-ui`), they should ship as separate packages rather than expanding this one — see [`docs/PLATFORM-ARCHITECTURE.md`](../../../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level vertical-module shape.
 
 ## Further reading
 
-- [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and vertical-module shape
-- [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../../docs/CROSS-PLATFORM-BOUNDARIES.md) — cross-platform UI boundaries
-- [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](../../../docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md) — brewery vertical implementation log
-- [`docs/DOCS-README-STANDARDS.md`](../../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to
+- [`docs/PLATFORM-ARCHITECTURE.md`](../../../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and vertical-module shape
+- [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../../../docs/CROSS-PLATFORM-BOUNDARIES.md) — cross-platform UI boundaries
+- [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](../../../../docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md) — brewery vertical implementation log
+- [`docs/DOCS-README-STANDARDS.md`](../../../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to

@@ -3,7 +3,7 @@
 Brewery-vertical brewing math — gravity conversions, unit normalization, and mash pH defaults.
 
 > [!NOTE]
-> Part of [Umbraculum](../../../README.md) — an open-source toolset for building workspace-shaped operational applications. Renamed from `@brewery/core` to `@umbraculum/brewery-core` as sub-plan #9 slot 6 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../../docs/design/brewery-scope-migration-plan.md). **Vertical-prefixed scope** — this package is brewery-domain math, not platform-wide infrastructure. The bare `@umbraculum/core` name is reserved for a future platform-core framework package.
+> Part of [Umbraculum](../../../../README.md) — an open-source toolset for building workspace-shaped operational applications. Renamed from `@brewery/core` to `@umbraculum/brewery-core` as sub-plan #9 slot 6 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../../../docs/design/brewery-scope-migration-plan.md). **Vertical-prefixed scope** — this package is brewery-domain math, not platform-wide infrastructure. The bare `@umbraculum/core` name is reserved for a future platform-core framework package.
 
 ## What this is
 
@@ -12,7 +12,7 @@ Pure JavaScript brewing calculations shared by the brewery vertical's web app, n
 ## Scope
 
 - **Contains**: `platoToSg` / `sgToPlato`; mass/volume converters (`massToKg`, `volumeToLiters`, …); imperial helpers (`kgToLb`, `litersToUsGallons`); `roundTo`; `DEFAULT_MASH_TARGET_PH`; unit guard helpers (`isMassUnitV1`, `isVolumeUnitV1`).
-- **Does not contain**: BeerJSON document shapes (see [`@umbraculum/brewery-beerjson`](../beerjson/README.md)); recipe editor UI (see [`@umbraculum/brewery-recipes-ui`](../recipes-ui/README.md)); water chemistry solvers beyond the shared default pH constant (extended models live in brewery docs under [`docs/modules/verticals/brewery/`](../../../docs/modules/verticals/brewery/)).
+- **Does not contain**: BeerJSON document shapes (see [`@umbraculum/brewery-beerjson`](../beerjson/README.md)); recipe editor UI (see [`@umbraculum/brewery-recipes-ui`](../recipes-ui/README.md)); water chemistry solvers beyond the shared default pH constant (extended models live in brewery docs under [`docs/modules/verticals/brewery/`](../../../../docs/modules/verticals/brewery/)).
 
 ## Exports / Surface
 
@@ -41,7 +41,7 @@ This package ships runtime JS directly from `src/` (no separate build step). Com
 
 - **Test**: `npm run test --workspace=@umbraculum/brewery-core`
 - **Lint**: `npm run lint --workspace=@umbraculum/brewery-core` (when configured for this workspace)
-- **Typecheck**: types in `src/index.d.ts`; broader workspace gates in [`docs/TYPING.md`](../../../docs/TYPING.md)
+- **Typecheck**: types in `src/index.d.ts`; broader workspace gates in [`docs/TYPING.md`](../../../../docs/TYPING.md)
 
 After changes under any `packages/**` workspace, rebuild dependents when needed: `npm run build:packages` (or `./scripts/build-packages-in-docker.sh`).
 
@@ -56,7 +56,7 @@ Stable for the brewery vertical's current gravity and unit-conversion needs. Non
 
 ## Further reading
 
-- [`docs/modules/packages/README.md`](../../../docs/modules/packages/README.md) — package index (horizontal vs vertical-flavored)
-- [`docs/modules/verticals/brewery/README.md`](../../../docs/modules/verticals/brewery/README.md) — reference vertical overview
+- [`docs/modules/packages/README.md`](../../../../docs/modules/packages/README.md) — package index (horizontal vs vertical-flavored)
+- [`docs/modules/verticals/brewery/README.md`](../../../../docs/modules/verticals/brewery/README.md) — reference vertical overview
 - [`@umbraculum/brewery-beerjson`](../beerjson/README.md) — BeerJSON layer built on these math primitives
-- [`docs/DOCS-README-STANDARDS.md`](../../../docs/DOCS-README-STANDARDS.md) — README standard this file follows
+- [`docs/DOCS-README-STANDARDS.md`](../../../../docs/DOCS-README-STANDARDS.md) — README standard this file follows
