@@ -68,8 +68,8 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
        docker run --rm -v "$PWD:/repo" node:20-slim bash -lc 'rm -rf /repo/packages/verticals/brewery/beerjson/dist'
        ./scripts/build-packages-in-docker.sh
        grep -c lateAddition packages/verticals/brewery/beerjson/dist/index.d.ts   # expect >=1 once that field exists
-       docker run --rm -v "$PWD:/repo" -w /repo/apps/native node:20-slim \
-         bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+       docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+         bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
        # exit 0 means the chain is healthy end-to-end
        ```
   - **Container ownership (now self-resolving from the script).** Historically, `scripts/build-packages-in-docker.sh` ran Docker as root inside the `/repo` bind-mount, which left any file it (re)wrote — anything under `packages/*/dist/*`, sometimes `package-lock.json`, sometimes files inside `apps/*` and `services/*` — owned by `root:root` on the host. Git tracks content not ownership, so this was invisible until you asked git to *replace* one of those files (stash pop, branch switch, restore, rebase): non-root users can't unlink root-owned files, and git aborts with `error: unable to unlink old '...': Permission denied`. The build script now appends a `chown -R $HOST_UID:$HOST_GID /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json` step (uid/gid are resolved on the host and passed in via env vars; the chown runs unconditionally so a failed build never leaves a partial root-owned tree; `/repo/node_modules` is excluded on purpose because it's a docker named volume, not a host bind-mount). If you ever do hit `Permission denied` from git on those paths — e.g. because an older runner image or an out-of-band `docker run` wrote them as root — the manual recovery command is still:

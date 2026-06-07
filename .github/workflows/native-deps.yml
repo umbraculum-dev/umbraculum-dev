@@ -38,13 +38,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Run expo install --check + apps/native typecheck (Docker, matches local rule)
-        # Uses node:20-slim to match the local docker run pattern documented in
-        # docs/DEVELOPMENT-NATIVE-LOCAL.md and the repo-wide "no npm on host"
-        # policy (plugin-shipped 00-shared-node-npm-container-only.mdc).
+      - name: Run expo install --check + apps/native/brewery typecheck (Docker, matches local rule)
+        # RFC-0011 Wave 4A: apps/native/brewery is a workspace; expo is hoisted to repo
+        # root — install at /repo first, then npx expo from the brewery workspace.
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/repo" \
-            -w /repo/apps/native/brewery \
+            -w /repo \
             node:20-slim \
-            bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+            bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"

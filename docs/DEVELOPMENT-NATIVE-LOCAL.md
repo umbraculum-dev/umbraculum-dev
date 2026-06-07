@@ -30,9 +30,9 @@ Verify at any time:
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery \
+  -w /repo \
   node:20-slim \
-  bash -lc "./node_modules/.bin/expo install --check"
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check"
 ```
 
 Exit 0 with "Dependencies are up to date" means you're good. Non-zero means at least one package will misbehave on Expo Go.
@@ -263,9 +263,9 @@ Fix:
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery \
+  -w /repo \
   node:20-slim \
-  bash -lc "./node_modules/.bin/expo install --fix"
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --fix"
 ```
 
 Then restart Metro with `-c` and **rescan the QR**.
@@ -317,9 +317,9 @@ Whenever Metro logs version warnings on startup, do not ignore them on physical 
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery \
+  -w /repo \
   node:20-slim \
-  bash -lc "./node_modules/.bin/expo install --check"
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check"
 ```
 
 A non-zero exit means at least one package will fail at runtime on Expo Go.
@@ -343,8 +343,9 @@ Fix:
 ./scripts/build-packages-in-docker.sh
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery node:20-slim \
-  bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+  -w /repo \
+  node:20-slim \
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
 # exit 0 means dist drift is gone
 ```
 
@@ -354,7 +355,7 @@ See `DEVELOPMENT-LOCAL.md` → "Shared packages build (native-ready)" for the dr
 
 ### `npm run typecheck` passes locally but the `native-deps` GitHub Action fails on the same commit
 
-Symptom: you ran the CI-equivalent docker command locally (`npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck`), it returned exit 0, you pushed, and the workflow turned red on a TypeScript error that the local run never reported.
+Symptom: you ran the CI-equivalent docker command locally (`npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck` with `-w /repo`), it returned exit 0, you pushed, and the workflow turned red on a TypeScript error that the local run never reported.
 
 Root cause: a bind-mounted `apps/native/node_modules` (or hoisted root `node_modules`) from a prior install can resolve a *different* `@types/*` version than a clean CI install does. The most common offender is `URL` typings — local `@types/node` may declare `URL.hostname` as writable, while a fresh CI install resolves a strict version where it's read-only. Other `lib.dom`-shaped APIs can drift the same way.
 
@@ -364,8 +365,9 @@ Fix when triaging:
 # Reproduce CI's clean install locally — this exposes the same @types resolution CI sees.
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery node:20-slim \
-  bash -lc "rm -rf node_modules && npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+  -w /repo \
+  node:20-slim \
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
 ```
 
 If this reproduces, fix the code so it doesn't depend on the lenient typing (e.g., for `URL`: rebuild the URL string from `u.protocol` + `u.hostname` + `u.port` + `u.pathname` + `u.search` + `u.hash` instead of assigning to `u.hostname = ...`). See `apps/native/brewery/src/auth/apiBaseUrl.ts` for the canonical example committed for exactly this reason. If it doesn't reproduce, the divergence is probably elsewhere (Node minor version, lockfile drift) — check the workflow logs for the exact npm version and tsc version.
@@ -423,19 +425,19 @@ docker stop brewery-metro     # --rm removes the container automatically
 # inspect current LAN IP (debug only — the helper already does this)
 ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit}'
 
-# verify versions in apps/native
+# verify versions in apps/native/brewery
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery \
+  -w /repo \
   node:20-slim \
-  bash -lc "./node_modules/.bin/expo install --check"
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check"
 
-# realign apps/native versions to SDK 54 expectations
+# realign apps/native/brewery versions to SDK 54 expectations
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery \
+  -w /repo \
   node:20-slim \
-  bash -lc "./node_modules/.bin/expo install --fix"
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --fix"
 
 # bring api back from a 502 (esbuild missing / Prisma stale)
 docker compose exec -T api npm install

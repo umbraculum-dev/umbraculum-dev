@@ -94,9 +94,9 @@ cd apps/native && npx eas-cli login && npx eas-cli init
 ```bash
 cd $REPO_ROOT
 ./scripts/check-packages-dist-up-to-date.sh
-# native-deps parity (container):
-docker run --rm -v "$PWD:/repo" -w /repo/apps/native node:20-slim \
-  bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+# native-deps parity (container — matches .github/workflows/native-deps.yml):
+docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
 npm run test -w @umbraculum/native
 ```
 

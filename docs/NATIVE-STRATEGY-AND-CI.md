@@ -166,7 +166,7 @@ Goals:
    - `packages/**`
    - root `package.json` / `package-lock.json`
    - the workflow file itself (`.github/workflows/native-deps.yml`)
-3. **Job:** `actions/checkout@v4` → single Docker step that runs in `node:20-slim`, mounts the repo into `/repo`, cd's into `/repo/apps/native/brewery`, and chains: `npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck`.
+3. **Job:** `actions/checkout@v5` → single Docker step that runs in `node:20-slim`, mounts the repo at `/repo` with `-w /repo`, runs root **`npm ci`**, then `cd apps/native/brewery && npx expo install --check && npm run typecheck`. (After RFC-0011 Wave 4A, `expo` is hoisted to the monorepo root — a brewery-only install no longer provides `./node_modules/.bin/expo`.)
 4. **Concurrency:** new runs on the same ref cancel in-flight runs (`concurrency.cancel-in-progress: true`) — keeps minutes lean on rapid pushes.
 5. **Timeout:** `timeout-minutes: 10`.
 
@@ -193,9 +193,9 @@ Run the same checks **locally before push**:
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native/brewery \
+  -w /repo \
   node:20-slim \
-  bash -lc "./node_modules/.bin/expo install --check && npm run typecheck"
+  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
 ```
 
 Document that one-liner next to your merge checklist. That is **professionally sufficient** if you always run it before touching native dependencies.
