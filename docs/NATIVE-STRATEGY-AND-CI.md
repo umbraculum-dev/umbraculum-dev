@@ -85,9 +85,9 @@ So “Mac-free” pushes the long-term path toward **EAS (or similar remote iOS 
 ## 5. EAS internal demo (July 2026)
 
 - **Demo host:** `https://demo.umbraculum.dev` — full API + web for walkthroughs and device smoke; **demo-only** ([`docs/design/demo-host-runbook.md`](design/demo-host-runbook.md)). Future customer-facing hosted product is **`cloud.umbraculum.dev`** ([`docs/design/cloud-hosted-product-track.md`](design/cloud-hosted-product-track.md)) — not this host.
-- **Config:** [`apps/native/eas.json`](../apps/native/eas.json) — `preview` profile builds an Android APK for internal distribution and bakes `EXPO_PUBLIC_*` URLs to **demo**; iOS uses EAS cloud builders (no local Mac required).
+- **Config:** [`apps/native/brewery/eas.json`](../apps/native/brewery/eas.json) — `preview` profile builds an Android APK for internal distribution and bakes `EXPO_PUBLIC_*` URLs to **demo**; iOS uses EAS cloud builders (no local Mac required).
 - **CI:** [`.github/workflows/native-eas-build.yml`](../.github/workflows/native-eas-build.yml) — manual `workflow_dispatch` only (requires `EXPO_TOKEN` secret). Not gated on every PR.
-- **EAS free tier (monthly quotas + queue):** Cloud builds are **not unlimited**. On the Free plan, Expo enforces a **per calendar month** allowance (typically **30 builds** — **up to 15 Android** and **up to 15 iOS** — plus separate **EAS Update** limits: **1,000 MAUs** and **100 GiB** bandwidth, all **monthly**). **1 concurrency** — only one build at a time. Queued time on the **free-tier queue** is **normal** and can last **well over an hour** before compile starts. That is **acceptable** — we run **occasional** demo APKs, not continuous CI. Agents must not treat a long **Waiting for build to complete** on GHA as a broken pipeline while Expo shows **Queued** / **Waiting to start**. Sources: [Expo billing FAQ](https://docs.expo.dev/billing/faq/), [EAS Free plan limits](https://expo.dev/changelog/2023-08-01-eas-free-plan-limits). Operator runbook: [`apps/native/EAS-DEMO-SETUP.md`](../apps/native/EAS-DEMO-SETUP.md) § “Expo free tier”.
+- **EAS free tier (monthly quotas + queue):** Cloud builds are **not unlimited**. On the Free plan, Expo enforces a **per calendar month** allowance (typically **30 builds** — **up to 15 Android** and **up to 15 iOS** — plus separate **EAS Update** limits: **1,000 MAUs** and **100 GiB** bandwidth, all **monthly**). **1 concurrency** — only one build at a time. Queued time on the **free-tier queue** is **normal** and can last **well over an hour** before compile starts. That is **acceptable** — we run **occasional** demo APKs, not continuous CI. Agents must not treat a long **Waiting for build to complete** on GHA as a broken pipeline while Expo shows **Queued** / **Waiting to start**. Sources: [Expo billing FAQ](https://docs.expo.dev/billing/faq/), [EAS Free plan limits](https://expo.dev/changelog/2023-08-01-eas-free-plan-limits). Operator runbook: [`apps/native/brewery/EAS-DEMO-SETUP.md`](../apps/native/brewery/EAS-DEMO-SETUP.md) § “Expo free tier”.
 - **GHA vs private repo:** While **umbraculum-dev** is **private**, prefer **local** `eas build` or monitor the build on expo.dev instead of holding **native-eas-build** open during a long queue — the runner bills for the whole poll. After the repo is **public**, manual GHA dispatch on `ubuntu-latest` is fine (standard runners: no minute charges; wall-clock wait for Expo workers is still long).
 - **Scope:** Brewery-only brew-day flows per [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) §5.
 - **Before first build:** Run `eas init` in `apps/native/`, set `expo.extra.eas.projectId` in `app.json` (replace placeholder), add `EXPO_TOKEN` to GitHub secrets. Demo host must be live — see [`docs/design/native-eas-demo-build-log.md`](design/native-eas-demo-build-log.md).
@@ -115,14 +115,14 @@ Optional enhancements (nice-to-have, not required for solo honesty):
 
 ## 6.1 Dev host autodetection (why auto-derive over DHCP / Tailscale / static IP)
 
-**Problem.** The laptop's LAN IP drifts (DHCP renewal, switching WiFi↔Ethernet, network change). With a hardcoded `EXPO_PUBLIC_API_BASE_URL` in `apps/native/app.json` and a hardcoded `REACT_NATIVE_PACKAGER_HOSTNAME` in the Metro command, every drift required two manual edits and a Metro restart. This is the LAN-IP pre-flight item from §5, made automatic.
+**Problem.** The laptop's LAN IP drifts (DHCP renewal, switching WiFi↔Ethernet, network change). With a hardcoded `EXPO_PUBLIC_API_BASE_URL` in `apps/native/brewery/app.json` and a hardcoded `REACT_NATIVE_PACKAGER_HOSTNAME` in the Metro command, every drift required two manual edits and a Metro restart. This is the LAN-IP pre-flight item from §5, made automatic.
 
 **Options considered.**
 
 | Option | What it does | Why not as primary |
 |---|---|---|
-| **A. Auto-derive from Metro `hostUri`** *(chosen)* | `apps/native/src/auth/apiBaseUrl.ts` reads `Constants.expoConfig.hostUri` at runtime and derives `http://<host>:18080` when no explicit URL is set. A `scripts/start-metro-dev.sh` helper detects the laptop's outbound LAN IP and passes it as `REACT_NATIVE_PACKAGER_HOSTNAME`. | — |
-| **Metro (SDK 54+)** | [`apps/native/metro.config.js`](../apps/native/metro.config.js) uses `getDefaultConfig` + `mergeConfig` (Expo monorepo defaults for `watchFolders` / `nodeModulesPaths`); only `resolver.extraNodeModules` is merged for React pinning and `brewery-recipes-ui`. `experiments.autolinkingModuleResolution` in [`app.config.js`](../apps/native/app.config.js). | Revisit if `expo doctor` / EAS still warn after dropping manual `disableHierarchicalLookup`. |
+| **A. Auto-derive from Metro `hostUri`** *(chosen)* | `apps/native/brewery/src/auth/apiBaseUrl.ts` reads `Constants.expoConfig.hostUri` at runtime and derives `http://<host>:18080` when no explicit URL is set. A `scripts/start-metro-dev.sh` helper detects the laptop's outbound LAN IP and passes it as `REACT_NATIVE_PACKAGER_HOSTNAME`. | — |
+| **Metro (SDK 54+)** | [`apps/native/brewery/metro.config.js`](../apps/native/brewery/metro.config.js) uses `getDefaultConfig` + `mergeConfig` (Expo monorepo defaults for `watchFolders` / `nodeModulesPaths`); only `resolver.extraNodeModules` is merged for React pinning and `brewery-recipes-ui`. `experiments.autolinkingModuleResolution` in [`app.config.js`](../apps/native/brewery/app.config.js). | Revisit if `expo doctor` / EAS still warn after dropping manual `disableHierarchicalLookup`. |
 | B. DHCP reservation on the router | Bind a fixed IP to the laptop's MAC in router admin; `app.json` stays pinned forever. | Only works on the home LAN. Useless on café/coworking WiFi or mobile hotspot. Assumes router admin access, which we cannot assume for all future contributors or future homes. |
 | C. Tailscale | Laptop + phone on a Tailscale tailnet; use a stable `100.x.x.x` or `<hostname>.tailnet.ts.net`. | Solves a bigger problem (works across any network, even when laptop & phone are not on the same LAN) at the cost of an always-on daemon and ~30–80ms latency per request. Sensible **secondary** option if we ever dev away from the home LAN regularly. |
 | D. Static IP on the laptop interface | Configure `wlo1`/`enp3s0` with a fixed IP outside the DHCP pool. | Fragile (collides with the router's DHCP pool when networks change) and same network-bound limitation as B. |
@@ -133,7 +133,7 @@ Optional enhancements (nice-to-have, not required for solo honesty):
 2. **No new daemons, no router config** — we own only the code; the solution must live there too.
 3. **Network-agnostic** — works on any network the laptop joins (LAN, café WiFi, hotspot) as long as the phone is on the same network as the laptop (which Expo Go already requires).
 4. **Reversible / overridable** — if `extra.EXPO_PUBLIC_API_BASE_URL` (in `app.json`) or `process.env.EXPO_PUBLIC_API_BASE_URL` is present, those still win. EAS staging/production builds and tunnel-mode dev keep working unchanged.
-5. **No commit per IP change** — `apps/native/app.json` stops carrying a personal LAN IP, which has been a source of merge noise in this repo (multiple commits across sessions just to swap `192.168.1.124` → `.115` → `.117`).
+5. **No commit per IP change** — `apps/native/brewery/app.json` stops carrying a personal LAN IP, which has been a source of merge noise in this repo (multiple commits across sessions just to swap `192.168.1.124` → `.115` → `.117`).
 
 **When to revisit A.** If we adopt `expo start --tunnel` regularly, `hostUri` becomes the ngrok tunnel URL and auto-derive would point at the tunnel rather than the laptop's API. At that point layer **C (Tailscale)** in as the dev-host-resolution mechanism for tunnel flows, keeping A for LAN flows. Until then, A is sufficient.
 
@@ -166,7 +166,7 @@ Goals:
    - `packages/**`
    - root `package.json` / `package-lock.json`
    - the workflow file itself (`.github/workflows/native-deps.yml`)
-3. **Job:** `actions/checkout@v4` → single Docker step that runs in `node:20-slim`, mounts the repo into `/repo`, cd's into `/repo/apps/native`, and chains: `npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck`.
+3. **Job:** `actions/checkout@v4` → single Docker step that runs in `node:20-slim`, mounts the repo into `/repo`, cd's into `/repo/apps/native/brewery`, and chains: `npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck`.
 4. **Concurrency:** new runs on the same ref cancel in-flight runs (`concurrency.cancel-in-progress: true`) — keeps minutes lean on rapid pushes.
 5. **Timeout:** `timeout-minutes: 10`.
 
@@ -193,7 +193,7 @@ Run the same checks **locally before push**:
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check && npm run typecheck"
 ```

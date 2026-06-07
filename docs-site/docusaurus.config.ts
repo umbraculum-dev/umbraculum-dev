@@ -27,6 +27,7 @@ const referenceAppsReadmes = [
   'web/README.md',
   'web/e2e/README.md',
   'native/README.md',
+  'native/brewery/README.md',
 ];
 const referenceServicesReadmes = [
   'api/README.md',

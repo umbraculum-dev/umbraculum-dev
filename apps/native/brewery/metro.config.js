@@ -3,7 +3,7 @@ const { getDefaultConfig } = require("expo/metro-config");
 const { mergeConfig } = require("metro-config");
 
 const projectRoot = __dirname;
-const workspaceRoot = path.resolve(projectRoot, "../..");
+const workspaceRoot = path.resolve(projectRoot, "../../..");
 const appNodeModules = path.join(projectRoot, "node_modules");
 const rootNodeModules = path.join(workspaceRoot, "node_modules");
 
@@ -25,7 +25,7 @@ const monorepoResolverOverrides = {
       "react/jsx-dev-runtime": path.join(rootNodeModules, "react", "jsx-dev-runtime.js"),
       scheduler: path.join(rootNodeModules, "scheduler"),
       "react-native": path.join(appNodeModules, "react-native"),
-      "@umbraculum/brewery-recipes-ui": path.join(workspaceRoot, "packages", "recipes-ui"),
+      "@umbraculum/brewery-recipes-ui": path.join(workspaceRoot, "packages", "verticals", "brewery", "recipes-ui"),
     },
   },
 };

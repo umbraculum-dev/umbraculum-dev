@@ -26,7 +26,7 @@ const SCAN_ROOTS = [
   "services/api/src",
   "packages",
   "apps/web/app",
-  "apps/native/src",
+  "apps/native/brewery/src",
 ] as const;
 
 const EXT = new Set([".ts", ".tsx"]);
@@ -74,7 +74,7 @@ function classifySlice(rel: string): string {
   if (rel.includes("packages/modules/module-sdk")) return "Packages (module-sdk)";
   if (rel.includes("packages/")) return "Packages";
   if (rel.includes("apps/web/app")) return "Apps (web)";
-  if (rel.includes("apps/native/src")) return "Apps (native)";
+  if (rel.includes("apps/native/brewery/src")) return "Apps (native)";
   return "Other";
 }
 
@@ -123,7 +123,7 @@ function detectAppCrossSegmentImports(files: string[]): InventoryRow[] {
   for (const file of files) {
     const rel = relative(REPO_ROOT, file);
     const isWebLocale = rel.includes("apps/web/app/[locale]/");
-    const isNativeModule = rel.includes("apps/native/src/modules/");
+    const isNativeModule = rel.includes("apps/native/brewery/src/modules/");
     const isWebRecipe = rel.includes("apps/web/app/[locale]/(brewery)/recipes/");
     if (!isWebLocale && !isNativeModule && !isWebRecipe) continue;
 

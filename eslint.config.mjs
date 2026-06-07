@@ -310,7 +310,7 @@ export default [
   // block.
   // -------------------------------------------------------------------
   {
-    files: ["apps/{web,native}/**/*.{ts,tsx}"],
+    files: ["apps/web/**/*.{ts,tsx}", "apps/native/brewery/**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "error",
       "@typescript-eslint/no-unsafe-member-access": "error",
@@ -533,13 +533,13 @@ export default [
   // web-recipe-cluster covers the recipes App Router tree (after water/edit elements).
   // -------------------------------------------------------------------
   {
-    files: ["apps/{web,native}/**/*.{ts,tsx}"],
+    files: ["apps/web/**/*.{ts,tsx}", "apps/native/brewery/**/*.{ts,tsx}"],
     plugins: { boundaries },
     settings: {
       "import/resolver": {
         typescript: {
           alwaysTryTypes: true,
-          project: ["apps/web/tsconfig.json", "apps/native/tsconfig.json"],
+          project: ["apps/web/tsconfig.json", "apps/native/brewery/tsconfig.json"],
         },
       },
       "boundaries/elements": [
@@ -604,12 +604,12 @@ export default [
         {
           type: "native-app-shared",
           pattern:
-            "apps/native/src/{auth,components,i18n,lib,media,navigation,screens,theme,types}/**",
+            "apps/native/brewery/src/{auth,components,i18n,lib,media,navigation,screens,theme,types}/**",
           mode: "full",
         },
         {
           type: "native-module-segment",
-          pattern: "apps/native/src/modules/*/**",
+          pattern: "apps/native/brewery/src/modules/*/**",
           mode: "file",
           capture: ["moduleCode"],
         },
@@ -801,7 +801,7 @@ export default [
   // Promoted to error 2026-06 (S closure epic) — see solid-client-safe-imports-spike.md.
   // -------------------------------------------------------------------
   {
-    files: ["apps/{web,native}/**/*.{ts,tsx}"],
+    files: ["apps/web/**/*.{ts,tsx}", "apps/native/brewery/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",

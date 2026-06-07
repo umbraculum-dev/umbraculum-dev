@@ -59,7 +59,7 @@ packages/
 | Path | npm name | What it is | Notable consumes |
 |---|---|---|---|
 | `apps/web/` | `@umbraculum/web` | Next.js + React + Tamagui — the **member-facing web application** (workspace web UI). Platform shared layout: `app/_shared-layout/`. Route groups: `(auth)/`, `(platform-layout)/`, `(brewery)/`, canonical `(pim|mrp|crp|automation)/`, cross-workspace `platform/`. | `@umbraculum/{ui, brewery-recipes-ui, navigation, i18n-react, api-client, media, brewery-media-assets, contracts, …}` |
-| `apps/native/` | `@umbraculum/native` | Expo + React Native + Tamagui — reference brewery brew-day app (single app today; multi-app target in RFC-0011 Wave 4). | Same horizontal + vertical packages as web where applicable |
+| `apps/native/brewery/` | `@umbraculum/native-brewery` | Expo + React Native + Tamagui — reference brewery brew-day app (RFC-0011 Wave 4). Umbrella: [`apps/native/README.md`](../apps/native/README.md). | Same horizontal + vertical packages as web where applicable |
 | `apps/web/e2e/` | (sub-workspace) | Playwright E2E — folder taxonomy: `platform/`, `canonical/`, `verticals/brewery/` (RFC-0011 Wave 5). | Runs against live stack |
 
 **Web app tree (spatial map):**

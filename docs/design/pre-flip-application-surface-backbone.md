@@ -16,7 +16,7 @@
 | **Module routes (web)** | `(brewery)/`, `(pim)/`, … under `[locale]/` | **Mostly fixed** after fork-cleanliness Part B (recipes consolidation) | Keep β; enforce module-local `_components` / `_lib` per route group |
 | **Shared layout helpers (web)** | **`app/_shared-layout/`** (platform) + `(brewery)/{_components,_lib}/` | **Done (Wave 1 + 3f, 2026-06-07)** | Keep; WS5 `web-platform-shared-layout` |
 | **Platform pages (web)** | `(platform-layout)/{ai,accessibility,about,…}` | **Done (Wave 3f, 2026-06-07)** | Keep grouping; `platform/` admin unchanged |
-| **Native apps** | Single `apps/native/` Expo workspace | Name implies one app; ERP/manufacturing needs PIM scanner, warehouse handheld, brew-day, … | Multi-app under `apps/native/<app-code>/` + shared `@umbraculum/native-shell` package |
+| **Native apps** | `apps/native/brewery/` + umbrella README | **Partial (Wave 4A, 2026-06-07)** | Multi-app under `apps/native/<app-code>/` + `@umbraculum/native-shell` |
 | **E2E** | `platform/`, `canonical/`, `verticals/brewery/` | **Done (Wave 5, 2026-06-07)** | Mirror module taxonomy under `e2e/{platform,canonical,verticals}/` |
 | **Packages (on disk)** | Flat `packages/*` (19 siblings) | Horizontal, SDK, canonical contracts, and brewery vertical at same level; folder names disagree with npm names | On-disk tiers + align paths with npm + split brewery out of platform packages |
 | **Packages (content)** | Brewery DTOs in `@umbraculum/contracts`; `BrewCheckbox` in `@umbraculum/ui` | Platform packages contain vertical logic/content — same class of bug as `app/_components` | `@umbraculum/brewery-contracts`; purge vertical leakage from platform packages |
@@ -467,7 +467,7 @@ flowchart TB
 | **3d** | Package-layer eslint boundaries + spike doc | 1–2d | **Done (2026-06-07)** |
 | **3e** | Colocate brewery API services — move `src/services/recipeWaterHub*`, `recipeWaterCompute/`, `domain/waterCalc/`, `domain/recipeAnalysis/` under `modules/brewery/services/` (§6.8) | 2–3d | **Done (2026-06-06)** — Phase 1; Phase 2 flat orchestrators deferred |
 | **3f** | **Shared layout nomenclature + path rename:** `_shared-layout/`, `(platform-layout)/`, `web-platform-shared-layout`; glossary + BUILDING-YOUR-VERTICAL decision tree | 1–2d | **Done (2026-06-07)** |
-| **4** | `@umbraculum/native-shell` + `apps/native/brewery/` | 3–5d | Optional pre-flip — scaffold second app README |
+| **4** | `@umbraculum/native-shell` + `apps/native/brewery/` | 3–5d | **Partial (2026-06-07)** — brewery app re-homed; native-shell extraction Wave 4B |
 | **5** | E2E folder taxonomy | 1d | No — **Done (2026-06-07)** |
 | **6** | Docs + eslint + module READMEs | 1d | Yes for changed waves — **Done (2026-06-07)** |
 

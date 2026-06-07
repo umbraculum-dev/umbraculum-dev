@@ -13,7 +13,7 @@ This repo prefers running Node/npm in containers. If you do run Expo tooling on 
 
 ## Native baseline (Expo SDK 54 + Expo Go)
 
-These pinned versions are an **ABI requirement** of the Expo Go binary on the device. Any drift produces a black/blank screen on first render (see "Troubleshooting" below). Keep `apps/native/package.json` matching:
+These pinned versions are an **ABI requirement** of the Expo Go binary on the device. Any drift produces a black/blank screen on first render (see "Troubleshooting" below). Keep `apps/native/brewery/package.json` matching:
 
 | Package | Pinned version | Why |
 | --- | --- | --- |
@@ -30,7 +30,7 @@ Verify at any time:
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check"
 ```
@@ -80,7 +80,7 @@ docker run --rm -v "$REPO_ROOT:/repo" -w /repo/apps/web node:20-slim bash -lc "n
 
 ### 4.0) Start Metro (recommended: helper script)
 
-Use `./scripts/start-metro-dev.sh`. It auto-detects the laptop's outbound LAN IP, removes any stale `brewery-metro` container, and starts Metro in Docker with the right `REACT_NATIVE_PACKAGER_HOSTNAME`. The app then auto-derives its API base URL from Metro's bundle host at runtime — so you no longer edit `apps/native/app.json` when your IP drifts. See `docs/NATIVE-STRATEGY-AND-CI.md` §5.1 for the rationale.
+Use `./scripts/start-metro-dev.sh`. It auto-detects the laptop's outbound LAN IP, removes any stale `brewery-metro` container, and starts Metro in Docker with the right `REACT_NATIVE_PACKAGER_HOSTNAME`. The app then auto-derives its API base URL from Metro's bundle host at runtime — so you no longer edit `apps/native/brewery/app.json` when your IP drifts. See `docs/NATIVE-STRATEGY-AND-CI.md` §5.1 for the rationale.
 
 ```bash
 cd $REPO_ROOT
@@ -117,7 +117,7 @@ docker run -d --rm --name brewery-metro \
   -p 19000:19000 -p 19001:19001 -p 19002:19002 -p 8081:8081 \
   -e REACT_NATIVE_PACKAGER_HOSTNAME="${LAN_IP}" \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo start --lan -c"
 ```
@@ -127,14 +127,14 @@ docker run -d --rm --name brewery-metro \
 
 ### 4.3) Pinning a specific URL (override the auto-derive)
 
-The auto-derive in `apps/native/src/auth/apiBaseUrl.ts` is bypassed when **any** of these is set, in this priority order:
+The auto-derive in `apps/native/brewery/src/auth/apiBaseUrl.ts` is bypassed when **any** of these is set, in this priority order:
 
-1. `apps/native/app.json` → `expo.extra.EXPO_PUBLIC_API_BASE_URL` (per-config pin; checked in to the repo for EAS staging/production builds via `app.config.ts` / `eas.json`).
+1. `apps/native/brewery/app.json` → `expo.extra.EXPO_PUBLIC_API_BASE_URL` (per-config pin; checked in to the repo for EAS staging/production builds via `app.config.ts` / `eas.json`).
 2. `process.env.EXPO_PUBLIC_API_BASE_URL` (per-session env override; used for tunnel mode, integration tests, ad-hoc pinning).
 3. Auto-derive from Metro `hostUri` (the new default; works on any LAN).
 4. `DEFAULT_API_BASE_URL` in `apiBaseUrl.ts` (last resort; only hit by real builds without Metro and no override).
 
-The same logic applies to `EXPO_PUBLIC_MEDIA_BASE_URL` via `apps/native/src/media/mediaBaseUrl.ts`, which delegates to `getApiBaseUrl()` when no explicit media URL is set.
+The same logic applies to `EXPO_PUBLIC_MEDIA_BASE_URL` via `apps/native/brewery/src/media/mediaBaseUrl.ts`, which delegates to `getApiBaseUrl()` when no explicit media URL is set.
 
 **When to use overrides:**
 
@@ -145,8 +145,8 @@ The same logic applies to `EXPO_PUBLIC_MEDIA_BASE_URL` via `apps/native/src/medi
 
 `apps/native` reads:
 
-- `EXPO_PUBLIC_API_BASE_URL` (used by native auth + API calls; see `apps/native/src/auth/apiBaseUrl.ts`)
-- `EXPO_PUBLIC_MEDIA_BASE_URL` (used by `RemoteImage`; see `apps/native/src/media/mediaBaseUrl.ts`)
+- `EXPO_PUBLIC_API_BASE_URL` (used by native auth + API calls; see `apps/native/brewery/src/auth/apiBaseUrl.ts`)
+- `EXPO_PUBLIC_MEDIA_BASE_URL` (used by `RemoteImage`; see `apps/native/brewery/src/media/mediaBaseUrl.ts`)
 
 For local dev on Expo Go you typically **leave both unset** — `apiBaseUrl.ts` auto-derives the host from Metro's `hostUri` (set by the helper script via `REACT_NATIVE_PACKAGER_HOSTNAME`), and `mediaBaseUrl.ts` delegates to it. See §4.3 for when to override.
 
@@ -165,7 +165,7 @@ Platform-specific notes:
   - Test a known asset in a device browser: `https://<your-domain>/media/yeast/dilution-1-100.<hash>.png`
   - In-app: open Yeast page → expand “Manual cell count methodology” → both images should render.
 - **Tabs icons**:
-  - Tab icons are defined in `apps/native/src/navigation/AppNavigator.tsx`.
+  - Tab icons are defined in `apps/native/brewery/src/navigation/AppNavigator.tsx`.
   - If you want non-emoji icons for production, add an icon library (e.g. `@expo/vector-icons`) and update `tabBarIcon`.
 
 ## Device testing (Expo Go)
@@ -256,14 +256,14 @@ Cause: `react-native` ships a renderer that requires an **exact** React version 
 - `react-native-svg` `15.12.1`
 - `expo` `~54.0.34`
 
-If `apps/native/package.json` drifts above those (e.g. because `apps/web` pinned a newer React and someone aligned native to match), the bundle compiles fine but crashes on the first native commit with this exact error.
+If `apps/native/brewery/package.json` drifts above those (e.g. because `apps/web` pinned a newer React and someone aligned native to match), the bundle compiles fine but crashes on the first native commit with this exact error.
 
 Fix:
 
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --fix"
 ```
@@ -275,12 +275,12 @@ Then restart Metro with `-c` and **rescan the QR**.
 
 ### `Incompatible React versions: react 19.1.0 vs react-dom 19.2.4` (Metro web preview at `:8081/` is blank)
 
-Cause: when the native bundle is compiled in **web target** (visiting `http://<LAN_IP>:8081/` in a browser), it pulls in `react-dom`. `react-dom` is not used by the device build, so `apps/native/package.json` historically didn't pin it — npm workspace hoisting then resolves `react-dom` from the **monorepo root** (typically the version `apps/web` pinned). When `apps/native` is on an older React (because Expo Go forced the downgrade), root's `react-dom` is newer, and the browser crashes on this exact-match check.
+Cause: when the native bundle is compiled in **web target** (visiting `http://<LAN_IP>:8081/` in a browser), it pulls in `react-dom`. `react-dom` is not used by the device build, so `apps/native/brewery/package.json` historically didn't pin it — npm workspace hoisting then resolves `react-dom` from the **monorepo root** (typically the version `apps/web` pinned). When `apps/native` is on an older React (because Expo Go forced the downgrade), root's `react-dom` is newer, and the browser crashes on this exact-match check.
 
-Fix: pin `react-dom` in `apps/native/package.json` to **exactly** the same version as `react`:
+Fix: pin `react-dom` in `apps/native/brewery/package.json` to **exactly** the same version as `react`:
 
 ```jsonc
-// apps/native/package.json → "dependencies"
+// apps/native/brewery/package.json → "dependencies"
 "react": "19.1.0",
 "react-dom": "19.1.0",
 ```
@@ -290,7 +290,7 @@ Then reinstall (inside a container to keep host-side Node out of the way) and re
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "npm install"
 ```
@@ -317,7 +317,7 @@ Whenever Metro logs version warnings on startup, do not ignore them on physical 
 ```bash
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check"
 ```
@@ -343,7 +343,7 @@ Fix:
 ./scripts/build-packages-in-docker.sh
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native node:20-slim \
+  -w /repo/apps/native/brewery node:20-slim \
   bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
 # exit 0 means dist drift is gone
 ```
@@ -364,11 +364,11 @@ Fix when triaging:
 # Reproduce CI's clean install locally — this exposes the same @types resolution CI sees.
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native node:20-slim \
+  -w /repo/apps/native/brewery node:20-slim \
   bash -lc "rm -rf node_modules && npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
 ```
 
-If this reproduces, fix the code so it doesn't depend on the lenient typing (e.g., for `URL`: rebuild the URL string from `u.protocol` + `u.hostname` + `u.port` + `u.pathname` + `u.search` + `u.hash` instead of assigning to `u.hostname = ...`). See `apps/native/src/auth/apiBaseUrl.ts` for the canonical example committed for exactly this reason. If it doesn't reproduce, the divergence is probably elsewhere (Node minor version, lockfile drift) — check the workflow logs for the exact npm version and tsc version.
+If this reproduces, fix the code so it doesn't depend on the lenient typing (e.g., for `URL`: rebuild the URL string from `u.protocol` + `u.hostname` + `u.port` + `u.pathname` + `u.search` + `u.hash` instead of assigning to `u.hostname = ...`). See `apps/native/brewery/src/auth/apiBaseUrl.ts` for the canonical example committed for exactly this reason. If it doesn't reproduce, the divergence is probably elsewhere (Node minor version, lockfile drift) — check the workflow logs for the exact npm version and tsc version.
 
 ### `error: unable to unlink old 'packages/.../dist/...': Permission denied` after running the build script
 
@@ -426,14 +426,14 @@ ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit
 # verify versions in apps/native
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check"
 
 # realign apps/native versions to SDK 54 expectations
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --fix"
 

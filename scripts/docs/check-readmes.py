@@ -64,6 +64,7 @@ FULL_SCOPE_README_PATHS = [
     "apps/web/README.md",
     "apps/web/e2e/README.md",
     "apps/native/README.md",
+    "apps/native/brewery/README.md",
     "services/api/README.md",
     "packages/modules/ai-tool-sdk/README.md",
     "packages/modules/i18n-keys/README.md",

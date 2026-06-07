@@ -16,6 +16,7 @@ export const referenceSidebarItems = [
       {type: 'link', label: 'apps/web', href: '/reference/apps/web/'},
       {type: 'link', label: 'apps/web/e2e', href: '/reference/apps/web/e2e/'},
       {type: 'link', label: 'apps/native', href: '/reference/apps/native/'},
+      {type: 'link', label: 'apps/native/brewery', href: '/reference/apps/native/brewery/'},
     ],
   },
   {

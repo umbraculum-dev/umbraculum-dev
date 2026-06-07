@@ -13,6 +13,7 @@
   },
   "workspaces": [
     "apps/*",
+    "apps/native/*",
     "services/*",
     "packages/platform/*",
     "packages/modules/*",

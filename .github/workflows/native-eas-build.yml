@@ -43,10 +43,10 @@ jobs:
 
       - name: EAS build (Android)
         if: inputs.platform == 'android' || inputs.platform == 'all'
-        working-directory: apps/native
+        working-directory: apps/native/brewery
         run: eas build --platform android --profile ${{ inputs.profile }} --non-interactive
 
       - name: EAS build (iOS)
         if: inputs.platform == 'ios' || inputs.platform == 'all'
-        working-directory: apps/native
+        working-directory: apps/native/brewery
         run: eas build --platform ios --profile ${{ inputs.profile }} --non-interactive

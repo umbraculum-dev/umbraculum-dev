@@ -480,7 +480,7 @@ When adding or editing `.github/workflows/*.yml`:
   may log *Waiting for build to complete* while Expo shows *Waiting to start*.
   **Private repo:** do not leave this workflow running during a long queue
   (minute burn). **Public repo:** manual dispatch is fine on `ubuntu-latest`.
-  See [`apps/native/EAS-DEMO-SETUP.md`](apps/native/EAS-DEMO-SETUP.md) § “Expo
+  See [`apps/native/brewery/EAS-DEMO-SETUP.md`](apps/native/brewery/EAS-DEMO-SETUP.md) § “Expo
   free tier”.
 
 ## ci-parity manifest / version changes (agent mandatory — do not skip)

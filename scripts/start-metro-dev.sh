@@ -66,7 +66,7 @@ docker run -d --rm \
   -p 19000:19000 -p 19001:19001 -p 19002:19002 -p 8081:8081 \
   -e REACT_NATIVE_PACKAGER_HOSTNAME="${LAN_IP}" \
   -v "${REPO_ROOT}:/repo" \
-  -w /repo/apps/native \
+  -w /repo/apps/native/brewery \
   node:20-slim \
   bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo start --lan -c"
 

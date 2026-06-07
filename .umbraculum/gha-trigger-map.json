@@ -67,7 +67,7 @@
         "packages/modules/module-sdk/**",
         "packages/*-contracts/**",
         "apps/web/package.json",
-        "apps/native/package.json",
+        "apps/native/brewery/package.json",
         "services/api/package.json",
         "packages/platform/rendering/package.json",
         "scripts/dogfood-npm-smoke.sh",

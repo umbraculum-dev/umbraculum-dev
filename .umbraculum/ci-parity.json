@@ -57,7 +57,7 @@
       "workspaces": [
         { "path": "services/api", "mode": "npm" },
         { "path": "services/api/prisma", "mode": "tsc" },
-        { "path": "apps/native", "mode": "npm" },
+        { "path": "apps/native/brewery", "mode": "npm" },
         { "path": "apps/web/e2e", "mode": "npm" },
         { "path": "packages/platform/api-client", "mode": "npm" },
         { "path": "packages/modules/automation-contracts", "mode": "npm" },

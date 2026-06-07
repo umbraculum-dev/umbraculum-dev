@@ -45,6 +45,6 @@ jobs:
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/repo" \
-            -w /repo/apps/native \
+            -w /repo/apps/native/brewery \
             node:20-slim \
             bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
