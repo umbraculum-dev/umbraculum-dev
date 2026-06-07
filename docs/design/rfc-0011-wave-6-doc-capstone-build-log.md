@@ -32,3 +32,16 @@
 - [backbone §9](pre-flip-application-surface-backbone.md) — Wave 6 Done
 - [docs-site/reference-sidebar-items.ts](../../docs-site/reference-sidebar-items.ts) — brewery-contracts, brewery-i18n, brewery-media-assets
 - [apps/web/README.md](../../apps/web/README.md), [apps/native/README.md](../../apps/native/README.md) — layering / multi-app target
+
+## Post W6+W5 sequencing (2026-06-07)
+
+| Track | Status | Next action |
+|-------|--------|-------------|
+| **Wave 4** (`@umbraculum/native-shell`, `apps/native/brewery/`) | Deferred | Reconsider after E2E taxonomy stable |
+| **Wave 3e Phase 2** (flat orchestrators under `services/api/src/services/`) | Deferred | Opportunistic refactor |
+| **umbraculum-website** extraction | Deferred | Parallel track per backbone |
+| **Backlog** (cross-module `(brewery)/_components`, `api-client/src/brewery/`) | Known gaps | Document-only until dedicated wave |
+| **Rule 63** b2c/b2b filename prefixes | Deferred | Optional follow-on PR |
+| **Git push** | Not done | `master` is 7 commits ahead of `origin/master` (3a–3d + W6 + W5) — push when ready |
+
+**Pre-flip §12 sign-off:** criteria 2, 5, 7 **Met**; 1, 3, 4, 6 **Partial** — honest gaps documented above and in backbone §12 audit table.
