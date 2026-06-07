@@ -20,7 +20,7 @@ Both public static surfaces use the same hosting pattern as RFC-0005:
 
 | Site | Domain (target) | Preview URL (pre-flip) | Build command (tuned) |
 |------|-----------------|------------------------|------------------------|
-| **Brochure** | `umbraculum.dev` | `https://umbraculum-dev-website.umbraculum-dev.workers.dev` | `npm run build` (repo [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure)) |
+| **Brochure** | `umbraculum.dev` | `https://umbraculum-brochure.umbraculum-dev.workers.dev` | `npm run build` (repo [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure)) |
 | **Docs** | `docs.umbraculum.dev` | `https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev` | `npm run build -w @umbraculum/docs-site` |
 
 Cloudflare runs `npm clean-install` before your build command — **do not** repeat `npm ci` in the build command (saves ~3 min per deploy).
@@ -90,7 +90,7 @@ Apply in each Worker → **Settings → Builds** after first green deploy:
 
 **Smoke-tested preview URLs (2026-05-30):**
 
-- Brochure: https://umbraculum-dev-website.umbraculum-dev.workers.dev
+- Brochure: https://umbraculum-brochure.umbraculum-dev.workers.dev
 - Docs: https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev
 
 Custom domains (`umbraculum.dev`, `docs.umbraculum.dev`) wait until flip day.

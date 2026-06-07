@@ -12,7 +12,7 @@
 
 ## 0. Before you start
 
-**Automated prep status (2026-05-30):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` / `finance@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-dev-website`, `umbraculum-dev-docs-docusaurus`) ✅; forum infra docs + `infra/community-forum/` ✅; Contabo VPS 10 ordered ⏳ (awaiting activation). **Remaining before §1:** donation channel accounts (2d) ✅; forum live on VPS (maintainer).
+**Automated prep status (2026-05-30):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` / `finance@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-brochure`, `umbraculum-dev-docs-docusaurus`) ✅; forum infra docs + `infra/community-forum/` ✅; Contabo VPS 10 ordered ⏳ (awaiting activation). **Remaining before §1:** donation channel accounts (2d) ✅; forum live on VPS (maintainer).
 
 | Gate | Doc |
 |------|-----|
@@ -66,7 +66,7 @@ Draft GitHub Release notes from [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA
 | `public/support/index.html` | Same meta removal |
 | Footer “Pre-release … noindex” lines | Remove or reword |
 
-Rebuild: `npm run build` in [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) → Cloudflare redeploys brochure Worker (`umbraculum-dev-website`).
+Rebuild: `npm run build` in [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) → Cloudflare redeploys brochure Worker (`umbraculum-brochure`).
 
 ### 3.2 Docs site (`docs-site`)
 
