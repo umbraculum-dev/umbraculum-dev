@@ -3,7 +3,7 @@
 Brewery-vertical shared PNG assets and generated manifest (hashed public paths under `/media/**`).
 
 > [!NOTE]
-> Part of [Umbraculum](../../../../README.md). The loader API and empty platform manifest live in [`@umbraculum/media`](../../platform/media/README.md).
+> Part of [Umbraculum](../../../../README.md). The loader API and empty platform manifest live in [`@umbraculum/media`](../../../platform/media/README.md).
 
 ## What this is
 
@@ -33,4 +33,4 @@ import { getMediaUrl, type MediaAssetKey } from "@umbraculum/brewery-media-asset
 ## Further reading
 
 - [`docs/CODING-STANDARDS.md`](../../../../docs/CODING-STANDARDS.md) — shared media policy
-- [`@umbraculum/media`](../../platform/media/README.md)
+- [`@umbraculum/media`](../../../platform/media/README.md)

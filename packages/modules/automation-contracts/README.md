@@ -3,7 +3,7 @@
 Phase A surface of the canonical `automation` module: typed Modbus mailbox spec, adapter SDK contract, and contract-version handshake.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 4 (2026-05-19) per [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision C; see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md). The sister repo (`brewery-alarms-tanks-supervisor`) emits JSON-only mailbox artifacts and does not import this package, so the rename was doc-only on the sister side.
+> Part of [Umbraculum](../../../README.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 4 (2026-05-19) per [RFC-0002](../../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision C; see [`docs/design/brewery-scope-migration-plan.md`](../../../docs/design/brewery-scope-migration-plan.md). The sister repo (`brewery-alarms-tanks-supervisor`) emits JSON-only mailbox artifacts and does not import this package, so the rename was doc-only on the sister side.
 
 ## Install
 
@@ -11,11 +11,11 @@ Phase A surface of the canonical `automation` module: typed Modbus mailbox spec,
 npm install @umbraculum/automation-contracts@^0.0.1
 ```
 
-Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+Public alpha — see [third-party-module.md](../../../docs/modules/contribute/third-party-module.md).
 
 ## What this is
 
-MIT-licensed contract types for the canonical `automation` module ([`docs/design/canonical-automation-module-surface.md`](../../docs/design/canonical-automation-module-surface.md), Accepted 2026-05-19).
+MIT-licensed contract types for the canonical `automation` module ([`docs/design/canonical-automation-module-surface.md`](../../../docs/design/canonical-automation-module-surface.md), Accepted 2026-05-19).
 
 Four exported surfaces:
 
@@ -65,7 +65,7 @@ Never hand-edit `data/mailbox.json`. Bump `CONTRACT_VERSION` in `src/version.ts`
 
 ## Build / test / typecheck (local)
 
-From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):
+From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):
 
 - **Build**: `npm run build -w @umbraculum/automation-contracts`
 - **Test**: `npm run test -w @umbraculum/automation-contracts`
@@ -73,8 +73,8 @@ From repo root (run Node/npm inside the project container, not on the host — s
 
 ## Cross-references
 
-- [`docs/design/canonical-automation-module-surface.md`](../../docs/design/canonical-automation-module-surface.md) — Phase A entry checklist, B1/B2/B3 resolutions
-- [`docs/design/openplc-mailbox-emitter-pr-shape.md`](../../docs/design/openplc-mailbox-emitter-pr-shape.md) — sister-repo PR shape for the M2 emitter
-- [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) §7.2 — automation module surface origin
-- [`docs/rfcs/0002-canonical-module-physical-layout.md`](../../docs/rfcs/0002-canonical-module-physical-layout.md) — `packages/<code>-contracts/` placement rule
-- [`packages/modules/module-sdk/`](../../modules/module-sdk/) — peer SDK package; this package will be referenced from `registerModule({ code: "automation", ... })` when Phase B lands
+- [`docs/design/canonical-automation-module-surface.md`](../../../docs/design/canonical-automation-module-surface.md) — Phase A entry checklist, B1/B2/B3 resolutions
+- [`docs/design/openplc-mailbox-emitter-pr-shape.md`](../../../docs/design/openplc-mailbox-emitter-pr-shape.md) — sister-repo PR shape for the M2 emitter
+- [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) §7.2 — automation module surface origin
+- [`docs/rfcs/0002-canonical-module-physical-layout.md`](../../../docs/rfcs/0002-canonical-module-physical-layout.md) — `packages/<code>-contracts/` placement rule
+- [`packages/modules/module-sdk/`](../module-sdk/) — peer SDK package; this package will be referenced from `registerModule({ code: "automation", ... })` when Phase B lands

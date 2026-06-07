@@ -41,13 +41,14 @@
     },
     {
       "id": "lint",
-      "command": "npm run lint",
-      "needsRootInstall": true
+      "needsRootInstall": true,
+      "command": "npm run build:packages && npm run lint"
     },
     {
       "id": "typecheck",
       "needsRootInstall": true,
       "needsNestedInstall": true,
+      "command": "npm run build:packages",
       "workspaces": [
         { "path": "services/api", "mode": "npm" },
         { "path": "services/api/prisma", "mode": "tsc" },

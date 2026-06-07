@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars -- mechanical SOLID page split; trim imports in follow-up */
 
 import { View } from "tamagui";
 

@@ -3,7 +3,7 @@
 Brewery-vertical locale bundles (`en.json`, `it.json`) for the reference vertical.
 
 > [!NOTE]
-> Part of [Umbraculum](../../../../README.md). Platform + canonical namespaces live in [`@umbraculum/i18n`](../../platform/i18n/README.md); this package holds brewery-only roots (`recipes`, `equipment`, `inventory`, `waterHub`, `waterProfiles`, `salts`, `math`, `devDashboard`).
+> Part of [Umbraculum](../../../../README.md). Platform + canonical namespaces live in [`@umbraculum/i18n`](../../../platform/i18n/README.md); this package holds brewery-only roots (`recipes`, `equipment`, `inventory`, `waterHub`, `waterProfiles`, `salts`, `math`, `devDashboard`).
 
 ## What this is
 
@@ -35,4 +35,4 @@ import { en } from "@umbraculum/brewery-i18n";
 ## Further reading
 
 - [`docs/I18N-AUDIT.md`](../../../../docs/I18N-AUDIT.md)
-- [`@umbraculum/i18n`](../../platform/i18n/README.md)
+- [`@umbraculum/i18n`](../../../platform/i18n/README.md)
