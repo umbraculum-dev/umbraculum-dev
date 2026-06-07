@@ -27,7 +27,20 @@ if npm view "${PKG_NAME}@${VERSION}" version >/dev/null 2>&1; then
   exit 0
 fi
 
-npm run build -w @umbraculum/brewery-api-client
+ensure_brewery_api_client_dist() {
+  local dist="${PKG_DIR}/dist"
+  if [ -f "${dist}/index.js" ] && [ -f "${dist}/index.d.ts" ] && [ -f "${dist}/index.cjs" ]; then
+    if [ ! -w "${dist}/index.js" ]; then
+      echo "dist/ exists but is not writable (usually root-owned after ci-parity Docker)."
+      echo "Publishing existing dist/ artifacts without rebuild."
+      echo "To refresh later: sudo chown -R \$(id -un):\$(id -gn) ${dist} && npm run build -w @umbraculum/brewery-api-client"
+      return 0
+    fi
+  fi
+  npm run build -w @umbraculum/brewery-api-client
+}
+
+ensure_brewery_api_client_dist
 
 cp "${PKG_DIR}/package.json" /tmp/brewery-api-client-package.json.bak
 jq '.dependencies["@umbraculum/api-client"] = "^0.0.1" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
