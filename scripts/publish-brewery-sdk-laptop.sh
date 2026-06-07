@@ -37,12 +37,31 @@ publish_pkg() {
   fi
 }
 
+verify_on_registry() {
+  local label="$1"
+  local version="$2"
+  if [ "${DRY_RUN:-0}" = "1" ]; then
+    return 0
+  fi
+  for i in 1 2 3 4 5; do
+    if npm view "${label}@${version}" version >/dev/null 2>&1; then
+      echo "OK: ${label}@$(npm view "${label}@${version}" version) on registry"
+      return 0
+    fi
+    echo "  ${label}: not visible yet (attempt ${i}/5), sleeping 3s…"
+    sleep 3
+  done
+  echo "FAIL: ${label}@${version} not found on registry after publish"
+  exit 1
+}
+
 echo "1. @umbraculum/brewery-contracts"
 cp packages/verticals/brewery/contracts/package.json /tmp/brewery-contracts-package.json.bak
 jq '.dependencies["@umbraculum/contracts"] = "^0.0.1"' \
   packages/verticals/brewery/contracts/package.json > /tmp/brewery-contracts-package.json
 mv /tmp/brewery-contracts-package.json packages/verticals/brewery/contracts/package.json
 publish_pkg packages/verticals/brewery/contracts "@umbraculum/brewery-contracts"
+verify_on_registry "@umbraculum/brewery-contracts" "$(jq -r .version packages/verticals/brewery/contracts/package.json)"
 mv /tmp/brewery-contracts-package.json.bak packages/verticals/brewery/contracts/package.json
 
 echo "2. Rewrite brewery-api-client deps for registry tarball"
@@ -53,6 +72,7 @@ mv /tmp/brewery-api-client-package.json packages/verticals/brewery/api-client/pa
 
 echo "3. @umbraculum/brewery-api-client"
 publish_pkg packages/verticals/brewery/api-client "@umbraculum/brewery-api-client"
+verify_on_registry "@umbraculum/brewery-api-client" "$(jq -r .version packages/verticals/brewery/api-client/package.json)"
 mv /tmp/brewery-api-client-package.json.bak packages/verticals/brewery/api-client/package.json
 
 echo "OK: brewery-contracts + brewery-api-client publish step complete"

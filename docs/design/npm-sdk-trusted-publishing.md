@@ -46,7 +46,13 @@ npx @umbraculum/ci-parity run --jobs sdk-publish-prep
 ./scripts/publish-brewery-sdk-laptop.sh
 ```
 
-Then configure trusted publishers (workflow filename **`publish-contracts-api-client.yml`**, not `publish-sdk-batch.yml`):
+If `brewery-contracts` is on the registry but `brewery-api-client` 404s (second publish failed or ran before contracts propagated), republish only the client:
+
+```bash
+./scripts/publish-brewery-api-client-laptop.sh
+```
+
+Configure OIDC trust **after each package exists on npm** (trusted publisher exchange 404s for unknown package names):
 
 ```bash
 REPO="umbraculum-dev/umbraculum-dev"
