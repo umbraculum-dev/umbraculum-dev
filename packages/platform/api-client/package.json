@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/api-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Typed API client with pluggable auth strategies (cookie sessions for web; bearer tokens for native + Node). The transport layer between any client and services/api. Returned payloads are runtime-validated by parsers from @umbraculum/contracts. Platform-classified per sub-plan #9 §1.1 — no brewery-domain logic.",
   "license": "MIT",
   "type": "module",

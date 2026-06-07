@@ -49,7 +49,18 @@ npx @umbraculum/ci-parity run --jobs sdk-publish-prep
 If `brewery-contracts` is on the registry but `brewery-api-client` 404s (second publish failed or ran before contracts propagated), republish only the client:
 
 ```bash
+cd ~/dkprojects/rfapps/umbraculum-dev
 ./scripts/publish-brewery-api-client-laptop.sh
+```
+
+If dogfood fails with `ERR_PACKAGE_PATH_NOT_EXPORTED` for `@umbraculum/api-client/transport`, the registry still has `@0.0.1` (pre–`./transport` export). Publish platform client `@0.0.2`, then republish brewery client `@0.0.2`:
+
+```bash
+cd ~/dkprojects/rfapps/umbraculum-dev
+git pull
+./scripts/publish-api-client-laptop.sh
+./scripts/publish-brewery-api-client-laptop.sh
+./scripts/dogfood-npm-smoke.sh
 ```
 
 Configure OIDC trust **after each package exists on npm** (trusted publisher exchange 404s for unknown package names):
@@ -187,4 +198,4 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 | 2026-05-29 | `sdk-batch-v0.1.1` GHA OIDC publish | **Green** — patch bump to `0.1.1` / `0.0.2` |
 | — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published manually |
 | 2026-06-02 | `publish-contracts-api-client.yml` + laptop script | Done — `@umbraculum/contracts` / `@umbraculum/api-client` `0.0.1` on registry + OIDC trust |
-| 2026-06-07 | Brewery vertical SDK (`brewery-contracts`, `brewery-api-client`) | In progress — `publish-brewery-sdk-laptop.sh` + workflow skip-if-exists |
+| 2026-06-07 | Brewery vertical SDK (`brewery-contracts`, `brewery-api-client`) | **Published** — `@0.0.1` / `@0.0.2` (api-client `@0.0.2` adds `./transport`) |

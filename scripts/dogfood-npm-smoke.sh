@@ -6,18 +6,18 @@
 #   ./scripts/dogfood-npm-smoke.sh
 #
 # Optional env:
-#   CONTRACTS_VERSION=0.0.1 API_CLIENT_VERSION=0.0.1
+#   CONTRACTS_VERSION=0.0.1 API_CLIENT_VERSION=0.0.2
 #   MODULE_SDK_VERSION=0.0.2 AI_TOOL_SDK_VERSION=0.1.1
 #   AUTOMATION_CONTRACTS_VERSION=0.0.2 PIM_CONTRACTS_VERSION=0.0.2
 #   MRP_CONTRACTS_VERSION=0.0.2 CRP_CONTRACTS_VERSION=0.0.2
-#   BREWERY_CONTRACTS_VERSION=0.0.1 BREWERY_API_CLIENT_VERSION=0.0.1
+#   BREWERY_CONTRACTS_VERSION=0.0.1 BREWERY_API_CLIENT_VERSION=0.0.2
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 CONTRACTS_VERSION="${CONTRACTS_VERSION:-0.0.1}"
-API_CLIENT_VERSION="${API_CLIENT_VERSION:-0.0.1}"
+API_CLIENT_VERSION="${API_CLIENT_VERSION:-0.0.2}"
 MODULE_SDK_VERSION="${MODULE_SDK_VERSION:-0.0.2}"
 AI_TOOL_SDK_VERSION="${AI_TOOL_SDK_VERSION:-0.1.1}"
 AUTOMATION_CONTRACTS_VERSION="${AUTOMATION_CONTRACTS_VERSION:-0.0.2}"
@@ -25,7 +25,7 @@ PIM_CONTRACTS_VERSION="${PIM_CONTRACTS_VERSION:-0.0.2}"
 MRP_CONTRACTS_VERSION="${MRP_CONTRACTS_VERSION:-0.0.2}"
 CRP_CONTRACTS_VERSION="${CRP_CONTRACTS_VERSION:-0.0.2}"
 BREWERY_CONTRACTS_VERSION="${BREWERY_CONTRACTS_VERSION:-0.0.1}"
-BREWERY_API_CLIENT_VERSION="${BREWERY_API_CLIENT_VERSION:-0.0.1}"
+BREWERY_API_CLIENT_VERSION="${BREWERY_API_CLIENT_VERSION:-0.0.2}"
 TMPDIR="${TMPDIR:-/tmp}/umbraculum-dogfood-npm-smoke-$$"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
@@ -47,6 +47,10 @@ import('@umbraculum/api-client').then((m) => {
   const keys = Object.keys(m).slice(0, 8);
   console.log('api-client exports sample:', keys.join(', '));
   if (!keys.length) throw new Error('no api-client exports');
+});
+import('@umbraculum/api-client/transport').then((m) => {
+  if (!m.getParsed || !m.toClientPath) throw new Error('api-client/transport missing getParsed or toClientPath');
+  console.log('api-client/transport resolves');
 });
 "
 

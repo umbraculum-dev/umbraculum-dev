@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/brewery-api-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Typed brewery vertical API client facades (recipes, water, brew sessions, inventory, …). Extracted from @umbraculum/api-client per RFC-0011 backlog; depends on platform transport + @umbraculum/brewery-contracts parsers.",
   "license": "MIT",
   "type": "module",

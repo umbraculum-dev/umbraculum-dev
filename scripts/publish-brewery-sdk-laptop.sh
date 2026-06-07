@@ -5,7 +5,7 @@
 # Prerequisites:
 #   - npm login with publish rights to @umbraculum org
 #   - npm ci && npm run build:packages && npm run test:packages (or ci-parity sdk-publish-prep)
-#   - @umbraculum/contracts @0.0.1 and @umbraculum/api-client @0.0.1 already on registry
+#   - @umbraculum/contracts @0.0.1 and @umbraculum/api-client @0.0.2 already on registry
 #
 # After laptop publish, configure OIDC trust for publish-contracts-api-client.yml
 # (see docs/design/npm-sdk-trusted-publishing.md § brewery vertical SDK).
@@ -66,7 +66,7 @@ mv /tmp/brewery-contracts-package.json.bak packages/verticals/brewery/contracts/
 
 echo "2. Rewrite brewery-api-client deps for registry tarball"
 cp packages/verticals/brewery/api-client/package.json /tmp/brewery-api-client-package.json.bak
-jq '.dependencies["@umbraculum/api-client"] = "^0.0.1" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
+jq '.dependencies["@umbraculum/api-client"] = "^0.0.2" | .dependencies["@umbraculum/brewery-contracts"] = "^0.0.1"' \
   packages/verticals/brewery/api-client/package.json > /tmp/brewery-api-client-package.json
 mv /tmp/brewery-api-client-package.json packages/verticals/brewery/api-client/package.json
 
