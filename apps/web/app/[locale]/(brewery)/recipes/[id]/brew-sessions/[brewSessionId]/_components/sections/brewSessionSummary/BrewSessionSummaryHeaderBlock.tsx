@@ -1,6 +1,6 @@
 import { SizableText } from "tamagui";
 
-import { CodeInline } from "../../../../../../../../../_shell/_components/CodeInline";
+import { CodeInline } from "../../../../../../../../../_shared-layout/_components/CodeInline";
 
 import type { BrewSessionSummaryHeaderModel } from "./brewSessionSummaryTypes";
 

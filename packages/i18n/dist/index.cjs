@@ -1971,7 +1971,7 @@ var en_default = {
       tryAgain: "Try again"
     }
   },
-  shellNotice: {
+  sharedLayoutNotice: {
     demo: {
       ariaLabel: "Demo environment notice",
       summaryLine: "Public demonstration environment on demo.umbraculum.dev \u2014 illustrative data only; may be reset without notice.",
@@ -3949,7 +3949,7 @@ var it_default = {
       tryAgain: "Riprova"
     }
   },
-  shellNotice: {
+  sharedLayoutNotice: {
     demo: {
       ariaLabel: "Avviso ambiente demo",
       summaryLine: "Ambiente di dimostrazione pubblico su demo.umbraculum.dev \u2014 dati solo dimostrativi; possono essere reimpostati senza preavviso.",

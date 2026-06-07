@@ -6,7 +6,7 @@
 
 > **Not platform architecture.** Read [`PLATFORM-ARCHITECTURE.md`](../../../PLATFORM-ARCHITECTURE.md) for vision, canonical modules vs vertical configurations, AI consultant, and monetization.  
 > **Cross-platform boundaries** (route IDs, `useT`, api-client auth, webview bridge, DB routing): [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md).  
-> **Ubuntu Touch** (webapp shell, online-first, no native brew-day offline): [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md).
+> **Ubuntu Touch** (Morph webapp wrapper, online-first, no native brew-day offline): [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md).
 
 Brewery is a **tier-6 vertical configuration**, not a canonical module — see [`README.md`](README.md) and [RFC-0001](../../../rfcs/0001-modules-tiers-governance-and-automation-placement.md).
 

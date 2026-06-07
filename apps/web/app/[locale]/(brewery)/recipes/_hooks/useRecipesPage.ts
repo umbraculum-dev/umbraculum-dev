@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createRecipe, deleteRecipe, listRecipes, listStyles } from "@umbraculum/api-client/brewery";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
-import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../_shared-layout/_lib/useRequireAuth";
 import type { RecipeListItem, StyleListItem } from "../_lib/recipesPageTypes";
 
 export function useRecipesPage() {

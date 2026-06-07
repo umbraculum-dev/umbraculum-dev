@@ -533,8 +533,8 @@ export default [
           mode: "full",
         },
         {
-          type: "web-platform-shell",
-          pattern: "apps/web/app/_shell/{_components,_lib}/**",
+          type: "web-platform-shared-layout",
+          pattern: "apps/web/app/_shared-layout/{_components,_lib}/**",
           mode: "full",
         },
         {
@@ -606,7 +606,7 @@ export default [
             {
               from: [
                 ["web-app-shared"],
-                ["web-platform-shell"],
+                ["web-platform-shared-layout"],
                 ["web-brewery-shared"],
                 ["web-water-segment"],
                 ["web-recipe-edit-surface"],
@@ -618,18 +618,18 @@ export default [
               disallow: [["api-service"]],
             },
             {
-              from: [["web-platform-shell"]],
+              from: [["web-platform-shared-layout"]],
               disallow: [["web-locale-vertical"], ["web-brewery-shared"]],
             },
             {
               from: [["web-brewery-shared"]],
-              allow: [["web-platform-shell"]],
+              allow: [["web-platform-shared-layout"]],
             },
             {
               from: [["web-water-segment"]],
               allow: [
                 ["web-water-shared"],
-                ["web-platform-shell"],
+                ["web-platform-shared-layout"],
                 ["web-brewery-shared"],
                 ["web-app-shared"],
               ],
@@ -639,7 +639,7 @@ export default [
               allow: [
                 ["web-recipe-edit-shared"],
                 ["web-water-shared"],
-                ["web-platform-shell"],
+                ["web-platform-shared-layout"],
                 ["web-brewery-shared"],
                 ["web-app-shared"],
               ],
@@ -651,14 +651,14 @@ export default [
                 ["web-recipe-edit-surface"],
                 ["web-water-shared"],
                 ["web-water-segment"],
-                ["web-platform-shell"],
+                ["web-platform-shared-layout"],
                 ["web-brewery-shared"],
                 ["web-app-shared"],
               ],
             },
             {
               from: [["web-locale-vertical"]],
-              allow: [["web-platform-shell"], ["web-brewery-shared"], ["web-app-shared"]],
+              allow: [["web-platform-shared-layout"], ["web-brewery-shared"], ["web-app-shared"]],
             },
             {
               from: [["web-water-segment"]],

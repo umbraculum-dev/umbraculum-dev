@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 
-import { asRecord } from "../../../../../../_shell/_lib/typeGuards";
+import { asRecord } from "../../../../../../_shared-layout/_lib/typeGuards";
 import { newRowId } from "../_lib/recipeEditHelpers";
 import type { GristRow } from "../_lib/recipeEditTypes";
 import type { EditorGristRow } from "../../../_lib/beerjsonRecipe";

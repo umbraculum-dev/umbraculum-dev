@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { getRecipe } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
-import { useRequireAuth } from "../../../../../../_shell/_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../../../_shared-layout/_lib/useRequireAuth";
 import { formatFixed } from "../../../../../../../src/i18n/format";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { useYeastPageLoad } from "./useYeastPageLoad";

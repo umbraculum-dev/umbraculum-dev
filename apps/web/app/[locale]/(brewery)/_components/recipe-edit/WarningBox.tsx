@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { MessageBox } from "../../../../_shell/_components/MessageBox";
+import { MessageBox } from "../../../../_shared-layout/_components/MessageBox";
 
 export interface WarningBoxProps {
   children: ReactNode;

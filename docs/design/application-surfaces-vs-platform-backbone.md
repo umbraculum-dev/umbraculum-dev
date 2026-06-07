@@ -30,7 +30,7 @@ flowchart TB
     brochure["apps/website — marketing brochure"]
   end
 
-  subgraph audience1["Layer 1 — Operator shell (workspace members)"]
+  subgraph audience1["Layer 1 — Workspace web UI (workspace members)"]
     web["apps/web"]
     native["apps/native"]
     ut["Ubuntu Touch — Click webapp over apps/web"]
@@ -59,7 +59,7 @@ flowchart TB
 | **Platform backbone** | Cross-cutting services every module consumes ([RFC-0001 §8.2](../rfcs/0001-modules-tiers-governance-and-automation-placement.md)); single source of truth for tenancy and AI context | `services/api`, `@umbraculum/contracts`, `@umbraculum/module-sdk`, `@umbraculum/ui`, `@umbraculum/navigation`, `@umbraculum/rendering`, … |
 | **Canonical modules** | Peer operational domains (flat SAP-style decomposition, not nested under "manufacturing") | `automation`, `pim` (shipped); `mrp`, `crp` (alpha read-only shipped); `wms`, `crm` (open doors) |
 | **Vertical configuration** | Seed data, prompts, vertical UI — consumes canonicals, does not replace them | `brewery` (reference tier-6 configuration) — web slice under `apps/web/app/[locale]/(brewery)/` (β layout complete for recipes, 2026-06) |
-| **Application surfaces** | Deployable UIs or sites for a **specific audience** | `apps/web` + `apps/native` (operators); **Ubuntu Touch** via Click webapp shell over `apps/web` ([`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md)); `apps/website` (public orientation); future storefront = separate `apps/*` |
+| **Application surfaces** | Deployable UIs or sites for a **specific audience** | `apps/web` + `apps/native` (operators); **Ubuntu Touch** via Click Morph webapp wrapper over `apps/web` ([`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md)); `apps/website` (public orientation); future storefront = separate `apps/*` |
 
 **Repository layers vs product layers.** [REPOSITORY-STRUCTURE.md](../REPOSITORY-STRUCTURE.md) names layer 1 **Applications** (`apps/*`) and layer 2 **Services** (`services/*`). That is **spatial** (where code lives), not Drupal's merchant/customer split. Both web and native are operator applications talking to the same API.
 
@@ -73,9 +73,9 @@ Use these terms in reviews and plans to avoid talking past each other. For onboa
 |---|---|---|
 | **API service** | HTTP monolith: routes, Prisma, jobs | Operator UI, "admin theme" |
 | **Horizontal platform** | Auth, workspace, billing, AI orchestrator, rendering, notifications boundary, … | A single package named `core` |
-| **Operator shell** | Federated web + native app workspace members use daily | Storefront, brochure site, Qt/QML Lomiri rewrite |
-| **Workspace-member app** | Same as operator shell — one audience, one AI context ([ROADMAP](../ROADMAP.md) standing principle) | B2C shopper app |
-| **Module registration** | Boot-time declaration via `registerModule()` / `registerWebModule()` / `registerNativeModule()` | Runtime shell layout (partially deferred — see §5) |
+| **Workspace web UI** | Federated web + native app workspace members use daily | Storefront, brochure site, Qt/QML Lomiri rewrite |
+| **Workspace-member app** | Same as workspace web UI — one audience, one AI context ([ROADMAP](../ROADMAP.md) standing principle) | B2C shopper app |
+| **Module registration** | Boot-time declaration via `registerModule()` / `registerWebModule()` / `registerNativeModule()` | Runtime shared layout registration (partially deferred — see §5) |
 | **Public surface (marketing)** | Static orientation HTML | Operational "public API" |
 | **Storefront / commerce** (future) | Separate deployable; read-only consumer of PIM/CRM master data | PIM admin UI |
 
@@ -144,7 +144,7 @@ During the `@brewery/*` → `@umbraculum/*` scope migration, `@brewery/core` (br
 
 Some **runtime** shell concerns are partially extracted:
 
-- **Registry-driven primary nav** — `composeWebShellNavItems()` in `@umbraculum/module-sdk` reads `registerWebModule({ navEntries })` metadata from [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/module-sdk/src/builtinWebModules.ts); [`PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) receives composed items from the server layout.
+- **Registry-driven primary nav** — `composeWebSharedLayoutNavItems()` in `@umbraculum/module-sdk` reads `registerWebModule({ navEntries })` metadata from [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/module-sdk/src/builtinWebModules.ts); [`PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) receives composed items from the server layout.
 - **Platform-owned URL segments** — [`registerPlatformSegments.ts`](../../apps/web/app/_lib/registerPlatformSegments.ts) lives in `apps/web` today.
 - **Entitlement-gated nav / upgrade affordances** — tied to `WorkspaceBilling` and future `WorkspaceBillingAddon` ([PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) §3.6–§3.7).
 
@@ -164,7 +164,7 @@ They should **not** become a second API, duplicate `module-sdk`, or hold domain 
 
 | Piece | Classification |
 |---|---|
-| Recipe editor, brew-day flows | Vertical configuration UI in operator shell |
+| Recipe editor, brew-day flows | Vertical configuration UI in workspace web UI |
 | `/auth/*`, workspace switcher | Horizontal platform |
 | `services/api` recipe routes | API service (brewery-vertical routes today; β-layout under `modules/brewery/`) |
 | Brochure at umbraculum.dev | Layer 4 marketing — not operational backend |
@@ -187,7 +187,7 @@ To offer "Umbraculum hosted for breweries" or "hosted PIM":
 1. Enable modules + vertical seed (brewery configuration or PIM-only)
 2. Set workspace billing tier and (future) per-module add-ons
 3. Assign workspace members and roles
-4. Optionally operate a **separate** marketing or commerce app — not by forking the operator shell into "admin" vs "store"
+4. Optionally operate a **separate** marketing or commerce app — not by forking the workspace web UI into "admin" vs "store"
 
 ---
 
@@ -199,5 +199,5 @@ To offer "Umbraculum hosted for breweries" or "hosted PIM":
 - [packages/module-sdk/README.md](../../packages/module-sdk/README.md) — registration contract (the backbone SDK)
 - [design/web-route-group-audit.md](web-route-group-audit.md) — URL segment ownership + `registerWebModule`
 - [design/canonical-native-platform-surface.md](canonical-native-platform-surface.md) — native shell obligations
-- [design/ubuntu-touch-shell-strategy.md](ubuntu-touch-shell-strategy.md) — Ubuntu Touch webapp shell (web slice + Click packaging; online-first)
+- [design/ubuntu-touch-shell-strategy.md](ubuntu-touch-shell-strategy.md) — Ubuntu Touch Morph webapp wrapper (web slice + Click packaging; online-first)
 - [RFC-0001 §8.2](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) — consumption contract (what modules must not reimplement)

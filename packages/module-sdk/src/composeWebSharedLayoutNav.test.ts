@@ -2,12 +2,12 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import {
   clearWebModuleRegistryForTests,
-  composeWebShellNavItems,
+  composeWebSharedLayoutNavItems,
   registerBuiltinWebModulesIfAbsent,
   registerWebModule,
 } from "./index.js";
 
-describe("composeWebShellNavItems", () => {
+describe("composeWebSharedLayoutNavItems", () => {
   afterEach(() => {
     clearWebModuleRegistryForTests();
   });
@@ -15,7 +15,7 @@ describe("composeWebShellNavItems", () => {
   it("orders platform entries and module nav entries by order key", () => {
     registerBuiltinWebModulesIfAbsent();
 
-    const items = composeWebShellNavItems();
+    const items = composeWebSharedLayoutNavItems();
     expect(items.map((item) => item.href)).toEqual([
       "/",
       "/recipes",
@@ -40,7 +40,7 @@ describe("composeWebShellNavItems", () => {
       ],
     });
 
-    const items = composeWebShellNavItems();
+    const items = composeWebSharedLayoutNavItems();
     expect(items.some((item) => item.href === "/inspections")).toBe(true);
   });
 });
@@ -54,7 +54,7 @@ describe("registerBuiltinWebModulesIfAbsent", () => {
     registerBuiltinWebModulesIfAbsent();
     registerBuiltinWebModulesIfAbsent();
 
-    const items = composeWebShellNavItems();
+    const items = composeWebSharedLayoutNavItems();
     expect(items.some((item) => item.href === "/production-orders")).toBe(true);
   });
 });

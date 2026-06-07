@@ -1,7 +1,7 @@
 import type {ReactNode} from "react";
 import {SizableText, View, XStack} from "tamagui";
 
-import {CodeInline} from "../../../../../../../../_shell/_components/CodeInline";
+import {CodeInline} from "../../../../../../../../_shared-layout/_components/CodeInline";
 import type {RecipeEditPageModel} from "../../../_hooks/useRecipeEditPage";
 import {buildRecipeAnalysisContext} from "./recipeAnalysisShared";
 

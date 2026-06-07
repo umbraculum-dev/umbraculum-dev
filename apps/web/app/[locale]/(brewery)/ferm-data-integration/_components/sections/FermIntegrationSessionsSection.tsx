@@ -3,7 +3,7 @@
 import { Button, SizableText, XStack, YStack } from "tamagui";
 
 import { BrewSelect } from "../../../_components/BrewSelect";
-import { CodeInline } from "../../../../../_shell/_components/CodeInline";
+import { CodeInline } from "../../../../../_shared-layout/_components/CodeInline";
 import type { UseFermDataIntegrationPageModel } from "../../_hooks/useFermDataIntegrationPage";
 import type { IntegrationDevice } from "../../_lib/fermIntegrationTypes";
 

@@ -9,8 +9,8 @@ import {
   listRecentBrewSessions,
 } from "@umbraculum/api-client";
 
-import { webPlatformApiClient } from "../../../../_shell/_lib/webApiClient";
-import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_shared-layout/_lib/webApiClient";
+import { useRequireAuth } from "../../../../_shared-layout/_lib/useRequireAuth";
 import {
   createKindRecord,
   INTEGRATION_KINDS,

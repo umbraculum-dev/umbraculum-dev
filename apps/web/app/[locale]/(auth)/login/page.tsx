@@ -7,7 +7,7 @@ import { Button, H1, Input, SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox, RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
-import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
+import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 import { ApiClientError, login } from "@umbraculum/api-client";
 import { LocaleSelect } from "../_components/LocaleSelect";
 

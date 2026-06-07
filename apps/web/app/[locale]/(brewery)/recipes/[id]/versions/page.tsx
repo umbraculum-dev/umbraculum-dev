@@ -10,7 +10,7 @@ import { listRecipeVersions } from "@umbraculum/api-client/brewery";
 import { Link } from "../../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
-import { useRequireAuth } from "../../../../../_shell/_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../../_shared-layout/_lib/useRequireAuth";
 
 type VersionListItem = {
   id: string;

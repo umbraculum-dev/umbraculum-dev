@@ -450,7 +450,7 @@ The web stack from §2.2 is enough for most first contributions. If you need the
 
 3. **Open Expo Go** on a physical device (same Wi‑Fi as the laptop) or an iOS/Android simulator. Enter the URL the script prints (`exp://<LAN-IP>:8081`) or scan from Expo Go recents.
 
-The native app auto-derives the API base URL from Metro's host — you usually do **not** edit `apps/native/app.json` for local LAN dev. Platform obligations, route matrix, and troubleshooting live in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) and [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md). Cross-platform package boundaries: [`docs/CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md). Ubuntu Touch (webapp shell, not Expo): [`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md).
+The native app auto-derives the API base URL from Metro's host — you usually do **not** edit `apps/native/app.json` for local LAN dev. Platform obligations, route matrix, and troubleshooting live in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) and [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md). Cross-platform package boundaries: [`docs/CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md). Ubuntu Touch (Morph webapp wrapper, not Expo): [`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md).
 
 ### 2.6 External integrators — OpenAPI and contracts
 

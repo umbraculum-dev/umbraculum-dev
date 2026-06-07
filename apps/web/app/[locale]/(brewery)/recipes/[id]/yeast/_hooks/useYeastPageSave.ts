@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { getRecipe, patchRecipe } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../_shell/_lib/typeGuards";
+import { asRecord } from "../../../../../../_shared-layout/_lib/typeGuards";
 import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,

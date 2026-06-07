@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "../../../../../src/i18n/navigation";
 import { SizableText, useMedia, XStack, YStack } from "tamagui";
 
-import { NavSheet } from "../../../../_shell/_components/NavSheet";
+import { NavSheet } from "../../../../_shared-layout/_components/NavSheet";
 
 export interface RecipeEditSection {
   id: string;

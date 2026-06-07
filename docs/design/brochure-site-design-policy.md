@@ -88,7 +88,7 @@ Positioning copy source of truth: [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHI
 
 This policy applies to **`apps/website/`** (static umbraculum.dev brochure).
 
-It does **not** override product UI in `apps/web/` (operational app chrome follows platform UX patterns; **Tamagui is the go-to** — see [`TAMAGUI.md`](../TAMAGUI.md) §"UI stack choice — product vs public surfaces"). It **does** align with docs-site tone — Docusaurus theme choices should stay similarly restrained; see RFC-0005 and the docs build log for docs-specific decisions.
+It does **not** override product UI in `apps/web/` (operational shared layout components follows platform UX patterns; **Tamagui is the go-to** — see [`TAMAGUI.md`](../TAMAGUI.md) §"UI stack choice — product vs public surfaces"). It **does** align with docs-site tone — Docusaurus theme choices should stay similarly restrained; see RFC-0005 and the docs build log for docs-specific decisions.
 
 ---
 

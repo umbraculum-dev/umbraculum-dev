@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "../../../../../src/i18n/navigation";
-import { AskAiLink } from "../../../../_shell/_components/AskAiLink";
+import { AskAiLink } from "../../../../_shared-layout/_components/AskAiLink";
 import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import { Accordion, H1, SizableText, YStack } from "tamagui";
 

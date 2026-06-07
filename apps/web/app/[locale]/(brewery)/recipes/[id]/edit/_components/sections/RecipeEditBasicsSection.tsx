@@ -1,6 +1,6 @@
 import {Button, Input, SizableText, View, XStack, YStack} from "tamagui";
 
-import {CodeInline} from "../../../../../../../_shell/_components/CodeInline";
+import {CodeInline} from "../../../../../../../_shared-layout/_components/CodeInline";
 import {BrewSelect} from "../../../../../_components/BrewSelect";
 import {ErrorBox, RecipeEditField, RecipeEditSection} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";

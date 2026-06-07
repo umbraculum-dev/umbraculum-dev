@@ -106,7 +106,7 @@ code {
   }
 }
 
-.brew-app-shell {
+.brew-app-shared-layout {
   max-width: 1100px;
   margin: 24px auto;
   padding: var(--app-shell-padding);

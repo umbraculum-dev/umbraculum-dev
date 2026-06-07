@@ -59,7 +59,7 @@ Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMEN
 | Topic | Doc |
 |-------|-----|
 | Native platform SoT, alpha scope, route matrix | [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) |
-| Ubuntu Touch operator shell (web slice + Click) | [`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) |
+| Ubuntu Touch workspace web UI (web slice + Click) | [`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) |
 | EAS internal alpha (July 2026) | Same doc §5; `apps/native/eas.json` |
 | `registerNativeModule` | [`packages/module-sdk`](../../packages/module-sdk/README.md) |
 | Validation debt on brewery screens | Native surface doc §6 |

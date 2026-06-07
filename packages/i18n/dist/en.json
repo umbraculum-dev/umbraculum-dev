@@ -1939,7 +1939,7 @@
       "tryAgain": "Try again"
     }
   },
-  "shellNotice": {
+  "sharedLayoutNotice": {
     "demo": {
       "ariaLabel": "Demo environment notice",
       "summaryLine": "Public demonstration environment on demo.umbraculum.dev — illustrative data only; may be reset without notice.",

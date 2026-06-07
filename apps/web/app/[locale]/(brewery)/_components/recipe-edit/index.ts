@@ -1,5 +1,5 @@
 export { ErrorBox } from "./ErrorBox";
-export { MessageBox, type MessageBoxProps, type MessageBoxVariant } from "../../../../_shell/_components/MessageBox";
+export { MessageBox, type MessageBoxProps, type MessageBoxVariant } from "../../../../_shared-layout/_components/MessageBox";
 export { WarningBox } from "./WarningBox";
 export { FieldBadge } from "./FieldBadge";
 export { RecipeEditField } from "./RecipeEditField";

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { H1, SizableText, YStack } from "tamagui";
 
 import { ErrorBox } from "../../_components/recipe-edit";
-import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../_shared-layout/_lib/useRequireAuth";
 import { RecipeImportForm } from "../../_components/RecipeImportForm";
 
 export default function RecipesImportPage() {

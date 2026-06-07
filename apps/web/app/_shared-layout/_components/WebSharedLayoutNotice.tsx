@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import type { WebShellNoticeConfig, WebShellNoticeVariant } from "@umbraculum/module-sdk";
+import type { WebSharedLayoutNoticeConfig, WebSharedLayoutNoticeVariant } from "@umbraculum/module-sdk";
 import { useTranslations } from "next-intl";
 
 import { SizableText } from "tamagui";
@@ -21,14 +21,14 @@ const DOC_URLS = {
   nativeSmoke: "https://docs.umbraculum.dev/design/canonical-native-platform-surface",
 } as const;
 
-function toMessageBoxVariant(variant: WebShellNoticeVariant): MessageBoxVariant {
+function toMessageBoxVariant(variant: WebSharedLayoutNoticeVariant): MessageBoxVariant {
   if (variant === "warning") return "warning";
   return "notice";
 }
 
 function externalLink(href: string, children: ReactNode) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="brew-shell-notice__link">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="brew-shared-layout-notice__link">
       {children}
     </a>
   );
@@ -50,8 +50,8 @@ function CredentialsTable({
   footnote: string;
 }) {
   return (
-    <div className="brew-shell-notice__credentials">
-      <table className="brew-shell-notice__table">
+    <div className="brew-shared-layout-notice__credentials">
+      <table className="brew-shared-layout-notice__table">
         <thead>
           <tr>
             <th scope="col">{columns.role}</th>
@@ -80,8 +80,8 @@ function CredentialsTable({
   );
 }
 
-function DemoShellNoticeBody() {
-  const t = useTranslations("shellNotice.demo");
+function DemoSharedLayoutNoticeBody() {
+  const t = useTranslations("sharedLayoutNotice.demo");
 
   const credentialRows: CredentialRow[] = [
     {
@@ -107,14 +107,14 @@ function DemoShellNoticeBody() {
   ];
 
   return (
-    <div className="brew-shell-notice__body">
+    <div className="brew-shared-layout-notice__body">
       <SizableText size="$2" fontWeight="650" color="var(--text)">
         {t("summaryLine")}
       </SizableText>
 
-      <details className="brew-shell-notice__details">
-        <summary className="brew-shell-notice__summary">{t("credentialsHeading")}</summary>
-        <div className="brew-shell-notice__expander-body">
+      <details className="brew-shared-layout-notice__details">
+        <summary className="brew-shared-layout-notice__summary">{t("credentialsHeading")}</summary>
+        <div className="brew-shared-layout-notice__expander-body">
           <CredentialsTable
             columns={{
               role: t("columnRole"),
@@ -127,9 +127,9 @@ function DemoShellNoticeBody() {
         </div>
       </details>
 
-      <details className="brew-shell-notice__details">
-        <summary className="brew-shell-notice__summary">{t("expanderLabel")}</summary>
-        <div className="brew-shell-notice__expander-body">
+      <details className="brew-shared-layout-notice__details">
+        <summary className="brew-shared-layout-notice__summary">{t("expanderLabel")}</summary>
+        <div className="brew-shared-layout-notice__expander-body">
           <SizableText size="$2" color="var(--text)">
             {t("dataLossWarning")}
           </SizableText>
@@ -140,7 +140,7 @@ function DemoShellNoticeBody() {
             {t("referenceVertical")}
           </SizableText>
 
-          <ul className="brew-shell-notice__list">
+          <ul className="brew-shared-layout-notice__list">
             <li>
               {externalLink(
                 DOC_URLS.gettingStarted,
@@ -170,7 +170,7 @@ function DemoShellNoticeBody() {
           <SizableText size="$2" color="var(--text)">
             {t("nativeIntro")}
           </SizableText>
-          <ul className="brew-shell-notice__list">
+          <ul className="brew-shared-layout-notice__list">
             <li>
               {t("nativeBulletOperators")}{" "}
               {externalLink(DOC_URLS.nativeCi, t("nativeLinkNativeCi"))}
@@ -189,15 +189,15 @@ function DemoShellNoticeBody() {
   );
 }
 
-export function WebShellNotice({ config }: { config: WebShellNoticeConfig | null }) {
-  const t = useTranslations("shellNotice.demo");
+export function WebSharedLayoutNotice({ config }: { config: WebSharedLayoutNoticeConfig | null }) {
+  const t = useTranslations("sharedLayoutNotice.demo");
 
   if (!config || config.id !== "demo") return null;
 
   return (
-    <section className="brew-shell-notice" aria-label={t("ariaLabel")}>
+    <section className="brew-shared-layout-notice" aria-label={t("ariaLabel")}>
       <MessageBox variant={toMessageBoxVariant(config.variant)} role="status">
-        <DemoShellNoticeBody />
+        <DemoSharedLayoutNoticeBody />
       </MessageBox>
     </section>
   );

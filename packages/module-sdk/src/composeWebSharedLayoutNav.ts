@@ -1,9 +1,9 @@
 import type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";
 
-import { PLATFORM_WEB_SHELL_NAV_ENTRIES } from "./builtinWebModules.js";
+import { PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES } from "./builtinWebModules.js";
 import { listRegisteredWebModules } from "./registerWebModule.js";
 
-export interface WebShellNavItem {
+export interface WebSharedLayoutNavItem {
   href: string;
   labelKey: ModuleNavLabelKey;
   order: number;
@@ -17,8 +17,8 @@ export interface WebShellNavItem {
  * first (`registerBuiltinWebModulesIfAbsent()` + `registerPlatformSegments()`
  * on web; API boot calls the built-in registrar before reading).
  */
-export function composeWebShellNavItems(): WebShellNavItem[] {
-  const moduleItems: WebShellNavItem[] = [];
+export function composeWebSharedLayoutNavItems(): WebSharedLayoutNavItem[] {
+  const moduleItems: WebSharedLayoutNavItem[] = [];
   for (const snapshot of listRegisteredWebModules()) {
     if (snapshot.code === "platform") continue;
     for (const entry of snapshot.navEntries) {
@@ -30,7 +30,7 @@ export function composeWebShellNavItems(): WebShellNavItem[] {
     }
   }
 
-  const platformItems: WebShellNavItem[] = PLATFORM_WEB_SHELL_NAV_ENTRIES.map(
+  const platformItems: WebSharedLayoutNavItem[] = PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES.map(
     (entry) => ({
       href: entry.href,
       labelKey: entry.labelKey,

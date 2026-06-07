@@ -50,9 +50,9 @@ Demo logins use the **E2E seed personas** (defaults; ship-safe — same on every
 
 **Active workspace (fixtures):** `e2e00000-0000-0000-0000-0000000000aa`.
 
-These credentials are **public by design** — they exist only on the demo host whose DB may be wiped at any time. They appear in the **web shell notice** on demo (one-line summary always visible; **Demo sign-in** table and **About this demo** prose each behind a collapsed expander by default). Copy defaults live in `@umbraculum/i18n` (`shellNotice.demo.*`); the banner is activated only when the demo VPS builds web with `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID=demo` (see **umbraculum-hosting-demo** `docker-compose.demo.yml`). Local `docker compose` does **not** set that flag.
+These credentials are **public by design** — they exist only on the demo host whose DB may be wiped at any time. They appear in the **platform shared layout notice** on demo (one-line summary always visible; **Demo sign-in** table and **About this demo** prose each behind a collapsed expander by default). Copy defaults live in `@umbraculum/i18n` (`sharedLayoutNotice.demo.*`); the banner is activated only when the demo VPS builds web with `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID=demo` (see **umbraculum-hosting-demo** `docker-compose.demo.yml`). Local `docker compose` does **not** set that flag.
 
-To override passwords on demo, set `E2E_ADMIN_PASSWORD` etc. in `/opt/umbraculum-hosting-demo/.env` and re-run `seed:e2e` (upsert hashes the new value into the same user row, no data loss). **Note:** the shell notice still shows i18n default passwords until copy is updated or a future env override lands — operators should keep runbook and banner in sync when rotating demo passwords.
+To override passwords on demo, set `E2E_ADMIN_PASSWORD` etc. in `/opt/umbraculum-hosting-demo/.env` and re-run `seed:e2e` (upsert hashes the new value into the same user row, no data loss). **Note:** the shared layout notice still shows i18n default passwords until copy is updated or a future env override lands — operators should keep runbook and banner in sync when rotating demo passwords.
 
 **Native login:** `POST /api/auth/login/native` with the same email/password as web.
 
@@ -177,7 +177,7 @@ docker compose -f docker-compose.demo.yml --env-file .env up -d traefik
 - [`demo-host-ssl-strategy.md`](demo-host-ssl-strategy.md) — Traefik v3.6 + ACME ADR
 - [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) — EAS build IDs and device smoke status
 - [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) §5 — native demo scope and checklist
-- [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md) — UT webapp shell strategy
+- [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md) — UT Morph webapp wrapper strategy
 - [`packaging/ubuntu-touch/umbraculum-reference/README.md`](../../packaging/ubuntu-touch/umbraculum-reference/README.md) — reference Click package (demo origin default)
 - [`NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md) §5 — EAS profiles and CI workflow
 - [`cloud-hosted-product-track.md`](cloud-hosted-product-track.md) — future hosted product (not demo)

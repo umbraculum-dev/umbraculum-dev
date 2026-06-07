@@ -191,7 +191,7 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 
 ## UI stack choice — product vs public surfaces
 
-**Tamagui is the go-to for product UI.** Operational surfaces in `apps/web`, `apps/native`, and shared packages (`@umbraculum/ui`, domain UI packages) use Tamagui so one component tree ships to **real DOM on web and real React Native on device** ([`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1, §3.5). **Ubuntu Touch** consumes the same Tamagui web tree via the Lomiri Click webapp shell — no QML fork ([`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md)). Do **not** introduce a parallel product UI stack (MUI, Chakra, Tailwind-only app chrome, a second component library for the same screens) without an RFC and an explicit abandonment of the cross-platform commitment.
+**Tamagui is the go-to for product UI.** Operational surfaces in `apps/web`, `apps/native`, and shared packages (`@umbraculum/ui`, domain UI packages) use Tamagui so one component tree ships to **real DOM on web and real React Native on device** ([`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1, §3.5). **Ubuntu Touch** consumes the same Tamagui web tree via the Lomiri Click Morph webapp wrapper — no QML fork ([`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md)). Do **not** introduce a parallel product UI stack (MUI, Chakra, Tailwind-only shared layout components, a second component library for the same screens) without an RFC and an explicit abandonment of the cross-platform commitment.
 
 **Docs site (`docs-site/`)** uses Docusaurus — documentation layout, search, and MDX are a different job. That is not a precedent for replacing Tamagui in the product apps.
 

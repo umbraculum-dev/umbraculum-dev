@@ -291,20 +291,20 @@
   display: block;
 }
 
-.brew-shell-notice {
+.brew-shared-layout-notice {
   margin-bottom: 0.75rem;
   align-self: stretch;
   width: 100%;
 }
 
-.brew-shell-notice__body {
+.brew-shared-layout-notice__body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
 }
 
-.brew-shell-notice__expander-body {
+.brew-shared-layout-notice__expander-body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -312,20 +312,20 @@
   padding-left: 0.15rem;
 }
 
-.brew-shell-notice__credentials {
+.brew-shared-layout-notice__credentials {
   width: 100%;
 }
 
-.brew-shell-notice__link {
+.brew-shared-layout-notice__link {
   color: var(--link, #6cb6ff);
   text-decoration: underline;
 }
 
-.brew-shell-notice__details {
+.brew-shared-layout-notice__details {
   margin-top: 0.25rem;
 }
 
-.brew-shell-notice__summary {
+.brew-shared-layout-notice__summary {
   cursor: pointer;
   font-size: 0.9375rem;
   font-weight: 600;
@@ -333,21 +333,21 @@
   list-style: none;
 }
 
-.brew-shell-notice__summary::-webkit-details-marker {
+.brew-shared-layout-notice__summary::-webkit-details-marker {
   display: none;
 }
 
-.brew-shell-notice__summary::before {
+.brew-shared-layout-notice__summary::before {
   content: "▸ ";
   display: inline-block;
   transition: transform 0.15s ease;
 }
 
-.brew-shell-notice__details[open] .brew-shell-notice__summary::before {
+.brew-shared-layout-notice__details[open] .brew-shared-layout-notice__summary::before {
   transform: rotate(90deg);
 }
 
-.brew-shell-notice__list {
+.brew-shared-layout-notice__list {
   margin: 0.25rem 0 0;
   padding-left: 1.25rem;
   font-size: 0.875rem;
@@ -355,27 +355,27 @@
   color: var(--text);
 }
 
-.brew-shell-notice__table {
+.brew-shared-layout-notice__table {
   width: 100%;
   margin-top: 0.5rem;
   border-collapse: collapse;
   font-size: 0.8125rem;
 }
 
-.brew-shell-notice__table th,
-.brew-shell-notice__table td {
+.brew-shared-layout-notice__table th,
+.brew-shared-layout-notice__table td {
   border: 1px solid var(--border);
   padding: 0.35rem 0.5rem;
   text-align: left;
   vertical-align: top;
 }
 
-.brew-shell-notice__table th {
+.brew-shared-layout-notice__table th {
   background: color-mix(in srgb, var(--surface-2) 80%, transparent);
   font-weight: 600;
 }
 
-.brew-shell-notice__table code {
+.brew-shared-layout-notice__table code {
   font-family: ui-monospace, monospace;
   font-size: 0.75rem;
   word-break: break-all;

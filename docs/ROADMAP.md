@@ -9,7 +9,7 @@ This roadmap captures the agreed “direction of travel” for the product so im
 - Platform vision (horizontal-platform-with-vertical-modules + AI consultant + add-on pricing): `docs/PLATFORM-ARCHITECTURE.md`
 - Licensing posture and rationale (AGPLv3 core + MIT SDK + commercial dual license): `docs/LICENSING.md`
 - Cross-platform boundaries: `docs/CROSS-PLATFORM-BOUNDARIES.md`
-- Ubuntu Touch operator shell: `docs/design/ubuntu-touch-shell-strategy.md`
+- Ubuntu Touch workspace web UI: `docs/design/ubuntu-touch-shell-strategy.md`
 - Building your vertical (ISV path; Magento sample-data parallel): `docs/BUILDING-YOUR-VERTICAL.md`
 - Glossary (terminology + optional reference vertical): `docs/GLOSSARY.md`
 - Brewery reference vertical implementation log: `docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`
@@ -178,7 +178,7 @@ Goal: move from **read-only alpha proof** to **production-ready** manufacturing 
 
 Goal: validate the "modules expand by config and SDK, not by core rewrite" promise, and decide native packaging strategy with evidence.
 
-- Spike Re.Pack module federation against the platform shell (expecting roughly 30 months of post-MF-release tooling hardening by this point). Decision gate: if the Expo + Re.Pack story is genuinely smooth, federate WMS as the second native module in the same shell; if not, ship WMS as web + PWA + a thin native scanner companion. Either way, the AI consultant sees both modules.
+- Spike Re.Pack module federation against the platform shared layout (expecting roughly 30 months of post-MF-release tooling hardening by this point). Decision gate: if the Expo + Re.Pack story is genuinely smooth, federate WMS as the second native module in the same shell; if not, ship WMS as web + PWA + a thin native scanner companion. Either way, the AI consultant sees both modules.
 - Brewery + WMS overlap on tooling, packaging, and AI tool registry — the strongest test of whether the platform shape genuinely supports multi-module operation or whether brewery still leaks across boundaries (see H1 2027 **F-mod** — decouple reference vertical from core boot).
 - First third-party-built vertical configuration accepted (likely distillery or kombucha) — the proof that the SDK is a public contract, not a private convention.
 
@@ -186,14 +186,14 @@ Goal: validate the "modules expand by config and SDK, not by core rewrite" promi
 
 - CRM module: native-shipped only if customer ICP demand justifies it; otherwise web-only with PWA on mobile. The decision depends on the segment we actually win, not on hopes.
 - Additional operational and manufacturing vertical configurations onboarded primarily through **configuration and seed data**, not code (food, cosmetics, supplements, fragrance, fine chemical batch, quality assurance).
-- Ecommerce surfaces (if pursued) are explicitly **separate apps** — different audience (shopper vs operator), different ASO, different auth model. Not added to the workspace-member app shell. Out of scope for this roadmap.
+- Ecommerce surfaces (if pursued) are explicitly **separate apps** — different audience (shopper vs operator), different ASO, different auth model. Not added to the workspace-member platform shared layout. Out of scope for this roadmap.
 - Foundation transfer question (`docs/PLATFORM-ARCHITECTURE.md` §10.1) reopened with evidence: by this point the project either has a community large enough that foundation governance is a meaningful upgrade, or it does not, and the decision becomes much easier than speculating about it now.
 
 ### Standing principles across the whole trajectory
 
 - **Project values are versioned alongside the architecture.** [`MANIFESTO.md`](../MANIFESTO.md) carries the explicit commitments — Total Quality with capital Q (§1.1), AI-orchestrated code as discipline (§1.2), sustainability for the *whole ecosystem* (§2.1), horizontal accessibility (§2.2), and the §3 human-values commitments (empathy, family-friendly schedules, welcomed unionism, explicit inclusivity). The roadmap milestones below are how those commitments land in calendar time; the manifesto is why the milestones are shaped the way they are. The public flip (§10.1.1) is the manifesto's first public-launch occasion.
 - **Web-first for the heavy desktop workflows.** Native apps exist only where workflows are intrinsically mobile (offline operation, BLE, scanning, push notifications, on-the-floor input).
-- **Ubuntu Touch via webapp shell, not Qt rewrite.** Operator UI on Lomiri reuses `apps/web` + Tamagui inside a Click webapp package; online-first on UT; store presence via OpenStore. Sacrifices native-slice offline on UT in exchange for fast cross-shell React delivery — [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md).
+- **Ubuntu Touch via Morph webapp wrapper, not Qt rewrite.** Operator UI on Lomiri reuses `apps/web` + Tamagui inside a Click webapp package; online-first on UT; store presence via OpenStore. Sacrifices native-slice offline on UT in exchange for fast cross-shell React delivery — [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md).
 - **One audience per app.** Workspace-member modules share one shell. Shopper-facing surfaces (if any) are separate apps.
 - **AI consultant is the cross-module connective tissue.** The architectural and economic case for one shell over a "myriad of apps" rests on the AI seeing all modules in one workspace context.
 - **No retroactive license changes.** Anything committed under AGPLv3 stays AGPLv3 (`docs/LICENSING.md` §9–10).

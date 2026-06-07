@@ -86,7 +86,7 @@ services:
       - ./packages/i18n:/packages/i18n:ro
       - ./packages/i18n-react:/packages/i18n-react:ro
       - ./packages/media:/packages/media:ro
-      # Week 1 audit (RFC-0006) wires apps/web/app/_shell/_lib/registerPlatformSegments.ts
+      # Week 1 audit (RFC-0006) wires apps/web/app/_shared-layout/_lib/registerPlatformSegments.ts
       # into apps/web/app/layout.tsx; the layout imports @umbraculum/module-sdk
       # to register platform-owned URL segments with the same web registry that
       # canonical modules (automation/brewery/pim) write to from the api side.

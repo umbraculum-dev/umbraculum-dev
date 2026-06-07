@@ -2,15 +2,15 @@ import type { ReactNode } from "react";
 
 import { getSharedMessages } from "@umbraculum/i18n";
 import { LocaleProvider } from "@umbraculum/i18n-react";
-import { composeWebShellNavItems, resolveWebShellNotice } from "@umbraculum/module-sdk";
+import { composeWebSharedLayoutNavItems, resolveWebSharedLayoutNotice } from "@umbraculum/module-sdk";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-import { AdSlot } from "../_shell/_components/AdSlot";
-import { PrimaryNav } from "../_shell/_components/PrimaryNav";
-import { WebShellNotice } from "../_shell/_components/WebShellNotice";
-import { TamaguiProviderWrapper } from "../_shell/_components/TamaguiProviderWrapper";
+import { AdSlot } from "../_shared-layout/_components/AdSlot";
+import { PrimaryNav } from "../_shared-layout/_components/PrimaryNav";
+import { WebSharedLayoutNotice } from "../_shared-layout/_components/WebSharedLayoutNotice";
+import { TamaguiProviderWrapper } from "../_shared-layout/_components/TamaguiProviderWrapper";
 import { isLocale } from "../../src/i18n/routing";
 
 export default async function LocaleLayout({
@@ -26,16 +26,16 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = getSharedMessages(locale);
-  const shellNavItems = composeWebShellNavItems();
-  const shellNotice = resolveWebShellNotice(process.env);
+  const sharedLayoutNavItems = composeWebSharedLayoutNavItems();
+  const sharedLayoutNotice = resolveWebSharedLayoutNotice(process.env);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LocaleProvider locale={locale} messages={messages}>
         <TamaguiProviderWrapper>
-          <div className="brew-app-shell">
-            <WebShellNotice config={shellNotice} />
-            <PrimaryNav shellNavItems={shellNavItems} />
+          <div className="brew-app-shared-layout">
+            <WebSharedLayoutNotice config={sharedLayoutNotice} />
+            <PrimaryNav sharedLayoutNavItems={sharedLayoutNavItems} />
             <AdSlot placement="global_top" />
             <main id="main" className="brew-main-margin">
               {children}

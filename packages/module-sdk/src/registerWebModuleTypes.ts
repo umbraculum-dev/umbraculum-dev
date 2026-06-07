@@ -23,7 +23,7 @@ export interface RegisterWebModuleOptions {
   ownedUrlSegments?: readonly string[];
   /**
    * Optional primary navigation entries. The web shell's `PrimaryNav` reads
-   * the registry via `composeWebShellNavItems()`. Each `primarySegment` MUST
+   * the registry via `composeWebSharedLayoutNavItems()`. Each `primarySegment` MUST
    * appear in `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale
    * bundles (see `@umbraculum/i18n-keys`). `order` is a sort key (lower is
    * earlier; defaults to 50 if omitted).

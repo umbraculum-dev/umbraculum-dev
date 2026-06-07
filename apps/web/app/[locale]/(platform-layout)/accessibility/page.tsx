@@ -5,10 +5,10 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { H1, SizableText, View, YStack } from "tamagui";
 
-import { BrewSelect } from "../(brewery)/_components/BrewSelect";
-import { ErrorBox, RecipeEditFieldLabel } from "../(brewery)/_components/recipe-edit";
-import { fetchAuthMe } from "../../_shell/_lib/fetchAuthMe";
-import { webPlatformApiClient } from "../../_shell/_lib/webApiClient";
+import { BrewSelect } from "../../(brewery)/_components/BrewSelect";
+import { ErrorBox, RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
+import { fetchAuthMe } from "../../../_shared-layout/_lib/fetchAuthMe";
+import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 import { ApiClientError, patchAuthPreferences } from "@umbraculum/api-client";
 
 type UiThemeKey = "default" | "hc_dark" | "hc_light";

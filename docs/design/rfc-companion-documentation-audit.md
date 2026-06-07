@@ -64,7 +64,7 @@
 | AI post-α H2 build log | [`ai-consultant-post-alpha-h2-build-log.md`](ai-consultant-post-alpha-h2-build-log.md) | Append per wave; link verification commands |
 | AI prompt composition (maintenance) | [`canonical-ai-prompt-composition-surface.md`](canonical-ai-prompt-composition-surface.md) | Sync module `aiPrompts` + route maps when adding modules or RouteIds |
 | Native horizontal surface | [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) | Update route matrix when promoting native routes; update §5 when demo scope shifts |
-| Ubuntu Touch operator shell | [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md) | Update module eligibility / trade-offs when UT packaging changes; reference package at [`packaging/ubuntu-touch/umbraculum-reference/`](../../packaging/ubuntu-touch/umbraculum-reference/README.md) |
+| Ubuntu Touch workspace web UI | [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md) | Update module eligibility / trade-offs when UT packaging changes; reference package at [`packaging/ubuntu-touch/umbraculum-reference/`](../../packaging/ubuntu-touch/umbraculum-reference/README.md) |
 | Demo host runbook | [`demo-host-runbook.md`](demo-host-runbook.md) | Update demo accounts table when seed emails change |
 | Cloud hosted track (stub) | [`cloud-hosted-product-track.md`](cloud-hosted-product-track.md) | Amend when `cloud.umbraculum.dev` work starts |
 | RFC-0002 native companion | [`0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §5 | Link to native surface when `registerNativeModule` behavior changes |

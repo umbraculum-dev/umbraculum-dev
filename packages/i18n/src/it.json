@@ -1930,7 +1930,7 @@
       "tryAgain": "Riprova"
     }
   },
-  "shellNotice": {
+  "sharedLayoutNotice": {
     "demo": {
       "ariaLabel": "Avviso ambiente demo",
       "summaryLine": "Ambiente di dimostrazione pubblico su demo.umbraculum.dev — dati solo dimostrativi; possono essere reimpostati senza preavviso.",

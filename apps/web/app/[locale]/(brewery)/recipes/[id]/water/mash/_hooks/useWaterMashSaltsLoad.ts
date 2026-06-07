@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import type { WaterCalcDerivation } from "@umbraculum/brewery-contracts";
 
-import { asRecord } from "../../../../../../../_shell/_lib/typeGuards";
+import { asRecord } from "../../../../../../../_shared-layout/_lib/typeGuards";
 import type { RecipeWaterSettings } from "../../_lib/waterSettings";
 import type { SaltAdditionsResult } from "../../_lib/waterCalcTypes";
 

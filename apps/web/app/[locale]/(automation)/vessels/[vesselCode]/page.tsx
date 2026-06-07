@@ -10,8 +10,8 @@ import { type VesselState } from "@umbraculum/automation-contracts";
 
 import { Link } from "../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../(brewery)/_components/recipe-edit";
-import { useRequireAuth } from "../../../../_shell/_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../../_shell/_lib/webApiClient";
+import { useRequireAuth } from "../../../../_shared-layout/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../../_shared-layout/_lib/webApiClient";
 
 /**
  * Phase B-3 automation vessel — detail page.

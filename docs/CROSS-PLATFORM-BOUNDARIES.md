@@ -203,7 +203,7 @@ Rebuild after changes: see [`DEVELOPMENT.md`](../DEVELOPMENT.md) and the shared-
 
 ---
 
-## 9. Ubuntu Touch operator shell (webapp, not a UI fork)
+## 9. Ubuntu Touch workspace web UI (webapp, not a UI fork)
 
 Umbraculum does **not** ship a Qt/QML UI for [Ubuntu Touch](https://ubuntu-touch.io/). Operator modules on Lomiri reuse the **web slice** unchanged: Tamagui pages in `apps/web`, cookie-session auth, and locale-prefixed routes from `@umbraculum/navigation`.
 
@@ -220,7 +220,7 @@ Umbraculum does **not** ship a Qt/QML UI for [Ubuntu Touch](https://ubuntu-touch
 ## Related docs
 
 - [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §3.5 — platform audit summary
-- [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch delivery decision (Click webapp shell, online-first)
+- [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch delivery decision (Click Morph webapp wrapper, online-first)
 - [`../packaging/ubuntu-touch/umbraculum-reference/README.md`](../packaging/ubuntu-touch/umbraculum-reference/README.md) — reference Click package + build steps
 - [`TAMAGUI.md`](TAMAGUI.md) — cross-platform UI primitive layer
 - [`canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) — iOS/Android native obligations (orthogonal to UT)

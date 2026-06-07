@@ -6,12 +6,12 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
-import { AskAiLink } from "../../../_shell/_components/AskAiLink";
+import { AskAiLink } from "../../../_shared-layout/_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
-import { AsyncExportButton } from "../../../_shell/_components/AsyncExportButton";
+import { AsyncExportButton } from "../../../_shared-layout/_components/AsyncExportButton";
 import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
-import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
+import { useRequireAuth } from "../../../_shared-layout/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 import { ProductionOrderSummary, RefreshButton, SectionCard } from "../_components/MrpReadOnly";
 
 export default function MrpProductionOrdersPage() {

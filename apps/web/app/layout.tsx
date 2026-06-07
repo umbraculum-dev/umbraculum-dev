@@ -7,7 +7,7 @@ import {
   resolveEnabledModuleCodes,
   resolveModuleProfile,
 } from "@umbraculum/module-sdk";
-import { registerPlatformSegments } from "./_shell/_lib/registerPlatformSegments";
+import { registerPlatformSegments } from "./_shared-layout/_lib/registerPlatformSegments";
 import "./globals.css";
 import "../public/tamagui.generated.css";
 

@@ -71,7 +71,7 @@ import { fileURLToPath } from "node:url";
  * `[locale]/` are NOT violations of Discipline D.
  *
  * Mirrors the eventual `registerWebModule({ code: "platform", ownedUrlSegments: [...] })`
- * call in `apps/web/app/_shell/_lib/registerPlatformSegments.ts` (Phase 5).
+ * call in `apps/web/app/_shared-layout/_lib/registerPlatformSegments.ts` (Phase 5).
  */
 const PLATFORM_RESERVED_SEGMENTS = new Set<string>([
   // auth pseudo-segments live inside (auth)/ route group, NOT as flat folders.
@@ -80,7 +80,9 @@ const PLATFORM_RESERVED_SEGMENTS = new Set<string>([
   "signup",
   "select-workspace",
   "select-account",
-  // platform pages currently flat under [locale]/
+  // Platform horizontal pages live under `(platform-layout)/` (Wave 3f).
+  // Segments listed here for registry parity with registerPlatformSegments.ts
+  // and to avoid false positives if a segment is ever moved back to flat layout.
   "about",
   "accessibility",
   "ai",

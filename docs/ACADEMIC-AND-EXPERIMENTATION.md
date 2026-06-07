@@ -62,7 +62,7 @@ These respect the **vertical configuration** model ([RFC-0001](rfcs/0001-modules
 | **Cosmetics / food formulation lab** | `pim` (products, attributes), optional read-only `mrp` | Formulation UI, batch records, your constants/rules |
 | **Campus lab equipment booking** | `automation` (vessels/equipment metaphor), platform auth | Booking flows, lab-specific seed data |
 | **Small-batch production demo** | `mrp` / `crp` read models, brewery patterns as reference | Your vertical config + demo data — not a second MRP engine |
-| **Capstone "operational app"** | Platform shell + one canonical module | Tier 6 vertical in **your repo**, MIT SDK, public GitHub |
+| **Capstone "operational app"** | Platform shared layout + one canonical module | Tier 6 vertical in **your repo**, MIT SDK, public GitHub |
 
 **Learning path:** skim [`GLOSSARY.md`](GLOSSARY.md) → [`MODULES.md`](MODULES.md) → clone and [`GETTING-STARTED.md`](GETTING-STARTED.md) → [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) when you start your own vertical repo.
 

@@ -49,7 +49,7 @@ Full table and examples: [solid-decoupling-audit.md §2](./solid-decoupling-audi
 | **Brewery vertical** | `modules/brewery/routes/`, `services/api/src/services/*`, `domain/` | Transitional layout; service surface | Brewery vertical |
 | **Platform routes/services** | `services/api/src/routes/`, `services/api/src/services/` | Auth, AI, integrations thickness | Platform API |
 | **Packages** | `packages/*-contracts/`, `module-sdk`, `brewery-core`, `beerjson` | Package boundaries; contract purity | Package maintainer |
-| **Apps** | `apps/web/app/`, `apps/native/src/modules/` | Page decomposition; api-client only | App shell |
+| **Apps** | `apps/web/app/`, `apps/native/src/modules/` | Page decomposition; api-client only | Platform shared layout |
 | **Cross-module edges** | MRP↔CRP↔brewery projections, AI tools | Dependency direction; shared contracts | Planning modules + platform |
 
 ---

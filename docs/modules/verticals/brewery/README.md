@@ -207,7 +207,7 @@ Brewery HTTP routes migrated to `zodApp` + `schema.tags: ['brewery']` appear in 
 
 - [`IMPLEMENTATION-LOG.md`](IMPLEMENTATION-LOG.md) — brewery vertical product rules, offline/sync intent, water/recipe constraints, living engineering constraints.
 - [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md) — web/native as-built boundaries (route IDs, auth, webview bridge).
-- [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch webapp shell (web workflows; no offline brew-day).
+- [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch Morph webapp wrapper (web workflows; no offline brew-day).
 - [`design/platform-module-profile.md`](../../../design/platform-module-profile.md) — F-mod deploy profile (`reference` vs `platform`).
 - [`API-OPENAPI.md`](../../../API-OPENAPI.md) — platform catalog + brewery add-on OpenAPI specs
 - [RFC-0002](../../../rfcs/0002-canonical-module-physical-layout.md) §3 (β layout), §6 (Decision D — brewery sequencing), §11.2 (concrete migration table).

@@ -2,7 +2,7 @@
 
 import { H1, SizableText, View, YStack } from "tamagui";
 
-import { DashboardClient } from "../../../../DashboardClient";
+import { DashboardClient } from "../../../../../DashboardClient";
 import type { AiSettingsPageModel } from "../_hooks/useAiSettingsPage";
 import { AiSettingsAdminForm } from "./AiSettingsAdminForm";
 

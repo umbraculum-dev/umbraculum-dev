@@ -6,11 +6,11 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 import { listVessels } from "@umbraculum/api-client/automation";
 import { type VesselState } from "@umbraculum/automation-contracts";
 
-import { AskAiLink } from "../../../_shell/_components/AskAiLink";
+import { AskAiLink } from "../../../_shared-layout/_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox } from "../../(brewery)/_components/recipe-edit";
-import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
+import { useRequireAuth } from "../../../_shared-layout/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 
 /**
  * Phase B-3 automation vessels — list page.

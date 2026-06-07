@@ -310,7 +310,7 @@ interface RegisterWebModuleOptions {
     ownedUrlSegments?: readonly string[];
     /**
      * Optional primary navigation entries. The web shell's `PrimaryNav` reads
-     * the registry via `composeWebShellNavItems()`. Each `primarySegment` MUST
+     * the registry via `composeWebSharedLayoutNavItems()`. Each `primarySegment` MUST
      * appear in `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale
      * bundles (see `@umbraculum/i18n-keys`). `order` is a sort key (lower is
      * earlier; defaults to 50 if omitted).
@@ -366,6 +366,7 @@ declare class NavEntryPrimarySegmentNotOwnedError extends Error {
     readonly primarySegment: string;
     constructor(code: string, primarySegment: string);
 }
+
 /**
  * Parallel web-side registry. Records the module code, owned URL segments,
  * and optional navigation entry. Collision detection runs at registration
@@ -499,7 +500,7 @@ declare function isModuleEnabled(code: string, env?: NodeJS.ProcessEnv): boolean
  */
 declare const BUILTIN_WEB_MODULE_REGISTRATIONS: readonly RegisterWebModuleOptions[];
 /** Platform-owned primary nav entries (not tied to a canonical module code). */
-declare const PLATFORM_WEB_SHELL_NAV_ENTRIES: readonly {
+declare const PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES: readonly {
     href: string;
     labelKey: ModuleNavLabelKey;
     order: number;
@@ -512,7 +513,7 @@ declare function registerBuiltinWebModulesIfAbsent(options?: {
     enabledCodes?: ReadonlySet<string>;
 }): void;
 
-interface WebShellNavItem {
+interface WebSharedLayoutNavItem {
     href: string;
     labelKey: ModuleNavLabelKey;
     order: number;
@@ -525,24 +526,24 @@ interface WebShellNavItem {
  * first (`registerBuiltinWebModulesIfAbsent()` + `registerPlatformSegments()`
  * on web; API boot calls the built-in registrar before reading).
  */
-declare function composeWebShellNavItems(): WebShellNavItem[];
+declare function composeWebSharedLayoutNavItems(): WebSharedLayoutNavItem[];
 
 /**
- * Deploy-time web shell notice — activated via NEXT_PUBLIC_WEB_SHELL_NOTICE_ID.
+ * Deploy-time web shell notice — activated via NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID.
  * @see docs/design/demo-host-runbook.md
  */
-declare const WEB_SHELL_NOTICE_IDS: readonly ["demo"];
-type WebShellNoticeId = (typeof WEB_SHELL_NOTICE_IDS)[number];
-type WebShellNoticeVariant = "notice" | "warning" | "info";
-interface WebShellNoticeConfig {
-    id: WebShellNoticeId;
-    variant: WebShellNoticeVariant;
+declare const WEB_SHARED_LAYOUT_NOTICE_IDS: readonly ["demo"];
+type WebSharedLayoutNoticeId = (typeof WEB_SHARED_LAYOUT_NOTICE_IDS)[number];
+type WebSharedLayoutNoticeVariant = "notice" | "warning" | "info";
+interface WebSharedLayoutNoticeConfig {
+    id: WebSharedLayoutNoticeId;
+    variant: WebSharedLayoutNoticeVariant;
     dismissible: boolean;
 }
 /**
  * Resolve an optional shell notice from process env.
- * Hosting injects `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID` at web build time only.
+ * Hosting injects `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID` at web build time only.
  */
-declare function resolveWebShellNotice(env?: NodeJS.ProcessEnv): WebShellNoticeConfig | null;
+declare function resolveWebSharedLayoutNotice(env?: NodeJS.ProcessEnv): WebSharedLayoutNoticeConfig | null;
 
-export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_MODULE_CODES, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type BuiltinModuleCode, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidModuleProfileError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleProfile, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHELL_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, WEB_SHELL_NOTICE_IDS, type WebShellNavItem, type WebShellNoticeConfig, type WebShellNoticeId, type WebShellNoticeVariant, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebShellNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, isModuleEnabled, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredTierLimitKeys, listRegisteredWebModules, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveEnabledModuleCodes, resolveModuleProfile, resolveRoutePromptOverlay, resolveWebShellNotice, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };
+export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_MODULE_CODES, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type BuiltinModuleCode, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidModuleProfileError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleProfile, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, WEB_SHARED_LAYOUT_NOTICE_IDS, type WebSharedLayoutNavItem, type WebSharedLayoutNoticeConfig, type WebSharedLayoutNoticeId, type WebSharedLayoutNoticeVariant, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebSharedLayoutNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, isModuleEnabled, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredTierLimitKeys, listRegisteredWebModules, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveEnabledModuleCodes, resolveModuleProfile, resolveRoutePromptOverlay, resolveWebSharedLayoutNotice, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };

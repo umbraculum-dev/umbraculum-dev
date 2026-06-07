@@ -18,13 +18,13 @@
 | Question | Decision |
 |---|---|
 | Can React Native run natively on Ubuntu Touch? | **No** — no maintained RN target for Linux mobile; not planned by Meta or Microsoft. |
-| Can we ship Umbraculum on Ubuntu Touch without rewriting UI in Qt/QML? | **Yes** — via the **UT webapp shell**: a Lomiri **Click package** that wraps `apps/web` in Morph's Qt WebEngine webview (`webapp-container`). |
+| Can we ship Umbraculum on Ubuntu Touch without rewriting UI in Qt/QML? | **Yes** — via the **UT Morph webapp wrapper**: a Lomiri **Click package** that wraps `apps/web` in Morph's Qt WebEngine webview (`webapp-container`). |
 | Do we maintain Tamagui as the single UI primitive layer? | **Yes — non-negotiable.** Ubuntu Touch consumes the **web slice**, not a parallel QML tree. |
 | Do we require OpenStore / Click store presence? | **Yes — non-negotiable.** Packaging is a first-class deliverable, not "open in Morph manually." |
-| Do we require offline on Ubuntu Touch? | **No — explicitly sacrificed for now.** Online-first is an accepted trade-off on this shell. |
+| Do we require offline on Ubuntu Touch? | **No — explicitly sacrificed for now.** Online-first is an accepted trade-off on this delivery path. |
 | What is the strategic payoff? | **Faster React-app delivery** across **web + iOS/Android native + macOS (via web or future RN macOS) + Ubuntu Touch** from one Tamagui/Next source tree — without forking the module model. |
 
-**Way forward (precise):** treat Ubuntu Touch as a **fourth operator shell** that reuses **`apps/web`** unchanged, distributed as a **UBports webapp Click package** per deployment (self-hosted URL or hosted product URL). Domain logic stays in API + contracts; UI stays in Tamagui web pages.
+**Way forward (precise):** treat Ubuntu Touch as a **fourth workspace web UI** that reuses **`apps/web`** unchanged, distributed as a **UBports webapp Click package** per deployment (self-hosted URL or hosted product URL). Domain logic stays in API + contracts; UI stays in Tamagui web pages.
 
 ---
 
@@ -61,10 +61,10 @@ The toolset commitment ([PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) 
 
 ```mermaid
 flowchart TB
-  subgraph L3 [Layer 3 — UI shells]
+  subgraph L3 [Layer 3 — UI delivery surfaces]
     web["apps/web — Next.js + Tamagui"]
     rn["apps/native — Expo + Tamagui"]
-    ut["Ubuntu Touch — Click webapp shell"]
+    ut["Ubuntu Touch — Click Morph webapp wrapper"]
   end
   subgraph L2 [Layer 2 — Client SDK]
     nav["@umbraculum/navigation"]
@@ -111,18 +111,18 @@ Sacrificing **offline on Ubuntu Touch** is **explicitly accepted** to unlock **q
 
 ### 3.1 Aligns with existing architecture
 
-- **Application surfaces** ([application-surfaces-vs-platform-backbone.md](application-surfaces-vs-platform-backbone.md)): operator shell = `apps/web` + `apps/native`. UT webapp is **`apps/web` + a packaging adapter**, not a new backbone layer.
+- **Application surfaces** ([application-surfaces-vs-platform-backbone.md](application-surfaces-vs-platform-backbone.md)): workspace web UI = `apps/web` + `apps/native`. UT webapp is **`apps/web` + a packaging adapter**, not a new backbone layer.
 - **Route policy** ([CROSS-PLATFORM-BOUNDARIES.md](../CROSS-PLATFORM-BOUNDARIES.md) §2): routes already have stable `RouteId`s and web paths via `@umbraculum/navigation`. UT navigates locale-prefixed URLs (`/en/products`, `/en/vessels`, …) — no new route semantics required.
 - **Auth** ([AUTH-STRATEGY.md](../AUTH-STRATEGY.md)): web uses cookie sessions (`sid`). UT webapp is a web client; standard login flows apply. Optional follow-on: extend the existing webview-exchange bridge for smoother handoff from a future UT-specific entrypoint.
 - **Native slice unchanged** ([canonical-native-platform-surface.md](canonical-native-platform-surface.md)): iOS/Android keep bearer auth, offline roadmap (SQLite), and brew-day guarantees. UT does not dilute those commitments.
 
 ### 3.2 Aligns with ROADMAP posture
 
-[ROADMAP.md](../ROADMAP.md) already states **web-first for heavy desktop workflows** and contemplates **web + PWA** fallbacks where native is not justified (e.g. WMS). UT webapp delivery is consistent with that pattern — another **online-first shell** for operator workflows that do not require device-local persistence.
+[ROADMAP.md](../ROADMAP.md) already states **web-first for heavy desktop workflows** and contemplates **web + PWA** fallbacks where native is not justified (e.g. WMS). UT webapp delivery is consistent with that pattern — another **online-first web delivery** for operator workflows that do not require device-local persistence.
 
 ### 3.3 Rejects fragmentation
 
-[RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §2 names domain duplication and cross-cutting fragmentation as core failure modes. A Qt UI fork would recreate Magento-style parallel implementations per platform. The webapp shell keeps **one UI slice per module**.
+[RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §2 names domain duplication and cross-cutting fragmentation as core failure modes. A Qt UI fork would recreate Magento-style parallel implementations per platform. The Morph webapp wrapper keeps **one UI slice per module**.
 
 ### 3.4 Strategic velocity
 
@@ -137,7 +137,7 @@ Product view: **optimize for time-to-Ubuntu-Touch**, not parity with native offl
 
 ## 4. What Ubuntu Touch delivery is (precise definition)
 
-### 4.1 UT webapp shell
+### 4.1 UT Morph webapp wrapper
 
 A **Click package** containing:
 
@@ -161,7 +161,7 @@ At runtime:
 | Contracts | Unchanged — still the third-party pin surface |
 | API | Unchanged — webview calls same Fastify routes |
 | Web | **Primary UT UI** — zero fork |
-| Native | **Not used on UT** — offline/sync guarantees do not apply to this shell |
+| Native | **Not used on UT** — offline/sync guarantees do not apply to this delivery path |
 
 ### 4.3 Reference Click package (packaging artifact)
 
@@ -188,8 +188,8 @@ See also [`packaging/ubuntu-touch/README.md`](../../packaging/ubuntu-touch/READM
 |---|---|---|---|
 | Offline SQLite / brew-day logging | Planned / product guarantee for the **brewery reference vertical** on iOS/Android ([brewery IMPLEMENTATION-LOG](../modules/verticals/brewery/IMPLEMENTATION-LOG.md)) | **Not supported** | Offline is owned by the **native slice** (device SQLite + sync queue — [`DATA-ACCESS-BOUNDARIES.md`](../DATA-ACCESS-BOUNDARIES.md) §5). v1 UT has **no native slice** and no second on-device store. Shipping offline in Morph would mean **new client persistence + conflict rules** beside the existing native plan — high cost, two offline stories, slow vs “wrap `apps/web` now.” **Accepted trade:** online-first on UT. |
 | Bearer-only native auth transport | Yes (`POST /auth/login/native`, Secure Store) | Cookie web session (`sid` in Morph) | `apps/web` is already **cookie-session** ([`AUTH-STRATEGY.md`](../AUTH-STRATEGY.md)). Bearer-in-webview would need custom token injection + refresh handling in the Click shell with **no product win** over standard web login for v1. **Accepted trade:** UT behaves like web auth, not Expo auth. |
-| Push notifications (Expo) | Future native path (FCM / APNs via Expo) | **Not in v1 shell** | Push requires **native registration** (device token, OS notification channel). A Morph webapp is not an Expo app; Lomiri-visible push would need **UBports-specific glue** (Click lifecycle, system notifier, optional small Qt helper) — separate from Tamagui/web work. **Deferred:** possible v2+; **not** free with webapp packaging. |
-| BLE / device sensors via native modules | Native-only (`apps/native` + RN plugins) | **Not in v1 shell** | Sensor/BLE code lives in the **RN native slice**, not in Tamagui web. Web Bluetooth inside Morph is **unreliable or absent** for industrial use; a Lomiri-native BLE bridge would be a **new bounded client** (Option C in §2.4), not “no rewrite.” **Deferred:** integrator or v2; out of quick-delivery scope. |
+| Push notifications (Expo) | Future native path (FCM / APNs via Expo) | **Not in v1 webapp wrapper** | Push requires **native registration** (device token, OS notification channel). A Morph webapp is not an Expo app; Lomiri-visible push would need **UBports-specific glue** (Click lifecycle, system notifier, optional small Qt helper) — separate from Tamagui/web work. **Deferred:** possible v2+; **not** free with webapp packaging. |
+| BLE / device sensors via native modules | Native-only (`apps/native` + RN plugins) | **Not in v1 webapp wrapper** | Sensor/BLE code lives in the **RN native slice**, not in Tamagui web. Web Bluetooth inside Morph is **unreliable or absent** for industrial use; a Lomiri-native BLE bridge would be a **new bounded client** (Option C in §2.4), not “no rewrite.” **Deferred:** integrator or v2; out of quick-delivery scope. |
 | Background sync queue | Native roadmap (pairs with offline SQLite) | **Online only** — no background drain queue | A sync **queue** exists to flush **local writes** when connectivity returns. Without UT offline storage, there is no queued work to replay in background — only live HTTP while the webview is open. **Accepted trade:** same as browser tab; no native WorkManager-style pipeline in v1. |
 
 #### Feasibility framing (outside the table)
@@ -318,11 +318,11 @@ Before declaring a UT deployment "aligned with this doc":
 | [README.md](../README.md) | Docs index — Design + Architecture entries |
 | [PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) §1.1, §3.5 | Cross-platform toolset commitment |
 | [MODULES.md](../MODULES.md) §5.1 | Four β slices; UT uses web slice only |
-| [CROSS-PLATFORM-BOUNDARIES.md](../CROSS-PLATFORM-BOUNDARIES.md) §9 | UT operator shell summary |
-| [application-surfaces-vs-platform-backbone.md](application-surfaces-vs-platform-backbone.md) | Operator shell layering |
+| [CROSS-PLATFORM-BOUNDARIES.md](../CROSS-PLATFORM-BOUNDARIES.md) §9 | UT workspace web UI summary |
+| [application-surfaces-vs-platform-backbone.md](application-surfaces-vs-platform-backbone.md) | Workspace web UI layering |
 | [AUTH-STRATEGY.md](../AUTH-STRATEGY.md) | Cookie vs bearer split |
 | [DATA-ACCESS-BOUNDARIES.md](../DATA-ACCESS-BOUNDARIES.md) §5 | Native offline vs UT (no SQLite on UT) |
-| [ROADMAP.md](../ROADMAP.md) | Standing principle — UT webapp shell |
+| [ROADMAP.md](../ROADMAP.md) | Standing principle — UT Morph webapp wrapper |
 | [canonical-native-platform-surface.md](canonical-native-platform-surface.md) §3.4 | What stays iOS/Android-only |
 | [modules/verticals/brewery/IMPLEMENTATION-LOG.md](../modules/verticals/brewery/IMPLEMENTATION-LOG.md) | Brew-day offline — native only (brewery reference vertical) |
 | [GLOSSARY.md](../GLOSSARY.md) | *Vertical*, *canonical*, brewery-as-example convention |
@@ -339,7 +339,7 @@ Before declaring a UT deployment "aligned with this doc":
 
 ## 12. Resolution
 
-**Decision:** Ubuntu Touch is a **webapp shell target** reusing **`apps/web` + Tamagui**, distributed as **Click/OpenStore packages**, **online-first**, **no Qt rewrite**.
+**Decision:** Ubuntu Touch is a **Morph webapp wrapper target** reusing **`apps/web` + Tamagui**, distributed as **Click/OpenStore packages**, **online-first**, **no Qt rewrite**.
 
 **Rejected:** full QML UI port, RN-on-LUT, Waydroid-as-product-strategy, offline parity on UT in v1.
 

@@ -14,7 +14,7 @@
 
 | Concern | Owner | Doc / code |
 |---------|-------|------------|
-| Native app shell | `apps/native` | [`apps/native/README.md`](../../apps/native/README.md) |
+| Native platform shared layout | `apps/native` | [`apps/native/README.md`](../../apps/native/README.md) |
 | Route policy | `@umbraculum/navigation` | [`packages/navigation/src/index.ts`](../../packages/navigation/src/index.ts) |
 | Module registration (native) | `@umbraculum/module-sdk` | `registerNativeModule()` — [`registerNativeModule.ts`](../../packages/module-sdk/src/registerNativeModule.ts) |
 | Auth transport | `@umbraculum/api-client` | `bearerTokenAuth` — [AUTH-STRATEGY.md](../AUTH-STRATEGY.md) |
@@ -101,7 +101,7 @@ Extend via `WEBVIEW_WHITELIST_ROUTE_IDS` in navigation (product decision per rou
 
 Callers MUST check `getRouteAvailability` before `routeToNativeTarget` — web-only IDs throw if gated incorrectly.
 
-### 3.4 Ubuntu Touch (webapp shell — not this doc)
+### 3.4 Ubuntu Touch (Morph webapp wrapper — not this doc)
 
 iOS/Android obligations in §3–§4 apply to **`apps/native` (Expo)** only. **Ubuntu Touch** reuses the **web slice** in a Lomiri Click webapp (`webapp-container` + Morph); route availability follows **web**, not native. Native-only brew-day screens and offline SQLite do **not** ship on UT. Decision-of-record: [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md).
 
@@ -218,7 +218,7 @@ When WMS surface design lands: [`apps/native/src/modules/wms/README.md`](../../a
 - [demo-host-runbook.md](demo-host-runbook.md) — **`demo.umbraculum.dev`** policy and demo accounts  
 - [cloud-hosted-product-track.md](cloud-hosted-product-track.md) — future **`cloud.umbraculum.dev`** (not demo)  
 - [native-eas-demo-build-log.md](native-eas-demo-build-log.md) — EAS build + smoke status  
-- [ubuntu-touch-shell-strategy.md](ubuntu-touch-shell-strategy.md) — UT webapp shell (orthogonal to native slice)  
+- [ubuntu-touch-shell-strategy.md](ubuntu-touch-shell-strategy.md) — UT Morph webapp wrapper (orthogonal to native slice)  
 - [canonical-mrp-module-surface.md](canonical-mrp-module-surface.md) / [canonical-crp-module-surface.md](canonical-crp-module-surface.md) — web-first planning  
 - [mrp-crp-alpha-demo-walkthrough.md](mrp-crp-alpha-demo-walkthrough.md) — browser walkthrough on demo host  
 - [modules/verticals/brewery/README.md](../modules/verticals/brewery/README.md) §3.3  

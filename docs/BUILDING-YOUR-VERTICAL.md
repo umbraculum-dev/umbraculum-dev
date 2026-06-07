@@ -21,7 +21,7 @@ Umbraculum uses the **same three-layer idea** with different packaging today:
 
 | Magento 2 (familiar) | Umbraculum (name) | Typical home | In `umbraculum-dev` today? |
 |---|---|---|---|
-| Magento Open Source **core** + framework (`magento/product-community-edition`, `magento/framework`, …) | **Horizontal platform** — auth, workspace, billing, AI, i18n, shells, rendering | Vendor / platform repo | **Yes** — shared |
+| Magento Open Source **core** + framework (`magento/product-community-edition`, `magento/framework`, …) | **Horizontal platform** — auth, workspace, billing, AI, i18n, shared layout, rendering | Vendor / platform repo | **Yes** — shared |
 | Standard domain modules shipped with the suite (Catalog, Customer, Inventory, …) — *peer domains, not "industry verticals"* | **Canonical modules** — `pim`, `mrp`, `wms`, `crm`, `automation`, `crp` | Platform repo | **Yes** — shared |
 | **`Magento_SampleData*`** modules (Luma demo products, widgets, …) — reference/demo, **not** your merchant product | **`brewery` reference vertical** — demo domain data, BeerJSON, brew-day UX, `@umbraculum/brewery-*` packages | *Should* be optional like sample data | **Co-shipped in monorepo** (see gap below) |
 | **Your agency module** — `vendor/module-acme-checkout`, theme, integrations in the **merchant project** | **Your vertical configuration** — `code: "distillery"`, `@acme/distillery-*`, your β slices | **Your repo** + your deploy | **Usually no** |
@@ -83,11 +83,26 @@ umbraculum platform (upstream)       ← backbone you track / deploy
 
 **Contributing a vertical into this monorepo:** optional. Only the **reference vertical** (`brewery`) and core team's demos live here by policy. Your production vertical should default to **your repo** ([`GLOSSARY.md`](GLOSSARY.md) §"Where code lives").
 
+### Where does my UI code go?
+
+Use this decision tree when adding web UI or helpers (conventional terms — see [backbone §3.7](design/pre-flip-application-surface-backbone.md)):
+
+```text
+Used on web AND native with the same widget?  → @umbraculum/<vertical>-* package
+Platform-wide nav / footer / auth / providers? → app/_shared-layout/{_components,_lib}/
+Module-only shared UI for one module code?     → app/[locale]/(<code>)/{_components,_lib}/
+Routable page (URL segment)?                   → app/[locale]/(<code>)/<segment>/
+                                              OR app/[locale]/(platform-layout)/<segment>/  (platform horizontal)
+Cross-workspace admin (ads, platform recipes)? → app/[locale]/platform/  (unchanged)
+```
+
+**Not** platform shared layout: a page's internal column/grid layout (recipe editor sections); Tamagui `layout` props; the POSIX command-line shell.
+
 ---
 
 ## Question 2 — Running without brewery (today vs target)
 
-You are building **product X** (distillery, hotel ops, cosmetics batch, internal PIM-only workspace, …). You do **not** want brewery recipes, brew-day flows, or `@umbraculum/brewery-*` in your operator shell.
+You are building **product X** (distillery, hotel ops, cosmetics batch, internal PIM-only workspace, …). You do **not** want brewery recipes, brew-day flows, or `@umbraculum/brewery-*` in your workspace web UI.
 
 ### Target (the Magento sample-data equivalent)
 

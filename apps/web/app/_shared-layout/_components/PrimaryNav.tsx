@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import type { AuthMeResponse } from "@umbraculum/contracts";
-import type { WebShellNavItem } from "@umbraculum/module-sdk";
+import type { WebSharedLayoutNavItem } from "@umbraculum/module-sdk";
 import { SizableText, XStack } from "tamagui";
 
 import { fetchAuthMe } from "../_lib/fetchAuthMe";
@@ -24,7 +24,7 @@ const AUTH_CHANGED_EVENT = "brewery:auth-changed";
 const BRAND_COOKIE = "UI_BRAND";
 const NAV_MESSAGE_PREFIX = "nav.";
 
-function navLabelSuffix(labelKey: WebShellNavItem["labelKey"]): string {
+function navLabelSuffix(labelKey: WebSharedLayoutNavItem["labelKey"]): string {
   return labelKey.startsWith(NAV_MESSAGE_PREFIX)
     ? labelKey.slice(NAV_MESSAGE_PREFIX.length)
     : labelKey;
@@ -40,7 +40,7 @@ function setBrand(brandKey: string) {
   document.documentElement.dataset['brand'] = brandKey;
 }
 
-export function PrimaryNav({ shellNavItems }: { shellNavItems: readonly WebShellNavItem[] }) {
+export function PrimaryNav({ sharedLayoutNavItems }: { sharedLayoutNavItems: readonly WebSharedLayoutNavItem[] }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
@@ -126,13 +126,13 @@ export function PrimaryNav({ shellNavItems }: { shellNavItems: readonly WebShell
         if (href === "/") return pathnameNoLocale === "/" || pathnameNoLocale === "";
         return pathnameNoLocale === href || pathnameNoLocale.startsWith(`${href}/`);
       };
-      return shellNavItems.map((item) => ({
+      return sharedLayoutNavItems.map((item) => ({
         href: item.href,
         label: t(navLabelSuffix(item.labelKey)),
         isActive: checkActive(item.href),
       }));
     },
-    [shellNavItems, t, pathnameNoLocale],
+    [sharedLayoutNavItems, t, pathnameNoLocale],
   );
 
   return (

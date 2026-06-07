@@ -52,7 +52,7 @@ Every workspace in the monorepo, grouped by layer. The npm name and the on-disk 
 
 | Path | npm name | What it is | Notable consumes |
 |---|---|---|---|
-| `apps/web/` | `@umbraculum/web` | Next.js + React + Tamagui storefront — the desktop-first web surface. Platform operator shell: `app/_shell/{_components,_lib}/`. | `@umbraculum/{ui, brewery-recipes-ui, navigation, i18n-react, api-client, media, contracts, …}` |
+| `apps/web/` | `@umbraculum/web` | Next.js + React + Tamagui storefront — the desktop-first web surface. Platform shared layout: `app/_shared-layout/{_components,_lib}/`. | `@umbraculum/{ui, brewery-recipes-ui, navigation, i18n-react, api-client, media, contracts, …}` |
 | `apps/native/` | `@umbraculum/native` | Expo + React Native + Tamagui mobile app — the on-the-go brew-day surface. | `@umbraculum/{ui, brewery-recipes-ui, navigation, i18n-react, api-client, media, contracts, …}` |
 | `apps/web/e2e/` | (sub-workspace) | Playwright E2E suite for the web app. | Runs against the live stack; no source-level package dependencies. |
 
@@ -234,7 +234,7 @@ graph TB
 - **Apps consume cross-platform packages, never each other.** Web and native share through layer 3, not through `apps/*` imports.
 - **`@umbraculum/brewery-recipes-ui` is the cross-platform domain UI** — both apps consume it, and it in turn consumes `@umbraculum/ui` (primitives) plus `@umbraculum/brewery-beerjson` + `@umbraculum/brewery-core` (domain math). This is the layered shape that makes brewery features render on both surfaces without per-app forks.
 - **`services/api` consumes contracts packages and the module SDK** — never the cross-platform packages (no `@umbraculum/ui` import from a Fastify handler, by design).
-- **`@umbraculum/module-sdk` is consumed by `services/api` AND `apps/web`** in the diagram today. The API-side `registerModule()` records server-side metadata; the web-side `registerWebModule()` is called both from each module's API bootstrap (so registration happens at app boot) and from `apps/web/app/_shell/_lib/registerPlatformSegments.ts` (so the platform's residual segments are also declared). `registerNativeModule()` remains future per RFC-0002 §5.
+- **`@umbraculum/module-sdk` is consumed by `services/api` AND `apps/web`** in the diagram today. The API-side `registerModule()` records server-side metadata; the web-side `registerWebModule()` is called both from each module's API bootstrap (so registration happens at app boot) and from `apps/web/app/_shared-layout/_lib/registerPlatformSegments.ts` (so the platform's residual segments are also declared). `registerNativeModule()` remains future per RFC-0002 §5.
 
 ---
 
@@ -275,7 +275,7 @@ This is a **canonical-for-now** decision — revisable when the marketing site l
 - [`DOCS-README-STANDARDS.md`](DOCS-README-STANDARDS.md) — the per-workspace module-README standard (Docs slice CI gate).
 - [`TAMAGUI.md`](TAMAGUI.md) — Tamagui as the choice that makes "one tree → both surfaces" possible.
 - [`NATIVE-STRATEGY-AND-CI.md`](NATIVE-STRATEGY-AND-CI.md) — native strategy + risk posture + CI.
-- [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch webapp shell decision.
+- [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch Morph webapp wrapper decision.
 - [`../packaging/ubuntu-touch/umbraculum-reference/README.md`](../packaging/ubuntu-touch/umbraculum-reference/README.md) — reference Click package for Lomiri.
 - [`OPEN-SOURCE-STACK.md`](OPEN-SOURCE-STACK.md) — per-dependency rationale (what each load-bearing dep does + why this over the proprietary alternative).
 - [`../README.md`](../README.md) — repo entry point with the high-level repository layout and the "Native out of the box (why Tamagui)" framing.

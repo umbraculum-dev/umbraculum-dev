@@ -93,7 +93,7 @@ Standard in this repo:
 The web app uses two CSS sources: `apps/web/app/globals.css` (imports) and `apps/web/public/tamagui.generated.css` (Tamagui). `globals.css` imports three files:
 
 - **variables.css** — `:root` tokens and theme presets (`data-theme`, `data-brand`, `data-density`, `data-font-scale`)
-- **layout.css** — Reset, base elements (html/body, a, button/input/select/textarea), `:focus-visible`, reduced-motion, and layout classes (`.brew-app-shell`, `.brew-panel`, `.brew-code-block`)
+- **layout.css** — Reset, base elements (html/body, a, button/input/select/textarea), `:focus-visible`, reduced-motion, and layout classes (`.brew-app-shared-layout`, `.brew-panel`, `.brew-code-block`)
 - **components.css** — App-specific component classes (`.brew-error-box`, `.brew-muted`, `.brew-recipe-edit-select`, `.brew-field-block`, etc.)
 
 **Naming:** All custom classes use the `brew-` prefix (e.g. `brew-panel`, `brew-recipe-edit-select`) to avoid clashes with Tamagui and third-party styles.

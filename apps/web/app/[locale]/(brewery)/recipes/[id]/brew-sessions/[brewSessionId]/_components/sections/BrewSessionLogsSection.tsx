@@ -8,7 +8,7 @@ import { Button, Checkbox, H1, H2, Input, SizableText, TextArea, View, XStack, Y
 import { BrewSelect } from "../../../../../../_components/BrewSelect";
 import { PageWideActionBar } from "../../../../../../_components/PageWideActionBar";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
-import { CodeInline } from "../../../../../../../../_shell/_components/CodeInline";
+import { CodeInline } from "../../../../../../../../_shared-layout/_components/CodeInline";
 import {
   ErrorBox,
   MessageBox,

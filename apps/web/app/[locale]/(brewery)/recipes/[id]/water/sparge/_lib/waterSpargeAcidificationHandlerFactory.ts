@@ -5,7 +5,7 @@ import { calcSpargeOverall, computeAndSaveSparge } from "@umbraculum/api-client/
 import type { WaterCalcDerivation, WaterOverallResult, WaterProfile } from "@umbraculum/brewery-contracts";
 
 import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../../_shell/_lib/typeGuards";
+import { asRecord } from "../../../../../../../_shared-layout/_lib/typeGuards";
 import type {
   SaltAdditionsResult,
   WaterAcidResult,

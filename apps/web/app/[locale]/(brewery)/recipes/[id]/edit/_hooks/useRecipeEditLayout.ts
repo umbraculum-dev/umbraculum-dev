@@ -13,7 +13,7 @@ export function useRecipeEditLayout() {
   useEffect(() => {
     let raf = 0;
     const update = () => {
-      const appShell = document.querySelector(".brew-app-shell");
+      const appShell = document.querySelector(".brew-app-shared-layout");
       const mainEl = document.getElementById("main");
       const leftGutterPx = appShell instanceof HTMLElement ? appShell.getBoundingClientRect().left : null;
       const railTopPx = mainEl instanceof HTMLElement ? Math.max(mainEl.getBoundingClientRect().top, 16) : null;

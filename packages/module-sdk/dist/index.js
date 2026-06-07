@@ -447,7 +447,7 @@ function registerModule(app, options) {
   return snapshot;
 }
 
-// src/registerWebModule.ts
+// src/registerWebModuleTypes.ts
 var UrlSegmentAlreadyOwnedError = class extends Error {
   segment;
   attemptingCode;
@@ -511,6 +511,8 @@ function normalizeNavEntries(options) {
   return [];
 }
 var URL_SEGMENT_PATTERN = /^[a-z][a-z0-9-]*$/;
+
+// src/registerWebModule.ts
 var webModulesByCode = /* @__PURE__ */ new Map();
 var segmentOwnership = /* @__PURE__ */ new Map();
 function registerWebModule(options) {
@@ -704,7 +706,7 @@ var BUILTIN_WEB_MODULE_REGISTRATIONS = [
     navEntries: [{ primarySegment: "products", labelKey: "nav.pim", order: 5 }]
   }
 ];
-var PLATFORM_WEB_SHELL_NAV_ENTRIES = [
+var PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES = [
   { href: "/", labelKey: "nav.dashboard", order: 0 },
   { href: "/ai", labelKey: "nav.ai", order: 80 },
   { href: "/about", labelKey: "nav.about", order: 90 }
@@ -720,8 +722,8 @@ function registerBuiltinWebModulesIfAbsent(options) {
   }
 }
 
-// src/composeWebShellNav.ts
-function composeWebShellNavItems() {
+// src/composeWebSharedLayoutNav.ts
+function composeWebSharedLayoutNavItems() {
   const moduleItems = [];
   for (const snapshot of listRegisteredWebModules()) {
     if (snapshot.code === "platform") continue;
@@ -733,7 +735,7 @@ function composeWebShellNavItems() {
       });
     }
   }
-  const platformItems = PLATFORM_WEB_SHELL_NAV_ENTRIES.map(
+  const platformItems = PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES.map(
     (entry) => ({
       href: entry.href,
       labelKey: entry.labelKey,
@@ -745,19 +747,19 @@ function composeWebShellNavItems() {
   );
 }
 
-// src/resolveWebShellNotice.ts
-var WEB_SHELL_NOTICE_IDS = ["demo"];
+// src/resolveWebSharedLayoutNotice.ts
+var WEB_SHARED_LAYOUT_NOTICE_IDS = ["demo"];
 var DEMO_NOTICE_CONFIG = {
   id: "demo",
   variant: "notice",
   dismissible: false
 };
-function isWebShellNoticeId(value) {
-  return WEB_SHELL_NOTICE_IDS.includes(value);
+function isWebSharedLayoutNoticeId(value) {
+  return WEB_SHARED_LAYOUT_NOTICE_IDS.includes(value);
 }
-function resolveWebShellNotice(env = process.env) {
-  const raw = env["NEXT_PUBLIC_WEB_SHELL_NOTICE_ID"]?.trim();
-  if (!raw || !isWebShellNoticeId(raw)) {
+function resolveWebSharedLayoutNotice(env = process.env) {
+  const raw = env["NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID"]?.trim();
+  if (!raw || !isWebSharedLayoutNoticeId(raw)) {
     return null;
   }
   if (raw === "demo") {
@@ -786,12 +788,12 @@ export {
   NavEntryPrimarySegmentNotOwnedError,
   PLATFORM_RESERVED_ADDON_CODE_PREFIX,
   PLATFORM_RESERVED_TIER_LIMIT_KEYS,
-  PLATFORM_WEB_SHELL_NAV_ENTRIES,
+  PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES,
   RESERVED_CANONICAL_MODULE_CODES,
   ReservedTierLimitKeyError,
   TierLimitKeyCollisionError,
   UrlSegmentAlreadyOwnedError,
-  WEB_SHELL_NOTICE_IDS,
+  WEB_SHARED_LAYOUT_NOTICE_IDS,
   aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable,
   assertValidModuleCode,
@@ -803,7 +805,7 @@ export {
   collectModulePromptOverlayTexts,
   collectRegisteredModulePromptOverlays,
   composeModuleTierLimitSlices,
-  composeWebShellNavItems,
+  composeWebSharedLayoutNavItems,
   fromParser,
   getRegisteredDocumentTemplate,
   getSegmentOwner,
@@ -825,7 +827,7 @@ export {
   resolveEnabledModuleCodes,
   resolveModuleProfile,
   resolveRoutePromptOverlay,
-  resolveWebShellNotice,
+  resolveWebSharedLayoutNotice,
   snapshotAddonCodeOwnership,
   snapshotModule,
   snapshotSegmentOwnership

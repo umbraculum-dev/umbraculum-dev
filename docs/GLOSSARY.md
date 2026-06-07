@@ -20,7 +20,7 @@ Topic-scoped glossaries still exist elsewhere and complement this page:
 | Doc | Scope |
 |---|---|
 | [`MODULES.md`](MODULES.md) §2 | Module ecosystem vocabulary (`package`, reserved codes, module SDK) |
-| [`design/application-surfaces-vs-platform-backbone.md`](design/application-surfaces-vs-platform-backbone.md) §3 | Product layering (operator shell, API service, storefront vs marketing) |
+| [`design/application-surfaces-vs-platform-backbone.md`](design/application-surfaces-vs-platform-backbone.md) §3 | Product layering (workspace web UI, API service, storefront vs marketing) |
 | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §9 | AI, billing, and platform engineering terms (BYOK, RAG, soft cap, …) |
 | [`TENANCY-AND-ACL.md`](TENANCY-AND-ACL.md) §2 | Workspace, membership, roles |
 
@@ -48,7 +48,7 @@ These terms are the minimum set for reading any other doc without getting lost.
 
 | Term | Plain-language meaning | Umbraculum-specific meaning | Source of truth |
 |---|---|---|---|
-| **Umbraculum** | The open-source project and monorepo you are in. | A **toolset** (not just a library): code, modules, SDKs, shells, docs, CI, and the Cursor authoring apparatus — the whole foundation for workspace-shaped operational apps. | [`README.md`](../README.md); [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1 |
+| **Umbraculum** | The open-source project and monorepo you are in. | A **toolset** (not just a library): code, modules, SDKs, shared layout code, docs, CI, and the Cursor authoring apparatus — the whole foundation for workspace-shaped operational apps. | [`README.md`](../README.md); [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1 |
 | **Toolset** | A complete toolbox plus discipline for using it. | Deliberate positioning vs "framework": includes canonical boundaries, quality gates, and contributor apparatus — not only runtime packages. | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1 |
 | **Horizontal platform** | Shared backbone every product built here reuses. | Auth, workspace, billing, AI orchestrator, i18n, navigation, rendering, notifications boundary, observability — **does not change** when you add a new vertical product. | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §2; [`application-surfaces-vs-platform-backbone.md`](design/application-surfaces-vs-platform-backbone.md) |
 | **Canonical module** | *(technical)* A reserved operational domain the platform owns at most one shipped implementation of. | Registered with a **`code` from a closed set** (`automation`, `pim`, `mrp`, `crp`, `wms`, `crm` today). Four coordinated slices: API + web + native + contracts package. Tier 1, mini-RFC gated. | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md); [`MODULES.md`](MODULES.md) §2–§3.1 |
@@ -60,7 +60,7 @@ These terms are the minimum set for reading any other doc without getting lost.
 | **Module SDK** | The npm package third-party module authors pin. | `@umbraculum/module-sdk` — `registerModule()`, reserved-code validation, `ValidatedSchema<T>`, document templates. MIT-licensed. | [`packages/module-sdk/README.md`](../packages/module-sdk/README.md) |
 | **β layout (beta layout)** | The four-slice physical shape of every module. | API slice (`services/api/src/modules/<code>/`), web slice (`apps/web/app/[locale]/(<code>)/`), native slice (`apps/native/src/modules/<code>/`), contracts package (`packages/<code>-contracts/` or vertical-flavored names). | [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) |
 | **Workspace** | A tenant boundary — the org/team using the app. | Replaces older "Account" wording in API routes (`/workspaces`, `active_workspace_id`). AI consultant and billing are workspace-scoped. | [`TENANCY-AND-ACL.md`](TENANCY-AND-ACL.md) |
-| **Operator shell** | The app workspace members use daily. | Federated web + native (and UT webapp) UI — **not** a shopper storefront, **not** the marketing site. | [`application-surfaces-vs-platform-backbone.md`](design/application-surfaces-vs-platform-backbone.md) §3 |
+| **Workspace web UI** | The app workspace members use daily. | Federated web + native (and UT webapp) UI — **not** a shopper storefront, **not** the marketing site. | [`application-surfaces-vs-platform-backbone.md`](design/application-surfaces-vs-platform-backbone.md) §3 |
 
 ### Three clarifications people stumble on
 
@@ -80,7 +80,7 @@ These terms are the minimum set for reading any other doc without getting lost.
 
 **Yes, this distinction makes sense — and it is easy to misread the repo.**
 
-Because **`brewery` lives inside `umbraculum-dev`**, newcomers often assume every vertical will land here. That is **not** the normal model. The monorepo is the **shared toolset**: platform core, canonical modules, SDKs, shells, and docs. A **vertical configuration** is the **product a team sells or operates for one industry** — built *on* that backbone, **usually maintained and shipped separately**.
+Because **`brewery` lives inside `umbraculum-dev`**, newcomers often assume every vertical will land here. That is **not** the normal model. The monorepo is the **shared toolset**: platform core, canonical modules, SDKs, shared layout, native bootstrap, and docs. A **vertical configuration** is the **product a team sells or operates for one industry** — built *on* that backbone, **usually maintained and shipped separately**.
 
 | Layer | Who owns it | Typical home | In `umbraculum-dev` today? |
 |---|---|---|---|
@@ -113,11 +113,13 @@ These are **pedagogical parallels**, not one-to-one product comparisons. They cl
 | Term | Meaning | Do not confuse with |
 |---|---|---|
 | **API service** | HTTP monolith: Fastify routes, Prisma, jobs | Operator UI, "admin theme" |
-| **Workspace-member app** | Same as **operator shell** — one audience, one AI context | B2C shopper app |
-| **Module registration** | Boot-time `registerModule()` / `registerWebModule()` / `registerNativeModule()` | Runtime shell layout (partially deferred) |
+| **Command-line shell** | bash/sh (or similar) for CI scripts, Docker Compose, and local dev commands | Platform shared layout, UT Morph wrapper |
+| **Platform shared layout** | Persistent UI frame in `apps/web` (nav, footer, auth bar, providers). Path: `app/_shared-layout/` — see [backbone §3.7](design/pre-flip-application-surface-backbone.md) | Page-internal layout; `@umbraculum/native-shell` |
+| **Workspace-member app** | Same as **workspace web UI** — one audience, one AI context | B2C shopper app |
+| **Module registration** | Boot-time `registerModule()` / `registerWebModule()` / `registerNativeModule()` | Runtime shared layout registration (partially deferred) |
 | **Public surface (marketing)** | Static orientation site (`apps/website`) | Operational "public API" |
-| **Storefront / commerce** (future) | Separate deployable; read-only consumer of PIM/CRM | PIM admin UI inside operator shell |
-| **UT webapp shell** | Ubuntu Touch Click package wrapping `apps/web` in Morph | Native React Native on Linux mobile; Qt/QML rewrite |
+| **Storefront / commerce** (future) | Separate deployable; read-only consumer of PIM/CRM | PIM admin UI inside workspace web UI |
+| **UT Morph webapp wrapper** | Ubuntu Touch Click package wrapping `apps/web` in Morph | Native React Native on Linux mobile; Qt/QML rewrite |
 
 See [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) for UT delivery terms.
 

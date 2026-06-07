@@ -14,7 +14,7 @@ import {
 } from "@umbraculum/api-client/brewery";
 
 import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
-import { fetchAuthMe } from "../../../../_shell/_lib/fetchAuthMe";
+import { fetchAuthMe } from "../../../../_shared-layout/_lib/fetchAuthMe";
 import { isAdmin, mergeAllProfiles } from "../_lib/waterProfileHelpers";
 import { DEFAULT_CREATE_ION, type CreateIon } from "../_lib/waterProfileTypes";
 

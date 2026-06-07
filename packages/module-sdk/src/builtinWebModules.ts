@@ -62,7 +62,7 @@ export const BUILTIN_WEB_MODULE_REGISTRATIONS: readonly RegisterWebModuleOptions
   ] as const satisfies readonly RegisterWebModuleOptions[];
 
 /** Platform-owned primary nav entries (not tied to a canonical module code). */
-export const PLATFORM_WEB_SHELL_NAV_ENTRIES: readonly {
+export const PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES: readonly {
   href: string;
   labelKey: ModuleNavLabelKey;
   order: number;

@@ -2,7 +2,7 @@ import {Link} from "../../../../../../../../src/i18n/navigation";
 import {SizableText, View, XStack, YStack} from "tamagui";
 
 import {formatFixed} from "../../../../../../../../src/i18n/format";
-import {CodeInline} from "../../../../../../../_shell/_components/CodeInline";
+import {CodeInline} from "../../../../../../../_shared-layout/_components/CodeInline";
 import {StripedRow} from "../../../../../_components/StripedRow";
 import {RecipeEditList, RecipeEditSection, RecipeEditSummary} from "../../../../../_components/recipe-edit";
 import type {RecipeEditPageModel} from "../../_hooks/useRecipeEditPage";

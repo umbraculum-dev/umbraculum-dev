@@ -38,9 +38,26 @@ Per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor
 - **E2E**: see the dedicated suite at [`e2e/README.md`](e2e/README.md) — runs in a one-shot Playwright Docker container against the live dev stack.
 - **Unit tests**: vitest is not configured in this workspace; component-level testing happens in the sibling `@umbraculum/ui` and `@umbraculum/brewery-recipes-ui` packages, and end-to-end behavior is covered by the Playwright suite. See [`docs/TESTING.md`](../../docs/TESTING.md) §"Layer map" for the per-layer responsibility split.
 
-## Web shell notice
+## Platform shared layout notice
 
-The locale layout always mounts [`app/_shell/_components/WebShellNotice.tsx`](app/_shell/_components/WebShellNotice.tsx). [`resolveWebShellNotice()`](../../packages/module-sdk/src/resolveWebShellNotice.ts) returns a preset only when `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID` is set at **build** time (demo VPS: `demo`). Local dev omits the env var — no banner. Preset copy is in `@umbraculum/i18n` (`shellNotice.demo.*`, `en` + `it`); demo shows a collapsed-by-default expander for long prose. Policy: [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md).
+The locale layout always mounts [`app/_shared-layout/_components/WebSharedLayoutNotice.tsx`](app/_shared-layout/_components/WebSharedLayoutNotice.tsx). [`resolveWebSharedLayoutNotice()`](../../packages/module-sdk/src/resolveWebSharedLayoutNotice.ts) returns a preset only when `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID` is set at **build** time (demo VPS: `demo`). Local dev omits the env var — no banner. Preset copy is in `@umbraculum/i18n` (`sharedLayoutNotice.demo.*`, `en` + `it`); demo shows a collapsed-by-default expander for long prose. Policy: [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md).
+
+## App tree (platform shared layout vs routes)
+
+Canonical diagram and terminology: [`docs/design/pre-flip-application-surface-backbone.md`](../../docs/design/pre-flip-application-surface-backbone.md) §3.7.
+
+```text
+apps/web/app/
+  _shared-layout/          # platform UI frame (nav, footer, auth — private folder)
+  [locale]/
+    layout.tsx             # imports _shared-layout; wraps all locale routes
+    (platform-layout)/     # platform horizontal pages (ai, accessibility, …)
+    (brewery)/             # reference vertical module routes
+    platform/              # cross-workspace admin (unchanged)
+    (auth)/                # login/register
+```
+
+**Where does new UI go?** See [`docs/BUILDING-YOUR-VERTICAL.md`](../../docs/BUILDING-YOUR-VERTICAL.md) § "Where does my UI code go?"
 
 ## How it fits in
 

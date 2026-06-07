@@ -13,9 +13,9 @@
 
 Six decisions:
 
-- **Decision A — Web platform shared layout directory.** Platform-owned shared layout UI and helpers live under `apps/web/app/_shell/{_components,_lib}/` (path name is legacy — see §3.1). They must not contain module- or vertical-specific names/logic. Module-shared folders live at `apps/web/app/[locale]/(<code>)/{_components,_lib}/`. Vertical UI shared across web and native belongs in `@umbraculum/<vertical>-*` packages.
+- **Decision A — Web platform shared layout directory.** Platform-owned shared layout UI and helpers live under `apps/web/app/_shared-layout/{_components,_lib}/` (path name is legacy — see §3.1). They must not contain module- or vertical-specific names/logic. Module-shared folders live at `apps/web/app/[locale]/(<code>)/{_components,_lib}/`. Vertical UI shared across web and native belongs in `@umbraculum/<vertical>-*` packages.
 
-- **Decision B — Platform horizontal pages use a route group.** Segments such as `ai`, `accessibility`, `about`, `contact`, `contributing` move under `apps/web/app/[locale]/(platform-shell)/<segment>/` (exact group name committed at implementation — must not collide with `[locale]/platform/` admin). URLs unchanged.
+- **Decision B — Platform horizontal pages use a route group.** Segments such as `ai`, `accessibility`, `about`, `contact`, `contributing` move under `apps/web/app/[locale]/(platform-layout)/<segment>/` (exact group name committed at implementation — must not collide with `[locale]/platform/` admin). URLs unchanged.
 
 - **Decision C — Native multi-app workspace.** `apps/native/` hosts one Expo workspace per deployable native app at `apps/native/<app-code>/`. Shared bootstrap (auth, navigation glue, i18n, theme) extracts to `@umbraculum/native-shell`. Module native slices default to `apps/native/<app-code>/src/modules/<code>/` unless promoted to a package when reused across apps.
 
@@ -43,22 +43,22 @@ RFC-0002 answered “where does my module's **pages** go?” It intentionally de
 - `@umbraculum/contracts` exports brewery, water, and gravity-analysis schemas from the **platform** contracts package — while RFC-0002 names `@umbraculum/brewery-contracts`, that package was never created
 - `packages/core/` on disk vs `@umbraculum/brewery-core` on npm; `BrewCheckbox` in `@umbraculum/ui`
 
-[`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md) teaches Magento's core vs sample-data vs agency-module story, but the repo tree contradicts that story in **app shell folders and platform npm packages alike**. Pre-flip is the last low-cost window to fix paths before external forks copy the wrong shape.
+[`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md) teaches Magento's core vs sample-data vs agency-module story, but the repo tree contradicts that story in **platform shared layout folders and platform npm packages alike**. Pre-flip is the last low-cost window to fix paths before external forks copy the wrong shape.
 
 ---
 
 ## 3. Decision A — Web platform shared layout directory (commit)
 
-**Platform-owned shared layout code lives in `apps/web/app/_shell/`.** (The `_shell` segment is a **filesystem path** from Wave 1; do not use “shell” as architecture prose — see §3.1.)
+**Platform-owned shared layout code lives in `apps/web/app/_shared-layout/`.** Wave **3f (2026-06-07)** renamed the path from legacy `_shell/`; use **platform shared layout** in prose (see §3.1, backbone §3.7).
 
 | Bucket | Path | May import from |
 |--------|------|-----------------|
-| Platform shared layout | `app/_shell/_components/`, `app/_shell/_lib/` | `@umbraculum/{ui,navigation,i18n-react,api-client,contracts,…}` horizontal packages |
+| Platform shared layout | `app/_shared-layout/_components/`, `app/_shared-layout/_lib/` | `@umbraculum/{ui,navigation,i18n-react,api-client,contracts,…}` horizontal packages |
 | Module shared UI (per code) | `app/[locale]/(<code>)/_components/`, `…/_lib/` | Same horizontal packages + `@umbraculum/<code>-contracts` + same-module segments |
 | Module pages | `app/[locale]/(<code>)/<segment>/` | Module shared UI + horizontal packages |
 | Cross-surface vertical UI | `@umbraculum/<vertical>-*` packages | Horizontal packages only |
 
-**WS5 enforcement:** add `web-platform-shell` eslint element (legacy identifier = **platform shared layout folder**); forbid imports from any `web-locale-vertical` into that folder and vice versa except through registered package boundaries.
+**WS5 enforcement:** add `web-platform-shared-layout` eslint element (legacy identifier = **platform shared layout folder**); forbid imports from any `web-locale-vertical` into that folder and vice versa except through registered package boundaries.
 
 **Migration:** rename/move current platform files from legacy `app/_components` + `app/_lib`; move brewery-specific files into `(brewery)/_components` or packages. Delete empty legacy folders when done.
 
@@ -70,14 +70,14 @@ This RFC title uses *shell layering* for historical reasons. **New and revised d
 
 | Do not write | Write instead |
 |--------------|---------------|
-| Operator shell, application shell (product sense) | **Member-facing web application** (`apps/web`), **workspace web UI** |
-| Operator chrome, app chrome, platform chrome | **Shared layout**, **shared layout components** (navigation, footer, auth bar) |
-| “Shell” without qualification | **Command-line shell**, **`app/_shell/` path**, **layout**, **Next.js route group** — pick the precise term |
-| New invented compounds | Standard terms from Next.js docs, software architecture, or [`GLOSSARY.md`](../GLOSSARY.md) after Wave 6 sync |
+| Operator shell, operator chrome, application shell, platform chrome | **Platform shared layout**, **workspace web UI**, **member-facing web application** |
+| Shared layout components (ambiguous) | **Shared layout components** (nav, footer, auth bar) under `app/_shared-layout/` |
+| “Shell” without qualification | **Command-line shell**, **platform shared layout**, **UT Morph webapp wrapper**, **Next.js route group** — pick the precise term |
+| New invented compounds | Standard terms from Next.js docs, software architecture, or [`GLOSSARY.md`](../GLOSSARY.md) |
 
-**Not sunset (yet):** committed **paths**, **package names**, and **eslint element ids** that contain `shell` (e.g. `_shell/`, `web-platform-shell`, `@umbraculum/native-shell`). Wave **3f** may rename paths/packages after prose is cleaned; explain each once using conventional terms.
+**Allowed exceptions (narrow):** RFC-0011 document title/filename (historical); `@umbraculum/native-shell` npm package name; **command-line shell** when discussing bash/CI.
 
-**Wave 3f** (§10.1): documentation grep + BUILDING-YOUR-VERTICAL rewrite; optional directory rename for `app/_shell/`. RFC-0011 Decision A **semantics** (platform vs module shared layout split) is unchanged regardless of folder name.
+**Wave 3f complete (2026-06-07):** path rename `_shared-layout/`, `(platform-layout)/` route group, eslint `web-platform-shared-layout`, zero legacy slang in integrator docs. Decision A **semantics** unchanged.
 
 ---
 
@@ -86,13 +86,13 @@ This RFC title uses *shell layering* for historical reasons. **New and revised d
 Platform-facing operator pages that are **not** canonical modules and **not** `[locale]/platform/` admin move under a dedicated route group:
 
 ```text
-apps/web/app/[locale]/(platform-shell)/ai/…
-apps/web/app/[locale]/(platform-shell)/accessibility/…
+apps/web/app/[locale]/(platform-layout)/ai/…
+apps/web/app/[locale]/(platform-layout)/accessibility/…
 ```
 
 **Invariants:**
 
-- URLs identical to today (`/en/ai`, not `/en/platform-shell/ai`).
+- URLs identical to today (`/en/ai`, not `/en/platform-layout/ai`).
 - `[locale]/platform/` remains the **cross-workspace admin** tree (ads, platform recipes).
 - `(auth)/` unchanged.
 
@@ -164,9 +164,9 @@ Folder ownership mirrors §3–§6. Not required for public-alpha if deferral re
 | Merge api + api-client packages | Violates client-safe boundary story (WS6) |
 | Leave brewery DTOs in `@umbraculum/contracts` | Perpetuates platform/vertical confusion; contradicts RFC-0002 brewery contracts slice |
 | Rename only npm scopes without on-disk tiers | `node_modules` improves slightly; repo map stays flat |
-| Move `app/_shell/` into an npm package by default | Shell is app-local Next.js composition + fork surface; horizontal code already lives in `@umbraculum/*` (see backbone §3.5) |
-| Rename `app/_shell/` before Wave 3f doc cleanup | Wave 1 needed a committed path for WS5; 3f sunsets slang in prose first, then may rename the folder |
-| Adopt “operator chrome” or similar in new docs | Internal slang — use **shared layout** per §3.1 |
+| Move `app/_shared-layout/` into an npm package by default | Shell is app-local Next.js composition + fork surface; horizontal code already lives in `@umbraculum/*` (see backbone §3.5) |
+| Rename `app/_shared-layout/` before Wave 3f doc cleanup | Wave 1 needed a committed path for WS5; 3f sunsets slang in prose first, then may rename the folder |
+| Adopt “shared layout components” or similar in new docs | Internal slang — use **shared layout** per §3.1 |
 
 ---
 
@@ -178,22 +178,21 @@ See [`pre-flip-application-surface-backbone.md`](../design/pre-flip-application-
 
 | After | Wave | Notes |
 |-------|------|-------|
-| Wave 1 (landed) | **2** | `(platform-shell)/` route group for `ai`, `accessibility`, … |
+| Wave 1 (landed) | **2** | `(platform-layout)/` route group — **done (2026-06-07, absorbed into Wave 3f)** |
 | Wave 3b (landed) | **3e** | API brewery service colocation under `modules/brewery/services/` — **complete (2026-06-06)** |
-| **Wave 3e (complete)** | **3f** | **Documentation vocabulary** — sunset slang (`operator shell`, `operator chrome`, unqualified “shell”); conventional terms only in integrator docs; optional `app/_shell/` path rename |
-| Various | **6** | BUILDING-YOUR-VERTICAL + integrator glossary sync |
+| **Wave 3e (complete)** | **3f** | **Shared layout nomenclature** — **complete (2026-06-07)** |
+| Various | **6** | BUILDING-YOUR-VERTICAL pedagogical rewrite + integrator glossary sync |
 
-### 10.1 Wave 3f — documentation vocabulary and optional path rename (scheduled after 3e)
+### 10.1 Wave 3f — shared layout nomenclature and path rename (complete 2026-06-07)
 
-Wave 1 committed the path `apps/web/app/_shell/` per Decision A. Maintainer feedback (2026-06): prose terms such as **operator shell**, **operator chrome**, and unqualified **shell** are **internal slang** — they overload POSIX/command-shell meaning and are not standard product-architecture vocabulary. Wave **3f** cleans documentation first; folder rename is optional.
+Wave **3f** landed the mechanical rename and documentation vocabulary in one PR:
 
-**Goals (in order):**
+1. **Paths:** `app/_shared-layout/` (from `_shell/`), `(platform-layout)/` route group for platform horizontal pages (`ai`, `accessibility`, …).
+2. **Identifiers:** `web-platform-shared-layout` eslint element; `@umbraculum/module-sdk` nav/notice APIs; `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID`; i18n `sharedLayoutNotice.*`.
+3. **Docs:** backbone §3.7 terminology contract; BUILDING-YOUR-VERTICAL decision tree; GLOSSARY split entries; zero legacy slang in integrator-facing prose.
+4. **Out of scope (unchanged):** `@umbraculum/native-shell` package name; RFC-0011 title/filename; Wave **6** full BUILDING-YOUR-VERTICAL rewrite.
 
-1. **Sunset slang in integrator-facing docs** — apply §3.1 and backbone §3.5; grep and replace in BUILDING-YOUR-VERTICAL, REPOSITORY-STRUCTURE, LINTING prose, module READMEs; sync [`GLOSSARY.md`](../GLOSSARY.md) (legacy “Operator shell” entry → conventional definition or redirect).
-2. **Optionally rename** `app/_shell/` to a self-explanatory path (e.g. `_shared-layout/`) if maintainers agree after prose is fixed — one mechanical PR updating WS5 patterns; **no re-export shims**.
-3. **Do not** move shared layout code into `node_modules/` by default (backbone §3.6 — app composition vs publishable packages).
-
-**Non-goals:** inventing new product vocabulary; keeping slang “for brevity” in new paragraphs.
+**Non-goals (honored):** re-export shims at old paths; “formerly called shell” redirect prose.
 
 ---
 

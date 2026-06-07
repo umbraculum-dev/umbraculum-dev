@@ -11,7 +11,7 @@ import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipe
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { formatWithHint } from "../../../../../../../src/i18n/format";
-import { useRequireAuth } from "../../../../../../_shell/_lib/useRequireAuth";
+import { useRequireAuth } from "../../../../../../_shared-layout/_lib/useRequireAuth";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "../_lib/waterHubSummary";
 import type { DisplayStream } from "../_lib/waterHubPageTypes";
 

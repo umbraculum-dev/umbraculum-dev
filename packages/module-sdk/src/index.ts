@@ -114,21 +114,21 @@ export {
 
 export {
   BUILTIN_WEB_MODULE_REGISTRATIONS,
-  PLATFORM_WEB_SHELL_NAV_ENTRIES,
+  PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES,
   registerBuiltinWebModulesIfAbsent,
 } from "./builtinWebModules.js";
 
 export {
-  composeWebShellNavItems,
-  type WebShellNavItem,
-} from "./composeWebShellNav.js";
+  composeWebSharedLayoutNavItems,
+  type WebSharedLayoutNavItem,
+} from "./composeWebSharedLayoutNav.js";
 
 export {
-  WEB_SHELL_NOTICE_IDS,
-  resolveWebShellNotice,
-  type WebShellNoticeConfig,
-  type WebShellNoticeId,
-  type WebShellNoticeVariant,
-} from "./resolveWebShellNotice.js";
+  WEB_SHARED_LAYOUT_NOTICE_IDS,
+  resolveWebSharedLayoutNotice,
+  type WebSharedLayoutNoticeConfig,
+  type WebSharedLayoutNoticeId,
+  type WebSharedLayoutNoticeVariant,
+} from "./resolveWebSharedLayoutNotice.js";
 
 export type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";

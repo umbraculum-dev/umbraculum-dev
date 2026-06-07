@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { createProduct as createProductApi, listProducts } from "@umbraculum/api-client/pim";
 import { type Product } from "@umbraculum/pim-contracts";
 
-import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
+import { useRequireAuth } from "../../../_shared-layout/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 
 export function usePimProductsPage() {
   const tProducts = useTranslations("pim.products");

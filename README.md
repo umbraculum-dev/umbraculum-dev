@@ -187,7 +187,7 @@ entry points:
 - [`docs/NATIVE-STRATEGY-AND-CI.md`](docs/NATIVE-STRATEGY-AND-CI.md) —
   native app build + CI strategy.
 - [`docs/design/ubuntu-touch-shell-strategy.md`](docs/design/ubuntu-touch-shell-strategy.md) —
-  Ubuntu Touch webapp shell (reuses `apps/web`; reference Click package under
+  Ubuntu Touch Morph webapp wrapper (reuses `apps/web`; reference Click package under
   [`packaging/ubuntu-touch/umbraculum-reference/`](packaging/ubuntu-touch/umbraculum-reference/README.md)).
 
 ## License

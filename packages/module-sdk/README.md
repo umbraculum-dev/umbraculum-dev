@@ -208,21 +208,21 @@ All module pages live under static sub-segments registered in `ownedUrlSegments`
 - `getSegmentOwner(segment: string): string | undefined`
 - `snapshotSegmentOwnership(): ReadonlyArray<readonly [segment, ownerCode]>`
 
-## Web shell notice — `resolveWebShellNotice()`
+## Web shell notice — `resolveWebSharedLayoutNotice()`
 
-Optional top-of-shell banner for deployed environments (demo credentials, operator messaging). The web app **always mounts** `WebShellNotice`; this resolver returns `null` unless `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID` is set at **web build** time.
+Optional top-of-shell banner for deployed environments (demo credentials, operator messaging). The web app **always mounts** `WebSharedLayoutNotice`; this resolver returns `null` unless `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID` is set at **web build** time.
 
 | Env | Preset | Behavior |
 |-----|--------|----------|
-| `NEXT_PUBLIC_WEB_SHELL_NOTICE_ID=demo` | `demo` | Non-dismissible notice; i18n copy in `@umbraculum/i18n` (`shellNotice.demo.*`) |
+| `NEXT_PUBLIC_WEB_SHARED_LAYOUT_NOTICE_ID=demo` | `demo` | Non-dismissible notice; i18n copy in `@umbraculum/i18n` (`sharedLayoutNotice.demo.*`) |
 | unset / unknown | — | No banner (local dev, integrator stacks) |
 
 Demo VPS operators set the env in **umbraculum-hosting-demo** `docker-compose.demo.yml` only — see [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md).
 
 ```typescript
-import { resolveWebShellNotice } from "@umbraculum/module-sdk";
+import { resolveWebSharedLayoutNotice } from "@umbraculum/module-sdk";
 
-const notice = resolveWebShellNotice(process.env);
+const notice = resolveWebSharedLayoutNotice(process.env);
 // → { id: "demo", variant: "notice", dismissible: false } | null
 ```
 

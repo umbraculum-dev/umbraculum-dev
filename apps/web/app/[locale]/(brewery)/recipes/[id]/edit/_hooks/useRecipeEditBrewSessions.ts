@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
-import { asRecord } from "../../../../../../_shell/_lib/typeGuards";
+import { asRecord } from "../../../../../../_shared-layout/_lib/typeGuards";
 
 export type RecipeEditBrewSessionSummary = {
   id: string;

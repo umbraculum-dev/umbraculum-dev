@@ -6,7 +6,7 @@ import { listWaterProfiles } from "@umbraculum/api-client/brewery";
 import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
-import { fetchAuthMe } from "../../../../../../_shell/_lib/fetchAuthMe";
+import { fetchAuthMe } from "../../../../../../_shared-layout/_lib/fetchAuthMe";
 
 export function useWaterPageAuthProfiles() {
   const [authChecked, setAuthChecked] = useState(false);

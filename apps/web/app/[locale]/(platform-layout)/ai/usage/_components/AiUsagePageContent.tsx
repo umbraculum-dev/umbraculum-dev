@@ -2,7 +2,7 @@
 
 import { H1, H2, SizableText, Spinner, View, XStack, YStack } from "tamagui";
 
-import { DashboardClient } from "../../../../DashboardClient";
+import { DashboardClient } from "../../../../../DashboardClient";
 import { UsageTokenChart } from "../../_components/UsageTokenChart";
 import type { AiUsagePageModel } from "../_hooks/useAiUsagePage";
 import { formatNumber, formatPercent } from "./aiUsageFormatters";

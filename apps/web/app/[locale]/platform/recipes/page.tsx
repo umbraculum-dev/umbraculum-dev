@@ -13,8 +13,8 @@ import {
 import { BrewSelect } from "../../(brewery)/_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../(brewery)/_components/recipe-edit";
 import { RecipeImportForm } from "../../(brewery)/_components/RecipeImportForm";
-import { useRequireAuth } from "../../../_shell/_lib/useRequireAuth";
-import { webPlatformApiClient } from "../../../_shell/_lib/webApiClient";
+import { useRequireAuth } from "../../../_shared-layout/_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_shared-layout/_lib/webApiClient";
 
 type WorkspaceItem = { id: string; name: string };
 type RecipeItem = { id: string; name: string };
