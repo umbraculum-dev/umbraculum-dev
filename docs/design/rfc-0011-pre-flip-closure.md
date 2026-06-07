@@ -45,7 +45,7 @@ Full audit trail: [wave-6 build log §12 audit](rfc-0011-wave-6-doc-capstone-bui
 | Item | Decision | Notes |
 |------|----------|-------|
 | **Rule 63 E2E prefixes** | **Closed** | All 11 specs under `apps/web/e2e/` use `b2b-registered-*` filenames |
-| **F-mod brewery-less SKU** | **Keep deferred** | `UMBRACULUM_MODULE_PROFILE=platform` exists; full product SKU post-alpha ([deferral register](public-flip-deferral-register.md) F-mod row) |
+| **F-mod brewery-less SKU** | **Keep deferred (product SKU)** | Runtime `UMBRACULUM_MODULE_PROFILE=platform` **documented pre-flip** ([`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md)); full install SKU post-alpha. **Demo:** `demo.umbraculum.dev` stays reference profile (core + brewery), not platform-only. |
 | **Second native app scaffold** | **Keep deferred** | Pattern in [`apps/native/README.md`](../../apps/native/README.md). **2026-06-07:** choose PIM vs quality module app **after** application-surface structure is stable — not pre-flip. |
 | **`docs-site/` extraction** | **Keep deferred** | R-POLICY — monorepo through public alpha; foundations pass pre-flip |
 | **API flat-services eslint fence** | **Land pre-flip (Phase 3)** | Prevents Wave 3e regression; see [backbone §13](pre-flip-application-surface-backbone.md) |

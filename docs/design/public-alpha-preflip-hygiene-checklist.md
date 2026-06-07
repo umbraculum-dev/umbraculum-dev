@@ -97,23 +97,33 @@ Answers from [RFC-0011 pre-flip closure](rfc-0011-pre-flip-closure.md) Step 4:
 
 | # | Question | Answer (maintainer) |
 |---|----------|---------------------|
-| M1 | **Flip window** | **July 2026.** **Single coordinated release** — monorepo app + toolset + public docs/brochure go public together (not a weeks-long staged rollout of docs first, product later). |
-| M2 | **Manual hygiene — block flip vs may trail** | See plain-language table below. Solo maintainer triages in flip week; nothing delegated yet. |
-| M3 | **Platform-only (`UMBRACULUM_MODULE_PROFILE=platform`) demo for evaluators** | **Post-alpha** — stock monorepo stays brewery-inclusive for flip; optional platform-only install story stays F-mod / post-alpha unless explicitly promoted before July. |
-| M4 | **Second native app scaffold** | **Post-alpha** — decide **PIM handheld vs quality** app code after application-surface structure is stable; tracked in [backbone §13](pre-flip-application-surface-backbone.md). |
-| M5 | **Docs deploy + noIndex on flip day** | **Solo maintainer** (same operator for Cloudflare deploy, `noIndex` removal, brochure sync). No separate “owner” role — checklist item exists so flip-day steps are not forgotten. |
+| M1 | **Flip window** | **July 2026. Atomic flip** — one coordinated go-live: monorepo + toolset + docs + brochure public together; forum may complete pre-flip; DocSearch is first step after flip (M2). |
+| M2 | **Manual hygiene — what runs when** | **Before flip (execute):** §2.2 gitleaks, §3.5 Postgres, §5.1 legal (both repos), §6.3 Cloudflare Pages, §6.6 forum. **First step after flip:** §6.4 DocSearch. **Not a flip blocker:** §6.7 donations. |
+| M3 | **Platform profile — document vs demo** | **Document pre-flip:** yes — [`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md) + [`platform-module-profile.md`](platform-module-profile.md). **Demo:** no second hosted SKU — `demo.umbraculum.dev` keeps **reference profile** (core + brewery) as the public vertical example; platform-only is self-host via `UMBRACULUM_MODULE_PROFILE=platform`. |
+| M4 | **Second native app scaffold** | **Post-alpha** — decide **PIM handheld vs quality** after structure is stable; [backbone §13](pre-flip-application-surface-backbone.md). |
+| M5 | **Docs deploy + noIndex on flip day** | **Solo maintainer** — Cloudflare deploy, noIndex removal, brochure sync, then DocSearch (M2). |
 
-#### M2 — what each manual item means (block vs trail)
+#### M2 — what each manual item means (maintainer decisions 2026-06-07)
 
-| Checklist ref | What it is | Typical flip posture |
-|---------------|------------|----------------------|
-| **§2.2 gitleaks** | Scan **git history** for leaked secrets (API keys, tokens) in both umbraculum-dev and umbraculum-toolset. | **Block flip** — do once before first public clone. |
-| **§3.5 Postgres** | RFC-0010 **platform vs brewery schema split**: migrations applied on dev/test DBs, backup taken before DDL, fresh-clone docs accurate. | **Block flip** if prod-like dev DB is behind migrations; self-host docs should already match. |
-| **§5.1 legal files** | `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` present and consistent in **both** repos. | **Block flip** — AGPL + contribution path must be correct on day one. |
-| **§6.3 Cloudflare Pages** | Hosting projects wired for **docs** + **brochure** per [public-alpha-cloudflare-pages-runbook.md](public-alpha-cloudflare-pages-runbook.md) (build commands, env, custom domains). | **Block flip** for URLs you announce; can flip repo public before DNS if URLs stay noIndex. |
-| **§6.4 DocSearch** | Algolia **site search** application (replace local lunr search) — submitted **after** docs URL is live and indexable. | **Trail by days** — local search works at flip. |
-| **§6.6 Community forum** | Discourse at forum.umbraculum.dev provisioned + pinned “How we communicate”. | **May trail flip by days** — not required for code/docs go-public. |
-| **§6.7 Donations** | Liberapay + Buy Me a Coffee accounts live; `/support/` links work. | **May trail flip** — roadmap 2d; nice-to-have for announcement. |
+| Checklist ref | What it is | Decision |
+|---------------|------------|----------|
+| **§2.2 gitleaks** | Scan **git history** for leaked secrets in umbraculum-dev **and** umbraculum-toolset. | **Do before flip** |
+| **§3.5 Postgres** | RFC-0010 schema split: migrations current, backup discipline, fresh-clone docs. | **Do before flip** |
+| **§5.1 legal files** | `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` in **both** repos. | **Do before flip** |
+| **§6.3 Cloudflare Pages** | Docs + brochure build/deploy from GitHub. | **Do before flip** |
+| **§6.4 DocSearch** | Algolia search on docs.umbraculum.dev (needs indexable URL). | **First action immediately after flip** |
+| **§6.6 Community forum** | forum.umbraculum.dev + pinned governance. | **Do before flip** |
+| **§6.7 Donations** | Liberapay + Buy Me a Coffee; `/support/` links. **Not** “keep donations secret pre-flip” — only “links work when `/support/` is public.” | **Not required for flip** |
+
+#### M2 — pre-flip execution queue
+
+1. §2.2 — gitleaks (both repos)  
+2. §3.5 — Postgres runbook checklist  
+3. §5.1 — legal parity (both repos)  
+4. §6.3 — Cloudflare Pages  
+5. §6.6 — forum provisioned  
+
+**Immediately after atomic flip:** §6.4 DocSearch ([`docsearch-application-draft.md`](docsearch-application-draft.md)).
 
 ---
 

@@ -172,6 +172,8 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 
 **Fresh clone:** `docker compose up` → **`reference`** profile (brewery on) — see [`.env.sample`](../../.env.sample) and [`design/platform-module-profile.md`](design/platform-module-profile.md).
 
+**Public demo host:** [`demo.umbraculum.dev`](https://demo.umbraculum.dev) intentionally runs the **reference** profile (platform core **plus** brewery vertical) — one hosted illustration of how a Tier 6 vertical sits alongside canonical modules ([`design/demo-host-runbook.md`](design/demo-host-runbook.md)). It is **not** a second demo for platform-only; integrators who omit brewery use `UMBRACULUM_MODULE_PROFILE=platform` in their own deploy (below).
+
 **Integrator without brewery:** set `UMBRACULUM_MODULE_PROFILE=platform` in `.env` or `docker compose -f docker-compose.yml -f docker-compose.platform.yml up -d`.
 
 **OpenAPI:** ISVs on the platform profile should consume [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) only — the brewery add-on spec (`openapi/brewery.json`) documents the reference vertical and is omitted from platform-profile generation. Browse interactively on [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform) (platform) or [docs.umbraculum.dev/openapi-brewery](https://docs.umbraculum.dev/openapi-brewery) (reference vertical). For typed HTTP calls from your repo, prefer [`@umbraculum/api-client`](../../packages/platform/api-client/README.md) facades over raw `fetch`. See [`API-OPENAPI.md`](API-OPENAPI.md).

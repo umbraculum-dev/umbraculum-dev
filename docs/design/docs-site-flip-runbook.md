@@ -49,7 +49,7 @@ Cross-reference: [WEBSITE.md](../WEBSITE.md) § brochure + docs relationship.
 
 | Step | Action |
 |------|--------|
-| DocSearch | Submit or refresh application after live URL — [docsearch-application-draft.md](docsearch-application-draft.md) |
+| DocSearch | **First step after flip** — submit or refresh Algolia application once URL is indexable — [docsearch-application-draft.md](docsearch-application-draft.md) (maintainer decision 2026-06-07) |
 | Smoke | `curl -sf https://docs.umbraculum.dev/` ; OpenAPI pages `/openapi-platform`, `/openapi-brewery` |
 | RFC-0011 closure blurb | Optional ROADMAP / announcement link to [rfc-0011-pre-flip-closure.md](rfc-0011-pre-flip-closure.md) |
 
