@@ -7,10 +7,8 @@ import { useFocusEffect, useNavigation, type CompositeNavigationProp } from "@re
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { useAuth } from "../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../auth/nativeApiClient";
-import { useLocaleController } from "../../i18n/I18nProvider";
+import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
+import { useLocaleController } from "@umbraculum/native-shell/i18n";
 import { openWebFallbackRoute } from "../../navigation/openWebFallback";
 import type { RootStackParamList, TabParamList } from "../../navigation/types";
 import { withTimeout, type HealthState } from "./dashboardScreenUtils";

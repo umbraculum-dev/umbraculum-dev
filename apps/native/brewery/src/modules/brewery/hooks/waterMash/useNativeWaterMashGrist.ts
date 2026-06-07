@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { getRecipe } from "@umbraculum/api-client/brewery";
 import { editorStateFromBeerJson } from "@umbraculum/brewery-beerjson";
 
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 
 type MashRecipe = {
   beerJsonRecipeJson?: unknown;

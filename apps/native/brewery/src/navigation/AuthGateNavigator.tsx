@@ -2,7 +2,7 @@ import React from "react";
 
 import { Spinner } from "@umbraculum/ui";
 
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "@umbraculum/native-shell/auth";
 import { LoginScreen } from "../screens/LoginScreen";
 
 export function AuthGateNavigator(props: { children: React.ReactNode }) {

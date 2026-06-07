@@ -13,9 +13,7 @@ import {
 } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 
-import { useAuth } from "../../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 
 import {
   INTEGRATION_KINDS,

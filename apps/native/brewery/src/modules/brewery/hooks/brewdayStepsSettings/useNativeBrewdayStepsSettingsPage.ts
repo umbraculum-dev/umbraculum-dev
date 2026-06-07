@@ -3,9 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getBrewdaySettings, patchBrewdaySettings } from "@umbraculum/api-client/brewery";
 import { useT } from "@umbraculum/i18n-react";
 
-import { useAuth } from "../../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import {
   DEFAULT_STEPS_SEED,
   PRESET_KEYS,

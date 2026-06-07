@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { computeAndSaveSparge } from "@umbraculum/api-client/brewery";
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 
 import { applyNativeWaterSpargeComputedResult } from "./applyNativeWaterSpargeComputedResult";
 import { buildNativeWaterSpargeAcidificationDraftPatch } from "./buildNativeWaterSpargeAcidificationDraftPatch";

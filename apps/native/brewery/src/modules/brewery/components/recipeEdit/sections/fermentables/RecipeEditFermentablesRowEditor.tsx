@@ -3,8 +3,8 @@ import type {EditorGristRow} from "@umbraculum/brewery-beerjson";
 import {Accordion} from "tamagui";
 import {Button, Card, Text} from "@umbraculum/ui";
 
-import {Input} from "../../../../../../components/AppInput";
-import {SURFACE_BACKGROUND} from "../../../../../../theme/colors";
+import { SURFACE_BACKGROUND } from "@umbraculum/native-shell/theme";
+import { Input } from "@umbraculum/native-shell/components";
 import {roundTo} from "../../../../lib/recipeEditHelpers";
 import {MALT_CLASS_OPTIONS} from "../../../../lib/recipeEditConstants";
 import type {PickerOption} from "../../../../lib/recipeEditTypes";

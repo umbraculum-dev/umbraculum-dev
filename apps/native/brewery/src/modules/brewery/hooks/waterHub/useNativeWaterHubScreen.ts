@@ -10,10 +10,8 @@ import type { RecipeWaterHubSummaryResponse } from "@umbraculum/brewery-contract
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { useT } from "@umbraculum/i18n-react";
 
-import { useAuth } from "../../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
-import { useLocaleController } from "../../../../i18n/I18nProvider";
+import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
+import { useLocaleController } from "@umbraculum/native-shell/i18n";
 import type { RootStackParamList } from "../../../../navigation/types";
 import {
   type DisplayStream,

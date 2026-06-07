@@ -6,7 +6,7 @@ import {
   patchEquipmentProfile,
 } from "@umbraculum/api-client/brewery";
 
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import type { EquipmentProfile } from "../../lib/equipmentTypes";
 import { parseNullableNumber } from "../../lib/equipmentTypes";
 

@@ -2,8 +2,8 @@ import {View} from "react-native";
 import {Accordion} from "tamagui";
 import {Card, Heading, Text} from "@umbraculum/ui";
 
-import {Input} from "../../../../../components/AppInput";
-import {SURFACE_BACKGROUND} from "../../../../../theme/colors";
+import { SURFACE_BACKGROUND } from "@umbraculum/native-shell/theme";
+import { Input } from "@umbraculum/native-shell/components";
 import type {RecipeEditScreenModel} from "../../../hooks/useRecipeEditScreen";
 
 export function RecipeEditBoilSection({ model }: { model: RecipeEditScreenModel }) {

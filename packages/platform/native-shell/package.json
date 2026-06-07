@@ -1,0 +1,75 @@
+{
+  "name": "@umbraculum/native-shell",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Shared Expo bootstrap for Umbraculum native apps — auth, i18n, theme, platform UI primitives. RFC-0011 Wave 4B.",
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./bootstrap": {
+      "types": "./dist/bootstrap.d.ts",
+      "import": "./dist/bootstrap.js",
+      "require": "./dist/bootstrap.cjs",
+      "default": "./dist/bootstrap.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js",
+      "require": "./dist/auth/index.cjs",
+      "default": "./dist/auth/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/i18n/index.d.ts",
+      "import": "./dist/i18n/index.js",
+      "require": "./dist/i18n/index.cjs",
+      "default": "./dist/i18n/index.js"
+    },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "import": "./dist/theme/index.js",
+      "require": "./dist/theme/index.cjs",
+      "default": "./dist/theme/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.cjs",
+      "default": "./dist/components/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@umbraculum/api-client": "file:../api-client",
+    "@umbraculum/i18n": "file:../i18n",
+    "@umbraculum/i18n-react": "file:../i18n-react",
+    "@umbraculum/ui": "file:../ui"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "expo-constants": "~18.0.0",
+    "expo-image": "^3.0.11",
+    "expo-localization": "~17.0.9",
+    "expo-secure-store": "~15.0.8",
+    "tamagui": "^2.0.0-rc.11"
+  },
+  "peerDependencies": {
+    "expo": ">=54",
+    "expo-constants": ">=18",
+    "expo-image": ">=3",
+    "expo-localization": ">=17",
+    "expo-secure-store": ">=15",
+    "react": ">=19",
+    "react-native": ">=0.81",
+    "tamagui": ">=2"
+  }
+}

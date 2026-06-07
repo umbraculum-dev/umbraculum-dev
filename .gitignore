@@ -58,6 +58,12 @@ coverage/
 # ------------------------------------------------------------
 !packages/*/dist/
 !packages/*/dist/**
+!packages/platform/*/dist/
+!packages/platform/*/dist/**
+!packages/modules/*/dist/
+!packages/modules/*/dist/**
+!packages/verticals/*/*/dist/
+!packages/verticals/*/*/dist/**
 
 # npm/yarn/pnpm debug logs
 npm-debug.log*

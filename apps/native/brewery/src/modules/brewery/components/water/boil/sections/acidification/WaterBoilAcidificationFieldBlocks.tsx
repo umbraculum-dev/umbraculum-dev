@@ -3,7 +3,7 @@ import { View } from "react-native";
 
 import { Button, Text, ModeFieldset } from "@umbraculum/ui";
 
-import { Input } from "../../../../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type { WaterBoilScreenModel } from "../../../../../hooks/useWaterBoilScreen";
 import { bicarbonatePpmToAlkalinityPpmCaCO3 } from "../../../../../hooks/waterBoil/waterBoilHelpers";
 import { PickerField } from "../../../shared/PickerField";

@@ -5,9 +5,7 @@ import { listEquipmentProfiles } from "@umbraculum/api-client/brewery";
 import type { AuthMeResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 
-import { useAuth } from "../../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import type { EquipmentProfile } from "../../lib/equipmentTypes";
 
 export function useNativeEquipmentPageData() {

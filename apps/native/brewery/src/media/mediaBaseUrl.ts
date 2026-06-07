@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 
-import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import { getApiBaseUrl } from "@umbraculum/native-shell/auth";
 
 function normalizeBaseUrl(value: unknown): string {
   if (typeof value !== "string") return "";

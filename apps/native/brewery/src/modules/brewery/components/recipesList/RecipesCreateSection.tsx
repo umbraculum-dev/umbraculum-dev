@@ -3,7 +3,7 @@ import { View } from "react-native";
 
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
 
-import { Input } from "../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type { useNativeRecipesListScreen } from "../../hooks/recipesList/useNativeRecipesListScreen";
 
 type RecipesListModel = ReturnType<typeof useNativeRecipesListScreen>;

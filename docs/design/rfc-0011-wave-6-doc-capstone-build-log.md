@@ -20,7 +20,7 @@
 | 3 | Brewery naming only under `(brewery)/` or `@umbraculum/brewery-*` | **Partial** | Cross-module UI imports documented as known gap |
 | 4 | No brewery under `packages/platform/` | **Partial** | Package purity landed (3c); `api-client/src/brewery/` facade documented |
 | 5 | `@umbraculum/brewery-contracts`; platform contracts clean | **Met** | Wave 3b |
-| 6 | Native README multi-app pattern | **Partial** | Target-state section added; Wave 4 (`native-shell`) deferred |
+| 6 | Native README multi-app pattern | **Met** | Wave 4A umbrella + Wave 4B `@umbraculum/native-shell` |
 | 7 | REPOSITORY-STRUCTURE ↔ RFC-0011 ↔ backbone linked | **Met** | Wave 6 |
 
 ## Deliverables
@@ -37,7 +37,7 @@
 
 | Track | Status | Next action |
 |-------|--------|-------------|
-| **Wave 4** (`@umbraculum/native-shell`, `apps/native/brewery/`) | Deferred | Reconsider after E2E taxonomy stable |
+| **Wave 4** (`@umbraculum/native-shell`, `apps/native/brewery/`) | **Done (2026-06-07)** | 4A re-home + 4B shell extraction; second native app scaffold deferred |
 | **Wave 3e Phase 2** (flat orchestrators under `services/api/src/services/`) | Deferred | Opportunistic refactor |
 | **umbraculum-website** extraction | Deferred | Parallel track per backbone |
 | **Backlog** (cross-module `(brewery)/_components`, `api-client/src/brewery/`) | Known gaps | Document-only until dedicated wave |

@@ -3,8 +3,8 @@ import type {EditorHopRow} from "@umbraculum/brewery-beerjson";
 import {Accordion} from "tamagui";
 import {Button, Card, Text} from "@umbraculum/ui";
 
-import {Input} from "../../../../../../components/AppInput";
-import {SURFACE_BACKGROUND} from "../../../../../../theme/colors";
+import { SURFACE_BACKGROUND } from "@umbraculum/native-shell/theme";
+import { Input } from "@umbraculum/native-shell/components";
 import {HOP_FORM_OPTIONS, HOP_USE_OPTIONS} from "../../../../lib/recipeEditConstants";
 import type {PickerOption} from "../../../../lib/recipeEditTypes";
 import type {RecipeEditScreenModel} from "../../../../hooks/useRecipeEditScreen";

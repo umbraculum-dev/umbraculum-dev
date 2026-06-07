@@ -7,8 +7,8 @@ import type { CompositeNavigationProp } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { AdSlot } from "../../components/AdSlot";
-import type { AuthContextValue } from "../../auth/AuthProvider";
+import type { AuthContextValue } from "@umbraculum/native-shell/auth";
+import { AdSlot } from "@umbraculum/native-shell/components";
 import type { RootStackParamList, TabParamList } from "../../navigation/types";
 
 export function DashboardScreenTopAd() {

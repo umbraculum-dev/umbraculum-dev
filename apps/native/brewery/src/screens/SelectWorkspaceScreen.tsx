@@ -5,8 +5,7 @@ import { getAuthMe, setActiveWorkspace } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 
-import { useAuth } from "../auth/AuthProvider";
-import { nativePlatformApiClient } from "../auth/nativeApiClient";
+import { useAuth, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 
 type WorkspaceListItem = { id: string; name: string; role: string; brandKey?: string | null };
 

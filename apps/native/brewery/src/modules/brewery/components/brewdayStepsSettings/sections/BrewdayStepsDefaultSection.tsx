@@ -3,7 +3,7 @@ import { View } from "react-native";
 
 import { Card, Heading, Text } from "@umbraculum/ui";
 
-import { Input } from "../../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type { NativeBrewdayStepsSettingsPageModel } from "../../../hooks/brewdayStepsSettings/useNativeBrewdayStepsSettingsPage";
 import { parseMinutes } from "../../../lib/brewdayStepsTypes";
 import { CheckboxRow, PickerField, SectionToggleButton } from "../nativeUiPrimitives";

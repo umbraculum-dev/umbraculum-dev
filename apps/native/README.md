@@ -9,7 +9,7 @@
 
 ## What this is
 
-Umbrella directory for **multiple Expo app workspaces** under `apps/native/<app-code>/`. Each deployable native app is its own npm workspace; shared bootstrap will live in `@umbraculum/native-shell` (Wave 4B).
+Umbrella directory for **multiple Expo app workspaces** under `apps/native/<app-code>/`. Each deployable native app is its own npm workspace; shared bootstrap lives in `@umbraculum/native-shell` (Wave 4B complete).
 
 ## Scope
 

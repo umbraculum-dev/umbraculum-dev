@@ -5,8 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useT } from "@umbraculum/i18n-react";
 import { AiChatPanel, Screen, useAiChatStream } from "@umbraculum/ui";
 
-import { useAuth } from "../auth/AuthProvider";
-import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import { useAuth, getApiBaseUrl } from "@umbraculum/native-shell/auth";
 
 /**
  * Native AI consultant screen — wraps the shared {@link AiChatPanel}

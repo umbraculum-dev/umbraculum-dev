@@ -203,7 +203,7 @@ Integrator docs synced with post–Wave 3a/3c/3d reality:
 2. [`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md) — filesystem diagram, expanded decision tree, known-gap callouts.
 3. [`GLOSSARY.md`](../GLOSSARY.md) — platform horizontal pages, canonical module segment, vertical route group; **workspace web UI** retained per §3.1.
 4. [`docs-site/reference-sidebar-items.ts`](../../docs-site/reference-sidebar-items.ts) — brewery-contracts, brewery-i18n, brewery-media-assets.
-5. [`apps/web/README.md`](../../apps/web/README.md), [`apps/native/README.md`](../../apps/native/README.md) — layering tree; native multi-app target stub (Wave 4 deferred).
+5. [`apps/web/README.md`](../../apps/web/README.md), [`apps/native/README.md`](../../apps/native/README.md) — layering tree; native multi-app + `@umbraculum/native-shell` (Wave 4 complete — see §10.4).
 6. Build log + §12 audit: [`rfc-0011-wave-6-doc-capstone-build-log.md`](../design/rfc-0011-wave-6-doc-capstone-build-log.md).
 
 **§11 companion artifacts (Wave 6):** all rows above ticked.
@@ -215,6 +215,15 @@ Integrator docs synced with post–Wave 3a/3c/3d reality:
 3. [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md), [`docs/TESTING.md`](../TESTING.md) L5 layer map updated.
 4. [`packages/platform/test-mcp`](../../packages/platform/test-mcp/) — `--project=platform`, example `platform/auth.spec.ts`.
 5. Rule 63 b2c/b2b filename prefixes **deferred**.
+
+### 10.4 Wave 4 — native multi-app + `@umbraculum/native-shell` (complete 2026-06-07)
+
+1. **`git mv`** `apps/native/` → `apps/native/brewery/` (`@umbraculum/native-brewery`); umbrella [`apps/native/README.md`](../../apps/native/README.md).
+2. Extract shared bootstrap from brewery app → [`packages/platform/native-shell/`](../../packages/platform/native-shell/) (`auth`, `i18n`, `theme`, `components`, `bootstrap` subpaths).
+3. Brewery app imports `@umbraculum/native-shell/*`; navigation + vertical screens remain in `apps/native/brewery/`.
+4. CI/ci-parity/eslint/docs-site/README updates; `build:packages` includes native-shell.
+
+**Deferred:** second native app scaffold (`apps/native/pim-floor/` etc.).
 
 ---
 

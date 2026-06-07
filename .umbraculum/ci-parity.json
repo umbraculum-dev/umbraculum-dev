@@ -67,6 +67,7 @@
         { "path": "packages/verticals/brewery/i18n", "mode": "npm" },
         { "path": "packages/platform/i18n", "mode": "npm" },
         { "path": "packages/platform/i18n-react", "mode": "npm" },
+        { "path": "packages/platform/native-shell", "mode": "npm" },
         { "path": "packages/platform/media", "mode": "npm" },
         { "path": "packages/verticals/brewery/media-assets", "mode": "npm" },
         { "path": "packages/platform/navigation", "mode": "npm" },

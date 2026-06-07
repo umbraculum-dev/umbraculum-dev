@@ -76,6 +76,7 @@ FULL_SCOPE_README_PATHS = [
     "packages/platform/i18n/README.md",
     "packages/platform/i18n-react/README.md",
     "packages/platform/media/README.md",
+    "packages/platform/native-shell/README.md",
     "packages/platform/navigation/README.md",
     "packages/verticals/brewery/recipes-ui/README.md",
     "packages/verticals/brewery/core/README.md",

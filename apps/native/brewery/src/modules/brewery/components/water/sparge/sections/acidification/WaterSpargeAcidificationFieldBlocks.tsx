@@ -5,7 +5,7 @@ import type { WaterProfile } from "@umbraculum/brewery-contracts";
 import { Button, Text } from "@umbraculum/ui";
 import { ModeFieldset } from "@umbraculum/ui";
 
-import { Input } from "../../../../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type { WaterSpargeScreenModel } from "../../../../../hooks/useWaterSpargeScreen";
 import { PickerField } from "../../../shared/PickerField";
 

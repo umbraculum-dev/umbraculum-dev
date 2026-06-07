@@ -7,8 +7,7 @@ import type { BrewSessionListItem } from "@umbraculum/brewery-contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 
-import { useAuth } from "../../../auth/AuthProvider";
-import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
+import { useAuth, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import type { RootStackParamList } from "../../../navigation/types";
 
 export function BrewSessionsListScreen() {

@@ -4,7 +4,7 @@ import { computeAndSaveMash } from "@umbraculum/api-client/brewery";
 import type { SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
 import { useT } from "@umbraculum/i18n-react";
 
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import type { NativeMashAdjustmentFieldsRef } from "./useNativeWaterMashAdjustment";
 import type { useNativeWaterMashAcidificationState } from "./useNativeWaterMashAcidificationState";
 

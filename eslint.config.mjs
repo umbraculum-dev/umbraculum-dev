@@ -604,7 +604,7 @@ export default [
         {
           type: "native-app-shared",
           pattern:
-            "apps/native/brewery/src/{auth,components,i18n,lib,media,navigation,screens,theme,types}/**",
+            "apps/native/brewery/src/{lib,media,navigation,screens,types}/**",
           mode: "full",
         },
         {

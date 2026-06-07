@@ -3,9 +3,8 @@ import { useRef, useState } from "react";
 import { useT } from "@umbraculum/i18n-react";
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
 
-import { useAuth } from "../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
-import { useLocaleController } from "../../../i18n/I18nProvider";
+import { useAuth, getApiBaseUrl } from "@umbraculum/native-shell/auth";
+import { useLocaleController } from "@umbraculum/native-shell/i18n";
 import type { RootStackParamList } from "../../../navigation/types";
 import { useNativeWaterMashAcidification } from "./waterMash/useNativeWaterMashAcidification";
 import { useNativeWaterMashAdjustment } from "./waterMash/useNativeWaterMashAdjustment";

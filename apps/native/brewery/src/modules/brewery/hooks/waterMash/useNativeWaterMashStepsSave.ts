@@ -7,7 +7,7 @@ import {
 import type { WaterVolumes } from "@umbraculum/brewery-recipes-ui";
 import type { Dispatch, SetStateAction } from "react";
 
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 
 import type { NativeWaterMashStepsRecipe } from "./useNativeWaterMashStepsLoad";
 

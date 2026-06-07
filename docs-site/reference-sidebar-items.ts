@@ -117,6 +117,11 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
+        label: 'packages/platform/native-shell',
+        href: '/reference/packages/platform/native-shell/',
+      },
+      {
+        type: 'link',
         label: 'packages/platform/navigation',
         href: '/reference/packages/platform/navigation/',
       },

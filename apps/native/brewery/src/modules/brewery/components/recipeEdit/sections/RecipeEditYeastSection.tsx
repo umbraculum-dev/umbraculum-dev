@@ -2,8 +2,8 @@ import {View} from "react-native";
 import {Accordion} from "tamagui";
 import {Button, Card, Heading, Text} from "@umbraculum/ui";
 
-import {SURFACE_BACKGROUND} from "../../../../../theme/colors";
-import {ReadOnlyField} from "../../../../../components/ReadOnlyField";
+import { SURFACE_BACKGROUND } from "@umbraculum/native-shell/theme";
+import { ReadOnlyField } from "@umbraculum/native-shell/components";
 import {formatFixed} from "../../../lib/recipeEditHelpers";
 import type {RecipeEditScreenModel} from "../../../hooks/useRecipeEditScreen";
 

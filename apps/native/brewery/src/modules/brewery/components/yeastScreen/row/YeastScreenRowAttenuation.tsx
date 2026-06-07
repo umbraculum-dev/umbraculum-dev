@@ -2,8 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import { Text } from "@umbraculum/ui";
 
-import { ReadOnlyField } from "../../../../../components/ReadOnlyField";
-import { Input } from "../../../../../components/AppInput";
+import { ReadOnlyField, Input } from "@umbraculum/native-shell/components";
 import { PickerField } from "../PickerField";
 import { formatFixed, YES_NO_OPTIONS } from "../../../hooks/yeastScreen/yeastScreenHelpers";
 import type { YeastScreenRowSectionProps } from "./YeastScreenRowIdentity";

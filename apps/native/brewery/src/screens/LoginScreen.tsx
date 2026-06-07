@@ -5,10 +5,9 @@ import { YStack } from "tamagui";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Heading, Screen, Text } from "@umbraculum/ui";
 
-import { AdSlot } from "../components/AdSlot";
-import { Input } from "../components/AppInput";
-import { useAuth } from "../auth/AuthProvider";
-import { useLocaleController } from "../i18n/I18nProvider";
+import { useAuth } from "@umbraculum/native-shell/auth";
+import { useLocaleController } from "@umbraculum/native-shell/i18n";
+import { AdSlot, Input } from "@umbraculum/native-shell/components";
 
 export function LoginScreen() {
   const auth = useAuth();

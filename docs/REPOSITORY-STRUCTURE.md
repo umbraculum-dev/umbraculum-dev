@@ -103,6 +103,7 @@ Industry-agnostic. Brewery **content** lives in `@umbraculum/brewery-i18n` and `
 | `packages/platform/navigation/` | `@umbraculum/navigation` | Cross-platform routing-policy framework. |
 | `packages/platform/i18n/` | `@umbraculum/i18n` | Platform + canonical locale bundles; merges `@umbraculum/brewery-i18n` in `getSharedMessages()` for reference profile. |
 | `packages/platform/i18n-react/` | `@umbraculum/i18n-react` | React + next-intl bindings (`useTranslator`). |
+| `packages/platform/native-shell/` | `@umbraculum/native-shell` | Shared Expo bootstrap — auth, locale, theme tokens, platform RN/Tamagui primitives (RFC-0011 Wave 4B). |
 | `packages/platform/api-client/` | `@umbraculum/api-client` | Typed fetch + auth (cookie web, bearer native). **Known gap:** vertical facade under `src/brewery/` — extraction deferred. |
 | `packages/platform/media/` | `@umbraculum/media` | Media loader framework + empty platform manifest. |
 | `packages/platform/rendering/` | `@umbraculum/rendering` | Document rendering pipeline (RFC-0007). |

@@ -13,9 +13,7 @@ import type { AuthMeResponse } from "@umbraculum/contracts";
 import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 import { useT } from "@umbraculum/i18n-react";
 
-import { useAuth } from "../../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import { EMPTY_ION_STATE, isAdmin } from "../../lib/waterProfileTypes";
 import type { WaterProfileIonState } from "../../lib/waterProfileTypes";
 

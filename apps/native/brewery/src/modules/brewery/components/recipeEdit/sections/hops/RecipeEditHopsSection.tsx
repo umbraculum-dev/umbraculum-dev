@@ -2,7 +2,7 @@ import {View} from "react-native";
 import {Accordion} from "tamagui";
 import {Card, Heading, Text} from "@umbraculum/ui";
 
-import {SURFACE_BACKGROUND} from "../../../../../../theme/colors";
+import { SURFACE_BACKGROUND } from "@umbraculum/native-shell/theme";
 import type {RecipeEditScreenModel} from "../../../../hooks/useRecipeEditScreen";
 import {RecipeEditHopsRowEditor} from "./RecipeEditHopsRowEditor";
 import {RecipeEditHopsSearchSection} from "./RecipeEditHopsSearchSection";

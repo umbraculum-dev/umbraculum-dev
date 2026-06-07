@@ -5,7 +5,7 @@ import type { RouteRef } from "@umbraculum/navigation";
 import { routeToLocalePath } from "@umbraculum/navigation";
 import { ApiClientError, exchangeWebviewToken } from "@umbraculum/api-client";
 
-import { nativePlatformApiClient } from "../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 
 export interface OpenWebFallbackOptions {
   baseUrl: string;

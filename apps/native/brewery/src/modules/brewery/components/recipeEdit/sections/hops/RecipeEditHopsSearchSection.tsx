@@ -1,7 +1,7 @@
 import {ScrollView, View} from "react-native";
 import {Button, Text} from "@umbraculum/ui";
 
-import {Input} from "../../../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type {RecipeEditScreenModel} from "../../../../hooks/useRecipeEditScreen";
 
 export function RecipeEditHopsSearchSection({ model }: { model: RecipeEditScreenModel }) {

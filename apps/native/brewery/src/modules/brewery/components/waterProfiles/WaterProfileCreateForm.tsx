@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
 
-import { Input } from "../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type { NativeWaterProfilesPageModel } from "../../hooks/waterProfiles/useNativeWaterProfilesPage";
 import { ION_KEYS } from "../../lib/waterProfileTypes";
 import { PickerField } from "../water/shared/PickerField";

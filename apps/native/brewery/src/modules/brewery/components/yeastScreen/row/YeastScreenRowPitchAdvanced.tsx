@@ -11,8 +11,7 @@ import {
 } from "@umbraculum/brewery-beerjson";
 import { Text } from "@umbraculum/ui";
 
-import { ReadOnlyField } from "../../../../../components/ReadOnlyField";
-import { Input } from "../../../../../components/AppInput";
+import { ReadOnlyField, Input } from "@umbraculum/native-shell/components";
 import { PickerField } from "../PickerField";
 import {
   SPECIES_OPTIONS,

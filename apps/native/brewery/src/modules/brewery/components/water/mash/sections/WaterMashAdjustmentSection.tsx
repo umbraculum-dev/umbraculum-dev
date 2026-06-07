@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
 
-import { Input } from "../../../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type { WaterMashScreenModel } from "../../../../hooks/useWaterMashScreen";
 import { PickerField } from "../../shared/PickerField";
 import { formatFixed } from "../../shared/waterNativeFormatters";

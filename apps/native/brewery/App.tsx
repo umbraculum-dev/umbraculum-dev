@@ -4,8 +4,8 @@ import { TamaguiProvider, Theme } from "tamagui";
 
 import config from "./tamagui.config";
 
-import { I18nProvider } from "./src/i18n/I18nProvider";
-import { AuthProvider } from "./src/auth/AuthProvider";
+import { I18nProvider } from "@umbraculum/native-shell/i18n";
+import { AuthProvider } from "@umbraculum/native-shell/auth";
 import { AppNavigator } from "./src/navigation/AppNavigator";
 import { registerPlatformNativeModules } from "./src/navigation/registerPlatformNativeModules";
 

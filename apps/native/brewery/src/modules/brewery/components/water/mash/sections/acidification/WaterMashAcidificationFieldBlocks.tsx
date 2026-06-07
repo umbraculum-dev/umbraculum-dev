@@ -3,7 +3,7 @@ import { View } from "react-native";
 
 import { ModeFieldset, Text } from "@umbraculum/ui";
 
-import { Input } from "../../../../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 import type { WaterMashScreenModel } from "../../../../../hooks/useWaterMashScreen";
 import { PickerField } from "../../../shared/PickerField";
 

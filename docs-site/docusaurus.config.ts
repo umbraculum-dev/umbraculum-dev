@@ -50,6 +50,7 @@ const referencePackagesReadmes = [
   'platform/media/README.md',
   'modules/module-sdk/README.md',
   'modules/mrp-contracts/README.md',
+  'platform/native-shell/README.md',
   'platform/navigation/README.md',
   'modules/pim-contracts/README.md',
   'verticals/brewery/recipes-ui/README.md',

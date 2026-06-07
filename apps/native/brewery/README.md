@@ -20,7 +20,8 @@ The native-specific build / CI / publishing strategy is documented in [`docs/NAT
 
 ## Scope
 
-- **Contains**: Expo entrypoint (`App.tsx`, `index.js`); React Navigation stack/tab/native-stack glue (`src/navigation/`); auth integration with `expo-secure-store` (`src/auth/`); per-screen views (`src/screens/`); native-side bootstrap (locale detection, Tamagui theme injection — `src/bootstrap.ts`, `src/i18n/`, `src/theme/`); native-component shims for things web doesn't need (`src/components/`); Metro bundler config (`metro.config.js`); the i18n-coverage guardrail (`scripts/i18n-guardrail.mjs`).
+- **Contains**: Expo entrypoint (`App.tsx`, `index.js`); React Navigation stack/tab/native-stack glue (`src/navigation/`); per-screen views (`src/screens/`); brewery vertical module screens/hooks (`src/modules/brewery/`); Metro bundler config (`metro.config.js`); the i18n-coverage guardrail (`scripts/i18n-guardrail.mjs`).
+- **Depends on (shared shell)**: `@umbraculum/native-shell` for bootstrap, auth, locale, theme tokens, and platform RN/Tamagui primitives (`Input`, `ReadOnlyField`, `AdSlot`).
 - **Does not contain**: API route handlers (`services/api`); shared UI primitives (`@umbraculum/ui`); domain UI (`@umbraculum/brewery-recipes-ui`); message catalogs (`@umbraculum/i18n`); contract types (`@umbraculum/contracts`); media assets (`@umbraculum/media` — referenced directly via Metro bundling); the API client (`@umbraculum/api-client`); the web app (`apps/web`).
 
 ## Quick start

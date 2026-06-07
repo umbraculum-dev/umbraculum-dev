@@ -1,4 +1,4 @@
-import "./src/bootstrap";
+import "@umbraculum/native-shell/bootstrap";
 
 import { registerRootComponent } from "expo";
 

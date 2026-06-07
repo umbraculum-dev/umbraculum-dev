@@ -5,8 +5,8 @@ import { useNavigation, type NavigationProp } from "@react-navigation/native";
 import { useT } from "@umbraculum/i18n-react";
 import { Screen, Text } from "@umbraculum/ui";
 
-import { getApiBaseUrl } from "../auth/apiBaseUrl";
-import { useLocaleController } from "../i18n/I18nProvider";
+import { getApiBaseUrl } from "@umbraculum/native-shell/auth";
+import { useLocaleController } from "@umbraculum/native-shell/i18n";
 import type { RootStackParamList } from "../navigation/types";
 
 export function AboutScreen() {

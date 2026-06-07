@@ -2,8 +2,8 @@ import {View} from "react-native";
 import {Accordion} from "tamagui";
 import {Card, Heading, Text} from "@umbraculum/ui";
 
-import {AdSlot} from "../../../../../../components/AdSlot";
-import {SURFACE_BACKGROUND, SURFACE_BORDER} from "../../../../../../theme/colors";
+import { SURFACE_BACKGROUND, SURFACE_BORDER } from "@umbraculum/native-shell/theme";
+import { AdSlot } from "@umbraculum/native-shell/components";
 import type {RecipeEditScreenModel} from "../../../../hooks/useRecipeEditScreen";
 import {RecipeEditFermentablesRowEditor} from "./RecipeEditFermentablesRowEditor";
 import {RecipeEditFermentablesSearchSection} from "./RecipeEditFermentablesSearchSection";

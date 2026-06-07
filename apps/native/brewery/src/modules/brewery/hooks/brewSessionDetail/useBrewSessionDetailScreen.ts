@@ -3,8 +3,7 @@ import { useRoute } from "@react-navigation/native";
 
 import { useT } from "@umbraculum/i18n-react";
 
-import { useAuth } from "../../../../auth/AuthProvider";
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { useAuth, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import { useBrewSessionDetailExport } from "./useBrewSessionDetailExport";
 import { useBrewSessionDetailHydrometer } from "./useBrewSessionDetailHydrometer";
 import { useBrewSessionDetailScreenLoad } from "./useBrewSessionDetailScreenLoad";

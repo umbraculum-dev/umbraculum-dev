@@ -2,7 +2,7 @@ import {View} from "react-native";
 import {Accordion} from "tamagui";
 import {Button, Card, Heading, Text} from "@umbraculum/ui";
 
-import {FIELD_COMPUTED_BG, FIELD_COMPUTED_BORDER, FIELD_READONLY_BG, FIELD_READONLY_BORDER, SURFACE_BACKGROUND} from "../../../../../theme/colors";
+import { FIELD_COMPUTED_BG, FIELD_COMPUTED_BORDER, FIELD_READONLY_BG, FIELD_READONLY_BORDER, SURFACE_BACKGROUND } from "@umbraculum/native-shell/theme";
 import {MashStepsEditor, SpargeStepReadOnlyRow} from "@umbraculum/brewery-recipes-ui";
 import {formatFixed} from "../../../lib/recipeEditHelpers";
 import type {RecipeEditScreenModel} from "../../../hooks/useRecipeEditScreen";

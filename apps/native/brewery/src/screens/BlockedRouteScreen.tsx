@@ -6,9 +6,8 @@ import type { RouteId } from "@umbraculum/navigation";
 import { buildWebFallbackRouteRef, getRouteAvailability } from "@umbraculum/navigation";
 import { Button, Heading, Screen, Text } from "@umbraculum/ui";
 
-import { getApiBaseUrl } from "../auth/apiBaseUrl";
-import { useAuth } from "../auth/AuthProvider";
-import { useLocaleController } from "../i18n/I18nProvider";
+import { getApiBaseUrl, useAuth } from "@umbraculum/native-shell/auth";
+import { useLocaleController } from "@umbraculum/native-shell/i18n";
 import { openWebFallbackRoute } from "../navigation/openWebFallback";
 
 export function BlockedRouteScreen({ routeId }: { routeId: RouteId }) {

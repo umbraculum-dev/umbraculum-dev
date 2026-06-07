@@ -3,7 +3,7 @@ import { View } from "react-native";
 
 import { Text } from "@umbraculum/ui";
 
-import { Input } from "../../../../components/AppInput";
+import { Input } from "@umbraculum/native-shell/components";
 
 export function NumInput(props: {
   label: string;

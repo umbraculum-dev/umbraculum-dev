@@ -3,7 +3,7 @@ import { Alert, Linking } from "react-native";
 
 import { runAsyncRenderJobExport } from "@umbraculum/api-client";
 
-import { getApiBaseUrl } from "../../../../auth/apiBaseUrl";
+import { getApiBaseUrl } from "@umbraculum/native-shell/auth";
 
 type ApiClient = Parameters<typeof runAsyncRenderJobExport>[0];
 

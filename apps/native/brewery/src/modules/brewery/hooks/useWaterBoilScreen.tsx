@@ -6,10 +6,8 @@ import { useT } from "@umbraculum/i18n-react";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
 
-import { useAuth } from "../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
-import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
-import { useLocaleController } from "../../../i18n/I18nProvider";
+import { useAuth, getApiBaseUrl, nativePlatformApiClient } from "@umbraculum/native-shell/auth";
+import { useLocaleController } from "@umbraculum/native-shell/i18n";
 import type { RootStackParamList } from "../../../navigation/types";
 import { useNativeWaterBoilAcidification } from "./waterBoil/useNativeWaterBoilAcidification";
 import { useNativeWaterBoilAdjustment } from "./waterBoil/useNativeWaterBoilAdjustment";

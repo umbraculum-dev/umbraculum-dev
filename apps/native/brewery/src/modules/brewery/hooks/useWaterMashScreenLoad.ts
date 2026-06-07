@@ -9,7 +9,7 @@ import {
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import type { WaterProfilesResponse } from "@umbraculum/brewery-contracts";
 
-import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 
 export type WaterMashScreenLoadHydratorsRef = MutableRefObject<{
   hydrateFromSettings: (settings: Record<string, unknown>) => void;

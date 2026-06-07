@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { createEquipmentProfile } from "@umbraculum/api-client/brewery";
 
-import { nativePlatformApiClient } from "../../../../auth/nativeApiClient";
+import { nativePlatformApiClient } from "@umbraculum/native-shell/auth";
 import { parseNullableNumber } from "../../lib/equipmentTypes";
 
 export function useNativeEquipmentPageCreateMutations(params: {
