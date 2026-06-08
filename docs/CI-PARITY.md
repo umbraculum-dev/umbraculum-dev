@@ -84,9 +84,9 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 | Aspect | T2-PR (`verify:pre-push`) | T2-release (`verify:pre-push:release`) |
 |--------|---------------------------|----------------------------------------|
 | Job selection | Only jobs whose GHA workflow would trigger on the diff | All manifest jobs (`docs-readmes`, `lint`, `typecheck`, `sdk-publish-prep`, `dogfood-npm-smoke`) |
-| Execution | Parallel containers (`--parallel --isolated-install`) | Sequential in one container (warm shared volumes) |
-| API vitest | Auto-runs when `api.yml` paths match | Not auto-run — use `api-integration-tests-pre-push` when needed |
-| Typical wall clock | ~max(job times) + archive overhead (~3–5 min) | ~sum(job times) (~8–15 min) |
+| Execution | Parallel containers (`--parallel --isolated-install`); native companions overlap ci-parity | Sequential in one container (warm shared volumes) |
+| API vitest | Auto-runs **in parallel with** ci-parity when `api.yml` paths match | Not auto-run — use `api-integration-tests-pre-push` when needed |
+| Typical wall clock | ~max(ci-parity job times, native companion times) + archive overhead (~3–5 min) | ~sum(job times) (~8–15 min) |
 
 ## Pre-push commands reference (contributors and agents)
 

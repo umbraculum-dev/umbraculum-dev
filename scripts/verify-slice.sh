@@ -121,6 +121,46 @@ run_native_step() {
   esac
 }
 
+# Start path-matched native companions in background (GHA runs these workflows in parallel).
+start_native_steps_parallel() {
+  native_pids=()
+  native_step_names=()
+  if [[ -z "${native_steps:-}" ]]; then
+    return 0
+  fi
+  IFS=',' read -r -a native_array <<< "$native_steps"
+  for step in "${native_array[@]}"; do
+    [[ -z "$step" ]] && continue
+    echo "verify-slice T2-PR: starting native companion [${step}] in parallel with ci-parity" >&2
+    (
+      run_native_step "$step"
+    ) &
+    native_pids+=("$!")
+    native_step_names+=("$step")
+  done
+}
+
+wait_native_steps_parallel() {
+  local i step
+  for i in "${!native_pids[@]}"; do
+    step="${native_step_names[$i]}"
+    if wait "${native_pids[$i]}"; then
+      if [[ "$step" == "api-integration" ]]; then
+        api_status="OK"
+      elif [[ "$step" == "expo-doctor" ]]; then
+        expo_doctor_status="OK"
+      fi
+    else
+      rc=1
+      if [[ "$step" == "api-integration" ]]; then
+        api_status="FAIL"
+      elif [[ "$step" == "expo-doctor" ]]; then
+        expo_doctor_status="FAIL"
+      fi
+    fi
+  done
+}
+
 run_t2() {
   local rc=0
   local parity_args=(run)
@@ -132,6 +172,8 @@ run_t2() {
   local expo_doctor_status="SKIPPED"
   local validate_status="OK"
   local tier_label="T2-PR"
+  local native_pids=()
+  local native_step_names=()
 
   if [[ -n "$T2_FULL" ]]; then
     tier_label="T2-release"
@@ -174,7 +216,12 @@ run_t2() {
     native_steps="$(python3 -c "import json,sys; print(','.join(json.loads(sys.argv[1])['nativeSteps']))" "$resolved_json")"
     parity_args+=(--parallel --isolated-install --jobs "$ci_jobs")
     parallel_count="$(echo "$ci_jobs" | tr ',' '\n' | grep -c . || true)"
-    echo "verify-slice T2-PR: ci-parity jobs=${ci_jobs} parallel=${parallel_count} native=${native_steps:-none}" >&2
+    echo "verify-slice T2-PR: ci-parity jobs=${ci_jobs} parallel=${parallel_count} native=${native_steps:-none} (native∥ci-parity)" >&2
+  fi
+
+  # T2-PR: overlap native companions with ci-parity (mirrors separate GHA workflows on one push).
+  if [[ -z "$T2_FULL" && -n "${native_steps:-}" ]]; then
+    start_native_steps_parallel
   fi
 
   local parity_summary="ci-parity=OK"
@@ -185,7 +232,10 @@ run_t2() {
     rc=1
   fi
 
-  if [[ -n "${native_steps:-}" ]]; then
+  if [[ -z "$T2_FULL" && ${#native_pids[@]} -gt 0 ]]; then
+    wait_native_steps_parallel
+  elif [[ -n "$T2_FULL" && -n "${native_steps:-}" ]]; then
+    # T2-release: native companions after full sequential manifest (no overlap).
     IFS=',' read -r -a native_array <<< "$native_steps"
     for step in "${native_array[@]}"; do
       [[ -z "$step" ]] && continue

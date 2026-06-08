@@ -334,6 +334,10 @@ python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base or
 ```
 
    `verify:pre-push` selects `--archive` automatically when the tree is clean.
+   **T2-PR runs in parallel** like GHA: path-matched ci-parity jobs use
+   `--parallel --isolated-install` (one container per job, concurrent); native
+   companions (`api-integration`, `expo-doctor`, …) start **in parallel with**
+   ci-parity when the diff triggers them — not after a sequential ci-parity pass.
    On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@<same-version-as-CI_PARITY_PKG_VERSION> -- run --archive` (read `CI_PARITY_PKG_VERSION` from [`scripts/ci-parity-check.sh`](scripts/ci-parity-check.sh)).
    Skill: **`path-aware-pre-push`**. Full table: [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § Pre-push commands reference.
 
