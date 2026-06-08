@@ -15,6 +15,12 @@ on:
   push:
     tags:
       - "sdk-contracts-v*"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why republish (logged in summary only)"
+        required: false
+        default: "manual api-client gap recovery"
 
 jobs:
   publish:
@@ -119,9 +125,26 @@ jobs:
             publish_npm_oidc "${PKG_DIR}" "${PKG_ESCAPED}" "${PKG_LABEL}"
           }
 
+          verify_on_registry() {
+            local PKG_LABEL="$1"
+            local VERSION="$2"
+            local i
+            for i in 1 2 3 4 5; do
+              if npm view "${PKG_LABEL}@${VERSION}" version >/dev/null 2>&1; then
+                echo "OK: ${PKG_LABEL}@${VERSION} visible on registry"
+                return 0
+              fi
+              echo "  attempt ${i}/5: ${PKG_LABEL}@${VERSION} not visible yet, sleeping 3s…"
+              sleep 3
+            done
+            echo "::error::${PKG_LABEL}@${VERSION} not on registry after publish"
+            exit 1
+          }
+
           publish_npm_oidc_skip_if_exists packages/platform/contracts "${CONTRACTS_ESCAPED}" "@umbraculum/contracts"
 
           cp packages/platform/api-client/package.json /tmp/api-client-package.json.bak
+          API_CLIENT_VERSION="$(jq -r .version packages/platform/api-client/package.json)"
           echo "Rewriting api-client dependencies to registry semver for publish tarball only"
           jq '.dependencies["@umbraculum/contracts"] = "^0.0.1" | .dependencies["@umbraculum/automation-contracts"] = "^0.0.2" | .dependencies["@umbraculum/pim-contracts"] = "^0.0.2" | .dependencies["@umbraculum/mrp-contracts"] = "^0.0.2" | .dependencies["@umbraculum/crp-contracts"] = "^0.0.2"' \
             packages/platform/api-client/package.json > /tmp/api-client-package.json
@@ -129,6 +152,12 @@ jobs:
 
           publish_npm_oidc_skip_if_exists packages/platform/api-client "${API_CLIENT_ESCAPED}" "@umbraculum/api-client"
           mv /tmp/api-client-package.json.bak packages/platform/api-client/package.json
+          verify_on_registry "@umbraculum/api-client" "${API_CLIENT_VERSION}"
+          if ! npm view "@umbraculum/api-client@${API_CLIENT_VERSION}" exports --json | jq -e 'has("./transport")' >/dev/null 2>&1; then
+            echo "::error::@umbraculum/api-client@${API_CLIENT_VERSION} missing ./transport export on registry"
+            exit 1
+          fi
+          echo "OK: @umbraculum/api-client@${API_CLIENT_VERSION} ./transport export present on registry"
 
           cp packages/verticals/brewery/contracts/package.json /tmp/brewery-contracts-package.json.bak
           jq '.dependencies["@umbraculum/contracts"] = "^0.0.1"' \
