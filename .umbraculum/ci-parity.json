@@ -29,6 +29,12 @@
         "command": "npm ci --no-audit --no-fund",
         "afterJob": "lint",
         "beforeJob": "typecheck"
+      },
+      {
+        "path": "docs-site/vendor/brochure",
+        "command": "npm ci --no-audit --no-fund",
+        "afterJob": "lint",
+        "beforeJob": "typecheck"
       }
     ]
   },

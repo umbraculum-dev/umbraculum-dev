@@ -345,6 +345,13 @@ python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base or
    you are intentionally running a **named subset** with explicit `--jobs` (and usually
    `--parallel --isolated-install`). Incident: Wave 3b push prep, 2026-06-06.
 
+   **Agent anti-pattern (do not repeat):** `./scripts/ci-parity-check.sh --archive run --jobs lint,typecheck`
+   **only** — skips path-matched **`docs-readmes`**, **`dogfood-npm-smoke`**, and never runs
+   **`validate --strict`** (`.github/workflows/ci-parity-validate.yml`). Incident: expo-doctor
+   push `d0f84f8`, 2026-06-08 — `check-public-docs-no-personal-paths` + unpublished
+   `@umbraculum/api-client@0.0.3` + strict manifest false positives. **`npm run verify:pre-push`**
+   now runs `validate:gha-triggers` + `validate:ci-parity` before ci-parity jobs.
+
    **SOLID program:** closed post–Wave 17 — see [`docs/design/solid-post-wave17-closure.md`](docs/design/solid-post-wave17-closure.md) §6 (verification gates; do not treat pre-push as a new SOLID initiative).
 3. T2-PR **auto-runs API vitest** when the diff matches `.github/workflows/api.yml`
    paths (via `.umbraculum/gha-trigger-map.json`). For manifest-only work outside

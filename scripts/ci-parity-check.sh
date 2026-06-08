@@ -75,7 +75,16 @@ EOF
   fi
 fi
 
-if [[ "$use_checkout" -eq 1 ]]; then
+is_host_only_cmd=0
+for arg in "${forward_args[@]}"; do
+  case "$arg" in
+    validate | explain) is_host_only_cmd=1 ;;
+  esac
+done
+
+if [[ "$is_host_only_cmd" -eq 1 ]]; then
+  : # validate/explain — host manifest check only (no --ci / docker run)
+elif [[ "$use_checkout" -eq 1 ]]; then
   extra_args+=(--ci)
   echo "ci-parity-check: verifying working tree (--ci), including uncommitted edits" >&2
 else
@@ -83,7 +92,7 @@ else
 fi
 
 # Keep in sync with ci_parity_version on every .github/workflows/* caller of ci-parity-reusable.yml
-CI_PARITY_PKG_VERSION="${CI_PARITY_PKG_VERSION:-1.0.11}"
+CI_PARITY_PKG_VERSION="${CI_PARITY_PKG_VERSION:-1.0.12}"
 
 run_ci_parity() {
   local cli=""

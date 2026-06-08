@@ -3,7 +3,7 @@
 **Tier:** Internal  
 **Status:** Active — Path A chosen (2026-06-07)  
 **Audience:** native maintainers, CI authors  
-**Related:** [expo_doctor_fixes plan](/home/rf/.cursor/plans/expo_doctor_fixes_104f6de0.plan.md), [DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md), [native-eas-demo-build-log.md](native-eas-demo-build-log.md)
+**Related:** Cursor plan `expo_doctor_fixes` (2026-06-07), [DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md), [native-eas-demo-build-log.md](native-eas-demo-build-log.md)
 
 ---
 

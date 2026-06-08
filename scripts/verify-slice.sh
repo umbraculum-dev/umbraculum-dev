@@ -130,10 +130,24 @@ run_t2() {
   local parallel_count=0
   local api_status="SKIPPED"
   local expo_doctor_status="SKIPPED"
+  local validate_status="OK"
   local tier_label="T2-PR"
 
   if [[ -n "$T2_FULL" ]]; then
     tier_label="T2-release"
+  fi
+
+  # Same gate as .github/workflows/ci-parity-validate.yml (must run before ci-parity jobs).
+  if ! python3 "${REPO_ROOT}/scripts/docs/validate-gha-trigger-map.py" --repo-root "$REPO_ROOT"; then
+    validate_status="FAIL"
+    rc=1
+  elif ! "${REPO_ROOT}/scripts/ci-parity-check.sh" validate --strict; then
+    validate_status="FAIL"
+    rc=1
+  fi
+  if [[ "$rc" -ne 0 ]]; then
+    echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: validate=FAIL (ci-parity-validate parity — fix before ci-parity jobs)" >&2
+    return 1
   fi
 
   if git -C "$REPO_ROOT" diff --quiet && git -C "$REPO_ROOT" diff --cached --quiet; then
@@ -195,7 +209,7 @@ run_t2() {
   if [[ "$tier_label" == "T2-release" ]]; then
     echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: ${parity_summary} jobs=${ci_jobs}"
   else
-    echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: ${parity_summary} jobs=${ci_jobs} parallel=${parallel_count} api=${api_status} expo-doctor=${expo_doctor_status}"
+    echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: validate=${validate_status} ${parity_summary} jobs=${ci_jobs} parallel=${parallel_count} api=${api_status} expo-doctor=${expo_doctor_status}"
   fi
   return "$rc"
 }
