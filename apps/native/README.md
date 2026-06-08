@@ -46,6 +46,8 @@ cd apps/native/brewery && npx expo start
 
 Full setup: [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../docs/DEVELOPMENT-NATIVE-LOCAL.md). Strategy / CI: [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md).
 
+**Dependency gate (agents + humans):** after editing native deps, root `overrides`, or `native-shell` peers, run [`scripts/check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) (CI: [`native-deps.yml`](../../.github/workflows/native-deps.yml)). See [`docs/design/expo-doctor-monorepo-assessment.md`](../../docs/design/expo-doctor-monorepo-assessment.md) §8.
+
 ## Related
 
 - [`apps/web`](../web/README.md) — member-facing web application  

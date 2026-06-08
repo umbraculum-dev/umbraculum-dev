@@ -56,20 +56,16 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "tamagui": "^2.0.0-rc.11"
+  },
+  "peerDependencies": {
+    "expo": "~54.0.35",
     "expo-constants": "~18.0.0",
     "expo-image": "^3.0.11",
     "expo-localization": "~17.0.9",
     "expo-secure-store": "~15.0.8",
-    "tamagui": "^2.0.0-rc.11"
-  },
-  "peerDependencies": {
-    "expo": ">=54",
-    "expo-constants": ">=18",
-    "expo-image": ">=3",
-    "expo-localization": ">=17",
-    "expo-secure-store": ">=15",
     "react": ">=19",
-    "react-native": ">=0.81",
+    "react-native": "0.81.5",
     "tamagui": ">=2"
   }
 }

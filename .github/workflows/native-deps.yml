@@ -38,12 +38,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Run expo install --check + apps/native/brewery typecheck (Docker, matches local rule)
-        # RFC-0011 Wave 4A: apps/native/brewery is a workspace; expo is hoisted to repo
-        # root — install at /repo first, then npx expo from the brewery workspace.
+      - name: Run expo-doctor + brewery typecheck (Docker, EAS-like)
+        # RFC-0011 Wave 4A: root npm ci, then scripts/check-native-expo-doctor.sh from brewery workspace.
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/repo" \
             -w /repo \
             node:20-slim \
-            bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
+            bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"

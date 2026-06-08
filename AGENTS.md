@@ -365,6 +365,25 @@ set.) They use CommonJS `require()`; missing an eslint override fails
 session with “before you push, run lint” for the operator — **you** run it.
 Incident: `8a05b6c` / fix `9c41400`.
 
+**Native dependency / expo-doctor gate:** When **you** edit `apps/native/**`,
+`packages/platform/native-shell/package.json`, root `package.json` `overrides` / lockfile,
+or `apps/native/brewery/metro.config.js`, reproduce the EAS-like doctor step before push.
+Use skill **`native-expo-doctor-pre-push`** (toolset rule **`78-native-expo-doctor-monorepo-gate`**).
+`npm run verify:pre-push` runs this automatically when the diff matches
+[`.umbraculum/gha-trigger-map.json`](.umbraculum/gha-trigger-map.json) `native-deps` paths.
+
+```bash
+docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+  bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
+```
+
+**Do not regress Path A (2026-06-07):** monorepo `react@19.1.0` overrides; tight `native-shell`
+`expo` peer (`~54.0.35`, never `>=54`); no `expo-*` in `native-shell` `devDependencies`;
+`app.config.js` `({ config }) =>` spread; Metro pins brewery `react`.
+
+CI: [`.github/workflows/native-deps.yml`](.github/workflows/native-deps.yml). Assessment +
+agent anti-patterns: [`docs/design/expo-doctor-monorepo-assessment.md`](docs/design/expo-doctor-monorepo-assessment.md) §8.
+
 **During iteration (not the push gate):** `./scripts/ci-parity-check.sh run`
 (`--ci`, working tree + warm volumes) is fine for fast WIP feedback — but
 **never** treat `--ci` green alone as push proof if you have not yet run archive

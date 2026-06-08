@@ -71,7 +71,7 @@ services:
       - NEXT_PUBLIC_API_BASE_URL=/api
       - UMBRACULUM_MODULE_PROFILE=${UMBRACULUM_MODULE_PROFILE:-reference}
       # NOTE: Previously required to bypass npm peer-dependency conflicts when React was pinned to 19.1.0.
-      # With React aligned to 19.2.4 (react-native peer range), keep this disabled unless conflicts return.
+      # Monorepo React is 19.1.0 (Expo Go ABI via root overrides). Keep legacy_peer_deps disabled unless conflicts return.
       # - npm_config_legacy_peer_deps=true
     ports:
       - "3000:3000"

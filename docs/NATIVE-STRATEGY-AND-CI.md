@@ -35,14 +35,14 @@ None of that is “moving fast”; it is **undefined behavior** that wastes days
 
 ### 2.2 What is professionally acceptable for your situation
 
-Using **Expo Go** on a physical device with **documented** version pins and **documented** divergence from web (`apps/web` on a newer React minor than `apps/native`) is **acceptable** when:
+Using **Expo Go** on a physical device with **documented** version pins and **monorepo-wide React alignment** (`react@19.1.0` via root `overrides` as of 2026-06-07) is **acceptable** when:
 
-1. The divergence is **explicit** (documented baseline table + exception in `DEVELOPMENT-LOCAL.md`).
-2. Everyone touching native deps knows to run **`expo install --check`** (and `--fix` when needed) before merging.
-3. Shared packages (`packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, etc.) avoid relying on **React patch/minor-only internals** that differ between 19.1 and 19.2—stick to public, stable APIs.
+1. Pins and overrides are **explicit** (baseline table in `DEVELOPMENT-NATIVE-LOCAL.md`, assessment in [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md)).
+2. Everyone touching native deps runs **[`scripts/check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh)** (or CI `native-deps.yml`) before merging — not brewery-only `expo install --check`.
+3. Shared packages (`packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, etc.) stick to **public, stable React APIs** — no version-sensitive internals.
 4. You keep the **triage order** in `docs/DEVELOPMENT-NATIVE-LOCAL.md` (API → LAN → phone browser → versions → cache → device log).
 
-That is **controlled technical debt**, not gambling. The debt becomes expensive only if you **stop maintaining** those guardrails or if you need capabilities Expo Go cannot provide (custom native code, store-grade signing workflows, etc.).
+That is **controlled alignment**, not gambling. Risk returns if agents **re-split** web and native React minors, loosen `@umbraculum/native-shell` expo peers, or skip the doctor gate.
 
 ### 2.3 Where real “disaster” risk still lives (even with docs)
 
@@ -72,8 +72,8 @@ So “Mac-free” pushes the long-term path toward **EAS (or similar remote iOS 
 **Today (aligned with your answers):**
 
 - Keep **Expo Go + SDK 54** as the primary dev loop on Linux.
-- Keep **`apps/native` pinned** to what Expo Go expects (see baseline table in `docs/DEVELOPMENT-NATIVE-LOCAL.md`), including **`react-dom` matching `react`** for Metro web preview.
-- Accept **temporary React minor drift** vs `apps/web`; document it and do **not** “fix” it by forcing native to web’s React until Expo Go supports it **or** you adopt a dev client.
+- Keep **`apps/native/brewery` pinned** to what Expo Go expects (see baseline table in `docs/DEVELOPMENT-NATIVE-LOCAL.md`), including **`react-dom` matching `react`** for Metro web preview.
+- Keep **`apps/web` on the same React minor** as native via root `overrides` (Path A, 2026-06-07). Do **not** bump web ahead until Path B (SDK upgrade or dev client) — see [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md) §5.
 - Maintain **`docs/DEVELOPMENT-NATIVE-LOCAL.md`** as the single operational source of truth (LAN IP, Metro detached vs interactive, troubleshooting).
 
 **Revisit Option C-2 when:** you decide you will distribute native binaries (Play Store / TestFlight / sideload) **or** when Expo Go blocks a feature you need (custom native module, specific native dependency version).
@@ -98,7 +98,7 @@ These are the **minimum** professional bar for the current stack:
 
 | Mitigation | Purpose |
 | --- | --- |
-| Baseline version table + `expo install --check` | Prevents Expo Go ABI crashes before they hit the device |
+| Baseline version table + [`check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh) (18/18) | Prevents hoist duplicates and Expo Go ABI crashes before they hit the device |
 | `react` + `react-dom` same exact version in `apps/native` | Prevents blank Metro web preview at `:8081/` |
 | LAN IP pre-flight (`ip`, curl smoke tests) | Prevents `Failed to download remote update` |
 | API `/api/health` triage + esbuild recovery doc | Prevents false “native bugs” when API is 502 |
@@ -107,9 +107,7 @@ These are the **minimum** professional bar for the current stack:
 | `@umbraculum/brewery-beerjson` is in `build:packages` (before `@umbraculum/brewery-recipes-ui`) | Prevents stale `packages/verticals/brewery/beerjson/dist/*` from silently breaking `apps/native` and `packages/verticals/brewery/recipes-ui` consumers (see `DEVELOPMENT-LOCAL.md` → "Shared packages build") |
 | `./scripts/check-packages-dist-up-to-date.sh` before pushing | Catches any `packages/*/dist` drift automatically. Now actually covers beerjson too (it didn't before this commit, because beerjson wasn't in the upstream `build:packages` chain). |
 
-Optional enhancements (nice-to-have, not required for solo honesty):
-
-- A **pre-push checklist** in `internal/working-notes/TODOs.md` or a short `scripts/check-native-deps.sh` that runs `expo install --check` in Docker (mirrors CI below).
+Agent gate (required when editing native hoist surface): Cursor rule **`78-native-expo-doctor-monorepo-gate`** + skill **`native-expo-doctor-pre-push`** in `umbraculum-node-react-cursor-assistant`; repo [`AGENTS.md`](../AGENTS.md) § Native dependency / expo-doctor gate.
 
 ---
 
@@ -166,7 +164,7 @@ Goals:
    - `packages/**`
    - root `package.json` / `package-lock.json`
    - the workflow file itself (`.github/workflows/native-deps.yml`)
-3. **Job:** `actions/checkout@v5` → single Docker step that runs in `node:20-slim`, mounts the repo at `/repo` with `-w /repo`, runs root **`npm ci`**, then `cd apps/native/brewery && npx expo install --check && npm run typecheck`. (After RFC-0011 Wave 4A, `expo` is hoisted to the monorepo root — a brewery-only install no longer provides `./node_modules/.bin/expo`.)
+3. **Job:** `actions/checkout@v5` → single Docker step in `node:20-slim` (`-v` repo at `/repo`, `-w /repo`): root **`npm ci`**, then **`./scripts/check-native-expo-doctor.sh`** (`expo install --check` + `expo-doctor` 18/18 + stale-tree cleanup), then **`npm run typecheck -w @umbraculum/native-brewery`**. (After RFC-0011 Wave 4A, doctor must run after **root** `npm ci` — brewery-only install misses hoist duplicates.)
 4. **Concurrency:** new runs on the same ref cancel in-flight runs (`concurrency.cancel-in-progress: true`) — keeps minutes lean on rapid pushes.
 5. **Timeout:** `timeout-minutes: 10`.
 
@@ -195,7 +193,7 @@ docker run --rm \
   -v "$REPO_ROOT:/repo" \
   -w /repo \
   node:20-slim \
-  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
+  bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
 ```
 
 Document that one-liner next to your merge checklist. That is **professionally sufficient** if you always run it before touching native dependencies.

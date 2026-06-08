@@ -39,11 +39,21 @@ When you change `packages/platform/native-shell/src/**`, rebuild before native a
 
 - **Consumed by**: `apps/native/brewery` (`@umbraculum/native-brewery`); future native app workspaces under `apps/native/*`.
 - **Depends on**: `@umbraculum/api-client`, `@umbraculum/i18n`, `@umbraculum/i18n-react`.
-- **Peer dependencies**: `expo`, `expo-secure-store`, `react`, `react-native`, `tamagui`.
+- **Peer dependencies** (must stay tight — loose peers hoist phantom `expo@56` at repo root):
+
+| Peer | Pin | Do not |
+|------|-----|--------|
+| `expo` | `~54.0.35` | `>=54` or open range |
+| `react-native` | `0.81.5` | Floating minor |
+| `react` | `>=19` (resolved to `19.1.0` via root overrides) | — |
+| `expo-constants`, `expo-image`, `expo-localization`, `expo-secure-store` | SDK-aligned ranges in `package.json` | Move to `devDependencies` |
+
+**No `expo-*` in `devDependencies`** — they install at repo root and break `expo-doctor` duplicate detection. After editing peers or root `overrides`, run [`scripts/check-native-expo-doctor.sh`](../../../scripts/check-native-expo-doctor.sh).
 
 ## Further reading
 
 - [`docs/design/pre-flip-application-surface-backbone.md`](../../../docs/design/pre-flip-application-surface-backbone.md) — Wave 4 native multi-app layout
 - [`docs/rfcs/0011-application-surface-shell-layering.md`](../../../docs/rfcs/0011-application-surface-shell-layering.md) — RFC-0011 application surface layering
 - [`apps/native/README.md`](../../../apps/native/README.md) — native umbrella index
+- [`docs/design/expo-doctor-monorepo-assessment.md`](../../../docs/design/expo-doctor-monorepo-assessment.md) — hoist / override SoT (agents: rule `78-native-expo-doctor-monorepo-gate`)
 - [`docs/DOCS-README-STANDARDS.md`](../../../docs/DOCS-README-STANDARDS.md) — module README standard

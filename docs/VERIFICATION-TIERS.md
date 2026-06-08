@@ -25,7 +25,7 @@ From repo root:
 | `npm run verify:openapi` | T1 | OpenAPI artifact + scoped API tests |
 | `npm run verify:api-platform` | T1 | Auth/workspaces routes + health check |
 | `npm run verify:from-diff` | T1 | Auto-select slice(s) from diff vs `main` |
-| `npm run verify:pre-push` | T2-PR | Path-aware ci-parity (parallel + archive on clean tree) + auto native companions (API vitest when triggered) — **default before push** |
+| `npm run verify:pre-push` | T2-PR | Path-aware ci-parity (parallel + archive on clean tree) + auto native companions (API vitest, expo-doctor when triggered) — **default before push** |
 | `npm run verify:pre-push:release` | T2-release | Full sequential ci-parity manifest — SDK tags, manifest/pin changes |
 | `npm run validate:gha-triggers` | — | Drift check: `.umbraculum/gha-trigger-map.json` vs GHA workflow `paths:` |
 
@@ -60,6 +60,7 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 |-------------|----|----|-----|
 | `packages/platform/contracts/src/**` | `npm test -w @umbraculum/contracts` (scoped container) | `npm run verify:contracts` | `./scripts/ci-parity-check.sh run --jobs typecheck` |
 | API routes + OpenAPI | `docker compose exec api npm run test:unit` | `npm run verify:openapi` | ci-parity (`--ci`) + **`api-integration-tests-pre-push`** skill |
+| `apps/native/**`, `native-shell`, root `overrides` | — | `./scripts/check-native-expo-doctor.sh` (WIP) | **`native-expo-doctor-pre-push`** skill (or `verify:pre-push` when `native-deps` paths match) |
 | `services/api/src/routes/auth.ts`, `workspaces.ts` | scoped vitest | `npm run verify:api-platform` | T2 row above |
 | Brewery batch routes | scoped vitest files | `./scripts/verify-slice.sh --tier T1 --slice api-brewery-batch1` | T2 row above |
 | Docs / README only | — | `./scripts/ci-parity-check.sh run --jobs docs-readmes` | `npm run verify:pre-push` (typically `docs-readmes` only) |

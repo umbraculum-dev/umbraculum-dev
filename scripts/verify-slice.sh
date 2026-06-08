@@ -109,6 +109,11 @@ run_native_step() {
       echo "==> [check-web-url-segments] npm run check-web-url-segments (container)"
       (cd "$REPO_ROOT" && ./scripts/docker-npm-run.sh -r 'npm run check-web-url-segments')
       ;;
+    expo-doctor)
+      echo "==> [expo-doctor] check-native-expo-doctor.sh + native-brewery typecheck (EAS-like)"
+      docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:20-slim \
+        bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
+      ;;
     *)
       echo "verify-slice: unknown native step ${step_id}" >&2
       return 1
@@ -124,6 +129,7 @@ run_t2() {
   local native_steps=""
   local parallel_count=0
   local api_status="SKIPPED"
+  local expo_doctor_status="SKIPPED"
   local tier_label="T2-PR"
 
   if [[ -n "$T2_FULL" ]]; then
@@ -172,11 +178,15 @@ run_t2() {
       if run_native_step "$step"; then
         if [[ "$step" == "api-integration" ]]; then
           api_status="OK"
+        elif [[ "$step" == "expo-doctor" ]]; then
+          expo_doctor_status="OK"
         fi
       else
         rc=1
         if [[ "$step" == "api-integration" ]]; then
           api_status="FAIL"
+        elif [[ "$step" == "expo-doctor" ]]; then
+          expo_doctor_status="FAIL"
         fi
       fi
     done
@@ -185,7 +195,7 @@ run_t2() {
   if [[ "$tier_label" == "T2-release" ]]; then
     echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: ${parity_summary} jobs=${ci_jobs}"
   else
-    echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: ${parity_summary} jobs=${ci_jobs} parallel=${parallel_count} api=${api_status}"
+    echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: ${parity_summary} jobs=${ci_jobs} parallel=${parallel_count} api=${api_status} expo-doctor=${expo_doctor_status}"
   fi
   return "$rc"
 }

@@ -23,7 +23,7 @@ These pinned versions are an **ABI requirement** of the Expo Go binary on the de
 | `react-native` | `0.81.5` | SDK 54 default |
 | `react-native-svg` | `15.12.1` (exact) | Expo Go ships this native module at this exact version |
 
-> **`apps/web` is on a different React minor (`19.2.4`)** while we target Expo Go. This is an intentional, temporary divergence from the "keep React aligned between web and native" guideline in `DEVELOPMENT-LOCAL.md`. See "Long-term: aligning web + native React" below for the roadmap to remove this divergence.
+> **`apps/web` and native both use `react@19.1.0`** (root `package.json` `overrides`, 2026-06-07 expo-doctor remediation). This restores a single React minor across the monorepo while Expo Go ABI is pinned to 19.1. See "Long-term: aligning web + native React" below if a future SDK upgrade moves web ahead again.
 
 Verify at any time:
 
@@ -270,12 +270,11 @@ docker run --rm \
 
 Then restart Metro with `-c` and **rescan the QR**.
 
-> Trade-off vs. the "keep React aligned between web and native" rule in `DEVELOPMENT-LOCAL.md`:
-> Expo Go is a hard external ABI constraint. While you target Expo Go for development, `apps/native` must match Expo Go's bundled React version, even if `apps/web` is one minor ahead. Permanent alignment requires either upgrading Expo SDK to one that ships your target React, or moving native off Expo Go onto a custom dev client (EAS Build or local `expo prebuild` + dev client) — both are larger architectural changes. Track the divergence in your dev notes and revisit when Expo SDK bumps.
+> Expo Go is a hard external ABI constraint. Path A (2026-06-07) keeps **web and native on `react@19.1.0`** via root `overrides`. Do not bump web ahead without Path B — see § Long-term below.
 
 ### `Incompatible React versions: react 19.1.0 vs react-dom 19.2.4` (Metro web preview at `:8081/` is blank)
 
-Cause: when the native bundle is compiled in **web target** (visiting `http://<LAN_IP>:8081/` in a browser), it pulls in `react-dom`. `react-dom` is not used by the device build, so `apps/native/brewery/package.json` historically didn't pin it — npm workspace hoisting then resolves `react-dom` from the **monorepo root** (typically the version `apps/web` pinned). When `apps/native` is on an older React (because Expo Go forced the downgrade), root's `react-dom` is newer, and the browser crashes on this exact-match check.
+Cause: when the native bundle is compiled in **web target** (visiting `http://<LAN_IP>:8081/` in a browser), it pulls in `react-dom`. If root hoisting resolves a **newer** `react-dom` than brewery `react` (pre–Path A when web was on `19.2.4`), the browser crashes on this exact-match check. Path A should prevent this; if it recurs, verify root `overrides` and run `./scripts/check-native-expo-doctor.sh`.
 
 Fix: pin `react-dom` in `apps/native/brewery/package.json` to **exactly** the same version as `react`:
 
@@ -345,7 +344,7 @@ docker run --rm \
   -v "$REPO_ROOT:/repo" \
   -w /repo \
   node:20-slim \
-  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
+  bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
 # exit 0 means dist drift is gone
 ```
 
@@ -355,7 +354,7 @@ See `DEVELOPMENT-LOCAL.md` → "Shared packages build (native-ready)" for the dr
 
 ### `npm run typecheck` passes locally but the `native-deps` GitHub Action fails on the same commit
 
-Symptom: you ran the CI-equivalent docker command locally (`npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck` with `-w /repo`), it returned exit 0, you pushed, and the workflow turned red on a TypeScript error that the local run never reported.
+Symptom: you ran a shortened local docker command (brewery-only install, no `check-native-expo-doctor.sh`), it returned exit 0, you pushed, and `native-deps` turned red on a TypeScript or expo-doctor error the local run never reported.
 
 Root cause: a bind-mounted `apps/native/node_modules` (or hoisted root `node_modules`) from a prior install can resolve a *different* `@types/*` version than a clean CI install does. The most common offender is `URL` typings — local `@types/node` may declare `URL.hostname` as writable, while a fresh CI install resolves a strict version where it's read-only. Other `lib.dom`-shaped APIs can drift the same way.
 
@@ -367,7 +366,7 @@ docker run --rm \
   -v "$REPO_ROOT:/repo" \
   -w /repo \
   node:20-slim \
-  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
+  bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
 ```
 
 If this reproduces, fix the code so it doesn't depend on the lenient typing (e.g., for `URL`: rebuild the URL string from `u.protocol` + `u.hostname` + `u.port` + `u.pathname` + `u.search` + `u.hash` instead of assigning to `u.hostname = ...`). See `apps/native/brewery/src/auth/apiBaseUrl.ts` for the canonical example committed for exactly this reason. If it doesn't reproduce, the divergence is probably elsewhere (Node minor version, lockfile drift) — check the workflow logs for the exact npm version and tsc version.
@@ -399,20 +398,22 @@ Walk through these in this exact order before deep-diving:
 6. **Bundle cache?** Restart Metro with `-c` and rescan the QR (or re-enter `exp://<LAN_IP>:8081`).
 7. **Read the device error log.** On the blue "Something went wrong" screen, tap **View error log** — `java.io.IOException: Failed to download remote update` means step 2/3; `Incompatible React versions` means step 4.
 
-## Long-term: aligning web + native React (planning, not yet executed)
+## Long-term: moving web ahead of Expo Go (Path B — deferred)
 
-Today `apps/web` runs React `19.2.4` and `apps/native` runs `19.1.0` because Expo Go's bundled native modules dictate the React version on the device. This divergence is **acceptable as long as we depend on Expo Go**. Removing it permanently is a deliberate architectural step that should be planned, not a quick "let's bump packages" change.
+**Current state (Path A, 2026-06-07):** `apps/web`, `apps/native/brewery`, and the repo root all resolve **`react@19.1.0`** / **`react-dom@19.1.0`** via root `package.json` `overrides`. This is intentional — Expo Go's bundled native modules dictate the React minor on device. See [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md).
 
-The two viable paths and what each entails (high level — fuller analysis lives in `docs/REACT-NATIVE-KICKOFF-READINESS.md` if we expand it):
+**Do not** bump `apps/web` to a newer React minor (e.g. `19.2.x`) without executing Path B. `expo-doctor` and [`scripts/check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh) will fail on duplicate `react` trees, and Expo Go may crash at runtime.
 
-1. **Move native off Expo Go onto a custom dev client** (EAS Build or local `expo prebuild` + dev client). Removes the Expo Go ABI constraint entirely; native then picks its own native module versions. Cost: build infra (EAS account or local Android/iOS toolchains), longer first-run, app store accounts for distribution to real testers, plus a more involved local dev story than scan-a-QR.
-2. **Upgrade Expo SDK** to a version whose bundled React matches what `apps/web` targets. Lower-cost than (1) but coupled to Expo's release cadence; check the SDK release notes for the React version it ships, and budget a day for upgrade-related breakages (`expo-secure-store`, `expo-image`, `react-native` minor, Tamagui native peer deps, `victory-native`, `react-native-svg`).
+When we need web on a newer React than Expo Go ships, pick one deliberate path (full analysis: assessment doc §5):
 
-Until one of those is done, treat the divergence as **known tech debt**:
+1. **Custom dev client** (EAS Build or `expo prebuild` + dev client) — exits Expo Go ABI constraint.
+2. **Expo SDK upgrade** to a release whose bundled React matches the web target — coupled to Expo's schedule.
 
-- Watch CI/dev tooling that compares versions across the monorepo and either tolerate or assert the expected gap on purpose.
-- Pin both `react` and `react-dom` in `apps/native` to the exact version Expo Go expects (currently `19.1.0`). Don't let `react-dom` resolve from root hoisting (see troubleshooting above).
-- Whenever you bump `apps/web` React, do not automatically bump `apps/native` — wait until Expo SDK supports the new version.
+Until Path B lands:
+
+- Keep root `overrides` and `native-shell` peer pins aligned with the assessment doc.
+- Run **`./scripts/check-native-expo-doctor.sh`** after any native hoist / lockfile edit (CI: [`native-deps.yml`](../.github/workflows/native-deps.yml)).
+- Pin both `react` and `react-dom` in `apps/native/brewery` to the exact Expo Go version (currently `19.1.0`).
 
 ## Appendix: operator quick reference
 
@@ -425,12 +426,12 @@ docker stop brewery-metro     # --rm removes the container automatically
 # inspect current LAN IP (debug only — the helper already does this)
 ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit}'
 
-# verify versions in apps/native/brewery
+# expo-doctor gate (EAS-like — matches CI native-deps.yml)
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
   -w /repo \
   node:20-slim \
-  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check"
+  bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh"
 
 # realign apps/native/brewery versions to SDK 54 expectations
 docker run --rm \

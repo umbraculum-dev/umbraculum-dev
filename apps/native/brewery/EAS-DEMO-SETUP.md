@@ -21,7 +21,7 @@
 From repo root:
 
 ```bash
-cd "$REPO_ROOT/apps/native"
+cd "$REPO_ROOT/apps/native/brewery"
 npx eas-cli login
 npx eas-cli init
 ```
@@ -83,9 +83,23 @@ Priority queue / paid Expo plans are optional operator upgrades, not required fo
 ```bash
 cd "$REPO_ROOT"
 ./scripts/build-packages-in-docker.sh
-cd apps/native
+cd apps/native/brewery
 npx eas-cli build --platform android --profile preview
 ```
+
+---
+
+## Troubleshooting: `expo-doctor` duplicate dependencies (monorepo)
+
+After root `npm ci`, run from repo root:
+
+```bash
+./scripts/check-native-expo-doctor.sh
+```
+
+The script removes stale `apps/native/node_modules` (pre–Wave 4A), nested `packages/platform/ui/node_modules`, and phantom root peer copies before `expo-doctor`. Target: **18/18**. See [`docs/design/expo-doctor-monorepo-assessment.md`](../../docs/design/expo-doctor-monorepo-assessment.md).
+
+**Agents:** run this (or rely on green `native-deps` GHA) after native lockfile / override edits — see [`AGENTS.md`](../../AGENTS.md) § Native dependency / expo-doctor gate.
 
 ---
 

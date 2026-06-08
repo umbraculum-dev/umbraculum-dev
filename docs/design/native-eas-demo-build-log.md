@@ -96,7 +96,7 @@ cd $REPO_ROOT
 ./scripts/check-packages-dist-up-to-date.sh
 # native-deps parity (container — matches .github/workflows/native-deps.yml):
 docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
-  bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo install --check && npm run typecheck"
+  bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
 npm run test -w @umbraculum/native
 ```
 
@@ -115,6 +115,16 @@ Record last green run date here when executed: **2026-05-27** (agent): `check-pa
 | `EXPO_PUBLIC_API_BASE_URL` baked | `https://demo.umbraculum.dev` |
 
 **Trigger:** GitHub Actions → `native-eas-build` → `platform=android`, `profile=preview` (requires `EXPO_TOKEN`) — **prefer GHA when the repo is public**; while private, use local `eas build` or expo.dev only during long free-tier queues (see [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) § “Expo free tier”).
+
+## Expo Doctor
+
+| Date | Score | Doc |
+|------|-------|-----|
+| 2026-06-07 | **18/18** (post-remediation) | [`expo-doctor-monorepo-assessment.md`](expo-doctor-monorepo-assessment.md); CI: [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) |
+
+Reproduce: root `npm ci` → `cd apps/native/brewery && npx expo-doctor@latest`. CI: [`native-deps.yml`](../../.github/workflows/native-deps.yml).
+
+---
 
 **Queue + quota note (2026-06-03):** Expo **Free** plan — **monthly** build allowance (dashboard: **15 Android** + **15 iOS** of **30** total; **1 concurrency**; EAS Update **1,000 MAUs** + **100 GiB** / month). Not unlimited; occasional demo builds are within policy. First `preview` Android build sat in **Free Tier Queue** (~1h+ *waiting for available worker*) while a private-repo GHA job polled *Waiting for build to complete* — expected. GHA workflow canceled; Expo build allowed to finish independently. See [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) § “Expo free tier”.
 
@@ -146,7 +156,7 @@ Record last green run date here when executed: **2026-05-27** (agent): `check-pa
 
 **Implication:** Demo rendering / Gotenberg / MRP work-order templates are OK. The gap is **native-only**: async render job + artifact URL for `platform: "native"` + `Linking.openURL` (Bearer client), not demo VPS.
 
-**Code path:** [`apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx`](../../apps/native/src/modules/brewery/screens/BrewSessionDetailScreen.tsx) → `runAsyncRenderJobExport` → [`packages/platform/api-client/src/platform/rendering.ts`](../../packages/platform/api-client/src/platform/rendering.ts).
+**Code path:** [`apps/native/brewery/src/modules/brewery/screens/BrewSessionDetailScreen.tsx`](../../apps/native/brewery/src/modules/brewery/screens/BrewSessionDetailScreen.tsx) → `runAsyncRenderJobExport` → [`packages/platform/api-client/src/platform/rendering.ts`](../../packages/platform/api-client/src/platform/rendering.ts).
 
 **Scope:** Optional §5.1 row 6 — does not reopen G1 core closure. Fix deferred.
 

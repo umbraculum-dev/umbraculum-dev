@@ -62,8 +62,6 @@
       "pathPatterns": [
         "packages/platform/contracts/**",
         "packages/platform/api-client/**",
-        "packages/verticals/brewery/contracts/**",
-        "packages/verticals/brewery/api-client/**",
         "packages/modules/ai-tool-sdk/**",
         "packages/modules/i18n-keys/**",
         "packages/modules/module-sdk/**",
@@ -85,6 +83,19 @@
       "ciParityJob": "sdk-publish-prep",
       "t2ReleaseOnly": true,
       "pathPatterns": []
+    },
+    {
+      "id": "native-deps",
+      "workflowFile": ".github/workflows/native-deps.yml",
+      "kind": "native",
+      "nativeStep": "expo-doctor",
+      "pathPatterns": [
+        "apps/native/**",
+        "packages/**",
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/native-deps.yml"
+      ]
     },
     {
       "id": "api",
