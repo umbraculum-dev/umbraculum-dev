@@ -330,6 +330,21 @@ allowed only after the operator explicitly approves and you state the cons
 Apparatus: rule `00-shared-node-npm-container-only.mdc`, skill
 `node-npm-container-only` (umbraculum-node-react-cursor-assistant).
 
+## Git stash (agents — operator consent required)
+
+Do **not** run `git stash` (push, pop, drop) without **explicit operator
+consent**. Stashing hides uncommitted work from the operator and from later
+agent sessions; a common failure mode is stash-without-`pop` after “cleaning
+the tree” for ci-parity.
+
+**Prefer instead:** ask the operator to commit or branch docs/WIP first;
+`git restore` only known artifact paths (e.g. `packages/*/dist/`); or run
+path-scoped verification that tolerates unrelated dirty files.
+
+If the operator explicitly approves a debug stash: use a descriptive message,
+`git stash pop` in the **same session**, and tell the operator exactly what
+was stashed if the session ends before pop.
+
 ## Pre-push CI parity (agent-owned — do not delegate to the operator)
 
 When **you** changed TypeScript, ESLint surface, module READMEs, lockfiles, or

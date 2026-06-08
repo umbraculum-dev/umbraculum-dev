@@ -136,17 +136,24 @@ Enable **skip 2FA for 5 minutes** on the first browser prompt. Verify: `npx npm@
 
 ---
 
-## Step 2 — Workflow
+## Step 2 — Workflows
+
+Both publish workflows use **Node 20** and **npm 10** (Node default) for `npm ci`, then upgrade to **npm ≥ 11.5.1** only for OIDC publish. Running `npm install -g npm@11` **before** `npm ci` on Node 24 rejects the root lockfile and the job dies before any package ships (see contracts recovery note in § contracts batch above).
+
+### `publish-sdk-batch.yml` (seven-package α batch)
 
 File: `umbraculum-dev/.github/workflows/publish-sdk-batch.yml`
 
-- Trigger: push tag `sdk-batch-v*`
+- Trigger: push tag `sdk-batch-v*` or **workflow_dispatch** (manual gap recovery)
 - `permissions.id-token: write`
 - **No** `registry-url` on `setup-node`
-- `npm install -g npm@11.6.2`
-- `npm ci` → `build:packages` → `test:packages`
+- `npm ci --workspaces --include-workspace-root` → `build:packages` → `test:packages` → `npm install -g npm@11.6.2`
 - Ordered OIDC publish: leaves → `module-sdk` (deps rewritten to `^0.1.1` registry semver **in workflow only** — match current leaf version) → four contracts packages
 - Explicit GitHub OIDC fetch + npm exchange per package (diagnostic logging)
+
+### `publish-contracts-api-client.yml` (contracts + api-client batch)
+
+Same Node 20 / npm-ci-first / npm-11-for-publish ordering; trigger `sdk-contracts-v*` or **workflow_dispatch**. See `.github/workflows/publish-contracts-api-client.yml`.
 
 `module-sdk` committed `package.json` keeps `file:../…` for monorepo CI; only the publish tarball gets registry deps.
 

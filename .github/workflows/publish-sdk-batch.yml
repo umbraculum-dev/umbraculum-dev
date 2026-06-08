@@ -14,6 +14,12 @@ on:
   push:
     tags:
       - "sdk-batch-v*"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why republish (logged in summary only)"
+        required: false
+        default: "manual SDK batch gap recovery"
 
 jobs:
   publish:
@@ -28,15 +34,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "20"
           package-manager-cache: false
+
+      # npm ci must run on npm 10 (Node 20 default) — npm 11 rejects the root lockfile
+      # before install completes. Upgrade to npm >= 11.5.1 only for OIDC publish below.
+      - run: npm ci --no-audit --no-fund --prefer-offline --workspaces --include-workspace-root
+      - run: npm run build:packages
+      - run: npm run test:packages
 
       - name: Install npm with OIDC trusted publishing support (>= 11.5.1)
         run: npm install -g npm@11.6.2 && npm --version
-
-      - run: npm ci
-      - run: npm run build:packages
-      - run: npm run test:packages
 
       - name: Publish MIT SDK batch to npm (OIDC)
         env:
