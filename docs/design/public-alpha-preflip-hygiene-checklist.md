@@ -1,7 +1,7 @@
 # Public alpha — pre-flip hygiene checklist (Stage 1)
 
 **Tier:** Public  
-**Status:** Stage 1 **substantially complete** (2026-06-08) — **2c cleared** after forum §7.5 recheck (~30 min Discourse Admin)  
+**Status:** Stage 1 **complete** (2026-06-08) — **2b signed off**; cleared for **2c** (DocSearch remains first step after flip)  
 **Audience:** maintainer running Stage 1 before the atomic public flip (**2c**)  
 **Related:** [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1, [`ROADMAP.md`](../ROADMAP.md) Week 1 tail + Week 3 Stage 1, [RFC-0010](../rfcs/0010-platform-brewery-postgres-schema-split.md) runbook [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres-schema-split.md)
 
@@ -82,7 +82,7 @@ Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres
 | 6.3 | Cloudflare Pages projects configured per [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | ☑ (2026-06-07 — Workers + custom domains 200; pre-flip noindex) |
 | 6.4 | DocSearch application submitted after docs URL live ([`docsearch-application-draft.md`](docsearch-application-draft.md)) | ☐ (**first step after 2c** — docs.umbraculum.dev already deployed with pre-flip `noindex`) |
 | 6.5 | Flip announcement reviewed ([`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)) | ☑ (2026-06-08 — draft reviewed; **publish at 2c** only; fill `[Name]` / `[Date]` / `[Contact]` on flip day) |
-| 6.6 | Community forum provisioned or scheduled ([`community-forum-runbook.md`](community-forum-runbook.md)) — §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1); may trail flip by days but before first proposal cycle | **Partial** (forum live; §7.5 partially done — **maintainer recheck** [§7.1](#71-remaining-maintainer-actions-before-2c)) |
+| 6.6 | Community forum provisioned or scheduled ([`community-forum-runbook.md`](community-forum-runbook.md)) — §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1); may trail flip by days but before first proposal cycle | ☑ (2026-06-08 — §7.5 complete: avatars, badges, digests, categories, pinned proposal + **How we communicate**, registration + password-reset email; logged-out policy readable via pinned topics; GitHub CoC links **expected private until 2c**) |
 | 6.7 | **Donation channel accounts (before flip)** — Liberapay `Umbraculum` + Buy Me a Coffee live; URLs match `/support/` — **roadmap Phase 2 `2d`** | ☑ (2026-06-08 — accounts live and wired in `/support/`; page stays `noindex` until 2c — expected) |
 
 **Docs-site flip coordination:** see [docs-site-flip-runbook.md](docs-site-flip-runbook.md) (noIndex removal, brochure vendor sync, DocSearch, Cloudflare deploy).
@@ -129,29 +129,27 @@ Answers from [RFC-0011 pre-flip closure](rfc-0011-pre-flip-closure.md) Step 4:
 
 ### 7.1 Remaining maintainer actions before 2c
 
-Everything automated or agent-verified is **done**. Only human steps remain:
+Stage 1 automated + forum gates are **complete** (2026-06-08). Only **2c** and post-flip steps remain:
 
 | # | Action | Where | Time | Status |
 |---|--------|-------|------|--------|
-| **A** | **Forum §7.5 recheck** | [Discourse Admin](https://forum.umbraculum.dev/admin) — checklist below | ~30 min | **Partial** — recheck scheduled |
+| **A** | **Forum §7.5 recheck** | [Discourse Admin](https://forum.umbraculum.dev/admin) + pinned topics | ~30 min | ☑ **Complete** (2026-06-08) |
 | **B** | **Run 2c flip-day runbook** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) | flip window | Not started |
 | **C** | **DocSearch application** | [`docsearch-application-draft.md`](docsearch-application-draft.md) | first step **after** 2c | Deferred (by design) |
 
-**Not required before 2c:** donation accounts (☑ live), docs deploy (☑ live), announcement publish (draft ☑ — paste at 2c).
+**Pre-flip complete:** donation accounts (§6.7), docs + brochure deploy (§6.3), announcement draft (§6.5), forum §7.5 (§6.6).
 
-#### Forum §7.5 recheck (step A)
+#### Forum §7.5 recheck (step A — complete 2026-06-08)
 
-Open [`community-forum-runbook.md`](community-forum-runbook.md) §7.5. In Discourse Admin, confirm each box:
+Maintainer confirmed all seven [runbook §7.5](community-forum-runbook.md) items:
 
-1. Default avatar = Umbi / Umbraculum mark; **avatar uploads and Gravatar off**
-2. **Badges off**; trust badges off; **user directory off**
-3. New-user **digest default = never** (or equivalent)
-4. Categories + pinned **proposal template** live (Community policy, Proposals)
-5. Pinned **How we communicate** topic in **Community policy** (body in runbook §6 item 5)
-6. **Test registration** + password-reset email delivers
-7. CoC + policy links visible without login (or readable via pinned topics)
-
-When all seven pass, change §6.6 above from **Partial** to ☑ and add a one-line note in §7 sign-off.
+1. ☑ Default avatar (Umbi URL); uploads + Gravatar off  
+2. ☑ Badges off; trust badges off; user directory off  
+3. ☑ New-user digest default = never; reply-by-email off; `disable emails` = no  
+4. ☑ Five categories; pinned **How to write a proposal** in Proposals  
+5. ☑ Pinned **How we communicate** in Community policy  
+6. ☑ Registration + password-reset email deliver  
+7. ☑ Policy readable logged out via pinned topics (`conduct@` in topic body); GitHub CoC URLs private until **2c** — expected
 
 #### 2c flip-day sequence (step B — when ready)
 
@@ -168,7 +166,7 @@ When all seven pass, change §6.6 above from **Partial** to ☑ and add a one-li
 
 | Date | Repo | Stage 1 result | Notes |
 |------|------|----------------|-------|
-| 2026-06-08 | umbraculum-dev + toolset | **Stage 1 substantially complete — 2c cleared pending forum §7.5 recheck** | Maintainer: donations ☑; docs + brochure deployed with pre-flip `noindex`; announcement draft reviewed; GHA `docs-readmes` green; §6.6 forum recheck scheduled. |
+| 2026-06-08 | umbraculum-dev + toolset | **Stage 1 complete — 2b signed off; cleared for 2c** | Forum §7.5 ☑ (maintainer); donations ☑; docs/brochure live with pre-flip `noindex`; announcement draft reviewed; GHA `docs-readmes` green. Post-flip: §6.4 DocSearch first. |
 | 2026-06-07 | umbraculum-dev + toolset | **Stage 1 mostly complete** | Gitleaks, Postgres, legal, Cloudflare ☑; forum §7.5 partial; DocSearch post-flip; donations optional. Audit: [`public-alpha-preflip-hygiene-audit-2026-06-07.md`](public-alpha-preflip-hygiene-audit-2026-06-07.md). |
 | 2026-05-27 | umbraculum-dev | **Partial (automated)** | Full report: [`public-alpha-preflip-hygiene-audit-2026-05-27.md`](public-alpha-preflip-hygiene-audit-2026-05-27.md). Maintainer sign-off still required for 2.2 gitleaks, 5.x legal mailboxes, 6.3–6.7 manual deploy/comms gates, toolset CoC/SECURITY. |
 | 2026-05-29 | umbraculum-dev | **Automated prep complete** | Stage 1 closure per org-transfer plan: internal report at `internal/working-notes/pre-public-flip-hygiene-scan-2026-05-27.md` (not linked from public docs). Ready for maintainer flip when §5–§6 manual items close. |
