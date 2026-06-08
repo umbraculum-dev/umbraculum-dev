@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Registry-only smoke: prove published @umbraculum/* SDK packages install outside the
-# monorepo (external integrator + third-party module paths).
+# monorepo (external integrator + third-party module paths). Default SDK versions
+# are read from each package's package.json; run in node:20-slim, not host npm.
 #
 # Usage (from repo root):
 #   ./scripts/dogfood-npm-smoke.sh
