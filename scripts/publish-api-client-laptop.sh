@@ -51,7 +51,11 @@ echo ":: publish ${PKG_NAME} from ${PKG_DIR}"
 if [ "${DRY_RUN:-0}" = "1" ]; then
   (cd "${PKG_DIR}" && npm publish --access public --dry-run)
 else
-  (cd "${PKG_DIR}" && npm publish --access public)
+  if ! (cd "${PKG_DIR}" && npm publish --access public); then
+    mv /tmp/api-client-package.json.bak "${PKG_DIR}/package.json"
+    echo "FAIL: npm publish — if HTTP 404, run npm login with @umbraculum publish rights or use GHA OIDC (sdk-contracts-v* tag / workflow_dispatch)." >&2
+    exit 1
+  fi
 fi
 
 mv /tmp/api-client-package.json.bak "${PKG_DIR}/package.json"

@@ -16,18 +16,36 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-CONTRACTS_VERSION="${CONTRACTS_VERSION:-0.0.1}"
-API_CLIENT_VERSION="${API_CLIENT_VERSION:-0.0.3}"
+read_pkg_version() {
+  node -p "require('${REPO_ROOT}/$1/package.json').version"
+}
+
+require_registry_version() {
+  local label="$1"
+  local version="$2"
+  if ! npm view "${label}@${version}" version >/dev/null 2>&1; then
+    echo "FAIL: ${label}@${version} not on registry — dogfood requires published SDK tarballs." >&2
+    echo "  Fix: push sdk-contracts-v* tag or workflow_dispatch publish-contracts-api-client.yml (OIDC)," >&2
+    echo "  or maintainer: ./scripts/publish-api-client-laptop.sh (npm login). See docs/design/npm-sdk-trusted-publishing.md" >&2
+    exit 1
+  fi
+}
+
+CONTRACTS_VERSION="${CONTRACTS_VERSION:-$(read_pkg_version packages/platform/contracts)}"
+API_CLIENT_VERSION="${API_CLIENT_VERSION:-$(read_pkg_version packages/platform/api-client)}"
 MODULE_SDK_VERSION="${MODULE_SDK_VERSION:-0.0.2}"
 AI_TOOL_SDK_VERSION="${AI_TOOL_SDK_VERSION:-0.1.1}"
 AUTOMATION_CONTRACTS_VERSION="${AUTOMATION_CONTRACTS_VERSION:-0.0.2}"
 PIM_CONTRACTS_VERSION="${PIM_CONTRACTS_VERSION:-0.0.2}"
 MRP_CONTRACTS_VERSION="${MRP_CONTRACTS_VERSION:-0.0.2}"
 CRP_CONTRACTS_VERSION="${CRP_CONTRACTS_VERSION:-0.0.2}"
-BREWERY_CONTRACTS_VERSION="${BREWERY_CONTRACTS_VERSION:-0.0.1}"
-BREWERY_API_CLIENT_VERSION="${BREWERY_API_CLIENT_VERSION:-0.0.3}"
+BREWERY_CONTRACTS_VERSION="${BREWERY_CONTRACTS_VERSION:-$(read_pkg_version packages/verticals/brewery/contracts)}"
+BREWERY_API_CLIENT_VERSION="${BREWERY_API_CLIENT_VERSION:-$(read_pkg_version packages/verticals/brewery/api-client)}"
 TMPDIR="${TMPDIR:-/tmp}/umbraculum-dogfood-npm-smoke-$$"
 trap 'rm -rf "${TMPDIR}"' EXIT
+
+require_registry_version "@umbraculum/api-client" "${API_CLIENT_VERSION}"
+require_registry_version "@umbraculum/brewery-api-client" "${BREWERY_API_CLIENT_VERSION}"
 
 mkdir -p "${TMPDIR}"
 cd "${TMPDIR}"
