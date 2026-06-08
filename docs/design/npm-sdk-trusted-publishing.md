@@ -53,7 +53,7 @@ If `brewery-contracts` is on the registry but `brewery-api-client` 404s (second 
 ./scripts/publish-brewery-api-client-laptop.sh
 ```
 
-If dogfood fails with `No matching version found for @umbraculum/api-client@0.0.3` while `brewery-api-client@0.0.3` is already on npm, the platform client never published (common when `sdk-contracts-v0.0.3` pointed at a commit whose `packages/platform/api-client/package.json` was still `0.0.2`). Push a **new** tag on a commit whose manifest is `0.0.3`, e.g. `sdk-contracts-v0.0.3-republish-2`, or run **workflow_dispatch** on `publish-contracts-api-client.yml`. The workflow now fails fast if `@umbraculum/api-client` is missing from the registry after publish.
+If dogfood fails with `No matching version found for @umbraculum/api-client@0.0.3` while `brewery-api-client@0.0.3` is already on npm, the platform client never published. Common causes: (1) `sdk-contracts-v0.0.3` tag pointed at a commit whose `api-client` manifest was still `0.0.2`; (2) publish workflow ran `npm install -g npm@11` **before** `npm ci` on Node 24 — npm 11 rejects the root lockfile and the job dies before publish. Fix: push a new `sdk-contracts-v*` tag on a commit with the Node 20 / npm-ci-first workflow, or **workflow_dispatch** `publish-contracts-api-client.yml`. The workflow fails fast if `@umbraculum/api-client` is still missing after publish.
 
 If dogfood fails with `ERR_PACKAGE_PATH_NOT_EXPORTED` for `@umbraculum/api-client/transport`, the registry still has `@0.0.1` (pre–`./transport` export). Publish platform client `@0.0.2`, then republish brewery client `@0.0.2`:
 
