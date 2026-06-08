@@ -314,6 +314,22 @@ horizontal services in [RFC-0001](docs/rfcs/0001-modules-tiers-governance-and-au
 Toolset witnesses (when installed): `48-rfc-companion-documentation-gate.mdc`,
 `49-plan-documentation-context.mdc`.
 
+## Node/npm: container-only — host is not the project
+
+The **Docker stack** (compose services, `node:20-slim` ci-parity image) is the
+canonical execution surface — same bar as GHA. The **host** laptop (Node/npm
+versions, PATH, global npm) is **not** part of the project and differs per
+contributor.
+
+**Agents:** do not run `node` / `npm` / `npx` on the host for verification,
+registry checks, or repo scripts that invoke npm — use compose exec,
+`docker run … node:20-slim`, or `./scripts/ci-parity-check.sh`. Host npm is
+allowed only after the operator explicitly approves and you state the cons
+(non-reproducible, not CI parity, must re-verify in container before done).
+
+Apparatus: rule `00-shared-node-npm-container-only.mdc`, skill
+`node-npm-container-only` (umbraculum-node-react-cursor-assistant).
+
 ## Pre-push CI parity (agent-owned — do not delegate to the operator)
 
 When **you** changed TypeScript, ESLint surface, module READMEs, lockfiles, or
