@@ -267,19 +267,19 @@ A specific subset of packages — the ones third-party module developers must de
 | Package | In-repo status | On npm registry | Published version | Notes |
 |---------|----------------|-----------------|-------------------|-------|
 | `@umbraculum/ci-parity` | ✅ | **Published** (OIDC) | `1.0.7` | MIT CLI + GHA reusable workflow; not an SDK package. See [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). |
-| `@umbraculum/ai-tool-sdk` | ✅ | **Published** | `0.1.0` | Leaf package (zero deps). OIDC via `publish-sdk-batch.yml`. RFC-0012 path: `packages/sdk/ai-tool-sdk/`. |
-| `@umbraculum/i18n-keys` | ✅ | **Published** | `0.1.0` | Leaf package (zero deps). |
-| `@umbraculum/module-sdk` | ✅ | **Published** | `0.1.0` | Registry `dependencies` on `^0.1.0` leaves; monorepo dev keeps `file:../…`. |
-| `@umbraculum/automation-contracts` | ✅ | **Published** | `0.1.0` | Path: `packages/canonical/automation/contracts/`. |
-| `@umbraculum/pim-contracts` | ✅ | **Published** | `0.1.0` | Path: `packages/canonical/pim/contracts/`. |
-| `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.1.0` | Path: `packages/canonical/mrp/contracts/`. |
-| `@umbraculum/crp-contracts` | ✅ | **Published** | `0.1.0` | Path: `packages/canonical/crp/contracts/`. |
+| `@umbraculum/ai-tool-sdk` | ✅ | **Published** | `0.2.0` | Leaf package (zero deps). OIDC via `publish-sdk-batch.yml`. RFC-0012 path: `packages/sdk/ai-tool-sdk/`. |
+| `@umbraculum/i18n-keys` | ✅ | **Published** | `0.2.0` | Leaf package (zero deps). |
+| `@umbraculum/module-sdk` | ✅ | **Published** | `0.2.0` | Registry `dependencies` on `^0.2.0` leaves; monorepo dev keeps `file:../…`. |
+| `@umbraculum/automation-contracts` | ✅ | **Published** | `0.2.0` | Path: `packages/canonical/automation/contracts/`. |
+| `@umbraculum/pim-contracts` | ✅ | **Published** | `0.2.0` | Path: `packages/canonical/pim/contracts/`. |
+| `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.2.0` | Path: `packages/canonical/mrp/contracts/`. |
+| `@umbraculum/crp-contracts` | ✅ | **Published** | `0.2.0` | Path: `packages/canonical/crp/contracts/`. |
 | `@umbraculum/contracts` | ✅ | **Published** | `0.0.1` | Platform wire parsers; prerequisite for `@umbraculum/api-client`. Monorepo dev keeps `file:../contracts`. OIDC via `publish-contracts-api-client.yml`. |
 | `@umbraculum/api-client` | ✅ | **Published** | `0.0.3` | Platform facades + `./transport`; brewery OpenAPI types moved to `@umbraculum/brewery-api-client@0.0.3`. |
 | `@umbraculum/brewery-contracts` | ✅ | **Published** | `0.0.1` | Brewery vertical wire types + Zod parsers (RFC-0011). |
 | `@umbraculum/brewery-api-client` | ✅ | **Published** | `0.0.3` | Brewery HTTP facades + `BreweryOpenApiPaths` + `BREWERY_FACADE_PARSER_MAP`; requires `@umbraculum/api-client@^0.0.3`. |
 
-**Monorepo contributors** use npm workspaces (workspace symlinks to `packages/{platform,sdk,canonical,verticals}/` for in-tree SDKs; consumer manifests pin published `@umbraculum/*` at registry semver — contracts/api-client `@0.0.1`, MIT SDK batch `@0.1.0` — see [`docs/design/npm-sdk-monorepo-dogfood.md`](design/npm-sdk-monorepo-dogfood.md)). **External module repos** install from npm first; git/workspace is a fallback for unreleased pins.
+**Monorepo contributors** use npm workspaces (workspace symlinks to `packages/{platform,sdk,canonical,verticals}/` for in-tree SDKs; consumer manifests pin published `@umbraculum/*` at registry semver — contracts/api-client `@0.0.1`, MIT SDK batch `@0.2.0` — see [`docs/design/npm-sdk-monorepo-dogfood.md`](design/npm-sdk-monorepo-dogfood.md)). **External module repos** install from npm first; git/workspace is a fallback for unreleased pins.
 
 **Go-public docs cross-refs:** [`ROADMAP.md`](ROADMAP.md), [`third-party-module.md`](modules/contribute/third-party-module.md), [`npm-sdk-trusted-publishing.md`](design/npm-sdk-trusted-publishing.md).
 

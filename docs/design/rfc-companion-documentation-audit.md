@@ -3,7 +3,7 @@
 **Tier:** Public
 **Status:** Living matrix — first pass 2026-05-27
 **Audience:** maintainers, plan authors, agents implementing RFC-backed features
-**Last reviewed:** 2026-05-28
+**Last reviewed:** 2026-06-08
 
 > [!NOTE]
 > Inventory of expected companion artifacts per accepted RFC. Remediation priorities drive the [RFC documentation quality program](https://github.com/umbraculum-dev/umbraculum-dev) (docs-only + toolset rules). Taxonomy: [`docs/rfcs/README.md`](../rfcs/README.md) §3.
@@ -36,6 +36,8 @@
 | [0008](../rfcs/0008-notifications-outbound-delivery.md) | Contract only | Boundary surface (pre-impl) | RFC text; **surface added 2026-05-27** | Transport service not built | Was **High** | P0 **closed** |
 | [0009](../rfcs/0009-workspace-billing-addons-and-entitlements.md) | Contract only | Boundary surface (pre-impl) | [`canonical-workspace-billing-addons-surface.md`](canonical-workspace-billing-addons-surface.md) | `WorkspaceBillingAddon` + enforcement H1 2027 | **Met** | — |
 | [0010](../rfcs/0010-platform-brewery-postgres-schema-split.md) | Shipped 2026-05-28 | As-built runbook + migration | [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres-schema-split.md) | — | **Met** | — |
+| [0011](../rfcs/0011-application-surface-shell-layering.md) | Shipped 2026-06-06 | Shell backbone companion | [`pre-flip-application-surface-backbone.md`](pre-flip-application-surface-backbone.md) | §6.3 tier tree updated RFC-0012 | Low | P1 |
+| [0012](../rfcs/0012-package-tier-clarity.md) | Shipped 2026-06-08 | Onboarding map | [`NAVIGATE-MONOREPO.md`](../NAVIGATE-MONOREPO.md) | Registry publish `0.2.0` pending `sdk-batch-v0.2.0` | Low | P1 |
 
 **Implementation closure references:** RFC-0007 §12 / §15.1; PIM PR7 [`pimChannelFeeds.test.ts`](../../services/api/src/tests/pimChannelFeeds.test.ts); MRP/CRP Wave 6 [`mrp-crp-wave-6-rendering-templates-build-log.md`](mrp-crp-wave-6-rendering-templates-build-log.md). RFC-0010 migration: `services/api/prisma/migrations/20260528170000_split_platform_brewery_schemas/migration.sql`.
 

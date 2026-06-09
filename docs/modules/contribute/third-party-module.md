@@ -49,10 +49,10 @@ You do **not** import from `services/api/src/modules/<code>/` directly. That tre
 
 ```bash
 npm install \
-  @umbraculum/module-sdk@0.1.0 \
-  @umbraculum/ai-tool-sdk@0.1.0 \
-  @umbraculum/i18n-keys@0.1.0
-# plus @umbraculum/<code>-contracts@0.1.0 for each canonical you target
+  @umbraculum/module-sdk@0.2.0 \
+  @umbraculum/ai-tool-sdk@0.2.0 \
+  @umbraculum/i18n-keys@0.2.0
+# plus @umbraculum/<code>-contracts@0.2.0 for each canonical you target
 # optional HTTP client stack:
 npm install @umbraculum/contracts@0.0.1 @umbraculum/api-client@0.0.1
 ```
@@ -61,7 +61,7 @@ Pin `peerDependencies` to `^` those versions (or newer patch/minor within range)
 
 **HTTP integrator walkthrough (no module registration):** [`INTEGRATOR-QUICKSTART.md`](../../INTEGRATOR-QUICKSTART.md) — install from npm, bearer login, platform API reads. **Sample repo:** [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) (public, no monorepo clone).
 
-**Monorepo hybrid (contributors).** Umbraculum contributors use npm workspaces: **consumer** manifests pin registry semver (`^0.1.0` MIT batch, `^0.0.1` contracts/api-client) or `file:` for co-dev; workspaces symlink in-tree `packages/{platform,sdk,canonical,verticals}/`. See [`NAVIGATE-MONOREPO.md`](../../NAVIGATE-MONOREPO.md) and [`npm-sdk-monorepo-dogfood.md`](../../design/npm-sdk-monorepo-dogfood.md).
+**Monorepo hybrid (contributors).** Umbraculum contributors use npm workspaces: **consumer** manifests pin registry semver (`^0.2.0` MIT batch, `^0.0.1` contracts/api-client) or `file:` for co-dev; workspaces symlink in-tree `packages/{platform,sdk,canonical,verticals}/`. See [`NAVIGATE-MONOREPO.md`](../../NAVIGATE-MONOREPO.md) and [`npm-sdk-monorepo-dogfood.md`](../../design/npm-sdk-monorepo-dogfood.md).
 
 ---
 

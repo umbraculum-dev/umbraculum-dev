@@ -307,7 +307,7 @@ Phase E13 completes the web Phase E migration by retiring legacy `apiFetch` and 
 | [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | Live cookie + bearer npm smoke (docker compose; not ci-parity) |
 | [`publish-contracts-api-client.yml`](../.github/workflows/publish-contracts-api-client.yml) | OIDC publish for `@umbraculum/contracts`, `@umbraculum/api-client`, `@umbraculum/brewery-contracts`, `@umbraculum/brewery-api-client` on `sdk-contracts-v*` tags |
 
-**npm publish:** `@umbraculum/contracts@0.0.1` and `@umbraculum/api-client@0.0.1` (2026-06-02); module-sdk α batch at `@0.0.2` / `@0.1.1` (see [`LICENSING.md`](LICENSING.md) §6.2.1). Monorepo consumers dogfood registry semver for all published SDK packages — see [`npm-sdk-monorepo-dogfood.md`](design/npm-sdk-monorepo-dogfood.md). Future bumps: [`npm-sdk-trusted-publishing.md`](design/npm-sdk-trusted-publishing.md) (`sdk-contracts-v*` / `sdk-batch-v*` tags).
+**npm publish:** `@umbraculum/contracts@0.0.1` and `@umbraculum/api-client@0.0.1` (2026-06-02); MIT SDK batch at `@0.2.0` after RFC-0012 tier move (see [`LICENSING.md`](LICENSING.md) §6.2.1). Monorepo consumers dogfood registry semver for all published SDK packages — see [`npm-sdk-monorepo-dogfood.md`](design/npm-sdk-monorepo-dogfood.md). Future bumps: [`npm-sdk-trusted-publishing.md`](design/npm-sdk-trusted-publishing.md) (`sdk-contracts-v*` / `sdk-batch-v*` tags).
 
 **Local smoke:**
 

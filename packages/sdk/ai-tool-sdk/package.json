@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/ai-tool-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Umbraculum AI-tool SDK \u2014 the library-agnostic interface every callable tool the AI consultant may invoke must satisfy (AiTool, AiToolScope, AiToolContext, AiToolRegistry, AiToolDefinition). Platform-classified per sub-plan #9 \u00a71.1; published as a peer of @umbraculum/module-sdk per PLATFORM-ARCHITECTURE.md \u00a74.4. Extracted from @umbraculum/contracts on 2026-05-21.",
   "license": "MIT",
   "type": "module",

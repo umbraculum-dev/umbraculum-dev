@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/module-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Umbraculum module registration contract (registerModule + registerWebModule + library-agnostic ValidatedSchema<T> interface) for canonical and third-party modules. Platform-classified per sub-plan #9 \u00a71.1; placement per RFC-0002 Decision C.",
   "license": "MIT",
   "type": "module",

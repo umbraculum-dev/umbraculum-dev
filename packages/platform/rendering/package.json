@@ -27,7 +27,7 @@
   "dependencies": {
     "@babel/runtime": "^7.29.7",
     "@fast-csv/format": "^5.0.0",
-    "@umbraculum/module-sdk": "^0.1.0",
+    "@umbraculum/module-sdk": "^0.2.0",
     "bullmq": "^5.0.0",
     "bwip-js": "^4.0.0",
     "eta": "^3.0.0",

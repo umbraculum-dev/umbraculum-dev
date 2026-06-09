@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/crp-contracts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Canonical CRP module contract types: resources, capacity calendars, scheduleable-operation handoffs, load buckets, and planned AI/rendering schemas.",
   "license": "MIT",
   "type": "module",

@@ -8,9 +8,9 @@
 #
 # Optional env:
 #   CONTRACTS_VERSION=0.0.1 API_CLIENT_VERSION=0.0.2
-#   MODULE_SDK_VERSION=0.0.2 AI_TOOL_SDK_VERSION=0.1.1
-#   AUTOMATION_CONTRACTS_VERSION=0.0.2 PIM_CONTRACTS_VERSION=0.0.2
-#   MRP_CONTRACTS_VERSION=0.0.2 CRP_CONTRACTS_VERSION=0.0.2
+#   MODULE_SDK_VERSION=0.2.0 AI_TOOL_SDK_VERSION=0.2.0 I18N_KEYS_VERSION=0.2.0
+#   AUTOMATION_CONTRACTS_VERSION=0.2.0 PIM_CONTRACTS_VERSION=0.2.0
+#   MRP_CONTRACTS_VERSION=0.2.0 CRP_CONTRACTS_VERSION=0.2.0
 #   BREWERY_CONTRACTS_VERSION=0.0.1 BREWERY_API_CLIENT_VERSION=0.0.2
 set -euo pipefail
 
@@ -34,12 +34,13 @@ require_registry_version() {
 
 CONTRACTS_VERSION="${CONTRACTS_VERSION:-$(read_pkg_version packages/platform/contracts)}"
 API_CLIENT_VERSION="${API_CLIENT_VERSION:-$(read_pkg_version packages/platform/api-client)}"
-MODULE_SDK_VERSION="${MODULE_SDK_VERSION:-0.0.2}"
-AI_TOOL_SDK_VERSION="${AI_TOOL_SDK_VERSION:-0.1.1}"
-AUTOMATION_CONTRACTS_VERSION="${AUTOMATION_CONTRACTS_VERSION:-0.0.2}"
-PIM_CONTRACTS_VERSION="${PIM_CONTRACTS_VERSION:-0.0.2}"
-MRP_CONTRACTS_VERSION="${MRP_CONTRACTS_VERSION:-0.0.2}"
-CRP_CONTRACTS_VERSION="${CRP_CONTRACTS_VERSION:-0.0.2}"
+MODULE_SDK_VERSION="${MODULE_SDK_VERSION:-$(read_pkg_version packages/sdk/module-sdk)}"
+AI_TOOL_SDK_VERSION="${AI_TOOL_SDK_VERSION:-$(read_pkg_version packages/sdk/ai-tool-sdk)}"
+I18N_KEYS_VERSION="${I18N_KEYS_VERSION:-$(read_pkg_version packages/sdk/i18n-keys)}"
+AUTOMATION_CONTRACTS_VERSION="${AUTOMATION_CONTRACTS_VERSION:-$(read_pkg_version packages/canonical/automation/contracts)}"
+PIM_CONTRACTS_VERSION="${PIM_CONTRACTS_VERSION:-$(read_pkg_version packages/canonical/pim/contracts)}"
+MRP_CONTRACTS_VERSION="${MRP_CONTRACTS_VERSION:-$(read_pkg_version packages/canonical/mrp/contracts)}"
+CRP_CONTRACTS_VERSION="${CRP_CONTRACTS_VERSION:-$(read_pkg_version packages/canonical/crp/contracts)}"
 BREWERY_CONTRACTS_VERSION="${BREWERY_CONTRACTS_VERSION:-$(read_pkg_version packages/verticals/brewery/contracts)}"
 BREWERY_API_CLIENT_VERSION="${BREWERY_API_CLIENT_VERSION:-$(read_pkg_version packages/verticals/brewery/api-client)}"
 TMPDIR="${TMPDIR:-/tmp}/umbraculum-dogfood-npm-smoke-$$"
@@ -97,6 +98,14 @@ const assertExports = (label, mod) => {
 import('@umbraculum/brewery-contracts').then((m) => assertExports('brewery-contracts', m));
 import('@umbraculum/brewery-api-client').then((m) => assertExports('brewery-api-client', m));
 "
+
+require_registry_version "@umbraculum/module-sdk" "${MODULE_SDK_VERSION}"
+require_registry_version "@umbraculum/ai-tool-sdk" "${AI_TOOL_SDK_VERSION}"
+require_registry_version "@umbraculum/i18n-keys" "${I18N_KEYS_VERSION}"
+require_registry_version "@umbraculum/automation-contracts" "${AUTOMATION_CONTRACTS_VERSION}"
+require_registry_version "@umbraculum/pim-contracts" "${PIM_CONTRACTS_VERSION}"
+require_registry_version "@umbraculum/mrp-contracts" "${MRP_CONTRACTS_VERSION}"
+require_registry_version "@umbraculum/crp-contracts" "${CRP_CONTRACTS_VERSION}"
 
 echo "=== dogfood-npm-smoke (module-sdk α batch) ==="
 echo "module-sdk=@${MODULE_SDK_VERSION} ai-tool-sdk=@${AI_TOOL_SDK_VERSION}"

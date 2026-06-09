@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/automation-contracts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Canonical automation module contract types: Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic platform contract; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. Phase A surface per docs/design/canonical-automation-module-surface.md \u00a79.",
   "license": "MIT",
   "type": "module",

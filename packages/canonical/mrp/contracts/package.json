@@ -1,6 +1,6 @@
 {
   "name": "@umbraculum/mrp-contracts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Canonical MRP module contract types: production orders, BOMs, operations, material requirements, work-order payloads, and planned AI/rendering schemas.",
   "license": "MIT",
   "type": "module",

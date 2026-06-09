@@ -283,7 +283,7 @@ Content: clone structure of [`ci-parity-npm-trusted-publishing.md`](ci-parity-np
 
 | Consumer | Install path |
 |----------|--------------|
-| External third-party module repo | `npm install @umbraculum/module-sdk@^0.0.2` (+ peers) |
+| External third-party module repo | `npm install @umbraculum/module-sdk@^0.2.0` (+ peers at `^0.2.0`) |
 | Umbraculum monorepo contributor | `npm install` at repo root — **consumer** manifests use registry `^` pins; npm workspaces symlink in-tree `packages/*` for active co-dev |
 
 Document this split in [`third-party-module.md`](../modules/contribute/third-party-module.md) §npm registry vs monorepo.
@@ -306,8 +306,8 @@ Document this split in [`third-party-module.md`](../modules/contribute/third-par
 
 ```bash
 git checkout master && git pull
-git tag sdk-batch-v0.1.0
-git push origin sdk-batch-v0.1.0
+git tag sdk-batch-v0.2.0
+git push origin sdk-batch-v0.2.0
 ```
 
 Watch: GitHub Actions → `publish-sdk-batch` workflow.
@@ -329,7 +329,7 @@ npm view @umbraculum/automation-contracts version
 ```bash
 TMP=$(mktemp -d) && cd "$TMP"
 npm init -y
-npm install @umbraculum/ai-tool-sdk@0.1.0
+npm install @umbraculum/ai-tool-sdk@0.2.0
 node --input-type=module -e "import('@umbraculum/ai-tool-sdk').then(m => console.log(Object.keys(m).slice(0,8)))"
 ```
 
@@ -389,6 +389,7 @@ From repo root per [`CI-PARITY.md`](../CI-PARITY.md).
 | 2026-05-29 | SP-1 | agent | — | Manifests, LICENSE, README install sections |
 | 2026-05-29 | SP-2 | agent | — | `publish-sdk-batch.yml` + trusted-publishing doc |
 | 2026-05-29 | SP-3 | umbraculum-dev | `ai-tool-sdk@0.1.0`→`0.1.1`, `i18n-keys@0.1.0`→`0.1.1`, `module-sdk@0.0.1`→`0.0.2`, four `*-contracts@0.0.1`→`0.0.2` | Laptop first publish; OIDC trust; `sdk-batch-v0.1.1` GHA green |
+| 2026-06-08 | RFC-0012 | umbraculum-dev | MIT batch → `0.2.0` at new tier paths | Tag `sdk-batch-v0.2.0`; registry publish via GHA OIDC |
 
 ---
 

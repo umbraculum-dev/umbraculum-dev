@@ -148,7 +148,7 @@ File: `umbraculum-dev/.github/workflows/publish-sdk-batch.yml`
 - `permissions.id-token: write`
 - **No** `registry-url` on `setup-node`
 - `npm ci --workspaces --include-workspace-root` → `build:packages` → `test:packages` → `npm install -g npm@11.6.2`
-- Ordered OIDC publish: leaves → `module-sdk` (deps rewritten to `^0.1.1` registry semver **in workflow only** — match current leaf version) → four contracts packages
+- Ordered OIDC publish: leaves → `module-sdk` (deps rewritten to `^0.2.0` registry semver **in workflow only** — match current leaf version) → four contracts packages
 - Explicit GitHub OIDC fetch + npm exchange per package (diagnostic logging)
 
 ### `publish-contracts-api-client.yml` (contracts + api-client batch)
@@ -208,3 +208,4 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 | — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published manually |
 | 2026-06-02 | `publish-contracts-api-client.yml` + laptop script | Done — `@umbraculum/contracts` / `@umbraculum/api-client` `0.0.1` on registry + OIDC trust |
 | 2026-06-07 | Brewery vertical SDK (`brewery-contracts`, `brewery-api-client`) | **Published** — `@0.0.1` / `@0.0.2` (api-client `@0.0.2` adds `./transport`) |
+| 2026-06-08 | RFC-0012 tier paths + `sdk-batch-v0.2.0` | Pending — MIT batch `0.2.0` (ai-tool-sdk, i18n-keys, module-sdk, four contracts) |

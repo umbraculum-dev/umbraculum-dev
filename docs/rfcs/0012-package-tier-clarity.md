@@ -19,7 +19,7 @@ Three decisions:
 
 - **Decision B — Symmetric domain nesting.** Canonical and vertical domain packages use `<tier>/<code>/<artifact>/` (same shape as `verticals/brewery/contracts/`). Canonical contracts live at `packages/canonical/<code>/contracts/` → `@umbraculum/<code>-contracts`. SDK packages live at `packages/sdk/<name>/`.
 
-- **Decision C — npm names unchanged; semver reset.** Tier is visible in **paths**, not npm names (Magento parallel: `Magento_Catalog`, not `Magento_Canonical_Catalog`). MIT publish batch resets to **0.1.0** with updated `repository.directory` fields. **No re-export shims** from old paths.
+- **Decision C — npm names unchanged; semver bump.** Tier is visible in **paths**, not npm names (Magento parallel: `Magento_Catalog`, not `Magento_Canonical_Catalog`). MIT publish batch at **0.2.0** on npm (tier-move; registry cannot accept downward publish from prior `0.1.1` / `0.0.2`). Updated `repository.directory` fields. **No re-export shims** from old paths.
 
 **Amendments:**
 
@@ -125,7 +125,7 @@ See [`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md) §1 for the full
 | PIM contracts | `packages/canonical/pim/contracts/` | `@umbraculum/pim-contracts` |
 | Brewery contracts | `packages/verticals/brewery/contracts/` | `@umbraculum/brewery-contracts` |
 
-MIT publish batch (`ai-tool-sdk`, `i18n-keys`, `module-sdk`, four `*-contracts`) resets to **0.1.0**. No backward-compat path shims.
+MIT publish batch (`ai-tool-sdk`, `i18n-keys`, `module-sdk`, four `*-contracts`) ships at **0.2.0** on npm (RFC-0012 tier-move release; registry already had `0.1.1` / `0.0.2` — npm cannot publish downward). Monorepo `package.json` versions match. No backward-compat path shims.
 
 **Rejected:** `@umbraculum/canonical-pim-contracts` — tier belongs in the path; npm keeps domain-first names.
 
