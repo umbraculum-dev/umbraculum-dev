@@ -74,7 +74,7 @@ Physical package tiers under `packages/` (RFC-0011 Wave 3a) are enforced by `esl
 
 | Element | Path pattern | Rule |
 |---------|--------------|------|
-| `pkg-platform` | `packages/platform/**` | Must **not** import `pkg-vertical`, `pkg-canonical`, or `pkg-sdk` |
+| `pkg-platform` | `packages/platform/**` | Must **not** import `pkg-vertical` (may import `pkg-sdk` + `pkg-canonical`) |
 | `pkg-sdk` | `packages/sdk/**` | Must **not** import `pkg-vertical` |
 | `pkg-canonical` | `packages/canonical/*/**` | Must **not** import `pkg-vertical` |
 | `pkg-vertical` | `packages/verticals/*/**` | May import `pkg-platform`, `pkg-sdk`, and `pkg-canonical`; **never** sibling vertical |

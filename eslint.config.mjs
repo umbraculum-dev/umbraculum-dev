@@ -845,7 +845,7 @@ export default [
           rules: [
             {
               from: [["pkg-platform"]],
-              disallow: [["pkg-vertical"], ["pkg-canonical"], ["pkg-sdk"]],
+              disallow: [["pkg-vertical"]],
             },
             {
               from: [["pkg-sdk"]],
