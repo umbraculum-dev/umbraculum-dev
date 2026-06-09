@@ -17,14 +17,14 @@ Monorepo contributors use workspace `file:` links — see [`DEVELOPMENT.md`](../
 
 ## What this is
 
-The single source of truth for every wire-shape type in the platform — auth payloads, water-chemistry compute responses, gravity-analysis results, AI-settings + AI-usage-ledger DTOs, format hints. Both the API (`services/api`) and the clients (`apps/web`, `apps/native`, `@umbraculum/api-client`) import the same `ResponseV1` / `RequestV1` types and the same runtime parsers, which guarantees that what the API serializes is exactly what the client deserializes — type-checked at compile time and shape-validated at runtime. The AI-tool SDK contract (`AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`) was extracted to [`@umbraculum/ai-tool-sdk`](../../modules/ai-tool-sdk/) on 2026-05-21 — that surface is library-agnostic SDK contract, not wire shape, and lives there now.
+The single source of truth for every wire-shape type in the platform — auth payloads, water-chemistry compute responses, gravity-analysis results, AI-settings + AI-usage-ledger DTOs, format hints. Both the API (`services/api`) and the clients (`apps/web`, `apps/native`, `@umbraculum/api-client`) import the same `ResponseV1` / `RequestV1` types and the same runtime parsers, which guarantees that what the API serializes is exactly what the client deserializes — type-checked at compile time and shape-validated at runtime. The AI-tool SDK contract (`AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`) was extracted to [`@umbraculum/ai-tool-sdk`](../../sdk/ai-tool-sdk/) on 2026-05-21 — that surface is library-agnostic SDK contract, not wire shape, and lives there now.
 
 The package uses **Zod v4 schemas** for new and migrated wire-shape contracts per [RFC-0003](../../../docs/rfcs/0003-validation-library-adoption.md). Older parser files may still carry staged-migration history, but the current authoring rule is schema-first: exported schemas are the source of truth, public types are inferred with `z.infer`, and thin `parse*` wrappers preserve call-site stability.
 
 ## Scope
 
 - **Contains**: DTO/type definitions and their matching Zod schemas / `parse*` runtime validators; format-hint types (`NumberFormatHintV1`, `NumberFormatUnit`); response envelopes (`MashComputeAndSaveResponseV1`, etc.); workspace AI-settings + AI-usage-ledger wire shapes (`WorkspaceAiSettings`, `AiRoleLimits`, `AiUsageLedgerEntry`, `AiToolCallRecord`); rendering job wire contracts (`RenderJobSubmitRequest`, `RenderJobStatusResponse`, `RenderJobResultResponse`).
-- **Does not contain**: the AI-tool SDK contract — extracted to [`@umbraculum/ai-tool-sdk`](../../modules/ai-tool-sdk/) on 2026-05-21; the Prisma schema (lives in `services/api/prisma/`); HTTP route handlers (live in `services/api/src/routes/`); UI rendering of contract data (lives in `@umbraculum/brewery-recipes-ui` / `apps/web` / `apps/native`); transport-layer concerns (auth headers, retries — those live in `@umbraculum/api-client`).
+- **Does not contain**: the AI-tool SDK contract — extracted to [`@umbraculum/ai-tool-sdk`](../../sdk/ai-tool-sdk/) on 2026-05-21; the Prisma schema (lives in `services/api/prisma/`); HTTP route handlers (live in `services/api/src/routes/`); UI rendering of contract data (lives in `@umbraculum/brewery-recipes-ui` / `apps/web` / `apps/native`); transport-layer concerns (auth headers, retries — those live in `@umbraculum/api-client`).
 
 ## Exports
 
@@ -47,7 +47,7 @@ The package uses **Zod v4 schemas** for new and migrated wire-shape contracts pe
 ### AI (wire-shape only — SDK contract moved)
 - `WorkspaceAiSettings`, `AiProvider`, `AiRoleLimits` — `GET/PUT /workspaces/:id/ai/settings` shapes
 - `AiUsageLedgerEntry`, `AiToolCallRecord` — usage-ledger wire shapes
-- *(For the AI-tool SDK contract — `AiTool`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition` — see [`@umbraculum/ai-tool-sdk`](../../modules/ai-tool-sdk/). Extracted from this package on 2026-05-21.)*
+- *(For the AI-tool SDK contract — `AiTool`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition` — see [`@umbraculum/ai-tool-sdk`](../../sdk/ai-tool-sdk/). Extracted from this package on 2026-05-21.)*
 
 ### Rendering
 - `RenderJobSubmitRequest`, `RenderJobStatusResponse`, `RenderJobResultResponse` — canonical document/file rendering job HTTP payloads from RFC-0007 PR3

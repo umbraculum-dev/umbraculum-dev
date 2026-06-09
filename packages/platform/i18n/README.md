@@ -12,7 +12,7 @@ The platform-wide message catalog. The web app (Next.js + next-intl) and the nat
 ## Scope
 
 - **Contains**: the canonical message tree (`common`, `nav`, `units`, `math`, `recipes`, `waterHub`, `auth`, etc.); locale JSON files (`en.json`, `it.json`); the `getSharedMessages(locale)` accessor.
-- **Does not contain**: React hooks or context providers (those live in `@umbraculum/i18n-react`); Next.js / next-intl wiring (lives in `apps/web/i18n/request.ts` and `apps/web/app/[locale]/layout.tsx`); platform-specific date/number formatters (Intl APIs are used directly at the call site); module key **conventions** (those live in [`@umbraculum/i18n-keys`](../../modules/i18n-keys/) — `ModuleNavLabelKey`, `moduleMessageRoot`, reserved platform roots).
+- **Does not contain**: React hooks or context providers (those live in `@umbraculum/i18n-react`); Next.js / next-intl wiring (lives in `apps/web/i18n/request.ts` and `apps/web/app/[locale]/layout.tsx`); platform-specific date/number formatters (Intl APIs are used directly at the call site); module key **conventions** (those live in [`@umbraculum/i18n-keys`](../../sdk/i18n-keys/) — `ModuleNavLabelKey`, `moduleMessageRoot`, reserved platform roots).
 
 ## Contents
 
@@ -71,4 +71,4 @@ Stable. Adding a locale is a runtime concern (drop a new `<locale>.json`, regist
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) — platform vision
 - [`docs/DOCS-README-STANDARDS.md`](../../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to
 - [`@umbraculum/i18n-react`](../i18n-react/README.md) — React bindings for translations
-- [`@umbraculum/i18n-keys`](../../modules/i18n-keys/README.md) — module message-key conventions (SDK surface)
+- [`@umbraculum/i18n-keys`](../../sdk/i18n-keys/README.md) — module message-key conventions (SDK surface)
