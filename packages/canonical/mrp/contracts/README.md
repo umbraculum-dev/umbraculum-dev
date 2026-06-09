@@ -3,7 +3,7 @@
 Canonical `mrp` module contract package: production-order, bill-of-material, operation, material-requirement, work-order, planned AI-tool, and planned rendering-template wire schemas.
 
 > [!NOTE]
-> Part of [Umbraculum](../../../README.md) — an open-source toolset for building workspace-shaped operational applications. `mrp` is a canonical extensible domain kernel, not a finished vertical MRP suite.
+> Part of [Umbraculum](../../../../README.md) — an open-source toolset for building workspace-shaped operational applications. `mrp` is a canonical extensible domain kernel, not a finished vertical MRP suite.
 
 ## Install
 
@@ -11,11 +11,11 @@ Canonical `mrp` module contract package: production-order, bill-of-material, ope
 npm install @umbraculum/mrp-contracts@^0.0.1
 ```
 
-Public alpha — see [third-party-module.md](../../../docs/modules/contribute/third-party-module.md).
+Public alpha — see [third-party-module.md](../../../../docs/modules/contribute/third-party-module.md).
 
 ## What this is
 
-AGPL-adjacent public contract types for the canonical `mrp` module ([`docs/design/canonical-mrp-module-surface.md`](../../../docs/design/canonical-mrp-module-surface.md)). Wave 1 adds schema-bound contracts so the API skeleton can expose read-only, workspace-scoped data without pretending that the August 2026 public-alpha proof is complete.
+AGPL-adjacent public contract types for the canonical `mrp` module ([`docs/design/canonical-mrp-module-surface.md`](../../../../docs/design/canonical-mrp-module-surface.md)). Wave 1 adds schema-bound contracts so the API skeleton can expose read-only, workspace-scoped data without pretending that the August 2026 public-alpha proof is complete.
 
 Exported surfaces:
 
@@ -43,9 +43,9 @@ From repo root, run Node/npm inside the project container:
 
 ## Cross-references
 
-- [`docs/design/mrp-crp-august-2026-co-design-plan.md`](../../../docs/design/mrp-crp-august-2026-co-design-plan.md)
-- [`docs/design/canonical-mrp-module-surface.md`](../../../docs/design/canonical-mrp-module-surface.md)
-- [`docs/design/mrp-crp-wave-6-rendering-templates-build-log.md`](../../../docs/design/mrp-crp-wave-6-rendering-templates-build-log.md)
-- [`docs/design/canonical-crp-module-surface.md`](../../../docs/design/canonical-crp-module-surface.md)
-- [`docs/modules/canonical/mrp.md`](../../../docs/modules/canonical/mrp.md)
-- [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/)
+- [`docs/design/mrp-crp-august-2026-co-design-plan.md`](../../../../docs/design/mrp-crp-august-2026-co-design-plan.md)
+- [`docs/design/canonical-mrp-module-surface.md`](../../../../docs/design/canonical-mrp-module-surface.md)
+- [`docs/design/mrp-crp-wave-6-rendering-templates-build-log.md`](../../../../docs/design/mrp-crp-wave-6-rendering-templates-build-log.md)
+- [`docs/design/canonical-crp-module-surface.md`](../../../../docs/design/canonical-crp-module-surface.md)
+- [`docs/modules/canonical/mrp.md`](../../../../docs/modules/canonical/mrp.md)
+- [`services/api/src/modules/mrp/`](../../../../services/api/src/modules/mrp/)
