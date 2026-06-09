@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Verify tier-1 package READMEs under packages/{platform,modules,verticals}/
+Verify tier-1 package READMEs under packages/{platform,sdk,canonical,verticals}/
 appear in docs-site reference registry (docusaurus.config.ts referencePackagesReadmes).
 
 Exits 0 when every discovered README is registered; 1 on drift.
@@ -25,7 +25,7 @@ EXCLUDE_SUFFIXES: frozenset[str] = frozenset()
 
 def discover_package_readmes() -> set[str]:
     found: set[str] = set()
-    for tier in ("platform", "modules", "verticals"):
+    for tier in ("platform", "sdk", "canonical", "verticals"):
         tier_root = PACKAGES_ROOT / tier
         if not tier_root.is_dir():
             continue

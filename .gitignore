@@ -60,8 +60,10 @@ coverage/
 !packages/*/dist/**
 !packages/platform/*/dist/
 !packages/platform/*/dist/**
-!packages/modules/*/dist/
-!packages/modules/*/dist/**
+!packages/sdk/*/dist/
+!packages/sdk/*/dist/**
+!packages/canonical/*/*/dist/
+!packages/canonical/*/*/dist/**
 !packages/verticals/*/*/dist/
 !packages/verticals/*/*/dist/**
 
