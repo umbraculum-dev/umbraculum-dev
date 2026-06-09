@@ -17,7 +17,7 @@
 
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
-| Contracts | `packages/modules/crp-contracts/` -> `@umbraculum/crp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, resource/work-center/calendar/load/conflict refs, planned AI/rendering payload schemas. |
+| Contracts | `packages/canonical/crp/contracts/` -> `@umbraculum/crp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, resource/work-center/calendar/load/conflict refs, planned AI/rendering payload schemas. |
 | API | `services/api/src/modules/crp/` | **Wave 1–6 shipped (read + rendering):** read-only routes, services, Prisma `crp` schema, module registration, read-time brewery/automation projections, read-only AI tool handlers, and RFC-0007 document templates with render-job routes. |
 | Web | `apps/web/app/[locale]/(crp)/` | **Wave 3 shipped:** read-only resources, resource detail, capacity-load, schedule, and conflict pages under registered static URL segments. Proposal/write pages remain future work. |
 | Native | `apps/native/src/modules/crp/` | Future operator/manager screens; may trail web in alpha. |
@@ -171,7 +171,7 @@ CRP references MRP operations by contract-level IDs, not by direct Prisma relati
 
 ## 7. Contracts package
 
-Wave 1 package: [`packages/modules/crp-contracts/`](../../packages/modules/crp-contracts/) published in-repo as `@umbraculum/crp-contracts`.
+Wave 1 package: [`packages/canonical/crp/contracts/`](../../packages/canonical/crp/contracts/) published in-repo as `@umbraculum/crp-contracts`.
 
 Expected exports:
 

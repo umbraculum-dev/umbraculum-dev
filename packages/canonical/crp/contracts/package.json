@@ -1,18 +1,18 @@
 {
-  "name": "@umbraculum/automation-contracts",
-  "version": "0.0.2",
-  "description": "Canonical automation module contract types: Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic platform contract; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. Phase A surface per docs/design/canonical-automation-module-surface.md §9.",
+  "name": "@umbraculum/crp-contracts",
+  "version": "0.1.0",
+  "description": "Canonical CRP module contract types: resources, capacity calendars, scheduleable-operation handoffs, load buckets, and planned AI/rendering schemas.",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
-    "directory": "packages/modules/automation-contracts"
+    "directory": "packages/canonical/crp/contracts"
   },
   "bugs": {
     "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
   },
-  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/modules/automation-contracts#readme",
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/canonical/crp/contracts#readme",
   "publishConfig": {
     "access": "public"
   },

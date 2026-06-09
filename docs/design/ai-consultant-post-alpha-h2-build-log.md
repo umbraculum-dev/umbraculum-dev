@@ -33,7 +33,7 @@
 
 | Area | Paths |
 |------|--------|
-| SDK scope | [`packages/modules/ai-tool-sdk/src/aiTool.ts`](../../packages/modules/ai-tool-sdk/src/aiTool.ts) |
+| SDK scope | [`packages/sdk/ai-tool-sdk/src/aiTool.ts`](../../packages/sdk/ai-tool-sdk/src/aiTool.ts) |
 | Prisma | `AiProposal` in [`services/api/prisma/schema.prisma`](../../services/api/prisma/schema.prisma) |
 | Service | [`services/api/src/services/ai/proposalService.ts`](../../services/api/src/services/ai/proposalService.ts) |
 | Tools | [`services/api/src/services/ai/tools/mrp/proposeOrderAdjustment.ts`](../../services/api/src/services/ai/tools/mrp/proposeOrderAdjustment.ts) |
@@ -77,7 +77,7 @@
 ## 7. Verification
 
 ```bash
-cd packages/modules/ai-tool-sdk && npm run build
+cd packages/sdk/ai-tool-sdk && npm run build
 cd packages/platform/contracts && npm run build
 cd packages/platform/ui && npm run build
 cd services/api && npm run typecheck

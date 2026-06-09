@@ -11,7 +11,7 @@
 
 ## 1. When this path applies
 
-You want to add a new code to `RESERVED_CANONICAL_MODULE_CODES` ([`packages/modules/module-sdk/src/reservedCodes.ts`](../../../packages/modules/module-sdk/src/reservedCodes.ts)). Examples [RFC-0001 §4.2](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) names as plausible-but-not-allocated:
+You want to add a new code to `RESERVED_CANONICAL_MODULE_CODES` ([`packages/sdk/module-sdk/src/reservedCodes.ts`](../../../packages/sdk/module-sdk/src/reservedCodes.ts)). Examples [RFC-0001 §4.2](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) names as plausible-but-not-allocated:
 
 - `quality` — QC, NCR, CAPA.
 - `maintenance` — preventive / predictive / asset registry.
@@ -65,7 +65,7 @@ The mini-RFC is written **as if it will be public-readable**, even pre-public-fl
 
 1. **Draft the mini-RFC** in a branch. Cite the reference implementation.
 2. **Solo author drafts → core team reviews → core team approves** (pre-public-flip procedure per [RFC-0001 §13](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md)). Post-public-flip, a 30-day public-comment period applies ([LICENSING.md §10](../../LICENSING.md)).
-3. **Once approved**, the code lands in [`packages/modules/module-sdk/src/reservedCodes.ts`](../../../packages/modules/module-sdk/src/reservedCodes.ts) in the same PR as the mini-RFC, alongside any cross-doc reference updates ([RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) reserved-code table, [PLATFORM-ARCHITECTURE.md](../../PLATFORM-ARCHITECTURE.md) §1.1.1 canonical-set sentence, `docs/MODULES.md` catalog).
+3. **Once approved**, the code lands in [`packages/sdk/module-sdk/src/reservedCodes.ts`](../../../packages/sdk/module-sdk/src/reservedCodes.ts) in the same PR as the mini-RFC, alongside any cross-doc reference updates ([RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) reserved-code table, [PLATFORM-ARCHITECTURE.md](../../PLATFORM-ARCHITECTURE.md) §1.1.1 canonical-set sentence, `docs/MODULES.md` catalog).
 4. **The implementation work follows**, on the normal phase rhythm: surface design doc → Phase A contracts → Phase B read path → … This is the same trajectory `automation` followed ([`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md) is the worked example).
 
 The mini-RFC allocates the code; the surface design doc and subsequent PRs implement the module. They are separate artifacts.
@@ -87,5 +87,5 @@ The mini-RFC allocates the code; the surface design doc and subsequent PRs imple
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4 (reserved codes), §6 (governance), §8 (consumption contract), §13 (change procedure).
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) — the layout the new canonical will follow.
 - [`docs/design/canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md) — surface design template.
-- [`packages/modules/module-sdk/src/reservedCodes.ts`](../../../packages/modules/module-sdk/src/reservedCodes.ts) — where new codes land.
+- [`packages/sdk/module-sdk/src/reservedCodes.ts`](../../../packages/sdk/module-sdk/src/reservedCodes.ts) — where new codes land.
 - [`docs/MODULES.md`](../../MODULES.md) §6 — governance & license signals.

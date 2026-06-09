@@ -133,5 +133,5 @@ v0.1.0 is intentionally minimal: conventions + helpers, no bundle merger and no 
 - [`docs/LICENSING.md`](../../../docs/LICENSING.md) §6.2 — MIT SDK posture
 - [`docs/I18N-AUDIT.md`](../../../docs/I18N-AUDIT.md) — web UI i18n migration audit
 - [`docs/modules/contribute/third-party-module.md`](../../../docs/modules/contribute/third-party-module.md) — stable surfaces to pin
-- [`packages/modules/module-sdk/README.md`](../module-sdk/README.md) — `registerWebModule` / `registerNativeModule`
+- [`packages/sdk/module-sdk/README.md`](../module-sdk/README.md) — `registerWebModule` / `registerNativeModule`
 - [`packages/platform/i18n/README.md`](../../platform/i18n/README.md) — where locale JSON lives today

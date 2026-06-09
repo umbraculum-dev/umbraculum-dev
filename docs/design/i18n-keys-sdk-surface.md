@@ -4,7 +4,7 @@
 **Status:** v0.1 — package `@umbraculum/i18n-keys@0.1.0` landed 2026-05-27  
 **Audience:** module authors, third-party integrators, platform maintainers  
 **Governing:** [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.2 + §4.4, [`docs/LICENSING.md`](../LICENSING.md) §6.2, [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) Tier 2  
-**Implementation:** [`packages/modules/i18n-keys/README.md`](../../packages/modules/i18n-keys/README.md)
+**Implementation:** [`packages/sdk/i18n-keys/README.md`](../../packages/sdk/i18n-keys/README.md)
 
 ## 1. Problem this package solves
 
@@ -73,7 +73,7 @@ After changing conventions or reserved roots:
 1. `npm run test --workspace=@umbraculum/i18n-keys`
 2. `npm run build -w @umbraculum/module-sdk` (depends on i18n-keys types)
 3. `npm run typecheck` in `services/api` (module boot uses string literals assignable to `ModuleNavLabelKey`)
-4. `python3 scripts/docs/check-readmes.py` (includes `packages/modules/i18n-keys/README.md`)
+4. `python3 scripts/docs/check-readmes.py` (includes `packages/sdk/i18n-keys/README.md`)
 
 ## 6. Related documents
 

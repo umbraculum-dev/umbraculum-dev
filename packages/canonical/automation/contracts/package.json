@@ -1,18 +1,18 @@
 {
-  "name": "@umbraculum/module-sdk",
-  "version": "0.0.2",
-  "description": "Umbraculum module registration contract (registerModule + registerWebModule + library-agnostic ValidatedSchema<T> interface) for canonical and third-party modules. Platform-classified per sub-plan #9 §1.1; placement per RFC-0002 Decision C.",
+  "name": "@umbraculum/automation-contracts",
+  "version": "0.1.0",
+  "description": "Canonical automation module contract types: Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic platform contract; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. Phase A surface per docs/design/canonical-automation-module-surface.md \u00a79.",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
-    "directory": "packages/modules/module-sdk"
+    "directory": "packages/canonical/automation/contracts"
   },
   "bugs": {
     "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
   },
-  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/modules/module-sdk#readme",
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/canonical/automation/contracts#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -40,8 +40,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@umbraculum/ai-tool-sdk": "file:../ai-tool-sdk",
-    "@umbraculum/i18n-keys": "file:../i18n-keys"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

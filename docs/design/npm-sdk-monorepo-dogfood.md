@@ -19,11 +19,11 @@ Goal: manifest parity with third-party module repos and early detection of “gr
 
 | Layer | Dependency style | Why |
 |-------|------------------|-----|
-| **Consumer apps** (`apps/web`, `apps/native`) | `"@umbraculum/contracts": "^0.0.1"`, `"@umbraculum/api-client": "^0.0.1"`, module-sdk batch at `^0.0.2` / `^0.1.1` where used | Matches external `npm install` manifests |
-| **API service** (`services/api`) | `"@umbraculum/contracts": "^0.0.1"` + module-sdk batch pins | Route handlers + module registration import published SDK surface |
-| **`packages/platform/rendering`** | `"@umbraculum/module-sdk": "^0.0.2"` | Same hybrid as other consumers |
+| **Consumer apps** (`apps/web`, `apps/native/brewery`) | `"@umbraculum/contracts": "^0.0.1"`, `"@umbraculum/api-client": "^0.0.1"`, MIT batch at `^0.1.0` or `file:` per [RFC-0012](../rfcs/0012-package-tier-clarity.md) | Matches external `npm install` manifests |
+| **API service** (`services/api`) | `"@umbraculum/contracts": "^0.0.1"` + MIT batch `file:` / `^0.1.0` pins | Route handlers + module registration import published SDK surface |
+| **`packages/platform/rendering`** | `"@umbraculum/module-sdk": "^0.1.0"` | Same hybrid as other consumers |
 | **Publisher package** (`packages/platform/api-client`) | `"@umbraculum/contracts": "file:../contracts"` | Co-develop client + contracts; publish workflow rewrites to registry semver in tarball only |
-| **Publisher package** (`packages/modules/module-sdk`) | `"@umbraculum/ai-tool-sdk": "file:../ai-tool-sdk"`, `"@umbraculum/i18n-keys": "file:../i18n-keys"` | Co-develop spine + leaves; OIDC publish rewrites deps in tarball only |
+| **Publisher package** (`packages/sdk/module-sdk`) | `"@umbraculum/ai-tool-sdk": "file:../ai-tool-sdk"`, `"@umbraculum/i18n-keys": "file:../i18n-keys"` | Co-develop spine + leaves; OIDC publish rewrites deps in tarball only |
 | **Source package** (`packages/platform/contracts`) | *(none — it is the source)* | Built locally; published via laptop or `sdk-contracts-v*` OIDC |
 
 **npm workspaces still symlink** in-tree published packages when they exist under `packages/*`. That is intentional: contributors editing SDK sources see changes immediately without republishing on every save.
@@ -66,26 +66,32 @@ Or manually in a **temp directory outside the monorepo** (see script). Passing t
 2. Run `npm run build:packages` (or ci-parity `sdk-publish-prep`) before typecheck/lint that reads `dist/`.
 3. Before merge / after bumping published semver: run `./scripts/dogfood-npm-smoke.sh` and update consumer `^` pins if version changed.
 
-Do **not** switch publisher `packages/platform/api-client` or `packages/modules/module-sdk` to registry `file:` → `^` — that breaks co-development of publishers with their in-tree deps.
+Do **not** switch publisher `packages/platform/api-client` or `packages/sdk/module-sdk` to registry `file:` → `^` — that breaks co-development of publishers with their in-tree deps.
 
 **Still `file:` in consumer manifests (unpublished monorepo packages):** `ui`, `i18n`, `i18n-react`, `navigation`, `media`, brewery vertical packages, `rendering` (private), etc.
 
 ---
 
-## Module-sdk α batch (adopted 2026-06-03)
+## Module-sdk MIT batch (RFC-0012 reset 2026-06-08)
 
-The **seven-package July α batch** (`ai-tool-sdk`, `i18n-keys`, `module-sdk`, four `*-contracts`) is on npm at **`0.1.1` / `0.0.2`**. Monorepo **consumers** now use registry semver pins (same hybrid as contracts/api-client):
+The **seven-package MIT batch** (`ai-tool-sdk`, `i18n-keys`, `module-sdk`, four `*-contracts`) lives under `packages/sdk/` and `packages/canonical/<code>/contracts/` ([RFC-0012](../rfcs/0012-package-tier-clarity.md)). Monorepo semver reset to **`0.1.0`** (no shims from old `packages/modules/` paths). **Consumers** use registry semver pins (hybrid dogfood) or `file:` where noted:
 
-| Package | Consumer pin |
-|---------|--------------|
-| `@umbraculum/ai-tool-sdk` | `^0.1.1` (`services/api`) |
-| `@umbraculum/module-sdk` | `^0.0.2` |
-| `@umbraculum/automation-contracts` | `^0.0.2` |
-| `@umbraculum/pim-contracts` | `^0.0.2` |
-| `@umbraculum/mrp-contracts` | `^0.0.2` |
-| `@umbraculum/crp-contracts` | `^0.0.2` |
+| Package | Consumer pin / link |
+|---------|---------------------|
+| `@umbraculum/ai-tool-sdk` | `file:` (`services/api`) |
+| `@umbraculum/module-sdk` | `^0.1.0` (`rendering`, `api-client`); `file:` (`apps/web`, `apps/native/brewery`) |
+| `@umbraculum/automation-contracts` | `^0.1.0` (`api-client`); `file:` (`apps/web`, `services/api`) |
+| `@umbraculum/pim-contracts` | same pattern |
+| `@umbraculum/mrp-contracts` | same pattern |
+| `@umbraculum/crp-contracts` | same pattern |
 
 [`scripts/dogfood-npm-smoke.sh`](../../scripts/dogfood-npm-smoke.sh) phase 2 installs `module-sdk`, all four canonical `*-contracts`, and `ai-tool-sdk` from the registry in a temp dir (no new ci-parity job id).
+
+---
+
+## Module-sdk α batch (superseded pins — pre RFC-0012)
+
+The **seven-package July α batch** was on npm at **`0.1.1` / `0.0.2`**. Superseded by RFC-0012 `0.1.0` reset and tier move (2026-06-08).
 
 ---
 
@@ -101,4 +107,5 @@ The **seven-package July α batch** (`ai-tool-sdk`, `i18n-keys`, `module-sdk`, f
 | Date | Event |
 |------|-------|
 | 2026-06-02 | Consumers switched to `^0.0.1`; registry smoke confirmed; this doc added |
+| 2026-06-08 | RFC-0012 tier move (`packages/sdk`, `packages/canonical/*/contracts`); MIT batch reset `0.1.0`; consumer pin table updated |
 | 2026-06-03 | Module-sdk α batch consumer pins (`^0.0.2` / `^0.1.1`); `dogfood-npm-smoke.sh` phase 2 |

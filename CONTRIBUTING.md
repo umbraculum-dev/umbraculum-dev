@@ -27,6 +27,8 @@ translations, and thoughtful issue triage.
   monorepo; selected SDK packages may be MIT — see the licensing doc).
 - Read [`DEVELOPMENT.md`](./DEVELOPMENT.md), and if it exists in your
   checkout, the project-local addendum `DEVELOPMENT-LOCAL.md`.
+- New to the monorepo layout? Read [`docs/NAVIGATE-MONOREPO.md`](./docs/NAVIGATE-MONOREPO.md)
+  (Magento-style path map + four package tiers) before diving into `packages/`.
 - **Before you push:** commit, then run **`npm run verify:pre-push`** from repo
   root (T2-PR — path-aware parallel ci-parity; same command agents use). Manifest
   / SDK tag prep: **`npm run verify:pre-push:release`**. See

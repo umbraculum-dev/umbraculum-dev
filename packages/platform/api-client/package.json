@@ -73,11 +73,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@umbraculum/automation-contracts": "^0.0.2",
+    "@umbraculum/automation-contracts": "^0.1.0",
     "@umbraculum/contracts": "^0.0.1",
-    "@umbraculum/crp-contracts": "^0.0.2",
-    "@umbraculum/mrp-contracts": "^0.0.2",
-    "@umbraculum/pim-contracts": "^0.0.2"
+    "@umbraculum/crp-contracts": "^0.1.0",
+    "@umbraculum/mrp-contracts": "^0.1.0",
+    "@umbraculum/pim-contracts": "^0.1.0"
   },
   "devDependencies": {
     "openapi-typescript": "^7.10.1",

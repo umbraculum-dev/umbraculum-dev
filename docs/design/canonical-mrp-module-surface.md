@@ -19,7 +19,7 @@ MRP does not own inventory execution, capacity scheduling, live controller state
 
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
-| Contracts | `packages/modules/mrp-contracts/` -> `@umbraculum/mrp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, production-order/BOM/material-requirement refs, planned AI/rendering payload schemas. |
+| Contracts | `packages/canonical/mrp/contracts/` -> `@umbraculum/mrp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, production-order/BOM/material-requirement refs, planned AI/rendering payload schemas. |
 | API | `services/api/src/modules/mrp/` | **Wave 1–6 shipped (read + rendering):** read-only routes, services, Prisma `mrp` schema, module registration, read-time brewery projections, read-only AI tool handlers, and RFC-0007 document templates with render-job routes. |
 | Web | `apps/web/app/[locale]/(mrp)/` | **Wave 3 shipped:** read-only production-order list/detail and material-requirement entry pages under registered static URL segments. Proposal/write pages remain future work. |
 | Native | `apps/native/src/modules/mrp/` | Future operator/manager screens; may trail web in alpha. |
@@ -135,7 +135,7 @@ The model intentionally uses cross-module references by ID/string rather than di
 
 ## 5. Contracts package
 
-Wave 1 package: [`packages/modules/mrp-contracts/`](../../packages/modules/mrp-contracts/) published in-repo as `@umbraculum/mrp-contracts`.
+Wave 1 package: [`packages/canonical/mrp/contracts/`](../../packages/canonical/mrp/contracts/) published in-repo as `@umbraculum/mrp-contracts`.
 
 Expected exports:
 

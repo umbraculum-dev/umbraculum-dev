@@ -62,4 +62,4 @@ From repo root (run Node/npm inside the project container, not on the host — s
 - [`docs/modules/canonical/pim.md`](../../../docs/modules/canonical/pim.md) — public module page.
 - [`services/api/src/modules/pim/`](../../../services/api/src/modules/pim/) — Phase B API slice consuming these schemas.
 - [`apps/web/app/[locale]/(pim)/`](../../../apps/web/app/%5Blocale%5D/%28pim%29/) — Phase C/E Tamagui admin pages consuming these schemas.
-- [`packages/modules/module-sdk/`](../module-sdk/) — peer SDK; `registerPimModule(app)` calls `registerModule({ code: "pim", prismaSchema: "pim" })`.
+- [`packages/sdk/module-sdk/`](../module-sdk/) — peer SDK; `registerPimModule(app)` calls `registerModule({ code: "pim", prismaSchema: "pim" })`.

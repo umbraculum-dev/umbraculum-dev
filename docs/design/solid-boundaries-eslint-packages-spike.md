@@ -14,7 +14,7 @@ After Wave **3a** (physical tier folders) and **3c** (platform package purity), 
 | Tier | Path | npm examples |
 |------|------|--------------|
 | Platform | `packages/platform/**` | `@umbraculum/ui`, `@umbraculum/i18n` |
-| Modules | `packages/modules/**` | `@umbraculum/module-sdk`, `*-contracts` |
+| Modules | `packages/canonical/*/**` | `@umbraculum/module-sdk`, `*-contracts` |
 | Verticals | `packages/verticals/*/**` | `@umbraculum/brewery-core`, `@umbraculum/brewery-i18n` |
 
 Mechanical ESLint fences prevent platform packages from re-accumulating vertical leakage (the pre-3c class of bug: `BrewCheckbox` in `@umbraculum/ui`, brewery namespaces in `@umbraculum/i18n`).
@@ -26,7 +26,7 @@ Mechanical ESLint fences prevent platform packages from re-accumulating vertical
 | Element | Pattern | Rule |
 |---------|---------|------|
 | `pkg-platform` | `packages/platform/**` | Must **not** import `pkg-vertical` (may import `pkg-modules` — e.g. `@umbraculum/api-client` → `*-contracts`) |
-| `pkg-modules` | `packages/modules/**` | Must **not** import `pkg-vertical` |
+| `pkg-modules` | `packages/canonical/*/**` | Must **not** import `pkg-vertical` |
 | `pkg-vertical` | `packages/verticals/*/**` | May import `pkg-platform` + `pkg-modules`; **never** sibling vertical (`verticalCode` capture) |
 
 **Scope:** `packages/**/*.{ts,tsx}` excluding `dist/**`.

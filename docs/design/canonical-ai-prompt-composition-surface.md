@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** Shipped at public-alpha hardening (2026-05)  
 **Audience:** module authors, API maintainers, AI consultant implementors, reviewers  
-**Related:** [`AI-CONSULTANT.md`](../AI-CONSULTANT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.3, [`packages/modules/module-sdk/README.md`](../../packages/modules/module-sdk/README.md)
+**Related:** [`AI-CONSULTANT.md`](../AI-CONSULTANT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.3, [`packages/sdk/module-sdk/README.md`](../../packages/sdk/module-sdk/README.md)
 
 ---
 

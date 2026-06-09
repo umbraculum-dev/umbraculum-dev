@@ -16,7 +16,7 @@
 |---------|-------|------------|
 | Native platform shared layout | `apps/native` | [`apps/native/README.md`](../../apps/native/README.md) |
 | Route policy | `@umbraculum/navigation` | [`packages/platform/navigation/src/index.ts`](../../packages/platform/navigation/src/index.ts) |
-| Module registration (native) | `@umbraculum/module-sdk` | `registerNativeModule()` — [`registerNativeModule.ts`](../../packages/modules/module-sdk/src/registerNativeModule.ts) |
+| Module registration (native) | `@umbraculum/module-sdk` | `registerNativeModule()` — [`registerNativeModule.ts`](../../packages/sdk/module-sdk/src/registerNativeModule.ts) |
 | Auth transport | `@umbraculum/api-client` | `bearerTokenAuth` — [AUTH-STRATEGY.md](../AUTH-STRATEGY.md) |
 | Render jobs (client) | `@umbraculum/api-client` | [`renderJob.ts`](../../packages/platform/api-client/src/renderJob.ts) |
 | Validation | `@umbraculum/contracts` | [RFC-0003](../rfcs/0003-validation-library-adoption.md) — parse at HTTP boundaries |

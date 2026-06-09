@@ -4,7 +4,7 @@
  *
  * Build-time / CI gate for the two web-route β disciplines committed by
  * the web-route-group audit (`docs/design/web-route-group-audit.md` §3)
- * and the URL-segment registry surface in `packages/modules/module-sdk`
+ * and the URL-segment registry surface in `packages/sdk/module-sdk`
  * (`registerWebModule({ ownedUrlSegments, navEntry })`).
  *
  * Checks performed (against `apps/web/app/[locale]/`):

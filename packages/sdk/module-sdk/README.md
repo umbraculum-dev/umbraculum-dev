@@ -237,7 +237,7 @@ From repo root (run Node/npm inside the project container, not on the host — s
 ## Cross-references
 
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) §4.4 — registration sketch
-- [`docs/rfcs/0002-canonical-module-physical-layout.md`](../../../docs/rfcs/0002-canonical-module-physical-layout.md) — `packages/modules/module-sdk/` placement (Decision C), web route-group convention (Decision B)
+- [`docs/rfcs/0002-canonical-module-physical-layout.md`](../../../docs/rfcs/0002-canonical-module-physical-layout.md) — `packages/sdk/module-sdk/` placement (Decision C), web route-group convention (Decision B)
 - [`docs/rfcs/0007-canonical-document-rendering.md`](../../../docs/rfcs/0007-canonical-document-rendering.md) — document-template registration + canonical rendering pipeline
 - [`docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md`](../../../docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — calendar amendment to RFC-0002 D (brewery file-move pulled into Week 1 of late-H1-2026)
 - [`docs/design/web-route-group-audit.md`](../../../docs/design/web-route-group-audit.md) — the two β disciplines (no group-root `page.tsx`, no group-root dynamic segment), the URL-segment registry surface, canonical good/bad examples

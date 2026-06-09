@@ -13,13 +13,13 @@
 
 | Order | Package | Path | On npm (latest) |
 |-------|---------|------|-----------------|
-| 1 | `@umbraculum/ai-tool-sdk` | `packages/modules/ai-tool-sdk/` | `0.1.1` |
-| 2 | `@umbraculum/i18n-keys` | `packages/modules/i18n-keys/` | `0.1.1` |
-| 3 | `@umbraculum/module-sdk` | `packages/modules/module-sdk/` | `0.0.2` |
-| 4 | `@umbraculum/automation-contracts` | `packages/modules/automation-contracts/` | `0.0.2` |
-| 5 | `@umbraculum/pim-contracts` | `packages/modules/pim-contracts/` | `0.0.2` |
-| 6 | `@umbraculum/mrp-contracts` | `packages/modules/mrp-contracts/` | `0.0.2` |
-| 7 | `@umbraculum/crp-contracts` | `packages/modules/crp-contracts/` | `0.0.2` |
+| 1 | `@umbraculum/ai-tool-sdk` | `packages/sdk/ai-tool-sdk/` | `0.1.1` |
+| 2 | `@umbraculum/i18n-keys` | `packages/sdk/i18n-keys/` | `0.1.1` |
+| 3 | `@umbraculum/module-sdk` | `packages/sdk/module-sdk/` | `0.0.2` |
+| 4 | `@umbraculum/automation-contracts` | `packages/canonical/automation/contracts/` | `0.0.2` |
+| 5 | `@umbraculum/pim-contracts` | `packages/canonical/pim/contracts/` | `0.0.2` |
+| 6 | `@umbraculum/mrp-contracts` | `packages/canonical/mrp/contracts/` | `0.0.2` |
+| 7 | `@umbraculum/crp-contracts` | `packages/canonical/crp/contracts/` | `0.0.2` |
 
 **Phase E extension (published 2026-06-02):**
 

@@ -17,7 +17,7 @@ Shipped module-pluggable prompt composition (`registerModule({ aiPrompts })`), n
 | Area | Paths |
 |------|--------|
 | Horizontal surface | [`canonical-ai-prompt-composition-surface.md`](canonical-ai-prompt-composition-surface.md) |
-| SDK | [`packages/modules/module-sdk/src/types.ts`](../../packages/modules/module-sdk/src/types.ts), [`moduleRegistry.ts`](../../packages/modules/module-sdk/src/moduleRegistry.ts) |
+| SDK | [`packages/sdk/module-sdk/src/types.ts`](../../packages/sdk/module-sdk/src/types.ts), [`moduleRegistry.ts`](../../packages/sdk/module-sdk/src/moduleRegistry.ts) |
 | Prompt text | [`services/api/src/services/ai/prompts/`](../../services/api/src/services/ai/prompts/) |
 | Composer | [`services/api/src/services/ai/promptComposer.ts`](../../services/api/src/services/ai/promptComposer.ts) |
 | Orchestrator | [`services/api/src/services/ai/orchestrator.ts`](../../services/api/src/services/ai/orchestrator.ts) |
@@ -31,7 +31,7 @@ Shipped module-pluggable prompt composition (`registerModule({ aiPrompts })`), n
 
 ```bash
 # module-sdk (host)
-cd packages/modules/module-sdk && npm test && npm run build
+cd packages/sdk/module-sdk && npm test && npm run build
 
 # API AI tests (api container)
 docker compose exec -T api sh -c 'cd /app && npm test -- src/tests/ai/promptComposer.test.ts src/tests/ai/workspacePromptComposition.test.ts src/tests/ai/ai.integration.test.ts'

@@ -326,7 +326,7 @@ export default [
   // RFC-0003 — packages/*-contracts/ runtime-validation discipline.
   //
   // Per RFC-0003 Decision A (Accepted 2026-05-19), every boundary
-  // payload in `packages/platform/contracts/`, `packages/modules/automation-contracts/`,
+  // payload in `packages/platform/contracts/`, `packages/canonical/automation/contracts/`,
   // and the 4 future module-contracts packages MUST be validated via a
   // Zod schema. Hand-rolled `parseX(unknown): X` functions are no longer
   // permitted as the primary validator — they may exist only as thin
@@ -345,7 +345,7 @@ export default [
   // 22-typescript-contracts-runtime-validation.mdc` for the IDE guidance.
   // -------------------------------------------------------------------
   {
-    files: ["packages/modules/*-contracts/src/**/*.{ts,tsx}", "packages/platform/contracts/src/**/*.{ts,tsx}"],
+    files: ["packages/canonical/*/contracts/src/**/*.{ts,tsx}", "packages/verticals/*/contracts/src/**/*.{ts,tsx}", "packages/platform/contracts/src/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -791,9 +791,9 @@ export default [
   // SOLID package-layer boundaries (RFC-0011 Wave 3d — error-level).
   //
   // Scoped to packages/** per solid-boundaries-eslint-packages-spike.md.
-  // Platform packages must not import modules/ or verticals/ tiers;
-  // modules must not import verticals/; vertical packages may import
-  // platform + modules but not sibling vertical folders.
+  // Platform packages must not import sdk/, canonical/, or verticals/ tiers;
+  // sdk and canonical must not import verticals/; vertical packages may import
+  // platform + sdk + canonical but not sibling vertical folders.
   //
   // Intentional exception: packages/platform/i18n/src/index.ts merges
   // @umbraculum/brewery-i18n (@arch-boundary) — rule disabled there.
@@ -816,9 +816,15 @@ export default [
           mode: "full",
         },
         {
-          type: "pkg-modules",
-          pattern: "packages/modules/**",
+          type: "pkg-sdk",
+          pattern: "packages/sdk/**",
           mode: "full",
+        },
+        {
+          type: "pkg-canonical",
+          pattern: "packages/canonical/*/**",
+          mode: "file",
+          capture: ["canonicalCode"],
         },
         {
           type: "pkg-vertical",
@@ -839,10 +845,14 @@ export default [
           rules: [
             {
               from: [["pkg-platform"]],
+              disallow: [["pkg-vertical"], ["pkg-canonical"], ["pkg-sdk"]],
+            },
+            {
+              from: [["pkg-sdk"]],
               disallow: [["pkg-vertical"]],
             },
             {
-              from: [["pkg-modules"]],
+              from: [["pkg-canonical"]],
               disallow: [["pkg-vertical"]],
             },
             {

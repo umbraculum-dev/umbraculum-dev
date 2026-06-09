@@ -36,9 +36,9 @@ If you want to ship the *one* canonical implementation of a new domain, you want
 
 The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party module depends on. Core packages: three unconditional plus one per canonical you target. Optional HTTP client packages when your module calls the platform API from Node or a custom client:
 
-- **`@umbraculum/module-sdk`** ([`packages/modules/module-sdk/README.md`](../../../packages/modules/module-sdk/README.md)) — `registerModule()`, `RESERVED_CANONICAL_MODULE_CODES`, `ValidatedSchema<T>`, `RegisterModuleOptions`, `registerWebModule()`, `registerNativeModule()`. The module SDK proper.
-- **`@umbraculum/ai-tool-sdk`** ([`packages/modules/ai-tool-sdk/README.md`](../../../packages/modules/ai-tool-sdk/README.md)) — `AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`. The AI-tool contract every module's tool implementations satisfy. Library-agnostic — third-party authors pick their own validation library for `inputSchema`. Pin if your module contributes AI tools (which most modules do via `registerAiTools` on `RegisterModuleOptions`).
-- **`@umbraculum/i18n-keys`** ([`packages/modules/i18n-keys/README.md`](../../../packages/modules/i18n-keys/README.md)) — `ModuleNavLabelKey`, `moduleMessageRoot`, `defaultModuleNavLabelKey`, `RESERVED_PLATFORM_MESSAGE_ROOTS`. Namespace conventions for module-owned message keys in locale bundles. Pin for any module that ships UI copy or registers `navEntry` / `tabEntry` label keys (typical for all modules with a web or native surface).
+- **`@umbraculum/module-sdk`** ([`packages/sdk/module-sdk/README.md`](../../../packages/sdk/module-sdk/README.md)) — `registerModule()`, `RESERVED_CANONICAL_MODULE_CODES`, `ValidatedSchema<T>`, `RegisterModuleOptions`, `registerWebModule()`, `registerNativeModule()`. The module SDK proper.
+- **`@umbraculum/ai-tool-sdk`** ([`packages/sdk/ai-tool-sdk/README.md`](../../../packages/sdk/ai-tool-sdk/README.md)) — `AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`. The AI-tool contract every module's tool implementations satisfy. Library-agnostic — third-party authors pick their own validation library for `inputSchema`. Pin if your module contributes AI tools (which most modules do via `registerAiTools` on `RegisterModuleOptions`).
+- **`@umbraculum/i18n-keys`** ([`packages/sdk/i18n-keys/README.md`](../../../packages/sdk/i18n-keys/README.md)) — `ModuleNavLabelKey`, `moduleMessageRoot`, `defaultModuleNavLabelKey`, `RESERVED_PLATFORM_MESSAGE_ROOTS`. Namespace conventions for module-owned message keys in locale bundles. Pin for any module that ships UI copy or registers `navEntry` / `tabEntry` label keys (typical for all modules with a web or native surface).
 - **`@umbraculum/<code>-contracts`** — the specific canonical's contracts package (e.g. `@umbraculum/automation-contracts` exports `AutomationAdapterDefinition`, `MAILBOX_SPEC`, `CONTRACT_VERSION`). One per canonical module you target.
 - **`@umbraculum/contracts`** ([`packages/platform/contracts/README.md`](../../../packages/platform/contracts/README.md)) — platform wire parsers (auth, workspaces, rendering jobs, ads, AI settings/usage). Pin when validating platform HTTP payloads outside `@umbraculum/api-client`.
 - **`@umbraculum/api-client`** ([`packages/platform/api-client/README.md`](../../../packages/platform/api-client/README.md)) — optional typed HTTP facades (`listWorkspaces`, canonical subpaths `/automation`, `/pim`, …). Prefer over raw `fetch` when calling Umbraculum APIs from Node scripts or external apps. Browse paths on [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform).
@@ -104,7 +104,7 @@ Use `peerDependencies` (not `dependencies`) for the SDK and contracts packages �
 
 ### Step 3 — Implement the contract
 
-Example: implementing `AutomationAdapterDefinition` for a custom Modbus device. (Illustrative — the real adapter contract is exported from `@umbraculum/automation-contracts`; consult [`packages/modules/automation-contracts/README.md`](../../../packages/modules/automation-contracts/README.md) for the current surface.)
+Example: implementing `AutomationAdapterDefinition` for a custom Modbus device. (Illustrative — the real adapter contract is exported from `@umbraculum/automation-contracts`; consult [`packages/canonical/automation/contracts/README.md`](../../../packages/canonical/automation/contracts/README.md) for the current surface.)
 
 ```typescript
 import type { AutomationAdapterDefinition } from "@umbraculum/automation-contracts";
@@ -170,7 +170,7 @@ This is the same trajectory the Drupal ecosystem's most successful contributed m
 ## 7. Common pitfalls
 
 - **Reaching into platform internals.** `import from "services/api/src/modules/automation/services/vesselsService"` is not a stable surface — that's our platform internals. Pin `@umbraculum/automation-contracts` instead.
-- **Using `dependencies` for the SDK instead of `peerDependencies`.** Causes duplicate SDK instances in the consumer's `node_modules`, which breaks the registry singleton ([module-sdk's `registerModule` uses a process-wide singleton](../../../packages/modules/module-sdk/src/moduleRegistry.ts)).
+- **Using `dependencies` for the SDK instead of `peerDependencies`.** Causes duplicate SDK instances in the consumer's `node_modules`, which breaks the registry singleton ([module-sdk's `registerModule` uses a process-wide singleton](../../../packages/sdk/module-sdk/src/moduleRegistry.ts)).
 - **Pinning a major contract version too narrowly.** Use caret-range `^X.Y.Z` for the contracts package so minor and patch updates flow without your consumers having to update your module in lockstep.
 - **Hard-coding addon prices.** Billing is the platform's; your module declares `addonCodes`, and Stripe/RevenueCat configuration of the price lives outside your module ([RFC-0001 §8.2](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) billing row).
 - **Shipping AGPLv3 SDK code as proprietary.** The SDK is MIT, so you can ship proprietary against it. Some *examples* in this repo are AGPLv3 — re-implement, don't copy, if you need proprietary code.
@@ -261,10 +261,10 @@ Your `README.md` should state explicitly:
 
 ## 9. Cross-references
 
-- [`packages/modules/module-sdk/README.md`](../../../packages/modules/module-sdk/README.md) — the SDK's own README.
-- [`packages/modules/ai-tool-sdk/README.md`](../../../packages/modules/ai-tool-sdk/README.md) — the AI-tool SDK contract.
-- [`packages/modules/i18n-keys/README.md`](../../../packages/modules/i18n-keys/README.md) — module message-key conventions.
-- [`packages/modules/automation-contracts/README.md`](../../../packages/modules/automation-contracts/README.md) — example contracts package.
+- [`packages/sdk/module-sdk/README.md`](../../../packages/sdk/module-sdk/README.md) — the SDK's own README.
+- [`packages/sdk/ai-tool-sdk/README.md`](../../../packages/sdk/ai-tool-sdk/README.md) — the AI-tool SDK contract.
+- [`packages/sdk/i18n-keys/README.md`](../../../packages/sdk/i18n-keys/README.md) — module message-key conventions.
+- [`packages/canonical/automation/contracts/README.md`](../../../packages/canonical/automation/contracts/README.md) — example contracts package.
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 3 / Tier 4 rows), §8 (consumption contract).
 - [LICENSING.md §6.2](../../LICENSING.md) — MIT SDK posture.
 - [`docs/MODULES.md`](../../MODULES.md) §4.3 — decision-tree row.

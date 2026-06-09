@@ -1,18 +1,18 @@
 {
-  "name": "@umbraculum/i18n-keys",
-  "version": "0.1.1",
-  "description": "Umbraculum i18n-keys SDK — namespace conventions and key helpers for module-owned message keys (module message roots, nav label keys, reserved platform roots). Platform-classified per sub-plan #9 §1.1; published as a peer of @umbraculum/module-sdk per PLATFORM-ARCHITECTURE.md §4.4. Greenfield package landed 2026-05-27 (not a carve-out from @umbraculum/i18n).",
+  "name": "@umbraculum/mrp-contracts",
+  "version": "0.1.0",
+  "description": "Canonical MRP module contract types: production orders, BOMs, operations, material requirements, work-order payloads, and planned AI/rendering schemas.",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
-    "directory": "packages/modules/i18n-keys"
+    "directory": "packages/canonical/mrp/contracts"
   },
   "bugs": {
     "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
   },
-  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/modules/i18n-keys#readme",
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/canonical/mrp/contracts#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -39,6 +39,9 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
   "devDependencies": {
     "vitest": "^3.0.0"
   }

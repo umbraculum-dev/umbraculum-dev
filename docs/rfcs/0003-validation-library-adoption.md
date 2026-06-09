@@ -27,14 +27,14 @@ The deferred cluster (§10) covers OpenAPI generation, the Zod v5 tracker, and t
 
 ## 2. Motivation
 
-[RFC-0001](0001-modules-tiers-governance-and-automation-placement.md) committed the conceptual module model. [RFC-0002](0002-canonical-module-physical-layout.md) committed the physical layout: five `@umbraculum/<code>-contracts/` packages plus a `@umbraculum/module-sdk` with `registerModule()`. [`docs/design/canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md) is the first canonical-module surface design (accepted 2026-05-19); its Phase A landed `packages/modules/automation-contracts/` on the same day.
+[RFC-0001](0001-modules-tiers-governance-and-automation-placement.md) committed the conceptual module model. [RFC-0002](0002-canonical-module-physical-layout.md) committed the physical layout: five `@umbraculum/<code>-contracts/` packages plus a `@umbraculum/module-sdk` with `registerModule()`. [`docs/design/canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md) is the first canonical-module surface design (accepted 2026-05-19); its Phase A landed `packages/canonical/automation/contracts/` on the same day.
 
 The contracts-validation strategy ([`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) v1.0–v1.2) committed to hand-rolled validators in May 2026 and re-confirmed twice (2026-05-16, 2026-05-18). Both re-confirmations were correct under the project state they audited. The re-confirmation pattern was calibrated to a steady-state assumption that has since been invalidated:
 
 **What changed.** The 2026-05-18 milestone-aligned audit recorded the validation question as orthogonal-axis (not a slice). Within 24 hours:
 
 - [RFC-0002](0002-canonical-module-physical-layout.md) accepted (β layout + 5 canonical-module contracts packages by H1 2027 + `@umbraculum/module-sdk` to be designed with or before the second canonical module).
-- [`docs/design/canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md) accepted (Phase A landed `packages/modules/automation-contracts/` as the *template* every future module-contracts package will copy from).
+- [`docs/design/canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md) accepted (Phase A landed `packages/canonical/automation/contracts/` as the *template* every future module-contracts package will copy from).
 
 The project's trajectory is no longer "8 parsers + 28 routes, steady-state." It is "5+ contracts packages + ~50 routes + public module-SDK + third-party-developer audience post-H1-2027 public flip." Under that trajectory, hand-rolled becomes the wrong shape — not because hand-rolled is incorrect (it is correct; the types slice tightened compile-time guarantees on every existing parser), but because it does not extend.
 
@@ -136,9 +136,9 @@ export interface RegisterModuleOptions {
 | PR | Scope | Estimated effort | Plugin-pack co-land |
 |---|---|---|---|
 | **PR 1** | `packages/platform/contracts/` — 8 parsers + 38 unit tests + ~25 consumer call sites in `apps/web` and `apps/native` | ~3 days | Plugin rule `22-typescript-contracts-runtime-validation.mdc` rewritten + new lint rule (`no-restricted-syntax` forbidding hand-rolled drift in `packages/*-contracts/`) |
-| **PR 2** | `packages/modules/automation-contracts/` — `mailbox-data.ts` (168→~55 lines) + `mailbox.ts` types collapse to `z.infer` + 28 mailbox tests | ~2 days | Plugin skill `scaffold-contracts-package` |
+| **PR 2** | `packages/canonical/automation/contracts/` — `mailbox-data.ts` (168→~55 lines) + `mailbox.ts` types collapse to `z.infer` + 28 mailbox tests | ~2 days | Plugin skill `scaffold-contracts-package` |
 | **PR 3** | `services/api/src/routes/` — 28 routes + `fastify-type-provider-zod` adoption + ~30 route-local `assert*` helpers + `apps/web` + `apps/native` client updates (no bridge layer) + ~80–100 integration tests | ~5 days | New plugin rule `<NN>-fastify-route-schema-validation.mdc` |
-| **PR 4** | `packages/modules/module-sdk/` — `ValidatedSchema<T>` interface + `RegisterModuleOptions` (concurrent with sub-plan #9 module-SDK design) | ~1–2 days | Library-agnostic interface documented in `packages/modules/module-sdk/README.md` |
+| **PR 4** | `packages/sdk/module-sdk/` — `ValidatedSchema<T>` interface + `RegisterModuleOptions` (concurrent with sub-plan #9 module-SDK design) | ~1–2 days | Library-agnostic interface documented in `packages/sdk/module-sdk/README.md` |
 
 **Rationale for this order:**
 
@@ -234,8 +234,8 @@ Three clusters of work are explicitly out-of-scope of RFC-0003 and tracked as fo
 ### 11.1 What this RFC builds on (and does NOT relitigate)
 
 - **[RFC-0001](0001-modules-tiers-governance-and-automation-placement.md)** — canonical-module rule, reserved codes, tier model. Validation library choice is invisible to the conceptual module model.
-- **[RFC-0002](0002-canonical-module-physical-layout.md)** — β layout (`packages/<code>-contracts/` × N) and `packages/modules/module-sdk/`. RFC-0003 adopts the contracts-package pattern as the migration boundary.
-- **[`docs/design/canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md)** — Phase A's `packages/modules/automation-contracts/` is migrated in PR 2.
+- **[RFC-0002](0002-canonical-module-physical-layout.md)** — β layout (`packages/<code>-contracts/` × N) and `packages/sdk/module-sdk/`. RFC-0003 adopts the contracts-package pattern as the migration boundary.
+- **[`docs/design/canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md)** — Phase A's `packages/canonical/automation/contracts/` is migrated in PR 2.
 - **[`docs/design/validation-library-adoption-audit.md`](../design/validation-library-adoption-audit.md)** — the skeptical audit that produced this RFC's verdict. Audit is the deep evidence; RFC is the commitment.
 - **[`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md)** — historical decision-log v1.0–v1.2 (preserved); v2.0 row appended on acceptance of this RFC.
 - **[`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md)** §6 (validation as orthogonal axis — historical), §8 (plugin-pack manifest — built on the Zod pattern per Decision E).

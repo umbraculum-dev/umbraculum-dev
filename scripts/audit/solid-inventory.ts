@@ -71,7 +71,7 @@ function classifySlice(rel: string): string {
     return "Platform routes/services";
   if (rel.includes("services/api/src/domain")) return "Brewery vertical (domain)";
   if (rel.includes("packages/") && rel.includes("-contracts/")) return "Packages (contracts)";
-  if (rel.includes("packages/modules/module-sdk")) return "Packages (module-sdk)";
+  if (rel.includes("packages/sdk/module-sdk")) return "Packages (module-sdk)";
   if (rel.includes("packages/")) return "Packages";
   if (rel.includes("apps/web/app")) return "Apps (web)";
   if (rel.includes("apps/native/brewery/src")) return "Apps (native)";

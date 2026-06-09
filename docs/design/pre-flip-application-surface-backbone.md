@@ -229,19 +229,19 @@ The flat `packages/` tree repeats the shell-layer confusion at the **npm workspa
 | `packages/platform/navigation/` | `@umbraculum/navigation` | Horizontal (L3) | Clean |
 | `packages/platform/i18n/` | `@umbraculum/i18n` | Horizontal (L3) | **Clean (Wave 3c)** — brewery copy in `@umbraculum/brewery-i18n`; platform merges at runtime |
 | `packages/platform/i18n-react/` | `@umbraculum/i18n-react` | Horizontal (L3) | Clean (bindings only) |
-| `packages/modules/i18n-keys/` | `@umbraculum/i18n-keys` | SDK (L5) | Clean |
+| `packages/sdk/i18n-keys/` | `@umbraculum/i18n-keys` | SDK (L5) | Clean |
 | `packages/platform/api-client/` | `@umbraculum/api-client` | Horizontal (L3) | Clean |
 | `packages/platform/media/` | `@umbraculum/media` | Horizontal (L3) | **Clean (Wave 3c)** — brewery assets in `@umbraculum/brewery-media-assets`; platform manifest empty |
 | `packages/platform/rendering/` | `@umbraculum/rendering` | Horizontal (L3) | Clean (BeerJSON proof is consumer, not owner) |
 | `packages/platform/test-mcp/` | `@umbraculum/test-mcp` | Dev tooling | Clean |
 | `packages/platform/contracts/` | `@umbraculum/contracts` | Platform contracts (L4) | **Was leaked** — `src/brewery/`, `src/water/`, `src/analysis/` moved to `@umbraculum/brewery-contracts` (Wave 3b, 2026-06-06) |
 | `packages/verticals/brewery/contracts/` | `@umbraculum/brewery-contracts` | Vertical contracts (L4) | **Clean** — RFC-0002 β fourth slice for `brewery` |
-| `packages/modules/module-sdk/` | `@umbraculum/module-sdk` | SDK (L5) | Clean |
-| `packages/modules/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | SDK (L5) | Clean |
-| `packages/modules/automation-contracts/` | `@umbraculum/automation-contracts` | Canonical (L4) | Clean — **good pattern** |
-| `packages/modules/pim-contracts/` | `@umbraculum/pim-contracts` | Canonical (L4) | Clean |
-| `packages/modules/mrp-contracts/` | `@umbraculum/mrp-contracts` | Canonical (L4) | Clean |
-| `packages/modules/crp-contracts/` | `@umbraculum/crp-contracts` | Canonical (L4) | Clean |
+| `packages/sdk/module-sdk/` | `@umbraculum/module-sdk` | SDK (L5) | Clean |
+| `packages/sdk/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | SDK (L5) | Clean |
+| `packages/canonical/automation/contracts/` | `@umbraculum/automation-contracts` | Canonical (L4) | Clean — **good pattern** |
+| `packages/canonical/pim/contracts/` | `@umbraculum/pim-contracts` | Canonical (L4) | Clean |
+| `packages/canonical/mrp/contracts/` | `@umbraculum/mrp-contracts` | Canonical (L4) | Clean |
+| `packages/canonical/crp/contracts/` | `@umbraculum/crp-contracts` | Canonical (L4) | Clean |
 | `packages/verticals/brewery/core/` | `@umbraculum/brewery-core` | Vertical (L5) | **Trap:** folder says `core`, npm says `brewery-core` |
 | `packages/verticals/brewery/beerjson/` | `@umbraculum/brewery-beerjson` | Vertical (L5) | **Trap:** folder omits `brewery-` prefix |
 | `packages/verticals/brewery/recipes-ui/` | `@umbraculum/brewery-recipes-ui` | Vertical (L5) | **Trap:** folder omits `brewery-` prefix |
@@ -260,7 +260,7 @@ The flat `packages/` tree repeats the shell-layer confusion at the **npm workspa
 
 5. **eslint / boundaries gap.** WS5 covers `apps/web` and `apps/native`; there is no equivalent **`eslint-plugin-boundaries` tier fence on `packages/**`** preventing `@umbraculum/ui` from importing `@umbraculum/brewery-recipes-ui` or `@umbraculum/contracts` from growing new vertical subtrees without review.
 
-### 6.3 Target on-disk shape
+### 6.3 Target on-disk shape — **implemented (RFC-0012, 2026-06-08)**
 
 ```text
 packages/
@@ -273,35 +273,37 @@ packages/
     contracts/                      # platform wire types ONLY (auth, workspaces, billing, ai, rendering, …)
     rendering/
     media/                          # loader framework; vertical assets under verticals/
-    native-shell/                   # NEW — extracted from apps/native
+    native-shell/
     test-mcp/
-  modules/                          # Layer 4–5 — SDK + canonical *-contracts
+  sdk/                              # Layer 4 — module registration + AI/i18n SDK leaves
     module-sdk/
     ai-tool-sdk/
     i18n-keys/
-    automation-contracts/
-    pim-contracts/
-    mrp-contracts/
-    crp-contracts/
+  canonical/                        # Layer 5 — one contracts slice per canonical code
+    automation/contracts/
+    pim/contracts/
+    mrp/contracts/
+    crp/contracts/
   verticals/
     brewery/                        # Tier-6 reference vertical — ALL brewery npm packages here
-      core/                         # @umbraculum/brewery-core  (rename from packages/verticals/brewery/core)
+      core/                         # @umbraculum/brewery-core
       beerjson/                     # @umbraculum/brewery-beerjson
       recipes-ui/                   # @umbraculum/brewery-recipes-ui
-      contracts/                    # @umbraculum/brewery-contracts  (NEW — see §6.4)
+      contracts/                    # @umbraculum/brewery-contracts
       i18n/                         # optional: brewery locale bundles split from platform i18n
-      media-assets/                 # optional: brewery-only manifest assets
+      api-client/                   # @umbraculum/brewery-api-client
 ```
 
 Root workspaces:
 
 ```json
 "packages/platform/*",
-"packages/modules/*",
+"packages/sdk/*",
+"packages/canonical/*/*",
 "packages/verticals/*/*"
 ```
 
-**npm names:** stable through Wave 3a (physical tier move only). Wave 3b+ aligns folder names under `verticals/brewery/` with npm without changing published names.
+**npm names:** unchanged (`@umbraculum/pim-contracts`, etc.). MIT SDK batch semver reset to `0.1.0` per [RFC-0012](../rfcs/0012-package-tier-clarity.md). Onboarding map: [`NAVIGATE-MONOREPO.md`](../NAVIGATE-MONOREPO.md).
 
 ### 6.4 Target content split — `@umbraculum/brewery-contracts`
 
@@ -339,7 +341,7 @@ Add `eslint-plugin-boundaries` elements on `packages/**`:
 | Element | Pattern | Rule |
 |---------|---------|------|
 | `pkg-platform` | `packages/platform/**` | Must not import `pkg-vertical` or `pkg-module-contracts` except via explicit allowlist for boot glue |
-| `pkg-module-contracts` | `packages/modules/*-contracts/**` | Must not import `pkg-vertical` |
+| `pkg-module-contracts` | `packages/canonical/*/*-contracts/**` | Must not import `pkg-vertical` |
 | `pkg-vertical` | `packages/verticals/**` | May import `pkg-platform` + relevant `pkg-module-contracts`; never sibling vertical |
 
 Spike doc: [`docs/design/solid-boundaries-eslint-packages-spike.md`](./solid-boundaries-eslint-packages-spike.md) (Wave 3d, 2026-06-07).

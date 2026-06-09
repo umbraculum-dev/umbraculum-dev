@@ -14,10 +14,11 @@ Documents are grouped by **purpose**, not by physical location. Most files sit a
 
 If you are new to the project, read these documents in order:
 
-0. [`GLOSSARY.md`](GLOSSARY.md) — **terminology first** (recommended if *vertical*, *canonical*, or *brewery* are unfamiliar): plain-language definitions, the brewery reference-vertical convention, and links to deeper docs.
-1. [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — the **vision and shape**: horizontal platform with vertical modules, AI consultant blueprint, BYOK + paid tier unlock, and the future managed-AI path.
-2. [`ROADMAP.md`](ROADMAP.md) — the **direction of travel**: what is shipped, what is next, the 12–30 month trajectory.
-3. [`LICENSING.md`](LICENSING.md) — the **licensing posture and reasoning**: AGPLv3 core + MIT SDK, commercial dual license, and what these choices imply for contributors, self-hosters, module developers, and enterprises.
+0. [`NAVIGATE-MONOREPO.md`](NAVIGATE-MONOREPO.md) — **path map first** (Magento mental model, four package tiers, PIM worked example). Read this when folder names feel ambiguous.
+1. [`GLOSSARY.md`](GLOSSARY.md) — **terminology first** (recommended if *vertical*, *canonical*, or *brewery* are unfamiliar): plain-language definitions, the brewery reference-vertical convention, and links to deeper docs.
+2. [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — the **vision and shape**: horizontal platform with vertical modules, AI consultant blueprint, BYOK + paid tier unlock, and the future managed-AI path.
+3. [`ROADMAP.md`](ROADMAP.md) — the **direction of travel**: what is shipped, what is next, the 12–30 month trajectory.
+4. [`LICENSING.md`](LICENSING.md) — the **licensing posture and reasoning**: AGPLv3 core + MIT SDK, commercial dual license, and what these choices imply for contributors, self-hosters, module developers, and enterprises.
 
 **Student, capstone team, or university lab?** [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md) — free self-host experimentation, suggested project shapes, alpha expectations, and an honest fit filter (brochure entry point links here).
 
@@ -33,7 +34,7 @@ Cross-platform (web + native + Ubuntu Touch Morph webapp wrapper) boundaries: [`
 
 The spatial map of the monorepo — what every workspace is, which layer it sits in, what consumes it, and what it consumes. Read this once before diving into any specific module or slice.
 
-- [`REPOSITORY-STRUCTURE.md`](REPOSITORY-STRUCTURE.md) — **the spatial map.** Five-layer mental model (apps → services → horizontal infrastructure packages → contracts packages → module SDK + vertical-flavored packages), workspace inventory tables, β-layout walkthrough for a single module, Mermaid dependency diagram, and the canonical-for-now docs publishing URL (`docs.umbraculum.dev`). Complements [`MODULES.md`](MODULES.md) (ecosystem) and [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) (architecture).
+- [`REPOSITORY-STRUCTURE.md`](REPOSITORY-STRUCTURE.md) — **the spatial map.** Five-layer mental model (apps → services → horizontal infrastructure packages → contracts packages → module SDK + vertical-flavored packages), workspace inventory tables, β-layout walkthrough for a single module, Mermaid dependency diagram, and the canonical-for-now docs publishing URL (`docs.umbraculum.dev`). Complements [`NAVIGATE-MONOREPO.md`](NAVIGATE-MONOREPO.md) (Magento map + worked example), [`MODULES.md`](MODULES.md) (ecosystem), and [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) (architecture).
 
 ---
 
@@ -122,7 +123,7 @@ Public architectural and governance commitments. Process: [`LICENSING.md`](LICEN
 - [`design/canonical-workspace-billing-addons-surface.md`](design/canonical-workspace-billing-addons-surface.md) — **Workspace billing add-ons boundary ([RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)).** `addonCodes` registry, `tier_only` vs `tier_and_addons` enforcement, H1 2027 implementation backlog; no `WorkspaceBillingAddon` table in public α.
 - [`design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) — Canonical `automation` module surface (RFC-0001 Decision E §7.2): adapter SDK, Vessel vs EquipmentProfile, OpenPLC seam, AI tools, tier limits (**Accepted design** 2026-05-19; implementation phased per doc §9).
 - [`design/web-route-group-audit.md`](design/web-route-group-audit.md) — **Decision-of-record for the web route-shape audit (Accepted 2026-05-21).** Ratifies the two β disciplines (no `(<code>)/page.tsx`, no `(<code>)/[<dynamic>]/page.tsx` at the route-group root), the URL-segment registry surface in `@umbraculum/module-sdk` (`registerWebModule({ ownedUrlSegments, navEntry })` + CI gate `scripts/check-web-url-segments.ts`), and the per-module URL corrections (`/en/automation` → `/en/vessels`, `/en/pim/*` → `/en/products` / `/en/categories` / `/en/attribute-sets`, brewery URLs preserved). Pairs with [RFC-0006](rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) (governance amendment to RFC-0002 D) and the Cursor plugin rule `46-web-route-shape.mdc` in `umbraculum-platform-tsjs-cursor-assistant` v0.5.0.
-- [`design/openplc-mailbox-emitter-pr-shape.md`](design/openplc-mailbox-emitter-pr-shape.md) — sister-repo PR shape for the mailbox-artifact emitter (Phase A step 4 hand-off; pairs with [`packages/modules/automation-contracts/`](../packages/modules/automation-contracts/)).
+- [`design/openplc-mailbox-emitter-pr-shape.md`](design/openplc-mailbox-emitter-pr-shape.md) — sister-repo PR shape for the mailbox-artifact emitter (Phase A step 4 hand-off; pairs with [`packages/canonical/automation/contracts/`](../packages/canonical/automation/contracts/)).
 
 ## Product
 

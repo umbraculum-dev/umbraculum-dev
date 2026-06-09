@@ -14,7 +14,7 @@ This RFC commits one decision and prescribes the cross-doc updates that land in 
 
 - **Decision A — Allocate `pim` as a sixth reserved canonical code.** Domain scope: master product information (products, variants, attribute sets, attributes, categories, media assets, channel overrides, locale overrides). Vertical-agnostic by construction — the Akeneo / Pimcore / Salsify class of system. Peer to `crm` / `mrp` / `wms` / `crp` / `automation`, not a sub-concern of any of them.
 
-The canonical code `pim` lands in [`packages/modules/module-sdk/src/reservedCodes.ts`](../../packages/modules/module-sdk/src/reservedCodes.ts)'s `RESERVED_CANONICAL_MODULE_CODES` tuple in the same PR as this RFC. Cross-doc references (RFC-0001 §4 reserved-code table, [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §1.1.1 canonical-set sentence, [`docs/MODULES.md`](../MODULES.md) §3.1 catalog, [`docs/modules/contribute/canonical-module.md`](../modules/contribute/canonical-module.md) §0 already-allocated list, [`docs/modules/canonical/pim.md`](../modules/canonical/pim.md) new open-door stub, [`docs/modules/README.md`](../modules/README.md) "What's here today" table) are updated in the same PR per [`contribute/canonical-module.md`](../modules/contribute/canonical-module.md) §4 step 3.
+The canonical code `pim` lands in [`packages/sdk/module-sdk/src/reservedCodes.ts`](../../packages/sdk/module-sdk/src/reservedCodes.ts)'s `RESERVED_CANONICAL_MODULE_CODES` tuple in the same PR as this RFC. Cross-doc references (RFC-0001 §4 reserved-code table, [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §1.1.1 canonical-set sentence, [`docs/MODULES.md`](../MODULES.md) §3.1 catalog, [`docs/modules/contribute/canonical-module.md`](../modules/contribute/canonical-module.md) §0 already-allocated list, [`docs/modules/canonical/pim.md`](../modules/canonical/pim.md) new open-door stub, [`docs/modules/README.md`](../modules/README.md) "What's here today" table) are updated in the same PR per [`contribute/canonical-module.md`](../modules/contribute/canonical-module.md) §4 step 3.
 
 The implementation phasing (surface design doc → Phase A contracts → Phase B read path → …) is OUT of scope of this RFC; this RFC allocates the code, not the surface. The surface design lands in a separate `docs/design/canonical-pim-module-surface.md` artifact later — same trajectory `automation` followed.
 
@@ -42,7 +42,7 @@ And [`contribute/canonical-module.md`](../modules/contribute/canonical-module.md
 | Precondition | Status |
 |---|---|
 | Cross-vertical applicability is demonstrated (≥2 verticals want the same primitives) | **Partial** — only the brewery vertical exists today, but the design is vertical-agnostic by construction (the Akeneo posture). The roadmap in [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §1.1 names distillery / kombucha / cosmetics / food-batch / fragrance as anticipated verticals, each of which is structurally a PIM consumer. |
-| A reference implementation is underway at Tier 3 or Tier 4 | **Not yet — starts in this same tranche.** This RFC commits the platform owner to begin Phase A (`packages/modules/pim-contracts/`) immediately after merge. |
+| A reference implementation is underway at Tier 3 or Tier 4 | **Not yet — starts in this same tranche.** This RFC commits the platform owner to begin Phase A (`packages/canonical/pim/contracts/`) immediately after merge. |
 | Consumption-contract satisfiable (no parallel auth / billing / AI / etc.) | **Yes** — see §4 below for the per-row checklist. |
 | Peer-level domain, not a sub-concern of an existing canonical | **Yes** — see §2.1 above for the boundary argument. |
 
@@ -60,7 +60,7 @@ So §4.2's spirit is preserved (no third-party reservation without an implementa
 
 ### 2.4 Why now, not later
 
-The cost asymmetry [RFC-0003](0003-validation-library-adoption.md) §2 argues for the validation-library adoption applies in reverse here: every line of product-related code written between today and `pim`'s eventual allocation is a line that may need to be relocated *from* a non-canonical home (under the brewery vertical, or under a `pim-prototype` Tier 3/4 package) *to* the canonical surface once allocated. Allocating now lets the very first lines of PIM code land at `services/api/src/modules/pim/` and `packages/modules/pim-contracts/` — the canonical paths from day one, no rename pass, no consumer-side breakage when the canonical promotion happens.
+The cost asymmetry [RFC-0003](0003-validation-library-adoption.md) §2 argues for the validation-library adoption applies in reverse here: every line of product-related code written between today and `pim`'s eventual allocation is a line that may need to be relocated *from* a non-canonical home (under the brewery vertical, or under a `pim-prototype` Tier 3/4 package) *to* the canonical surface once allocated. Allocating now lets the very first lines of PIM code land at `services/api/src/modules/pim/` and `packages/canonical/pim/contracts/` — the canonical paths from day one, no rename pass, no consumer-side breakage when the canonical promotion happens.
 
 The cost of the alternative (Tier 3/4 prototype + later promotion) is real and well-modeled: it's exactly the pattern [RFC-0003](0003-validation-library-adoption.md) §2 quantified for the validation-library question, where deferring to H1 2027 cost ~3× the focused pre-trajectory work. The PIM-specific factor is smaller because PIM has fewer existing consumers than validation does, but the same cost-asymmetry shape applies.
 
@@ -200,7 +200,7 @@ Treat this as an RFC-0001 amendment rather than a Decision D mini-RFC: edit RFC-
 No migration. PIM is net-new code; nothing exists today to be moved. The path forward (out of scope of this RFC, named here only for completeness):
 
 1. **Surface design doc** — `docs/design/canonical-pim-module-surface.md`. Modeled on [`canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md). Resolves the data model, AI tool surface, tier-limit fields, phasing, and the pricing-locus question deferred from §3.2.
-2. **Phase A — contracts.** `packages/modules/pim-contracts/` → `@umbraculum/pim-contracts`. Ships `ProductSchema`, `VariantSchema`, `AttributeSetSchema`, `CategorySchema`, `MediaAssetRefSchema`, `ChannelOverrideSchema`, plus `ProductRef` / `VariantRef` (the cross-module shared types). Built on Zod v4 per [RFC-0003](0003-validation-library-adoption.md). Carries `CONTRACT_VERSION`.
+2. **Phase A — contracts.** `packages/canonical/pim/contracts/` → `@umbraculum/pim-contracts`. Ships `ProductSchema`, `VariantSchema`, `AttributeSetSchema`, `CategorySchema`, `MediaAssetRefSchema`, `ChannelOverrideSchema`, plus `ProductRef` / `VariantRef` (the cross-module shared types). Built on Zod v4 per [RFC-0003](0003-validation-library-adoption.md). Carries `CONTRACT_VERSION`.
 3. **Phase B — read path.** `services/api/src/modules/pim/` skeleton with `registerModule({ code: "pim", ... })`. Read routes (list / get / search), AI tools (search / suggest / detect-duplicates), workspace-scoped data model.
 4. **Phase C — write path + channel-feeds.** Inbound feed ingestion, outbound channel publication, the full Akeneo-shaped surface.
 5. **Brewery vertical integration.** Brewery's recipe-as-product surface migrates to PIM primitives. Calendar note: the brewery β file move was later accelerated by [RFC-0006](0006-amend-rfc-0002-brewery-file-move-acceleration.md); the real brewery↔PIM FK/projection integration remains future work.
@@ -215,8 +215,8 @@ Accepted 2026-05-19 under [RFC-0001](0001-modules-tiers-governance-and-automatio
 
 **Cross-doc updates landing in the same PR** (per [`contribute/canonical-module.md`](../modules/contribute/canonical-module.md) §4 step 3):
 
-- [`packages/modules/module-sdk/src/reservedCodes.ts`](../../packages/modules/module-sdk/src/reservedCodes.ts) — `pim` added to `RESERVED_CANONICAL_MODULE_CODES`.
-- [`packages/modules/module-sdk/dist/`](../../packages/modules/module-sdk/dist/) — rebuilt via `npm run build` in the workspace's module-sdk container.
+- [`packages/sdk/module-sdk/src/reservedCodes.ts`](../../packages/sdk/module-sdk/src/reservedCodes.ts) — `pim` added to `RESERVED_CANONICAL_MODULE_CODES`.
+- [`packages/sdk/module-sdk/dist/`](../../packages/sdk/module-sdk/dist/) — rebuilt via `npm run build` in the workspace's module-sdk container.
 - [RFC-0001 §4](0001-modules-tiers-governance-and-automation-placement.md) — reserved-code table extended; `pim` added to §4's bulleted enumeration; amendment footer recording this RFC's allocation event.
 - [RFC-0001 §5 Tier 1 row](0001-modules-tiers-governance-and-automation-placement.md) — example column includes `pim`.
 - [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §1.1.1 — canonical-set inventory sentence includes `pim`.
@@ -230,7 +230,7 @@ Accepted 2026-05-19 under [RFC-0001](0001-modules-tiers-governance-and-automatio
 **Out of scope of this PR** (subsequent work, called out for clarity):
 
 - Surface design doc (`docs/design/canonical-pim-module-surface.md`).
-- Phase A contracts package (`packages/modules/pim-contracts/`).
+- Phase A contracts package (`packages/canonical/pim/contracts/`).
 - Phase B read path (`services/api/src/modules/pim/`).
 
 **Change procedure for this RFC.** Future amendments follow the same RFC process documented in [`docs/LICENSING.md`](../LICENSING.md) §10 and [RFC-0001](0001-modules-tiers-governance-and-automation-placement.md) §13. De-allocation of `pim` (the reverse operation) requires a successor RFC explicitly named as a de-allocation, following [RFC-0001](0001-modules-tiers-governance-and-automation-placement.md) §6 step 5's forward-only rule.

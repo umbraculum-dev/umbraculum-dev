@@ -48,7 +48,7 @@ npm run audit:solid-inventory
 | Pattern | Why keep |
 |---------|----------|
 | `domain/waterCalc/mashAcidificationTargetMashPh.ts`, `spargeAcidification.ts` | Cohesive domain math; logical SRP ≠ file size |
-| `packages/modules/module-sdk/src/moduleRegistry.ts` | Boot composition root |
+| `packages/sdk/module-sdk/src/moduleRegistry.ts` | Boot composition root |
 | Generated OpenAPI under `packages/platform/api-client/src/generated/` | Codegen output — tooling epic, not runtime S |
 | DI containers / interface per Prisma service | Audit Tier C — Fastify + vi.mock sufficient |
 

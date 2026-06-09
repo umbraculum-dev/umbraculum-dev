@@ -63,9 +63,9 @@
       "pathPatterns": [
         "packages/platform/contracts/**",
         "packages/platform/api-client/**",
-        "packages/modules/ai-tool-sdk/**",
-        "packages/modules/i18n-keys/**",
-        "packages/modules/module-sdk/**",
+        "packages/sdk/ai-tool-sdk/**",
+        "packages/sdk/i18n-keys/**",
+        "packages/sdk/module-sdk/**",
         "packages/*-contracts/**",
         "apps/web/package.json",
         "apps/native/brewery/package.json",
@@ -144,7 +144,7 @@
       "nativeStep": "check-web-url-segments",
       "pathPatterns": [
         "apps/web/app/**",
-        "packages/modules/module-sdk/**",
+        "packages/sdk/module-sdk/**",
         "scripts/check-web-url-segments.ts",
         ".github/workflows/check-web-url-segments.yml",
         "package.json",

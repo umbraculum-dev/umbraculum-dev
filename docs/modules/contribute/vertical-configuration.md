@@ -202,5 +202,5 @@ Read [`verticals/brewery/README.md`](../verticals/brewery/README.md) end-to-end 
 - [`verticals/brewery/README.md`](../verticals/brewery/README.md) — the worked example.
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6 row), §8 (consumption contract).
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3 (β layout), §4 (naming), §6 (Decision D — brewery sequencing).
-- [`packages/modules/module-sdk/README.md`](../../../packages/modules/module-sdk/README.md) — the SDK you pin.
+- [`packages/sdk/module-sdk/README.md`](../../../packages/sdk/module-sdk/README.md) — the SDK you pin.
 - [`docs/MODULES.md`](../../MODULES.md) §3.2, §4.2 — catalog of vertical configurations and decision-tree row.

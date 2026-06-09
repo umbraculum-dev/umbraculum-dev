@@ -13,7 +13,7 @@ A side-by-side implementation of three contracts in **Zod v4** and **Valibot**, 
 
 The three contracts cover the complexity axes that matter for the project's contracts surface:
 
-1. **`MAILBOX_SPEC` validator** — JSON-loaded artifact with structural validation + cross-entry duplicate detection. Real-world equivalent: [`packages/modules/automation-contracts/src/mailbox-data.ts`](../../packages/modules/automation-contracts/src/mailbox-data.ts) (168 lines hand-rolled).
+1. **`MAILBOX_SPEC` validator** — JSON-loaded artifact with structural validation + cross-entry duplicate detection. Real-world equivalent: [`packages/canonical/automation/contracts/src/mailbox-data.ts`](../../packages/canonical/automation/contracts/src/mailbox-data.ts) (168 lines hand-rolled).
 2. **`parseMashAcidBlock` discriminated union** — three-variant discriminated union with shared nested schemas. Real-world equivalent: [`packages/platform/contracts/src/water/parseComputeAndSave.ts`](../../packages/platform/contracts/src/water/parseComputeAndSave.ts) lines 207–235 (30 lines hand-rolled, plus shared helpers).
 3. **`/auth/signup` Fastify route** — typed body via library-specific Fastify type provider. Real-world equivalent: [`services/api/src/routes/auth.ts`](../../services/api/src/routes/auth.ts) lines 86–108 (23 lines hand-rolled).
 

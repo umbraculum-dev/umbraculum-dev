@@ -1,10 +1,10 @@
 # Umbraculum repository structure — where things live, why there, how they fit
 
 **Tier:** Public  
-**Status:** v0.2 — updated 2026-06-07 (RFC-0011 Waves 3a–3f: package tiers, platform purity, web shell nomenclature)  
+**Status:** v0.3 — updated 2026-06-08 (RFC-0012: `platform/` + `sdk/` + `canonical/` + `verticals/` package tiers)  
 **Audience:** new contributors, evaluators preparing to adopt Umbraculum as an operational dependency, prospective module developers, future maintainers running an orientation pass.  
 **Owners:** maintainers  
-**Related:** [`GLOSSARY.md`](GLOSSARY.md), [`MODULES.md`](MODULES.md), [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md), [`rfcs/0002-canonical-module-physical-layout.md`](rfcs/0002-canonical-module-physical-layout.md), [`rfcs/0011-application-surface-shell-layering.md`](rfcs/0011-application-surface-shell-layering.md), [`design/pre-flip-application-surface-backbone.md`](design/pre-flip-application-surface-backbone.md), [`packages/modules/module-sdk/README.md`](../packages/modules/module-sdk/README.md).
+**Related:** [`GLOSSARY.md`](GLOSSARY.md), [`NAVIGATE-MONOREPO.md`](NAVIGATE-MONOREPO.md), [`MODULES.md`](MODULES.md), [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md), [`rfcs/0002-canonical-module-physical-layout.md`](rfcs/0002-canonical-module-physical-layout.md), [`rfcs/0011-application-surface-shell-layering.md`](rfcs/0011-application-surface-shell-layering.md), [`rfcs/0012-package-tier-clarity.md`](rfcs/0012-package-tier-clarity.md), [`design/pre-flip-application-surface-backbone.md`](design/pre-flip-application-surface-backbone.md), [`packages/sdk/module-sdk/README.md`](../packages/sdk/module-sdk/README.md).
 
 > [!NOTE]
 > Part of [Umbraculum](../README.md) — an open-source toolset for building workspace-shaped operational applications. This doc is the **spatial map** of the monorepo: an inventory of every workspace + which layer it sits in + what depends on it.
@@ -32,22 +32,24 @@ Every workspace belongs to exactly one layer. Modules consume lower layers, neve
 |---|---|---|---|---|
 | 1 | **Applications** | `apps/*` | `apps/web`, `apps/native`, `apps/web/e2e` | Deployable end-user surfaces. Apps consume layers 2–5, never each other. |
 | 2 | **Services** | `services/*` | `services/api` | Long-running backends (Fastify + Prisma + Postgres + Redis). |
-| 3 | **Horizontal infrastructure** | `packages/platform/*` | `@umbraculum/ui`, `@umbraculum/navigation`, `@umbraculum/i18n`, `@umbraculum/api-client`, `@umbraculum/media`, `@umbraculum/rendering` | Cross-cutting, **industry-agnostic** packages. No vertical-owned content (Wave 3c split brewery i18n/media to vertical packages). |
-| 4 | **Contracts** | `packages/platform/contracts`, `packages/modules/*-contracts`, `packages/verticals/<code>/contracts` | `@umbraculum/contracts`, `@umbraculum/pim-contracts`, `@umbraculum/brewery-contracts` | Typed DTOs, Zod schemas, route IDs — the only piece third-party modules pin (MIT per [`LICENSING.md`](LICENSING.md) §6.2). |
-| 5 | **Module SDK + vertical packages** | `packages/modules/*`, `packages/verticals/<code>/*` | `@umbraculum/module-sdk`, `@umbraculum/brewery-core`, `@umbraculum/brewery-recipes-ui` | Registration spine + vertical-flavored libraries (`@umbraculum/<vertical>-<name>` prefix). |
+| 3 | **Platform** | `packages/platform/*` | `@umbraculum/ui`, `@umbraculum/navigation`, `@umbraculum/i18n`, `@umbraculum/api-client`, `@umbraculum/media`, `@umbraculum/rendering`, `@umbraculum/contracts` | Cross-cutting, **industry-agnostic** packages (Magento `framework` class). |
+| 4 | **SDK** | `packages/sdk/*` | `@umbraculum/module-sdk`, `@umbraculum/ai-tool-sdk`, `@umbraculum/i18n-keys` | Plug-in registration spine (MIT). Not a domain module. |
+| 5 | **Canonical modules** | `packages/canonical/<code>/*` | `@umbraculum/pim-contracts`, `@umbraculum/mrp-contracts`, … | Reserved-domain packages (contracts slice today; room for `ui/` later). |
+| 6 | **Vertical packages** | `packages/verticals/<code>/*` | `@umbraculum/brewery-core`, `@umbraculum/brewery-recipes-ui`, … | Reference vertical + pattern for ISV products. |
 
 **Two rules:**
 
 1. **No cross-app imports.** Apps share code through layers 3–5.
 2. **No vertical → vertical imports.** Cross-vertical sharing belongs in layer 3 or platform contracts.
 
-**On-disk package tiers (RFC-0011 Wave 3a):**
+**On-disk package tiers (RFC-0012):**
 
 ```text
 packages/
-  platform/           # layer 3 + platform contracts
-  modules/            # canonical *-contracts, module-sdk, ai-tool-sdk, i18n-keys
-  verticals/brewery/    # reference vertical (core, beerjson, recipes-ui, contracts, i18n, media-assets)
+  platform/              # industry-agnostic horizontal libs + @umbraculum/contracts
+  sdk/                   # module-sdk, ai-tool-sdk, i18n-keys
+  canonical/             # reserved-domain modules (pim/contracts, mrp/contracts, …)
+  verticals/brewery/     # reference vertical (core, beerjson, recipes-ui, contracts, …)
 ```
 
 ---
@@ -115,18 +117,18 @@ Industry-agnostic. Brewery **content** lives in `@umbraculum/brewery-i18n` and `
 |---|---|---|---|
 | `packages/platform/contracts/` | `@umbraculum/contracts` | Platform-wide | Auth, workspaces, billing, ads, AI, rendering — **no brewery/water/gravity** (Wave 3b). |
 | `packages/verticals/brewery/contracts/` | `@umbraculum/brewery-contracts` | `brewery` vertical | Recipe, brew-session, water, gravity wire types. |
-| `packages/modules/automation-contracts/` | `@umbraculum/automation-contracts` | `automation` | Modbus mailbox, adapter SDK types. |
-| `packages/modules/pim-contracts/` | `@umbraculum/pim-contracts` | `pim` | PIM DTOs and schemas. |
-| `packages/modules/mrp-contracts/` | `@umbraculum/mrp-contracts` | `mrp` | MRP read-only alpha contracts. |
-| `packages/modules/crp-contracts/` | `@umbraculum/crp-contracts` | `crp` | CRP read-only alpha contracts. |
+| `packages/canonical/automation/contracts/` | `@umbraculum/automation-contracts` | `automation` | Modbus mailbox, adapter SDK types. |
+| `packages/canonical/pim/contracts/` | `@umbraculum/pim-contracts` | `pim` | PIM DTOs and schemas. |
+| `packages/canonical/mrp/contracts/` | `@umbraculum/mrp-contracts` | `mrp` | MRP read-only alpha contracts. |
+| `packages/canonical/crp/contracts/` | `@umbraculum/crp-contracts` | `crp` | CRP read-only alpha contracts. |
 
 ### 3.5 Module SDK (layer 5)
 
 | Path | npm name | Role |
 |---|---|---|
-| `packages/modules/module-sdk/` | `@umbraculum/module-sdk` | MIT registration contract — `registerModule`, `registerWebModule`, `ValidatedSchema<T>`. |
-| `packages/modules/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | MIT AI-tool interface types. |
-| `packages/modules/i18n-keys/` | `@umbraculum/i18n-keys` | MIT nav/message key conventions — zero locale JSON. |
+| `packages/sdk/module-sdk/` | `@umbraculum/module-sdk` | MIT registration contract — `registerModule`, `registerWebModule`, `ValidatedSchema<T>`. |
+| `packages/sdk/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | MIT AI-tool interface types. |
+| `packages/sdk/i18n-keys/` | `@umbraculum/i18n-keys` | MIT nav/message key conventions — zero locale JSON. |
 
 ### 3.6 Vertical-flavored packages (`packages/verticals/brewery/*`)
 
@@ -150,7 +152,7 @@ Per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3, every module 
 | **API** | `services/api/src/modules/<code>/` | Routes, services, AI tools, Prisma slice. |
 | **Web** | `apps/web/app/[locale]/(<code>)/` | Next.js pages (route groups are URL-invisible). |
 | **Native** | `apps/native/src/modules/<code>/` | RN screens (brewery reference today). |
-| **Contracts** | `packages/modules/<code>-contracts/` or `packages/verticals/<code>/contracts/` | DTOs + Zod schemas. |
+| **Contracts** | `packages/canonical/<code>/contracts/` or `packages/verticals/<code>/contracts/` | DTOs + Zod schemas. |
 
 **Vertical contracts path:** tier-6 verticals use `packages/verticals/<code>/contracts/` → `@umbraculum/<code>-contracts` (brewery) or `@umbraculum/brewery-contracts` npm name.
 
@@ -187,9 +189,12 @@ graph TB
     cont["@umbraculum/contracts"]
   end
 
-  subgraph mod_tier["packages/modules"]
-    pimc["@umbraculum/pim-contracts"]
+  subgraph sdk_tier["packages/sdk"]
     sdk["@umbraculum/module-sdk"]
+  end
+
+  subgraph canon_tier["packages/canonical"]
+    pimc["@umbraculum/pim-contracts"]
   end
 
   subgraph vert_tier["packages/verticals/brewery"]
@@ -238,7 +243,8 @@ Docs site: [`docs-site/`](../docs-site/) → `docs.umbraculum.dev`.
 - [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) — integrator onboarding + UI placement decision tree.
 - [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — platform vision and public-flip path.
 - [`design/pre-flip-application-surface-backbone.md`](design/pre-flip-application-surface-backbone.md) — RFC-0011 wave plan and §12 success criteria.
-- [`rfcs/0011-application-surface-shell-layering.md`](rfcs/0011-application-surface-shell-layering.md) — application surface shell layering RFC.
+- [`NAVIGATE-MONOREPO.md`](NAVIGATE-MONOREPO.md) — Magento mapping + worked PIM example.
+- [`rfcs/0012-package-tier-clarity.md`](rfcs/0012-package-tier-clarity.md) — four-tier package tree (RFC-0012).
 - [`rfcs/0002-canonical-module-physical-layout.md`](rfcs/0002-canonical-module-physical-layout.md) — β-layout decision.
 - [`DOCS-README-STANDARDS.md`](DOCS-README-STANDARDS.md) — module README standard.
 - [`LINTING.md`](LINTING.md) — WS5 app boundaries + package-layer fences (Wave 3d).

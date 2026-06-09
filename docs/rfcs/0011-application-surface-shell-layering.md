@@ -19,7 +19,7 @@ Six decisions:
 
 - **Decision C — Native multi-app workspace.** `apps/native/` hosts one Expo workspace per deployable native app at `apps/native/<app-code>/`. Shared bootstrap (auth, navigation glue, i18n, theme) extracts to `@umbraculum/native-shell`. Module native slices default to `apps/native/<app-code>/src/modules/<code>/` unless promoted to a package when reused across apps.
 
-- **Decision D — Package on-disk tiers.** Monorepo paths group as `packages/platform/*`, `packages/modules/*`, `packages/verticals/<vertical-code>/*`. Folder names under `verticals/brewery/` align with npm (`core/` → `@umbraculum/brewery-core`). **npm package names and scopes unchanged** at flip unless Decision F lands in the same window.
+- **Decision D — Package on-disk tiers.** Monorepo paths group as `packages/platform/*`, `packages/canonical/*/*`, `packages/verticals/<vertical-code>/*`. Folder names under `verticals/brewery/` align with npm (`core/` → `@umbraculum/brewery-core`). **npm package names and scopes unchanged** at flip unless Decision F lands in the same window.
 
 - **Decision E — E2E taxonomy (recommended, not blocking).** Playwright suites mirror product layers: `e2e/platform/`, `e2e/canonical/`, `e2e/verticals/<code>/`. Deferral permitted via [`public-flip-deferral-register.md`](../design/public-flip-deferral-register.md).
 
@@ -119,7 +119,7 @@ Workspace globs:
 
 ```json
 "packages/platform/*",
-"packages/modules/*",
+"packages/canonical/*/*",
 "packages/verticals/*/*"
 ```
 
@@ -158,7 +158,7 @@ Folder ownership mirrors §3–§6. Not required for public-alpha if deferral re
 
 | Option | Rejected because |
 |--------|------------------|
-| Single tree under `packages/modules/<code>/` for web shell + pages (α layout) | RFC-0002 already rejected α for Next.js/Fastify entrypoints |
+| Single tree under `packages/sdk/<code>/` for web shell + pages (α layout) | RFC-0002 already rejected α for Next.js/Fastify entrypoints |
 | Multiple operator web apps (`apps/web-brewery`, `apps/web-platform`) | Breaks one-shell / one-AI-context ([ROADMAP.md](../ROADMAP.md)) |
 | Move brewery to `@brewery/*` npm scope in monorepo | Adds flip churn; integrators already expect `@umbraculum/brewery-*` prefix for reference vertical |
 | Merge api + api-client packages | Violates client-safe boundary story (WS6) |

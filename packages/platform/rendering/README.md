@@ -96,5 +96,5 @@ When adding templates from a new module, update the registry table in the same P
 - [`docs/design/canonical-document-rendering-surface.md`](../../../docs/design/canonical-document-rendering-surface.md) — as-built horizontal surface
 - [`docs/design/canonical-document-rendering-engine-rationale.md`](../../../docs/design/canonical-document-rendering-engine-rationale.md) — comparative rationale behind the engine picks
 - [`docs/modules/contribute/horizontal-package.md`](../../../docs/modules/contribute/horizontal-package.md) — horizontal-package contribution path and consumption-contract checklist
-- [`packages/modules/module-sdk/README.md`](../../modules/module-sdk/README.md) — SDK package that owns the MIT type surface
+- [`packages/sdk/module-sdk/README.md`](../../modules/module-sdk/README.md) — SDK package that owns the MIT type surface
 - [`packages/platform/media/README.md`](../media/README.md) — package that will own persisted render artifacts and signed URLs

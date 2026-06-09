@@ -53,7 +53,7 @@ Phase D deliverables (all shipped, all uncommitted per user policy):
 ## Phase D verification
 
 - `docker compose exec api npm test -- src/tests/pim` → **5 test files, 34 tests, all green** (8 products + 8 variants + 8 attribute sets + 8 categories + 2 cross-module integration). No regressions on the prior 32 L2 tests after Phase D test added.
-- README forward-link failures (Gate-skill re-verification section above) now resolved — both [`canonical-pim-module-surface.md`](canonical-pim-module-surface.md) and [`pimBreweryIntegration.test.ts`](../../services/api/src/tests/pimBreweryIntegration.test.ts) exist on disk; `check_full_scope(packages/modules/pim-contracts/README.md)` and `check_sub_component(services/api/src/modules/pim/README.md)` both PASS structurally (any residual `Cross-references` count warning is sub-component-acceptable).
+- README forward-link failures (Gate-skill re-verification section above) now resolved — both [`canonical-pim-module-surface.md`](canonical-pim-module-surface.md) and [`pimBreweryIntegration.test.ts`](../../services/api/src/tests/pimBreweryIntegration.test.ts) exist on disk; `check_full_scope(packages/canonical/pim/contracts/README.md)` and `check_sub_component(services/api/src/modules/pim/README.md)` both PASS structurally (any residual `Cross-references` count warning is sub-component-acceptable).
 
 ## Lessons learned
 
@@ -67,7 +67,7 @@ The route-group deviation flagged below (PIM at `pim/` instead of `(pim)/`) was 
 
 ### Original lessons (pre-audit)
 
-- **Docker bind mounts:** `@umbraculum/pim-contracts` required the same `/packages/modules/pim-contracts:ro` pattern as `automation-contracts` on `api` and `web` services; without recreating containers after `docker-compose.yml` edits, Vitest could not resolve the package.
+- **Docker bind mounts:** `@umbraculum/pim-contracts` required the same `/packages/canonical/pim/contracts:ro` pattern as `automation-contracts` on `api` and `web` services; without recreating containers after `docker-compose.yml` edits, Vitest could not resolve the package.
 - **Prisma multi-schema:** Adding `"pim"` to `datasource db.schemas` worked without enabling a separate `previewFeatures` flag on Prisma 6.19.
 - **Web routes:** Product UI lives at `apps/web/app/[locale]/pim/`. This deviates from the canonical `(automation)/` route-group pattern called for by the original plan §6. The deviation works (`/en/pim` returns the list page) and was retained pending an in-flight architectural audit of the project's route-group conventions — the `(automation)/` reference itself appears to have a routing collision with `[locale]/page.tsx` that makes the vessels list at `/en/automation` unreachable. The audit will decide whether `(automation)/`, `pim/`, both, or neither is the canonical pattern going forward. See `docs/design/web-route-group-audit.md` (forthcoming) for the decision once recorded.
 - **Phase D handoff worked as planned:** The original plan §8 fit-assessment recommended escalating Phase D to opus or codex; user reversed the defer mid-session and tasked the verifier (opus) directly. The cross-module integration test pattern selection (Option A vs B) was the single judgment point and was surfaced to the user via AskQuestion *before* any code was written — a clean separation between "judgment Composer can't make" and "execution Composer can do mechanically." This pattern (verifier-as-finalist for judgment-dense phases, executor-as-bulk-implementor for template-fill phases) is recommended as a default for future canonical-module builds.
@@ -79,15 +79,15 @@ The route-group deviation flagged below (PIM at `pim/` instead of `(pim)/`) was 
 
 ### module-readme-verification
 
-**Target:** `packages/modules/pim-contracts/README.md`
+**Target:** `packages/canonical/pim/contracts/README.md`
 
 ```
 Prerequisites: README exists; checker logic from scripts/docs/check-readmes.py (check_full_scope) applied ad hoc — file not yet in §2.1 in-scope list.
 Commands:
-  python3 -c "… check_full_scope('packages/modules/pim-contracts/README.md') …"  → exit 0 (script ran; result FAIL)
+  python3 -c "… check_full_scope('packages/canonical/pim/contracts/README.md') …"  → exit 0 (script ran; result FAIL)
 Stop conditions: (none triggered)
 Result:
-README packages/modules/pim-contracts/README.md: FAIL (2 issues)
+README packages/canonical/pim/contracts/README.md: FAIL (2 issues)
   - Brand callout missing (no `> [!NOTE]` block found).
   - Missing required `## Build / test / lint (local)` heading.
 ```
@@ -106,17 +106,17 @@ README services/api/src/modules/pim/README.md: FAIL (1 issues)
 
 ### typescript-strict-flag-verification
 
-**Target:** `packages/modules/pim-contracts/`
+**Target:** `packages/canonical/pim/contracts/`
 
 ```
 Prerequisites: tsconfig.json present; REPO_ROOT node_modules/.bin/tsc used via node:20-slim container.
 Commands:
   docker run … tsc -p tsconfig.json --noEmit  → exit 2
-  Read packages/modules/pim-contracts/tsconfig.json — 6/6 strict flags set (strict, noImplicitOverride, noPropertyAccessFromIndexSignature, noUncheckedIndexedAccess, exactOptionalPropertyTypes, verbatimModuleSyntax)
+  Read packages/canonical/pim/contracts/tsconfig.json — 6/6 strict flags set (strict, noImplicitOverride, noPropertyAccessFromIndexSignature, noUncheckedIndexedAccess, exactOptionalPropertyTypes, verbatimModuleSyntax)
 Stop conditions: (none triggered)
 Result:
-TYPECHECK packages/modules/pim-contracts: FAIL (1 errors)
-FLAGS packages/modules/pim-contracts: 6/6 set
+TYPECHECK packages/canonical/pim/contracts: FAIL (1 errors)
+FLAGS packages/canonical/pim/contracts: 6/6 set
   src/variant.test.ts(19,35): error TS4111: Property 'color' comes from an index signature, so it must be accessed with ['color'].
 ```
 
@@ -172,8 +172,8 @@ Verifier (claude-opus-4-7-thinking-xhigh) acting in agent mode closed the two Co
 
 | Gate | Original verdict | Fix applied | Re-verified verdict |
 |---|---|---|---|
-| typescript-strict-flag-verification | FAIL — TS4111 in `src/variant.test.ts:19` (`attributeValues.color` → use `['color']`) | One-character bracket-access fix in `packages/modules/pim-contracts/src/variant.test.ts` | **PASS** — `tsc -p tsconfig.json --noEmit` clean; `npm test -w @umbraculum/pim-contracts` → 7/7 |
-| module-readme-verification (`packages/modules/pim-contracts/README.md`) | FAIL — missing `> [!NOTE]` project callout; build heading was `## Build / test / typecheck`, standard requires `## Build / test / lint (local)` | Added canonical `> [!NOTE]` project callout, renamed build heading, expanded Phase-coupling + Cross-references sections to match `automation-contracts` depth | **PASS** for structural checks after Phase D surface doc lands (only remaining failures are forward-links to `docs/design/canonical-pim-module-surface.md` + `pimBreweryIntegration.test.ts`, both authored later this same session) |
+| typescript-strict-flag-verification | FAIL — TS4111 in `src/variant.test.ts:19` (`attributeValues.color` → use `['color']`) | One-character bracket-access fix in `packages/canonical/pim/contracts/src/variant.test.ts` | **PASS** — `tsc -p tsconfig.json --noEmit` clean; `npm test -w @umbraculum/pim-contracts` → 7/7 |
+| module-readme-verification (`packages/canonical/pim/contracts/README.md`) | FAIL — missing `> [!NOTE]` project callout; build heading was `## Build / test / typecheck`, standard requires `## Build / test / lint (local)` | Added canonical `> [!NOTE]` project callout, renamed build heading, expanded Phase-coupling + Cross-references sections to match `automation-contracts` depth | **PASS** for structural checks after Phase D surface doc lands (only remaining failures are forward-links to `docs/design/canonical-pim-module-surface.md` + `pimBreweryIntegration.test.ts`, both authored later this same session) |
 | module-readme-verification (`services/api/src/modules/pim/README.md`) | FAIL — missing `## What this is` / `## Why this exists` heading | Added `## What this is` section + brand callout `> [!NOTE]` linking to the automation sibling | **PASS** for sub-component check after Phase D surface doc lands (only remaining failure is the same forward-link to `docs/design/canonical-pim-module-surface.md`) |
 
 The remaining forward-links resolved in the same session once Phase D produced [`docs/design/canonical-pim-module-surface.md`](canonical-pim-module-surface.md) and [`services/api/src/tests/pimBreweryIntegration.test.ts`](../../services/api/src/tests/pimBreweryIntegration.test.ts).

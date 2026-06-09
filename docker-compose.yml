@@ -93,17 +93,17 @@ services:
       # to register platform-owned URL segments with the same web registry that
       # canonical modules (automation/brewery/pim) write to from the api side.
       # Without this bind mount the web container's symlink at
-      # node_modules/@umbraculum/module-sdk -> ../../../packages/modules/module-sdk
-      # resolves to /packages/modules/module-sdk which does not exist (compare with
+      # node_modules/@umbraculum/module-sdk -> ../../../packages/sdk/module-sdk
+      # resolves to /packages/sdk/module-sdk which does not exist (compare with
       # the api service's existing module-sdk mount further down).
-      - ./packages/modules/module-sdk:/packages/modules/module-sdk:ro
+      - ./packages/sdk/module-sdk:/packages/sdk/module-sdk:ro
       # ai-tool-sdk landed 2026-05-21 as a peer of module-sdk on the published-SDK
       # surface (PLATFORM-ARCHITECTURE.md §4.4); extracted from @umbraculum/contracts.
       # module-sdk's dist/*.d.ts now references @umbraculum/ai-tool-sdk, so the
       # same bind-mount discipline applies even though apps/web has no direct
       # import — TS resolution can chase the transitive declaration.
-      - ./packages/modules/ai-tool-sdk:/packages/modules/ai-tool-sdk:ro
-      - ./packages/modules/i18n-keys:/packages/modules/i18n-keys:ro
+      - ./packages/sdk/ai-tool-sdk:/packages/sdk/ai-tool-sdk:ro
+      - ./packages/sdk/i18n-keys:/packages/sdk/i18n-keys:ro
       - ./packages/platform/navigation:/packages/platform/navigation:ro
       - ./packages/verticals/brewery/recipes-ui:/packages/verticals/brewery/recipes-ui:ro
       - ./packages/platform/ui:/packages/platform/ui:ro
@@ -114,10 +114,10 @@ services:
       - ./packages/platform/api-client:/packages/platform/api-client:ro
       # RFC-0011 brewery-api-client extraction: web imports @umbraculum/brewery-api-client directly.
       - ./packages/verticals/brewery/api-client:/packages/verticals/brewery/api-client:ro
-      - ./packages/modules/automation-contracts:/packages/modules/automation-contracts:ro
-      - ./packages/modules/pim-contracts:/packages/modules/pim-contracts:ro
-      - ./packages/modules/mrp-contracts:/packages/modules/mrp-contracts:ro
-      - ./packages/modules/crp-contracts:/packages/modules/crp-contracts:ro
+      - ./packages/canonical/automation/contracts:/packages/canonical/automation/contracts:ro
+      - ./packages/canonical/pim/contracts:/packages/canonical/pim/contracts:ro
+      - ./packages/canonical/mrp/contracts:/packages/canonical/mrp/contracts:ro
+      - ./packages/canonical/crp/contracts:/packages/canonical/crp/contracts:ro
 
   docs-site:
     image: node:20-slim
@@ -178,22 +178,22 @@ services:
       # (rename history: slot 2 media → @umbraculum/media; slot 6 core →
       # @umbraculum/brewery-core; slot 9 contracts → @umbraculum/contracts;
       # sub-plan #9 closed slot 14 — all @brewery/* now @umbraculum/*).
-      - ./packages/modules/module-sdk:/packages/modules/module-sdk:ro
+      - ./packages/sdk/module-sdk:/packages/sdk/module-sdk:ro
       # Legacy symlink target (pre-3a api node_modules volume): ../../../packages/module-sdk
-      - ./packages/modules/module-sdk:/packages/module-sdk:ro
+      - ./packages/sdk/module-sdk:/packages/module-sdk:ro
       - ./packages/platform/rendering:/packages/platform/rendering:ro
-      - ./packages/modules/automation-contracts:/packages/modules/automation-contracts:ro
-      - ./packages/modules/pim-contracts:/packages/modules/pim-contracts:ro
-      - ./packages/modules/mrp-contracts:/packages/modules/mrp-contracts:ro
-      - ./packages/modules/crp-contracts:/packages/modules/crp-contracts:ro
+      - ./packages/canonical/automation/contracts:/packages/canonical/automation/contracts:ro
+      - ./packages/canonical/pim/contracts:/packages/canonical/pim/contracts:ro
+      - ./packages/canonical/mrp/contracts:/packages/canonical/mrp/contracts:ro
+      - ./packages/canonical/crp/contracts:/packages/canonical/crp/contracts:ro
       # ai-tool-sdk landed 2026-05-21 as the dedicated home for the AI-tool SDK
       # contract (PLATFORM-ARCHITECTURE.md §4.4); extracted from @umbraculum/contracts.
       # The api consumes it directly (services/api/src/services/ai/**) and
       # transitively via @umbraculum/module-sdk's RegisterModuleOptions.registerAiTools.
-      - ./packages/modules/ai-tool-sdk:/packages/modules/ai-tool-sdk:ro
+      - ./packages/sdk/ai-tool-sdk:/packages/sdk/ai-tool-sdk:ro
       # i18n-keys landed 2026-05-27; module-sdk dist/*.d.ts references
       # @umbraculum/i18n-keys for ModuleNavLabelKey on nav/tab entries.
-      - ./packages/modules/i18n-keys:/packages/modules/i18n-keys:ro
+      - ./packages/sdk/i18n-keys:/packages/sdk/i18n-keys:ro
       # RAG D1 ingest reads docs/help and surface markdown (read-only).
       - .:/umbraculum:ro
 

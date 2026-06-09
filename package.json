@@ -16,7 +16,8 @@
     "apps/native/*",
     "services/*",
     "packages/platform/*",
-    "packages/modules/*",
+    "packages/sdk/*",
+    "packages/canonical/*/*",
     "packages/verticals/*/*",
     "docs-site"
   ],

@@ -13,9 +13,9 @@
 
 This RFC commits to four decisions and defers one cluster of implementation work:
 
-- **Decision A — Physical-layout shape: β (three-tree distribution).** Canonical-module surface is distributed across three runtime trees plus one contracts package per code: API slice in `services/api/src/modules/<code>/`; web slice in `apps/web/app/[locale]/(<code>)/`; native slice in `apps/native/src/modules/<code>/`; shared types and registration contracts in `packages/<code>-contracts/` (published as `@umbraculum/<code>-contracts`). Rejects α (single tree under `packages/modules/<code>/`) and γ (status-quo flat layout).
+- **Decision A — Physical-layout shape: β (three-tree distribution).** Canonical-module surface is distributed across three runtime trees plus one contracts package per code: API slice in `services/api/src/modules/<code>/`; web slice in `apps/web/app/[locale]/(<code>)/`; native slice in `apps/native/src/modules/<code>/`; shared types and registration contracts in `packages/canonical/<code>/contracts/` (vertical: `packages/verticals/<code>/contracts/`) published as `@umbraculum/<code>-contracts`. Rejects α (single tree under `packages/modules/<code>/`) and γ (status-quo flat layout). *Contracts on-disk path amended by [RFC-0012](0012-package-tier-clarity.md) (2026-06-08).*
 - **Decision B — Naming conventions.** Folder name = canonical code (lowercase, no `module-` prefix). Web route group = `(<code>)/` (no URL change). Contracts package = `@umbraculum/<code>-contracts`. Prisma `multiSchema` namespace = canonical code for new modules.
-- **Decision C — `registerModule()` helper location.** The public `registerModule()` API and its TypeScript types live in `packages/modules/module-sdk/` (npm scope `@umbraculum/module-sdk`, MIT per [`docs/LICENSING.md`](../LICENSING.md) §6.2). A parallel web-side module registry lives in the same package (or a thin `@umbraculum/module-sdk-web` re-export if the web bundler requires a split — the boundary is an implementation detail; the RFC commits to one logical SDK surface).
+- **Decision C — `registerModule()` helper location.** The public `registerModule()` API and its TypeScript types live in `packages/sdk/module-sdk/` (npm scope `@umbraculum/module-sdk`, MIT per [`docs/LICENSING.md`](../LICENSING.md) §6.2). A parallel web-side module registry lives in the same package (or a thin `@umbraculum/module-sdk-web` re-export if the web bundler requires a split — the boundary is an implementation detail; the RFC commits to one logical SDK surface).
 - **Decision D — Brewery-as-first-vertical migration sequencing.** Brewery does NOT pre-migrate as a no-op restructure. The flat brewery surface migrates to the β layout at H1 2027 alongside the second canonical module landing, validating the convention against a real cross-module workspace. The `@brewery/*` → `@umbraculum/*` package-scope migration (sub-plan #9) happens in the same window.
 
 The deferred cluster (§7) covers three implementation-boundary questions that β does not resolve: tier-6 vertical-configuration folder shape, contracts-package contents vs in-module `contracts.ts`, and cross-module shared types. Those belong to sub-plan #9 (`@brewery/*` package scope migration), not to this RFC.
@@ -51,7 +51,7 @@ Named precedents for β-shaped distribution (not identical, but directionally al
 | API | `services/api/src/modules/<code>/` | Fastify route plugins, services, Prisma models for this module's schema, AI tool handlers, module-local tests |
 | Web | `apps/web/app/[locale]/(<code>)/` | Next.js App Router pages and layouts for this module (route group — no URL prefix change) |
 | Native | `apps/native/src/modules/<code>/` | Screens, navigation entries, module-local components for React Native |
-| Contracts | `packages/<code>-contracts/` → `@umbraculum/<code>-contracts` | DTO types, route IDs, `registerModule()` slot declarations consumed by API, web, native, and third-party repos |
+| Contracts | `packages/canonical/<code>/contracts/` (vertical: `packages/verticals/<code>/contracts/`) → `@umbraculum/<code>-contracts` | DTO types, route IDs, `registerModule()` slot declarations consumed by API, web, native, and third-party repos |
 
 **Platform infrastructure stays outside module trees.** Auth, workspaces, billing, health, generic integrations, webhooks, and cross-module AI orchestration remain in their current locations (`services/api/src/routes/{auth,workspaces,billing,...}.ts`, `apps/web/app/[locale]/(auth)/`, etc.) until a future RFC proposes a `platform/` module tree. RFC-0002 does not move platform code.
 
@@ -94,9 +94,9 @@ Four conventions, applied consistently across all β slices:
 
 ---
 
-## 5. Decision C — `registerModule()` helper location: `packages/modules/module-sdk/` (commit)
+## 5. Decision C — `registerModule()` helper location: `packages/sdk/module-sdk/` (commit)
 
-**The public `registerModule()` contract lives in `packages/modules/module-sdk/`, published as `@umbraculum/module-sdk` (MIT).**
+**The public `registerModule()` contract lives in `packages/sdk/module-sdk/`, published as `@umbraculum/module-sdk` (MIT).**
 
 Rationale:
 
@@ -260,7 +260,7 @@ When the second canonical module shipped and the web-route audit landed, RFC-000
 
 **Prisma (historical planning row):** ~~brewery tables remain `public` until a follow-on migration authorizes `brewery` schema~~ → superseded by RFC-0010.
 
-**`registerModule()`:** create `packages/modules/module-sdk/` and wire `services/api/src/app.ts` to register `brewery` and `wms` (and any other installed modules).
+**`registerModule()`:** create `packages/sdk/module-sdk/` and wire `services/api/src/app.ts` to register `brewery` and `wms` (and any other installed modules).
 
 ### 11.3 Per-future-canonical-module shape
 

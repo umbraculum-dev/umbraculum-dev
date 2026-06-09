@@ -135,7 +135,7 @@ This is the standard "multi-runtime module with a versioned interface contract" 
 
 The two repos are joined by an explicit, versioned contract:
 
-- **`PI_*` Modbus mailbox spec** — sister repo is the source of truth; platform mirrors via a script-generated artifact (`PI_*.json` / `.ts`) checked into [`packages/modules/automation-contracts/`](../../../../packages/modules/automation-contracts/README.md) via PR. Drift is visible in PR diffs rather than at runtime. Per [canonical-automation-module-surface.md §12.2](../../../design/canonical-automation-module-surface.md).
+- **`PI_*` Modbus mailbox spec** — sister repo is the source of truth; platform mirrors via a script-generated artifact (`PI_*.json` / `.ts`) checked into [`packages/canonical/automation/contracts/`](../../../../packages/canonical/automation/contracts/README.md) via PR. Drift is visible in PR diffs rather than at runtime. Per [canonical-automation-module-surface.md §12.2](../../../design/canonical-automation-module-surface.md).
 - **`CONTRACT_VERSION` handshake** — major-version mismatch refuses connection; minor mismatch warns and continues. Pinned in `@umbraculum/automation-contracts`.
 - **`integrated_release_tag`** — the PLC version + sidecar version + contract_version + API version move together as one coordinated baseline. (The integrated-release-versioning discipline is documented and enforced in the OpenPLC sister repo; the discipline is what lets the two repos evolve independently without diverging out of compatibility silently.)
 

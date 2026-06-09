@@ -97,16 +97,17 @@ apps/web/app/[locale]/
   platform/                # cross-workspace admin (unchanged URL shape)
 ```
 
-On-disk **package tiers** (RFC-0011 Wave 3a):
+On-disk **package tiers** (RFC-0012):
 
 ```text
 packages/
   platform/                # @umbraculum/ui, i18n, api-client, contracts, …
-  modules/                 # canonical *-contracts, module-sdk
+  sdk/                     # module-sdk, ai-tool-sdk, i18n-keys
+  canonical/               # pim/contracts, mrp/contracts, …
   verticals/brewery/       # brewery-core, brewery-contracts, brewery-i18n, …
 ```
 
-See [`REPOSITORY-STRUCTURE.md`](REPOSITORY-STRUCTURE.md) §2–§3 for the full inventory.
+See [`NAVIGATE-MONOREPO.md`](NAVIGATE-MONOREPO.md) and [`REPOSITORY-STRUCTURE.md`](REPOSITORY-STRUCTURE.md) §2–§3.
 
 ### Where does my UI code go?
 
@@ -164,7 +165,7 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 | Layer | Default (`reference` profile) | Platform opt-out (`UMBRACULUM_MODULE_PROFILE=platform` or [`docker-compose.platform.yml`](../../docker-compose.platform.yml)) |
 |---|---|---|
 | **API** | `registerBreweryModule(app)` when profile is `reference` ([`services/api/src/app.ts`](../../services/api/src/app.ts)) | Brewery module + `/platform/recipes/*` not registered |
-| **Web nav** | `brewery` in [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/modules/module-sdk/src/builtinWebModules.ts) | Brewery segments omitted |
+| **Web nav** | `brewery` in [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/sdk/module-sdk/src/builtinWebModules.ts) | Brewery segments omitted |
 | **Native** | Brewery routes in [`registerPlatformNativeModules`](../../apps/native/src/navigation/registerPlatformNativeModules.ts) | Brewery native module skipped |
 | **Database** | `brewery.*` schema always migrated | Same — runtime opt-out only; schema remains |
 | **Workspace UI toggle** | **None** — deploy profile + optional add-on rows | `WorkspaceBillingAddon` + `tier_and_addons` enforcement (Phase 3 slice); full purchase UI deferred H1 2027 |

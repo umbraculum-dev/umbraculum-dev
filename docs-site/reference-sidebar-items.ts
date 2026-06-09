@@ -37,8 +37,8 @@ export const referenceSidebarItems = [
     items: [
       {
         type: 'link',
-        label: 'packages/modules/ai-tool-sdk',
-        href: '/reference/packages/modules/ai-tool-sdk/',
+        label: 'packages/sdk/ai-tool-sdk',
+        href: '/reference/packages/sdk/ai-tool-sdk/',
       },
       {
         type: 'link',
@@ -47,8 +47,8 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
-        label: 'packages/modules/automation-contracts',
-        href: '/reference/packages/modules/automation-contracts/',
+        label: 'packages/canonical/automation/contracts',
+        href: '/reference/packages/canonical/automation/contracts/',
       },
       {
         type: 'link',
@@ -87,8 +87,8 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
-        label: 'packages/modules/crp-contracts',
-        href: '/reference/packages/modules/crp-contracts/',
+        label: 'packages/canonical/crp/contracts',
+        href: '/reference/packages/canonical/crp/contracts/',
       },
       {
         type: 'link',
@@ -97,8 +97,8 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
-        label: 'packages/modules/i18n-keys',
-        href: '/reference/packages/modules/i18n-keys/',
+        label: 'packages/sdk/i18n-keys',
+        href: '/reference/packages/sdk/i18n-keys/',
       },
       {
         type: 'link',
@@ -112,13 +112,13 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
-        label: 'packages/modules/module-sdk',
-        href: '/reference/packages/modules/module-sdk/',
+        label: 'packages/sdk/module-sdk',
+        href: '/reference/packages/sdk/module-sdk/',
       },
       {
         type: 'link',
-        label: 'packages/modules/mrp-contracts',
-        href: '/reference/packages/modules/mrp-contracts/',
+        label: 'packages/canonical/mrp/contracts',
+        href: '/reference/packages/canonical/mrp/contracts/',
       },
       {
         type: 'link',
@@ -132,8 +132,8 @@ export const referenceSidebarItems = [
       },
       {
         type: 'link',
-        label: 'packages/modules/pim-contracts',
-        href: '/reference/packages/modules/pim-contracts/',
+        label: 'packages/canonical/pim/contracts',
+        href: '/reference/packages/canonical/pim/contracts/',
       },
       {
         type: 'link',

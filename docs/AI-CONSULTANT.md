@@ -79,7 +79,7 @@ Domain tools enforce workspace membership at the service layer ([`requireActiveW
 
 Operators may also use module-owned HTTP render-job routes (for example `POST /mrp/work-orders/:orderId/render-jobs`) that build template `data` server-side; the consultant uses `render_document` with a pre-built payload or should prefer those routes when orchestrating exports for humans.
 
-The shape of these tools is documented in the typed `AiTool` / `AiToolRegistry` contract in [`@umbraculum/ai-tool-sdk`](../packages/modules/ai-tool-sdk/README.md); the orchestrator that runs them lives at [`services/api/src/services/ai/orchestrator.ts`](../services/api/src/services/ai/orchestrator.ts).
+The shape of these tools is documented in the typed `AiTool` / `AiToolRegistry` contract in [`@umbraculum/ai-tool-sdk`](../packages/sdk/ai-tool-sdk/README.md); the orchestrator that runs them lives at [`services/api/src/services/ai/orchestrator.ts`](../services/api/src/services/ai/orchestrator.ts).
 
 ---
 
@@ -101,7 +101,7 @@ These bounds are not a hedge — they are the shape of v0. The architecture inte
 
 ## 4.1 Prompt composition (public α)
 
-Each chat turn builds a system prompt in fixed order: **base → platform → module overlays (alphabetical by module code) → optional route overlay → workspace memory**. Module and route text is contributed through `registerModule({ aiPrompts })` in [`@umbraculum/module-sdk`](../packages/modules/module-sdk/README.md); the orchestrator collects overlays at request time.
+Each chat turn builds a system prompt in fixed order: **base → platform → module overlays (alphabetical by module code) → optional route overlay → workspace memory**. Module and route text is contributed through `registerModule({ aiPrompts })` in [`@umbraculum/module-sdk`](../packages/sdk/module-sdk/README.md); the orchestrator collects overlays at request time.
 
 Clients may send an optional `routeId` (from [`@umbraculum/navigation`](../packages/platform/navigation/README.md)) on `POST /ai/chat` so route-specific hints apply — for example when opening `/ai?fromRoute=productionOrders`.
 
@@ -117,14 +117,14 @@ When the model calls a `propose`-scope tool, the chat stream emits a `proposal` 
 
 ## 5. How modules contribute tools
 
-Tools are **owned by their respective modules**, not by the AI consultant itself. The implemented contract is [`registerModule({ registerAiTools })`](../packages/modules/module-sdk/README.md): a canonical module or vertical configuration declares its AI-tool registrar alongside its routes, Prisma schema, document templates, tier limits, and add-on codes. The platform's single tool registry invokes those module registrars at API boot.
+Tools are **owned by their respective modules**, not by the AI consultant itself. The implemented contract is [`registerModule({ registerAiTools })`](../packages/sdk/module-sdk/README.md): a canonical module or vertical configuration declares its AI-tool registrar alongside its routes, Prisma schema, document templates, tier limits, and add-on codes. The platform's single tool registry invokes those module registrars at API boot.
 
 So in v0:
 
 - Tool implementations co-locate under [`services/api/src/services/ai/tools/<module>/`](../services/api/src/services/ai/tools/) (today: `brewery/`, `automation/`, `pim/`, `mrp/`, `crp/`).
 - Each shipped domain module declares `registerAiTools` in [`services/api/src/modules/<code>/index.ts`](../services/api/src/modules/).
 - The api's [`app.ts`](../services/api/src/app.ts) creates the in-memory registry, invokes module-owned registrars through `@umbraculum/module-sdk`, then registers horizontal platform tools such as `render_document`.
-- The contract for tools is public and typed (`AiTool`, `AiToolRegistry`, `AiToolScope` in [`@umbraculum/ai-tool-sdk`](../packages/modules/ai-tool-sdk/README.md)).
+- The contract for tools is public and typed (`AiTool`, `AiToolRegistry`, `AiToolScope` in [`@umbraculum/ai-tool-sdk`](../packages/sdk/ai-tool-sdk/README.md)).
 
 Modules also contribute **`aiPrompts`** alongside tools. Horizontal platform tools (`render_document`, `platform.reportingQuery`, `platform.searchProductDocs`) register at API boot. Future WMS/CRM tool bundles remain blocked until those modules exist.
 

@@ -9,7 +9,7 @@
  *
  * Bumped from `"0.0.0-dev"` to `"2.0.1-dev"` in Phase A step 5 when the
  * first sister-repo mailbox artifact mirrored at
- * `packages/modules/automation-contracts/data/mailbox.json` (sister-repo
+ * `packages/canonical/automation/contracts/data/mailbox.json` (sister-repo
  * `brewery-alarms-tanks-supervisor` `upgrade/v2` commit `114502d`).
  *
  * Subsequent bumps follow the integrated release tag in the sister

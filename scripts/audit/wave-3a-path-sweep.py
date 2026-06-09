@@ -17,20 +17,20 @@ PATH_REPLACEMENTS: list[tuple[str, str]] = [
     ("packages/beerjson", "packages/verticals/brewery/beerjson"),
     ("packages/core/", "packages/verticals/brewery/core/"),
     ("packages/core", "packages/verticals/brewery/core"),
-    ("packages/automation-contracts/", "packages/modules/automation-contracts/"),
-    ("packages/automation-contracts", "packages/modules/automation-contracts"),
-    ("packages/pim-contracts/", "packages/modules/pim-contracts/"),
-    ("packages/pim-contracts", "packages/modules/pim-contracts"),
-    ("packages/mrp-contracts/", "packages/modules/mrp-contracts/"),
-    ("packages/mrp-contracts", "packages/modules/mrp-contracts"),
-    ("packages/crp-contracts/", "packages/modules/crp-contracts/"),
-    ("packages/crp-contracts", "packages/modules/crp-contracts"),
-    ("packages/module-sdk/", "packages/modules/module-sdk/"),
-    ("packages/module-sdk", "packages/modules/module-sdk"),
-    ("packages/ai-tool-sdk/", "packages/modules/ai-tool-sdk/"),
-    ("packages/ai-tool-sdk", "packages/modules/ai-tool-sdk"),
-    ("packages/i18n-keys/", "packages/modules/i18n-keys/"),
-    ("packages/i18n-keys", "packages/modules/i18n-keys"),
+    ("packages/automation-contracts/", "packages/canonical/automation/contracts/"),
+    ("packages/automation-contracts", "packages/canonical/automation/contracts"),
+    ("packages/pim-contracts/", "packages/canonical/pim/contracts/"),
+    ("packages/pim-contracts", "packages/canonical/pim/contracts"),
+    ("packages/mrp-contracts/", "packages/canonical/mrp/contracts/"),
+    ("packages/mrp-contracts", "packages/canonical/mrp/contracts"),
+    ("packages/crp-contracts/", "packages/canonical/crp/contracts/"),
+    ("packages/crp-contracts", "packages/canonical/crp/contracts"),
+    ("packages/module-sdk/", "packages/sdk/module-sdk/"),
+    ("packages/module-sdk", "packages/sdk/module-sdk"),
+    ("packages/ai-tool-sdk/", "packages/sdk/ai-tool-sdk/"),
+    ("packages/ai-tool-sdk", "packages/sdk/ai-tool-sdk"),
+    ("packages/i18n-keys/", "packages/sdk/i18n-keys/"),
+    ("packages/i18n-keys", "packages/sdk/i18n-keys"),
     ("packages/i18n-react/", "packages/platform/i18n-react/"),
     ("packages/i18n-react", "packages/platform/i18n-react"),
     ("packages/api-client/", "packages/platform/api-client/"),
@@ -140,7 +140,7 @@ def update_root_workspaces() -> None:
     pkg_json = REPO / "package.json"
     text = pkg_json.read_text(encoding="utf-8")
     old = '"packages/*",'
-    new = '"packages/platform/*",\n    "packages/modules/*",\n    "packages/verticals/*/*",'
+    new = '"packages/platform/*",\n    "packages/canonical/*/*",\n    "packages/verticals/*/*",'
     if old in text:
         text = text.replace(old, new)
         pkg_json.write_text(text, encoding="utf-8")

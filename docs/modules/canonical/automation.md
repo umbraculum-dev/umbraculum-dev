@@ -33,7 +33,7 @@ It does **not** own scheduling, capacity planning, or "next planned use" views �
 | **API** | [`services/api/src/modules/automation/`](../../../services/api/src/modules/automation/) | **Shipped (B-3)** — `index.ts` with `registerAutomationModule`, `routes/automationVesselsRoutes.ts`, `services/vesselsService.ts`, `adapters/mockAdapter.ts`. |
 | **Web** | [`apps/web/app/[locale]/(automation)/`](../../../apps/web/app/[locale]/(automation)/) | **Shipped (B-3); aligned per Week-1 audit ([RFC-0006](../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) + [`web-route-group-audit.md`](../../design/web-route-group-audit.md))** — `vessels/page.tsx` (vessel list at `/en/vessels`), `vessels/[vesselCode]/page.tsx` (vessel detail at `/en/vessels/<code>`). Next.js route group `(automation)/` does not contribute a URL segment per RFC-0002 §3; the canonical static sub-segment is `vessels` and the module declares `ownedUrlSegments: ["vessels"]` via `registerWebModule()`. The pre-audit layout had `(automation)/page.tsx` + `(automation)/[vesselCode]/page.tsx` at the group root — both violated the two β disciplines and produced a routing collision that left `/en/automation` unreachable. |
 | **Native** | _(`apps/native/src/modules/automation/` per [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3)_ | **Not yet wired.** Native surface for automation is pending; mock adapter + web read path are sufficient for Phase B. |
-| **Contracts** | [`packages/modules/automation-contracts/`](../../../packages/modules/automation-contracts/) → [`@umbraculum/automation-contracts`](../../../packages/modules/automation-contracts/README.md) | **Shipped.** Adapter SDK types, `CONTRACT_VERSION`, `MAILBOX_SPEC` (356 entries mirrored from the OpenPLC sister repo). |
+| **Contracts** | [`packages/canonical/automation/contracts/`](../../../packages/canonical/automation/contracts/) → [`@umbraculum/automation-contracts`](../../../packages/canonical/automation/contracts/README.md) | **Shipped.** Adapter SDK types, `CONTRACT_VERSION`, `MAILBOX_SPEC` (356 entries mirrored from the OpenPLC sister repo). |
 
 Postgres schema name is `automation` ([`services/api/prisma/schema.prisma`](../../../services/api/prisma/schema.prisma) — see the `automation.vessels`, `automation.adapter_connections`, `automation.alarm_events` tables).
 
@@ -103,7 +103,7 @@ Phase D adds `automation.activeAlarms`, `automation.adapterHealth`, `automation.
 
 ## 6. Adapter SDK contract — what third parties implement
 
-Third-party adapter authors pin **only** [`@umbraculum/automation-contracts`](../../../packages/modules/automation-contracts/README.md) and [`@umbraculum/module-sdk`](../../../packages/modules/module-sdk/README.md). Four surfaces are exported from the contracts package:
+Third-party adapter authors pin **only** [`@umbraculum/automation-contracts`](../../../packages/canonical/automation/contracts/README.md) and [`@umbraculum/module-sdk`](../../../packages/sdk/module-sdk/README.md). Four surfaces are exported from the contracts package:
 
 | Export | What it pins |
 |---|---|
@@ -175,5 +175,5 @@ If you are building a Tier 6 vertical configuration (e.g. a distillery or kombuc
 - **Validation:** [RFC-0003](../../rfcs/0003-validation-library-adoption.md) (Zod v4 schemas at the boundary)
 - **OpenPLC sister-repo handoff:** [`docs/design/openplc-mailbox-emitter-pr-shape.md`](../../design/openplc-mailbox-emitter-pr-shape.md)
 - **Module README in code:** [`services/api/src/modules/automation/README.md`](../../../services/api/src/modules/automation/README.md) — the in-code companion (phase scope, surface boundary, demo SQL).
-- **Contracts package README:** [`packages/modules/automation-contracts/README.md`](../../../packages/modules/automation-contracts/README.md)
+- **Contracts package README:** [`packages/canonical/automation/contracts/README.md`](../../../packages/canonical/automation/contracts/README.md)
 - **Entry page:** [`docs/MODULES.md`](../../MODULES.md)

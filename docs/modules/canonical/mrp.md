@@ -8,7 +8,7 @@
 **Audience:** anyone evaluating Umbraculum's manufacturing-planning roadmap or planning to extend the future MRP module.
 
 > [!NOTE]
-> Per-module page for the foundation-stage `mrp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/mrp-contracts`](../../../packages/modules/mrp-contracts/README.md), [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md), the `mrp` Prisma schema, Wave 2 read-time brewery projections, Wave 3 read-only web pages, Wave 4 deterministic fixture-backed proof, and Wave 5 read-only AI advisor tools. The current planning/build artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical MRP module surface design](../../design/canonical-mrp-module-surface.md), the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md), the [Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md), the [Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md), the [Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md), and the [Wave 5 AI planning advisor build log](../../design/mrp-crp-wave-5-ai-planning-advisor-build-log.md).
+> Per-module page for the foundation-stage `mrp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/mrp-contracts`](../../../packages/canonical/mrp/contracts/README.md), [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md), the `mrp` Prisma schema, Wave 2 read-time brewery projections, Wave 3 read-only web pages, Wave 4 deterministic fixture-backed proof, and Wave 5 read-only AI advisor tools. The current planning/build artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical MRP module surface design](../../design/canonical-mrp-module-surface.md), the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md), the [Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md), the [Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md), the [Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md), and the [Wave 5 AI planning advisor build log](../../design/mrp-crp-wave-5-ai-planning-advisor-build-log.md).
 
 ---
 
@@ -48,7 +48,7 @@ The module materializes as four coordinated paths; Wave 1 shipped the contracts/
 | API | [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/) |
 | Web | `apps/web/app/[locale]/(mrp)/` |
 | Native | `apps/native/src/modules/mrp/` |
-| Contracts | [`packages/modules/mrp-contracts/`](../../../packages/modules/mrp-contracts/) → `@umbraculum/mrp-contracts` |
+| Contracts | [`packages/canonical/mrp/contracts/`](../../../packages/canonical/mrp/contracts/) → `@umbraculum/mrp-contracts` |
 
 Postgres schema name: `mrp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) convention 4).
 
@@ -70,7 +70,7 @@ Postgres schema name: `mrp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md), no mini-RFC is required for `mrp` to ship — the canonical code is already allocated by RFC-0001 §4. The procedure is:
 
 1. **Surface design doc** under [`docs/design/canonical-mrp-module-surface.md`](../../design/canonical-mrp-module-surface.md), modeled on [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md). Resolves the data model, extensibility contract, AI tool surface, tier-limit fields, phasing. **Done.**
-2. **Wave 1 — contracts + read-only API foundation.** `packages/modules/mrp-contracts/`, `services/api/src/modules/mrp/`, the `mrp` Prisma schema, module registration, and L2 isolation tests are **shipped as foundation-only**.
+2. **Wave 1 — contracts + read-only API foundation.** `packages/canonical/mrp/contracts/`, `services/api/src/modules/mrp/`, the `mrp` Prisma schema, module registration, and L2 isolation tests are **shipped as foundation-only**.
 3. **Wave 2 — coordinated brewery projection.** Existing brewery routes remain stable while recipes and brew sessions project into MRP BOM, production-order, operation, and material-requirement read models. **Shipped as read-time projection only.**
 4. **Wave 3 — read-only web alpha experience.** `apps/web/app/[locale]/(mrp)/production-orders/` and `material-requirements/` expose those read models without write controls. **Shipped as web read-only proof only.**
 5. **Wave 4 — deterministic read-only alpha proof.** E2E fixture data and focused Playwright assertions now prove the MRP/CRP read-only projection path without creating MRP rows. **Shipped as proof hardening only.**
@@ -95,7 +95,7 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 - [MRP/CRP Wave 6 rendering templates build log](../../design/mrp-crp-wave-6-rendering-templates-build-log.md) — RFC-0007 templates and render-job routes.
 - [MRP/CRP alpha demo walkthrough](../../design/mrp-crp-alpha-demo-walkthrough.md) — operator runbook + Playwright quick gates.
 - [MRP/CRP alpha demo closure build log](../../design/mrp-crp-alpha-demo-closure-build-log.md) — web exports + CI proof.
-- [`@umbraculum/mrp-contracts`](../../../packages/modules/mrp-contracts/README.md) — Wave 1 contracts package.
+- [`@umbraculum/mrp-contracts`](../../../packages/canonical/mrp/contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — mature MRP + CRP + WMS pairing (H1 2027).
 - [ROADMAP.md § H2 2026 MRP/CRP](../../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning) — alpha track (done/TODO).

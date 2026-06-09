@@ -77,4 +77,4 @@ From repo root (run Node/npm inside the project container, not on the host — s
 - [`docs/design/openplc-mailbox-emitter-pr-shape.md`](../../../docs/design/openplc-mailbox-emitter-pr-shape.md) — sister-repo PR shape for the M2 emitter
 - [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) §7.2 — automation module surface origin
 - [`docs/rfcs/0002-canonical-module-physical-layout.md`](../../../docs/rfcs/0002-canonical-module-physical-layout.md) — `packages/<code>-contracts/` placement rule
-- [`packages/modules/module-sdk/`](../module-sdk/) — peer SDK package; this package will be referenced from `registerModule({ code: "automation", ... })` when Phase B lands
+- [`packages/sdk/module-sdk/`](../module-sdk/) — peer SDK package; this package will be referenced from `registerModule({ code: "automation", ... })` when Phase B lands

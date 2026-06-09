@@ -173,7 +173,7 @@ ESM + CJS dual emit per [RFC-0002](0002-canonical-module-physical-layout.md) Dec
 
 ## 5. Decision C — SDK extension point `registerDocumentTemplate` (commit)
 
-**Add a `documentTemplates` slot to `registerModule()` in `@umbraculum/module-sdk`,** alongside the existing `registerAiTools` / `addonCodes` / `tierLimits` / `routes` slots ([`packages/modules/module-sdk/src/types.ts`](../../packages/modules/module-sdk/src/types.ts) — surface published with the SDK extension follow-on PR per §12).
+**Add a `documentTemplates` slot to `registerModule()` in `@umbraculum/module-sdk`,** alongside the existing `registerAiTools` / `addonCodes` / `tierLimits` / `routes` slots ([`packages/sdk/module-sdk/src/types.ts`](../../packages/sdk/module-sdk/src/types.ts) — surface published with the SDK extension follow-on PR per §12).
 
 **Sketch:**
 
@@ -367,7 +367,7 @@ Per [RFC-0004 §8](0004-canonical-pim.md) precedent (a consumption-contract-exte
 - [`docs/REPOSITORY-STRUCTURE.md`](../REPOSITORY-STRUCTURE.md) §3.3 — add an `@umbraculum/rendering` row to the layer-3 horizontal infrastructure packages table; after PR1-PR7 it links to the shipped package and records the implemented pipeline.
 - [`docs/rfcs/README.md`](README.md) §2 — add the RFC-0007 row to the index table with the one-line commitment from §1.
 
-**No code changes in this PR.** The `packages/modules/module-sdk/src/types.ts` `documentTemplates` slot addition is deliberately deferred to the §12 follow-on package-scaffold PR — committing a SDK type without the runtime that gives it meaning is the kind of partial commit [`docs/LICENSING.md`](../LICENSING.md) §6.2 / [RFC-0002](0002-canonical-module-physical-layout.md) Decision C's "SDK is published, downstream consumers pin it" framing wants the project to avoid.
+**No code changes in this PR.** The `packages/sdk/module-sdk/src/types.ts` `documentTemplates` slot addition is deliberately deferred to the §12 follow-on package-scaffold PR — committing a SDK type without the runtime that gives it meaning is the kind of partial commit [`docs/LICENSING.md`](../LICENSING.md) §6.2 / [RFC-0002](0002-canonical-module-physical-layout.md) Decision C's "SDK is published, downstream consumers pin it" framing wants the project to avoid.
 
 ---
 
@@ -439,7 +439,7 @@ At acceptance time, the core implementation surface was intentionally sequenced 
 
 1. **[Implemented — PR1] Package scaffold** — `packages/platform/rendering/` → `@umbraculum/rendering`. README per [`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md); `package.json` with pinned engine versions per §6.1; surface types matching §4.1; no implementation yet.
    - Note: PR1 also recorded the MJML v5 correction after dependency-audit review found MJML v4's transitive advisory posture unacceptable.
-2. **[Implemented — PR1] SDK extension** — add the `documentTemplates` slot to [`packages/modules/module-sdk/src/types.ts`](../../packages/modules/module-sdk/src/types.ts) + the runtime collection in `registerModule()`. Same shape as the existing `registerAiTools` slot collection. Re-export the SDK-side types from `@umbraculum/module-sdk` per §4.2 MIT split.
+2. **[Implemented — PR1] SDK extension** — add the `documentTemplates` slot to [`packages/sdk/module-sdk/src/types.ts`](../../packages/sdk/module-sdk/src/types.ts) + the runtime collection in `registerModule()`. Same shape as the existing `registerAiTools` slot collection. Re-export the SDK-side types from `@umbraculum/module-sdk` per §4.2 MIT split.
 3. **[Implemented — PR2] Engine adapters** — Gotenberg HTTP client, exceljs adapter, bwip-js adapter, `@fast-csv/format` adapter, eta integration, MJML integration, xmlbuilder2 integration. Acceptable to land one PR per engine if dependency volume warrants it.
 4. **[Implemented — PR3] Job-runner wiring** — BullMQ + Postgres job-state model (new `rendering` Prisma schema per §7.2) + Fastify routes for submit / status / cancel / signed-URL retrieval inside [`services/api`](../../services/api/). Self-host docs update: Gotenberg sidecar entry in `docker-compose.yml`; [`docs/GETTING-STARTED.md`](../GETTING-STARTED.md) section explaining the new sidecar; [`docs/REDIS-ARCHITECTURE.md`](../REDIS-ARCHITECTURE.md) update noting BullMQ's coexistence with the existing session cache.
    - Note: PR3 keeps v1 artifact persistence API-owned in the `rendering` Prisma schema and signed retrieval route. A future media-layer follow-up can move artifact storage behind `@umbraculum/media` once that package exposes the needed persistence surface.
@@ -501,7 +501,7 @@ Same audience-impact shape [RFC-0004 §6](0004-canonical-pim.md) used.
 - [`docs/LICENSING.md`](../LICENSING.md) §6.1 — AGPLv3 horizontal-platform-code default.
 - [`docs/LICENSING.md`](../LICENSING.md) §6.2 — MIT SDK-package enumeration that §4.2 extends with rendering types.
 - [`docs/REDIS-ARCHITECTURE.md`](../REDIS-ARCHITECTURE.md) — the Redis BullMQ rides on per §7 / §6.1.
-- [`packages/modules/module-sdk/`](../../packages/modules/module-sdk/) — the SDK the new extension point lives in.
+- [`packages/sdk/module-sdk/`](../../packages/sdk/module-sdk/) — the SDK the new extension point lives in.
 - [`packages/platform/media/`](../../packages/platform/media/) — the asset pipeline `RenderResult` hands off to.
 - [`packages/platform/i18n/`](../../packages/platform/i18n/) — the locale pipeline `RenderContext.locale` feeds.
 - [`services/api/src/modules/brewery/routes/recipesExport.ts`](../../services/api/src/modules/brewery/routes/recipesExport.ts) — the first sync-mode proof per §12 PR #5.

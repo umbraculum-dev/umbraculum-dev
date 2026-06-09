@@ -23,7 +23,7 @@ This page states what **free** means, what **alpha depth** implies for a semeste
 |------|----------------------|
 | **Clone the monorepo, run locally** | **Free** — `docker compose up`; see [`GETTING-STARTED.md`](GETTING-STARTED.md) |
 | **Fork and modify the AGPL core** | **Free** under [AGPLv3](LICENSING.md) obligations (network use, source offer when you deploy modified core to others) |
-| **Ship a Tier 6 vertical in your own repo** | **Free to start** — pin MIT [`@umbraculum/module-sdk`](../packages/modules/module-sdk/README.md) and `@umbraculum/*-contracts`; no certification fee; see [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) |
+| **Ship a Tier 6 vertical in your own repo** | **Free to start** — pin MIT [`@umbraculum/module-sdk`](../packages/sdk/module-sdk/README.md) and `@umbraculum/*-contracts`; no certification fee; see [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) |
 | **Study the brewery reference vertical** | **Free** — in-repo worked example; not proof every vertical belongs in the core monorepo ([`GLOSSARY.md`](GLOSSARY.md) §"Where code lives") |
 | **Contribute via PR** | **Free** — DCO sign-off only; no CLA ([`CONTRIBUTING.md`](../CONTRIBUTING.md)) |
 | **Hosted Umbraculum cloud (future)** | **Not GA at alpha** — any future managed service may have tiers; self-host remains the documented path |

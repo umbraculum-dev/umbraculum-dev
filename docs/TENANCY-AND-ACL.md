@@ -123,7 +123,7 @@ Modules must **not** invent parallel permission tables or custom role enums. Dec
 AI tools run in the API with the same `{ userId, workspaceId }` context as HTTP handlers. They call existing services — **no raw DB access, no parallel ACL layer**.
 
 - Orchestrator: membership check before tool execution ([`services/api/src/services/ai/orchestrator.ts`](../services/api/src/services/ai/orchestrator.ts))
-- Tool contract: [`packages/modules/ai-tool-sdk/src/aiTool.ts`](../packages/modules/ai-tool-sdk/src/aiTool.ts) (`AiToolContext`)
+- Tool contract: [`packages/sdk/ai-tool-sdk/src/aiTool.ts`](../packages/sdk/ai-tool-sdk/src/aiTool.ts) (`AiToolContext`)
 - Platform architecture: [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §6
 
 ---

@@ -122,7 +122,7 @@
       }
     },
     "packages-pim": {
-      "pathPrefixes": ["packages/modules/pim-contracts/"],
+      "pathPrefixes": ["packages/canonical/pim/contracts/"],
       "tiers": {
         "T0": [
           {

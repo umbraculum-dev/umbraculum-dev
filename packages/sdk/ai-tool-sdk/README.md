@@ -88,4 +88,4 @@ The interface surface is stable and intentionally minimal. Breaking changes foll
 - [`docs/LICENSING.md`](../../../docs/LICENSING.md) §6.2 — why this package is MIT-licensed (and what that means for module authors)
 - [`docs/AI-CONSULTANT.md`](../../../docs/AI-CONSULTANT.md) — the AI consultant architecture this contract serves
 - [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) — module governance + canonical-code allocation
-- [`packages/modules/module-sdk/README.md`](../module-sdk/README.md) — the companion SDK package authors compose with
+- [`packages/sdk/module-sdk/README.md`](../module-sdk/README.md) — the companion SDK package authors compose with

@@ -189,14 +189,14 @@ Doc references:
 **Hard stops.**
 
 - [`docs/design/openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) §1 + §7 reference the old name when describing what the sister-repo emitter pairs with — both updated. Sister repo emits JSON-only artifacts and does NOT import this package (plan doc §2.3); doc references were the only sister-side change.
-- [`packages/modules/automation-contracts/src/version.ts`](../../packages/modules/automation-contracts/src/version.ts) carries `CONTRACT_VERSION = "2.0.1-dev"` — verified NOT bumped during the rename; only its JSDoc reference text was retitled.
+- [`packages/canonical/automation/contracts/src/version.ts`](../../packages/canonical/automation/contracts/src/version.ts) carries `CONTRACT_VERSION = "2.0.1-dev"` — verified NOT bumped during the rename; only its JSDoc reference text was retitled.
 
 **File inventory.**
 
 Workspace name + own files:
-- [x] [`packages/modules/automation-contracts/package.json`](../../packages/modules/automation-contracts/package.json) — `name` field + description cleanup (removed "End-state npm scope: ..." sentence, replaced with "Renamed from ... as sub-plan #9 slot 4").
-- [x] [`packages/modules/automation-contracts/README.md`](../../packages/modules/automation-contracts/README.md) — heading + sub-plan note + 3 npm command references (`-w @umbraculum/automation-contracts`).
-- [x] [`packages/modules/automation-contracts/src/version.ts`](../../packages/modules/automation-contracts/src/version.ts) — JSDoc reference only; `CONTRACT_VERSION` constant value preserved at `"2.0.1-dev"`.
+- [x] [`packages/canonical/automation/contracts/package.json`](../../packages/canonical/automation/contracts/package.json) — `name` field + description cleanup (removed "End-state npm scope: ..." sentence, replaced with "Renamed from ... as sub-plan #9 slot 4").
+- [x] [`packages/canonical/automation/contracts/README.md`](../../packages/canonical/automation/contracts/README.md) — heading + sub-plan note + 3 npm command references (`-w @umbraculum/automation-contracts`).
+- [x] [`packages/canonical/automation/contracts/src/version.ts`](../../packages/canonical/automation/contracts/src/version.ts) — JSDoc reference only; `CONTRACT_VERSION` constant value preserved at `"2.0.1-dev"`.
 
 Build configs:
 - [x] **[`package.json`](../../package.json)** (root) — `scripts.build:packages` (`-w @brewery/automation-contracts` → `-w @umbraculum/automation-contracts`). Per slot-2 HARD STOP.
@@ -522,7 +522,7 @@ Consumer `package.json` deps (bulk sed):
 - [x] [`apps/native/package.json`](../../apps/native/package.json).
 - [x] [`services/api/package.json`](../../services/api/package.json).
 - [x] [`packages/platform/api-client/package.json`](../../packages/platform/api-client/package.json) — dep entry only (workspace `name` stays `@brewery/api-client` until slot 10).
-- [x] [`packages/modules/module-sdk/package.json`](../../packages/modules/module-sdk/package.json) — dep entry only (workspace `name` stays `@brewery/module-sdk` until slot 11).
+- [x] [`packages/sdk/module-sdk/package.json`](../../packages/sdk/module-sdk/package.json) — dep entry only (workspace `name` stays `@brewery/module-sdk` until slot 11).
 
 Build configs:
 - [x] [`apps/web/next.config.js`](../../apps/web/next.config.js) `transpilePackages` (HARD STOP cleared).
@@ -533,7 +533,7 @@ Source imports — group by directory and execute the grep+replace:
 - [x] All `apps/native/src/**/*.ts{,x}` matching the grep (8 files: lib/typeGuards.ts + 7 screens — Equipment, RecipeEdit, WaterBoil, WaterHub, WaterMash, WaterProfiles, WaterSparge).
 - [x] All `services/api/src/**/*.ts` matching the grep — routes (3 files), services (3 files), AI tools (8 files: brewery/* + automation/*), orchestrator, toolRegistry, aiSettingsService, recipeWaterHubSummaryService, gravityAnalysis.ts.
 - [x] All `services/api/src/tests/**/*.test.ts` and `**/*.contract.test.ts` matching the grep (4 files: contracts/{shapeHelpers,recipe.contract,waterProfiles.contract} + ai/toolRegistry.test).
-- [x] [`packages/modules/module-sdk/src/types.ts`](../../packages/modules/module-sdk/src/types.ts).
+- [x] [`packages/sdk/module-sdk/src/types.ts`](../../packages/sdk/module-sdk/src/types.ts).
 
 CI:
 - [x] [`.github/workflows/api.yml`](../../.github/workflows/api.yml) — workflow step display name updated.
@@ -627,19 +627,19 @@ Doc references:
 
 **Hard stops cleared.**
 
-- [x] Predecessor: slot 9 shipped — confirmed `packages/modules/module-sdk/package.json` already had `"@umbraculum/contracts": "file:../contracts"` at start of slot 11 (slot-9 sweep had updated the dep entry; only the workspace `name` field remained to flip).
+- [x] Predecessor: slot 9 shipped — confirmed `packages/sdk/module-sdk/package.json` already had `"@umbraculum/contracts": "file:../contracts"` at start of slot 11 (slot-9 sweep had updated the dep entry; only the workspace `name` field remained to flip).
 - [x] [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) F5 row updated: state column flipped from "In progress (scoping done)" to "**Done (2026-05-19, slot 11 of sub-plan #9)**"; the row's narrative rewritten to reflect that the `@umbraculum/module-sdk` name is now the live workspace name (no longer a future-state target) and that the two transient cross-scope states from slot 9 are both closed.
 - [x] [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) `ValidatedSchema<T>` reference updated by the bulk sweep (1 substitution).
 - [x] Preflight skill 6 HARD STOP classes ran cleanly: only ONE HIT — root `build:packages` (slot's only stop). `bin` field absent; `next.config.js` transpilePackages absent (web has no source-level dep on module-sdk); `metro.config.js` absent (will be slot 13's only HARD STOP for recipes-ui); root `test:packages` does NOT include module-sdk — see follow-up note below; workflow display names absent.
-- [x] 4-cousin substring-collision walk clean: (a) no `@brewery/module-sdk-*` longer-prefix variants; (b) shorter-prefix N/A — no `@brewery/module` workspace exists in the §1.1 classification table (the regex literal `-sdk` anchor would have protected it had one existed, continuing the slot-10 structural-untouchability claim); (c) no `@umbraculum/module-sdk*` collision (no prior slot renamed anything starting with that string); (d) zero subpath imports (`packages/modules/module-sdk/package.json` declares only `.` as an export).
+- [x] 4-cousin substring-collision walk clean: (a) no `@brewery/module-sdk-*` longer-prefix variants; (b) shorter-prefix N/A — no `@brewery/module` workspace exists in the §1.1 classification table (the regex literal `-sdk` anchor would have protected it had one existed, continuing the slot-10 structural-untouchability claim); (c) no `@umbraculum/module-sdk*` collision (no prior slot renamed anything starting with that string); (d) zero subpath imports (`packages/sdk/module-sdk/package.json` declares only `.` as an export).
 - [x] Slot-9 + slot-10 NEW HARD STOPs held: `cursor-tmp/slot11-bulk-sed.py` excluded itself via the `EXCLUDE_DIR_PARTS` set + the defensive belt-and-braces (script's `OLD_FULL` literal constructed from concatenated string segments); the cousin-(b) shorter-prefix structural-untouchability claim continued to hold across all 17 substitutions.
 
 **File inventory cleared.**
 
 Workspace name + own files:
-- [x] [`packages/modules/module-sdk/package.json`](../../packages/modules/module-sdk/package.json) — `name` flipped; pre-existing "End-state" sentence rewritten to describe the contract surface; the slot-9 sweep had already updated the `@umbraculum/contracts` dep entry, so no further dep changes needed.
-- [x] [`packages/modules/module-sdk/README.md`](../../packages/modules/module-sdk/README.md) — heading + workspace command examples updated; rename history note added per slot-8 / slot-9 / slot-10 convention; "End-state" forecast NOTE rewritten to record the closure of both slot-9 transient states.
-- [x] [`packages/modules/module-sdk/src/types.ts`](../../packages/modules/module-sdk/src/types.ts) — already clean (the slot-9 sweep had updated the `@umbraculum/contracts` import; no `@brewery/module-sdk` self-references in this file).
+- [x] [`packages/sdk/module-sdk/package.json`](../../packages/sdk/module-sdk/package.json) — `name` flipped; pre-existing "End-state" sentence rewritten to describe the contract surface; the slot-9 sweep had already updated the `@umbraculum/contracts` dep entry, so no further dep changes needed.
+- [x] [`packages/sdk/module-sdk/README.md`](../../packages/sdk/module-sdk/README.md) — heading + workspace command examples updated; rename history note added per slot-8 / slot-9 / slot-10 convention; "End-state" forecast NOTE rewritten to record the closure of both slot-9 transient states.
+- [x] [`packages/sdk/module-sdk/src/types.ts`](../../packages/sdk/module-sdk/src/types.ts) — already clean (the slot-9 sweep had updated the `@umbraculum/contracts` import; no `@brewery/module-sdk` self-references in this file).
 
 Consumer `package.json` deps:
 - [x] [`services/api/package.json`](../../services/api/package.json).
@@ -650,7 +650,7 @@ Source imports:
 - [x] [`services/api/src/tests/vitest.setup.ts`](../../services/api/src/tests/vitest.setup.ts) — 2 substitutions.
 
 Other:
-- [x] [`docker-compose.yml`](../../docker-compose.yml) — line-115 comment reference updated; the on-disk bind-mount path on line 123 references the directory `packages/modules/module-sdk/` (not the npm scope) and is correctly unchanged.
+- [x] [`docker-compose.yml`](../../docker-compose.yml) — line-115 comment reference updated; the on-disk bind-mount path on line 123 references the directory `packages/sdk/module-sdk/` (not the npm scope) and is correctly unchanged.
 
 Doc references:
 - [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md).
@@ -659,7 +659,7 @@ Doc references:
 - [x] [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) — 3 substitutions in B-1 closure note + surrounding references.
 - [x] [`docs/modules/canonical/automation.md`](../modules/canonical/automation.md) — 1 substitution.
 
-**Step-3 sweep results:** 12 files / 17 substitutions (vs 16-file plan-doc inventory; the 4-file delta = 1 self-exclusion of `packages/modules/module-sdk/package.json` because step 1 had already updated the `name` field + 3 explicit excludes — own README + 2 history docs).
+**Step-3 sweep results:** 12 files / 17 substitutions (vs 16-file plan-doc inventory; the 4-file delta = 1 self-exclusion of `packages/sdk/module-sdk/package.json` because step 1 had already updated the `name` field + 3 explicit excludes — own README + 2 history docs).
 
 **Verification + commit cleared.**
 
@@ -852,7 +852,7 @@ Bulk-sed sweep (9 files, 11 substitutions): `.github/workflows/api.yml` (CI work
 
 Doc-tier closeout (slot-13 lesson + new slot-14 cleanups):
 - [x] Slot-13-deferred footers cleaned in `packages/{contracts, navigation, i18n}/README.md`.
-- [x] Forward-looking placeholders updated in `packages/modules/automation-contracts/src/adapter.ts:112` (`@umbraculum/openplc-adapter`) + `docs/design/canonical-automation-module-surface.md:61` (`@umbraculum/brewery-equipment-contracts`) + `docker-compose.yml:118` (symlink-path comment + closure note).
+- [x] Forward-looking placeholders updated in `packages/canonical/automation/contracts/src/adapter.ts:112` (`@umbraculum/openplc-adapter`) + `docs/design/canonical-automation-module-surface.md:61` (`@umbraculum/brewery-equipment-contracts`) + `docker-compose.yml:118` (symlink-path comment + closure note).
 - [x] Status-stale claims rewritten in `docs/PLATFORM-ARCHITECTURE.md` (5 sites in §3.3 / §4.4 / §5.2 / §10.1.1) + `docs/FOUNDATION-HARDENING.md` §5.5 + scope row + `docs/ROADMAP.md` H1 2027 milestone + Phase summary.
 - [x] `docs/DOCS-README-STANDARDS.md` §3.1 rewritten from "parking guidance" to "historical closure note"; template heading + import-snippet + audit-checklist rule + §8 next-anchor updated.
 

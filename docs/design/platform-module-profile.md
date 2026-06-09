@@ -16,7 +16,7 @@ Deploy-time knob **`UMBRACULUM_MODULE_PROFILE`** selects which first-party modul
 | **`reference`** (default) | **On** | Fresh clone onboarding, demo host, alpha walkthroughs |
 | **`platform`** | **Off** | ISVs building product X without brewery routes/nav/AI |
 
-Resolver: [`packages/modules/module-sdk/src/enabledModules.ts`](../../packages/modules/module-sdk/src/enabledModules.ts).
+Resolver: [`packages/sdk/module-sdk/src/enabledModules.ts`](../../packages/sdk/module-sdk/src/enabledModules.ts).
 
 ---
 

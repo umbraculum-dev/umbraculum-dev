@@ -14,7 +14,7 @@
 **Status:** Superseded by RFC-0003 (Accepted 2026-05-19). Preserved as historical evidence-of-reasoning.
 **Audience:** future-self performing the next architectural audit (use §5 as the methodology template via the extracted template doc); historians asking "why did we pick Zod over Valibot in 2026-05?"; reviewers of RFC-0003 who want to inspect the verdict chain.
 **Owners:** project lead
-**Related:** [`docs/rfcs/0003-validation-library-adoption.md`](../rfcs/0003-validation-library-adoption.md) (the canonical commitment artifact, Accepted 2026-05-19), [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) v2.0 (live strategy + F1–F9 follow-up tracker), [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) §4.5 (validation slice deep-dive) + §8.6 (plugin-pack mapping for the Zod v4 standard), [`docs/design/architectural-audit-template.md`](./architectural-audit-template.md) (the reusable §5 skeptical-test framework, extracted from this doc for use in future audits), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) (β layout + `@umbraculum/<code>-contracts` packages × 5 — one of the two premise-shifts that triggered this audit), [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) §12 (`packages/modules/automation-contracts/` Phase A done 2026-05-19 — the other premise-shift).
+**Related:** [`docs/rfcs/0003-validation-library-adoption.md`](../rfcs/0003-validation-library-adoption.md) (the canonical commitment artifact, Accepted 2026-05-19), [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) v2.0 (live strategy + F1–F9 follow-up tracker), [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) §4.5 (validation slice deep-dive) + §8.6 (plugin-pack mapping for the Zod v4 standard), [`docs/design/architectural-audit-template.md`](./architectural-audit-template.md) (the reusable §5 skeptical-test framework, extracted from this doc for use in future audits), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) (β layout + `@umbraculum/<code>-contracts` packages × 5 — one of the two premise-shifts that triggered this audit), [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) §12 (`packages/canonical/automation/contracts/` Phase A done 2026-05-19 — the other premise-shift).
 
 ---
 
@@ -72,13 +72,13 @@ function parseMashAcidBlock(v: unknown, label: string): MashAcidComputeBlock {
 
 The full `parseComputeAndSave.ts` is **388 lines**: 12 helper-parser functions + 3 exported parse functions. The hand-rolled shared helpers (`isObject`, `isFiniteNumber`) are duplicated across files because each contracts module is self-contained.
 
-### 2.2 Hand-rolled mailbox validator in `packages/modules/automation-contracts/`
+### 2.2 Hand-rolled mailbox validator in `packages/canonical/automation/contracts/`
 
 The newest contracts package (Phase A step 5, landed 2026-05-19). 168-line `mailbox-data.ts` file: imports the `data/mailbox.json` artifact (356 entries from the OpenPLC sister repo), runs a structural validator at module-load, exports `MAILBOX_SPEC` typed as `MailboxSpec`. Includes duplicate-detection logic (same checks the sister-repo emitter performs, re-validated here to catch mirror drift).
 
 Representative excerpt — the per-entry validator:
 
-```53:107:packages/modules/automation-contracts/src/mailbox-data.ts
+```53:107:packages/canonical/automation/contracts/src/mailbox-data.ts
 function assertEntry(raw: unknown, idx: number): MailboxEntry {
   if (!isPlainObject(raw)) {
     throw new MailboxMirrorError(
@@ -112,7 +112,7 @@ function assertEntry(raw: unknown, idx: number): MailboxEntry {
 }
 ```
 
-This is the **template** that all future canonical-module contracts packages (`packages/wms-contracts/`, `packages/modules/mrp-contracts/`, ≥3 more) will copy from. Its shape is the de-facto SDK pattern for module authors.
+This is the **template** that all future canonical-module contracts packages (`packages/wms-contracts/`, `packages/canonical/mrp/contracts/`, ≥3 more) will copy from. Its shape is the de-facto SDK pattern for module authors.
 
 ### 2.3 Hand-rolled inline route validation in `services/api/src/routes/`
 
@@ -150,10 +150,10 @@ Plus hand-rolled `assert*` helpers in the same file: `assertSafeNextPath`, `asse
 ### 2.4 Test surface pointing at hand-rolled APIs
 
 - 38 unit tests in `packages/platform/contracts/src/**/*.test.ts` (5 files). Assertions test parser outputs against fixtures + error-message strings on bad inputs.
-- 28 unit tests in `packages/modules/automation-contracts/src/mailbox-data.test.ts` (loads the mirror, asserts shape, checks specific `PI_*` entries).
+- 28 unit tests in `packages/canonical/automation/contracts/src/mailbox-data.test.ts` (loads the mirror, asserts shape, checks specific `PI_*` entries).
 - ~80–100 route-level integration tests across `services/api/src/tests/` that exercise the inline `BadRequestError` validation paths (the Tests slice Phase 4b work).
 
-**Total surface in scope of any migration:** 8 parsers + 1 mailbox validator + 28 routes + ~146 tests. ~63 KB source in `packages/platform/contracts/`, ~168 lines in `packages/modules/automation-contracts/src/mailbox-data.ts`, ~28 routes × ~10–25 lines each ≈ 400 lines of inline route validation, ~30 `assert*` helpers in routes.
+**Total surface in scope of any migration:** 8 parsers + 1 mailbox validator + 28 routes + ~146 tests. ~63 KB source in `packages/platform/contracts/`, ~168 lines in `packages/canonical/automation/contracts/src/mailbox-data.ts`, ~28 routes × ~10–25 lines each ≈ 400 lines of inline route validation, ~30 `assert*` helpers in routes.
 
 ---
 
@@ -163,7 +163,7 @@ The examples below are *paper-design* — they show the shape of the migration w
 
 ### 3.1 Example A — mailbox validator (the freshest contract; the template)
 
-**Today** — `packages/modules/automation-contracts/src/mailbox.ts` declares the types as the source of truth (45 lines); `mailbox-data.ts` validates the JSON against them (168 lines). Total: **213 lines** for type + validator, with manually-maintained drift between the type declaration and the validator implementation.
+**Today** — `packages/canonical/automation/contracts/src/mailbox.ts` declares the types as the source of truth (45 lines); `mailbox-data.ts` validates the JSON against them (168 lines). Total: **213 lines** for type + validator, with manually-maintained drift between the type declaration and the validator implementation.
 
 **With Zod**, the schema becomes the source of truth and the type is inferred:
 
@@ -379,7 +379,7 @@ The migration is not free. Here is what we lose, not minimized:
 ### 4.2 Test surface that needs rework
 
 - ~38 unit tests in `packages/platform/contracts/` that assert error messages of the form `/Invalid GravityAnalysisResponseV1.result/` need to be rewritten to assert `ZodError` shape (`err.issues[0].path` and `err.issues[0].code`).
-- ~28 unit tests in `packages/modules/automation-contracts/` for the mailbox validator — same rework.
+- ~28 unit tests in `packages/canonical/automation/contracts/` for the mailbox validator — same rework.
 - ~80–100 route-level integration tests in `services/api/src/tests/` that expect specific `BadRequestError("invalid_email", "Email is required")` errors need a bridge: either (a) update the tests to expect the new error shape, or (b) keep a bridge layer that maps `ZodError` → `BadRequestError(code, message)` and leave tests unchanged. **Option (b) is the safer migration but introduces a permanent translation layer.**
 
 Test fixtures (the `validResponse()` helpers like in `parseGravityAnalysis.test.ts`) do NOT need rework — those are happy-path data shapes, not assertions about the parser's internal behavior.
@@ -448,7 +448,7 @@ Each test asks one question that, if answered "no," would weaken or invalidate t
 - Strategy doc estimate: 40–80 hours (con #2 in `CONTRACTS-VALIDATION-STRATEGY.md`).
 - My prior message estimate: 60–100 hours focused, 12–18 working days.
 - The strategy doc's 40–80 hour estimate was written in May 2026 against the 8 parsers + 28 routes. It did not include:
-  - `packages/modules/automation-contracts/` migration (added since).
+  - `packages/canonical/automation/contracts/` migration (added since).
   - Plugin-pack rewrite (separate effort).
   - Module-SDK alignment.
 - Adjusted estimate including those: **80–140 hours** for the complete migration including plugin-pack + module-SDK alignment.
@@ -576,7 +576,7 @@ This recommendation has all four counterweights present. It is *changing because
 3. RFC-0003 records the spike output as the evidence base; lead approves; status flips to **Accepted**.
 4. Update `docs/CONTRACTS-VALIDATION-STRATEGY.md` with v2.0 decision-log row (flip recorded; rationale = "canonical-module trajectory acceleration; criteria 1+2 will fire within 6 months; toolset-coherence argument from the project lead").
 5. Update `docs/FOUNDATION-HARDENING.md`: move "validation" from §6 (orthogonal axis) to §2 (landed slices) once the migration completes; add §4.5 (validation slice deep-dive); add §8.6 plugin-pack mapping.
-6. Migration PRs per §8 of the prior chat message (PR 1 = `packages/platform/contracts`; PR 2 = `packages/modules/automation-contracts`; PR 3 = Fastify route migration + bridge layer; plugin-pack rules co-land with each migration PR).
+6. Migration PRs per §8 of the prior chat message (PR 1 = `packages/platform/contracts`; PR 2 = `packages/canonical/automation/contracts`; PR 3 = Fastify route migration + bridge layer; plugin-pack rules co-land with each migration PR).
 
 **If the verdict is NOT sound (the lead disagrees with §6):**
 
@@ -619,7 +619,7 @@ When a future contributor asks "why is Zod the standard?", point them here, then
 
 ### 10.3 Structural-caveat ledger
 
-§6 verdict carries one structural caveat: **library-agnostic SDK boundary**. The caveat is now operationalized as RFC-0003 Decision C + [`packages/modules/module-sdk/src/validatedSchema.ts`](../../packages/modules/module-sdk/src/validatedSchema.ts) (`ValidatedSchema<T>` interface + `fromParser` adapter). If a future re-audit tightens or relaxes that caveat, the new audit's verdict section should cite §6 here as the prior posture.
+§6 verdict carries one structural caveat: **library-agnostic SDK boundary**. The caveat is now operationalized as RFC-0003 Decision C + [`packages/sdk/module-sdk/src/validatedSchema.ts`](../../packages/sdk/module-sdk/src/validatedSchema.ts) (`ValidatedSchema<T>` interface + `fromParser` adapter). If a future re-audit tightens or relaxes that caveat, the new audit's verdict section should cite §6 here as the prior posture.
 
 ### 10.4 What this document is NOT
 

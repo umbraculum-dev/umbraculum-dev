@@ -116,20 +116,20 @@ jobs:
             echo "::endgroup::"
           }
 
-          publish_npm_oidc packages/modules/ai-tool-sdk "${AI_TOOL_SDK_ESCAPED}" "@umbraculum/ai-tool-sdk"
-          publish_npm_oidc packages/modules/i18n-keys "${I18N_KEYS_ESCAPED}" "@umbraculum/i18n-keys"
+          publish_npm_oidc packages/sdk/ai-tool-sdk "${AI_TOOL_SDK_ESCAPED}" "@umbraculum/ai-tool-sdk"
+          publish_npm_oidc packages/sdk/i18n-keys "${I18N_KEYS_ESCAPED}" "@umbraculum/i18n-keys"
 
           echo "Rewriting module-sdk dependencies to registry semver for publish tarball only"
-          jq '.dependencies["@umbraculum/ai-tool-sdk"] = "^0.1.1" | .dependencies["@umbraculum/i18n-keys"] = "^0.1.1"' \
-            packages/modules/module-sdk/package.json > /tmp/module-sdk-package.json
-          mv /tmp/module-sdk-package.json packages/modules/module-sdk/package.json
+          jq '.dependencies["@umbraculum/ai-tool-sdk"] = "^0.1.0" | .dependencies["@umbraculum/i18n-keys"] = "^0.1.0"' \
+            packages/sdk/module-sdk/package.json > /tmp/module-sdk-package.json
+          mv /tmp/module-sdk-package.json packages/sdk/module-sdk/package.json
 
-          publish_npm_oidc packages/modules/module-sdk "${MODULE_SDK_ESCAPED}" "@umbraculum/module-sdk"
+          publish_npm_oidc packages/sdk/module-sdk "${MODULE_SDK_ESCAPED}" "@umbraculum/module-sdk"
 
-          publish_npm_oidc packages/modules/automation-contracts "${AUTOMATION_CONTRACTS_ESCAPED}" "@umbraculum/automation-contracts"
-          publish_npm_oidc packages/modules/pim-contracts "${PIM_CONTRACTS_ESCAPED}" "@umbraculum/pim-contracts"
-          publish_npm_oidc packages/modules/mrp-contracts "${MRP_CONTRACTS_ESCAPED}" "@umbraculum/mrp-contracts"
-          publish_npm_oidc packages/modules/crp-contracts "${CRP_CONTRACTS_ESCAPED}" "@umbraculum/crp-contracts"
+          publish_npm_oidc packages/canonical/automation/contracts "${AUTOMATION_CONTRACTS_ESCAPED}" "@umbraculum/automation-contracts"
+          publish_npm_oidc packages/canonical/pim/contracts "${PIM_CONTRACTS_ESCAPED}" "@umbraculum/pim-contracts"
+          publish_npm_oidc packages/canonical/mrp/contracts "${MRP_CONTRACTS_ESCAPED}" "@umbraculum/mrp-contracts"
+          publish_npm_oidc packages/canonical/crp/contracts "${CRP_CONTRACTS_ESCAPED}" "@umbraculum/crp-contracts"
 
       - name: Published versions summary
         run: |

@@ -1,5 +1,5 @@
 /**
- * Zod v4 equivalent of packages/modules/automation-contracts/src/mailbox-data.ts.
+ * Zod v4 equivalent of packages/canonical/automation/contracts/src/mailbox-data.ts.
  *
  * Paper-design spike per docs/rfcs/0003-validation-library-adoption.md §15.
  * Replaces ~115 lines of hand-rolled assertEntry + assertSpec with a single
