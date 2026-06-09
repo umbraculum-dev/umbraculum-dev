@@ -45,14 +45,14 @@ The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party m
 
 You do **not** import from `services/api/src/modules/<code>/` directly. That tree is platform internals and not version-stable. If something you need is not exported from a contracts package, that's a feature request against the contracts package, not a license to reach inside.
 
-**npm registry (primary).** Core SDK packages on the public npm registry as of **2026-05-29**; `@umbraculum/contracts` and `@umbraculum/api-client` at **`0.0.1`** (2026-06):
+**npm registry (primary).** Core SDK packages on the public npm registry; MIT batch reset to **`0.1.0`** with [RFC-0012](../rfcs/0012-package-tier-clarity.md) tier paths (2026-06-08). `@umbraculum/contracts` and `@umbraculum/api-client` remain at **`0.0.1`** until their next publish:
 
 ```bash
 npm install \
-  @umbraculum/module-sdk@0.0.2 \
-  @umbraculum/ai-tool-sdk@0.1.1 \
-  @umbraculum/i18n-keys@0.1.1
-# plus @umbraculum/<code>-contracts@0.0.2 for each canonical you target
+  @umbraculum/module-sdk@0.1.0 \
+  @umbraculum/ai-tool-sdk@0.1.0 \
+  @umbraculum/i18n-keys@0.1.0
+# plus @umbraculum/<code>-contracts@0.1.0 for each canonical you target
 # optional HTTP client stack:
 npm install @umbraculum/contracts@0.0.1 @umbraculum/api-client@0.0.1
 ```
@@ -61,7 +61,7 @@ Pin `peerDependencies` to `^` those versions (or newer patch/minor within range)
 
 **HTTP integrator walkthrough (no module registration):** [`INTEGRATOR-QUICKSTART.md`](../../INTEGRATOR-QUICKSTART.md) — install from npm, bearer login, platform API reads. **Sample repo:** [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) (public, no monorepo clone).
 
-**Monorepo hybrid (contributors).** Umbraculum contributors use npm workspaces: **consumer** manifests pin the same registry semver as third-party repos (`^0.0.2` module-sdk batch, `^0.0.1` contracts/api-client); workspaces still symlink in-tree `packages/*` for active co-dev. Unpublished monorepo packages (`ui`, `i18n`, brewery vertical, …) remain `file:` links. See [`npm-sdk-monorepo-dogfood.md`](../../design/npm-sdk-monorepo-dogfood.md). Git dependencies on the monorepo checkout remain valid when you need unreleased pins.
+**Monorepo hybrid (contributors).** Umbraculum contributors use npm workspaces: **consumer** manifests pin registry semver (`^0.1.0` MIT batch, `^0.0.1` contracts/api-client) or `file:` for co-dev; workspaces symlink in-tree `packages/{platform,sdk,canonical,verticals}/`. See [`NAVIGATE-MONOREPO.md`](../../NAVIGATE-MONOREPO.md) and [`npm-sdk-monorepo-dogfood.md`](../../design/npm-sdk-monorepo-dogfood.md).
 
 ---
 

@@ -9,17 +9,17 @@
 
 ## 1. Scope
 
-**July 2026 alpha batch (published 2026-05-29; current registry versions):**
+**July 2026 alpha batch** — paths per [RFC-0012](../rfcs/0012-package-tier-clarity.md). **Monorepo manifest:** `0.1.0` (2026-06-08 reset). **npm registry** still carries older versions until the next `sdk-batch-v*` publish:
 
-| Order | Package | Path | On npm (latest) |
-|-------|---------|------|-----------------|
-| 1 | `@umbraculum/ai-tool-sdk` | `packages/sdk/ai-tool-sdk/` | `0.1.1` |
-| 2 | `@umbraculum/i18n-keys` | `packages/sdk/i18n-keys/` | `0.1.1` |
-| 3 | `@umbraculum/module-sdk` | `packages/sdk/module-sdk/` | `0.0.2` |
-| 4 | `@umbraculum/automation-contracts` | `packages/canonical/automation/contracts/` | `0.0.2` |
-| 5 | `@umbraculum/pim-contracts` | `packages/canonical/pim/contracts/` | `0.0.2` |
-| 6 | `@umbraculum/mrp-contracts` | `packages/canonical/mrp/contracts/` | `0.0.2` |
-| 7 | `@umbraculum/crp-contracts` | `packages/canonical/crp/contracts/` | `0.0.2` |
+| Order | Package | Path | Monorepo | On npm (until republish) |
+|-------|---------|------|----------|--------------------------|
+| 1 | `@umbraculum/ai-tool-sdk` | `packages/sdk/ai-tool-sdk/` | `0.1.0` | `0.1.1` |
+| 2 | `@umbraculum/i18n-keys` | `packages/sdk/i18n-keys/` | `0.1.0` | `0.1.1` |
+| 3 | `@umbraculum/module-sdk` | `packages/sdk/module-sdk/` | `0.1.0` | `0.0.2` |
+| 4 | `@umbraculum/automation-contracts` | `packages/canonical/automation/contracts/` | `0.1.0` | `0.0.2` |
+| 5 | `@umbraculum/pim-contracts` | `packages/canonical/pim/contracts/` | `0.1.0` | `0.0.2` |
+| 6 | `@umbraculum/mrp-contracts` | `packages/canonical/mrp/contracts/` | `0.1.0` | `0.0.2` |
+| 7 | `@umbraculum/crp-contracts` | `packages/canonical/crp/contracts/` | `0.1.0` | `0.0.2` |
 
 **Phase E extension (published 2026-06-02):**
 
@@ -63,8 +63,8 @@ module-sdk → file:../ai-tool-sdk, file:../i18n-keys
 
 ```json
 "dependencies": {
-  "@umbraculum/ai-tool-sdk": "^0.1.1",
-  "@umbraculum/i18n-keys": "^0.1.1"
+  "@umbraculum/ai-tool-sdk": "^0.1.0",
+  "@umbraculum/i18n-keys": "^0.1.0"
 }
 ```
 
@@ -85,7 +85,7 @@ In a **clean temp directory**:
 
 ```bash
 npm init -y
-npm install @umbraculum/ai-tool-sdk@0.1.1 @umbraculum/module-sdk@0.0.2
+npm install @umbraculum/ai-tool-sdk@0.1.0 @umbraculum/module-sdk@0.1.0
 node --input-type=module -e "import('@umbraculum/module-sdk').then(m => console.log(Object.keys(m).slice(0,6)))"
 ```
 
