@@ -44,7 +44,7 @@ export function EquipmentProfileCreateForm(props: { model: NativeEquipmentPageMo
   } = props.model;
 
   return (
-    <YStack marginTop="$3">
+    <View style={{ marginTop: 12 }}>
     <Accordion.Item value="create">
       <Card gap="$2" aria-label={t("createTitle")}>
         <Accordion.Header>
