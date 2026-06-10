@@ -426,6 +426,23 @@ docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
 CI: [`.github/workflows/native-deps.yml`](.github/workflows/native-deps.yml). Assessment +
 agent anti-patterns: [`docs/design/expo-doctor-monorepo-assessment.md`](docs/design/expo-doctor-monorepo-assessment.md) §8.
 
+**Tamagui CLI duplicate-instance gate:** When **you** edit `tamagui` / `@tamagui/*`
+version pins (any of the five manifests in `docs/TAMAGUI.md`), root `overrides` for
+Tamagui, Tamagui-related lockfiles, or debug runtime errors (`Can't find Tamagui
+configuration`, duplicate-instance warnings), run skill **`tamagui-cli-check`**
+(toolset rule **`79-tamagui-cli-monorepo-gate`**). **Enforcement:** plugin
+`alwaysApply` is unreliable — this repo commits
+[`.cursor/rules/79-tamagui-cli-monorepo-gate.mdc`](.cursor/rules/79-tamagui-cli-monorepo-gate.mdc)
+as the binding copy for agents.
+
+```bash
+docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+  bash -lc "./scripts/check-tamagui-cli.sh"
+```
+
+Not in ci-parity today; agents own it on the Tamagui hoist surface before push.
+Human SoT: [`docs/TAMAGUI.md`](docs/TAMAGUI.md) § Tamagui CLI check.
+
 **During iteration (not the push gate):** `./scripts/ci-parity-check.sh run`
 (`--ci`, working tree + warm volumes) is fine for fast WIP feedback — but
 **never** treat `--ci` green alone as push proof if you have not yet run archive

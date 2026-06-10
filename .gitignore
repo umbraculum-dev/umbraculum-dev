@@ -5,7 +5,10 @@ backups/
 # ------------------------------------------------------------
 
 # Cursor artifacts (synced via npx / developer-managed)
-.cursor/
+.cursor/*
+# Repo-side enforcement copies for plugin alwaysApply gaps (see AGENTS.md)
+!.cursor/rules/
+!.cursor/rules/*.mdc
 .cursorignore
 
 # npm auth / registry config (often contains tokens)

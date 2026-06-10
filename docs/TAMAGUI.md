@@ -1,7 +1,7 @@
 # Tamagui: type-system situation + our adaptation strategy
 
 **Tier:** Public
-**Status:** v1.3 — descriptive (not prescriptive). Living document. Updated 2026-06-10 — monorepo-wide Tamagui **2.2.0** stable adoption (exact pins + root overrides); tsc baselines re-measured. v1.2 (2026-05-21) refreshed shorthand-prop counts post-web-route-shape audit. v1.1 (2026-05-16) revised the "Tamagui wall" framing post-HIGH-full landing (see triage block #3 below).
+**Status:** v1.4 — descriptive (not prescriptive). Living document. Updated 2026-06-10 — Tamagui CLI check gate (`scripts/check-tamagui-cli.sh`, agent rule 79). v1.3 — monorepo-wide Tamagui **2.2.0** stable adoption (exact pins + root overrides); tsc baselines re-measured. v1.2 (2026-05-21) refreshed shorthand-prop counts post-web-route-shape audit. v1.1 (2026-05-16) revised the "Tamagui wall" framing post-HIGH-full landing (see triage block #3 below).
 **Audience:** maintainers, contributors authoring web/native UI code, anyone debugging Tamagui-related lint/TS noise.
 **Owners:** maintainers
 **Related:** `docs/LINTING.md` (the lint phase log, including the post-mortem revision of the Tamagui-wall framing), `packages/platform/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
@@ -21,6 +21,23 @@ This document:
 3. Tells future maintainers when *not* to spend time fixing what is upstream.
 
 **Pinned version (2026-06-10):** `tamagui` and every declared `@tamagui/*` dependency use exact **`2.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (devDep). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps.
+
+### Tamagui CLI check (duplicate instances)
+
+Tamagui ships `npx @tamagui/cli check` to detect **multiple physical installations** of `tamagui` / `@tamagui/*` (version skew *or* duplicate copies at the same version). Runtime symptom when duplicates exist: `Can't find Tamagui configuration` / `no parent theme context` on primitives such as `SizableText` even though `TamaguiProvider` is mounted.
+
+**Agents:** run skill **`tamagui-cli-check`** (rule **`79-tamagui-cli-monorepo-gate`**) whenever Tamagui pins, root `overrides`, or related lockfiles change, or when debugging the runtime error above. **umbraculum-dev** enforces via committed [`.cursor/rules/79-tamagui-cli-monorepo-gate.mdc`](../.cursor/rules/79-tamagui-cli-monorepo-gate.mdc) (plugin `alwaysApply` alone is not reliable).
+
+**Canonical script** (container — not host npm):
+
+```bash
+docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+  bash -lc "./scripts/check-tamagui-cli.sh"
+```
+
+The script: removes stale `packages/platform/ui/node_modules` and `packages/verticals/brewery/recipes-ui/node_modules`, runs `npm ci` in `apps/web` (`legacy-peer-deps`), strips nested `node_modules` under `node_modules/@umbraculum/ui` and `…/brewery-recipes-ui`, runs `npm dedupe`, then `@tamagui/cli check`. Expect: `Tamagui dependencies look good ✅`.
+
+**Common cause:** root `npm install --legacy-peer-deps` or `apps/web` `npm install` nesting Tamagui under `file:` workspace links. Web compose startup removes package-mount nested trees; post-install dedupe in [`docker-compose.yml`](../docker-compose.yml) targets the `web_node_modules` volume mirror paths.
 
 Concrete numbers (refreshed 2026-06-10, post-2.2.0):
 
