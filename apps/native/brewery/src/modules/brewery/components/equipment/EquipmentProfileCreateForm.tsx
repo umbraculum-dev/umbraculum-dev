@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
-import { Accordion, YStack } from "tamagui";
+import { Accordion } from "tamagui";
 
 import type { NativeEquipmentPageModel } from "../../hooks/equipment/useNativeEquipmentPage";
 import { NumInput } from "./NumInput";
@@ -147,6 +147,6 @@ export function EquipmentProfileCreateForm(props: { model: NativeEquipmentPageMo
         </Accordion.Content>
       </Card>
     </Accordion.Item>
-    </YStack>
+    </View>
   );
 }
