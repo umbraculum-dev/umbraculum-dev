@@ -1,7 +1,7 @@
 # Tamagui: type-system situation + our adaptation strategy
 
 **Tier:** Public
-**Status:** v1.2 — descriptive (not prescriptive). Living document. Updated 2026-05-21 — shorthand-prop tsc count refreshed post-web-route-shape audit (590 → 1086; the documented >1000 trigger has been crossed — see "When to revisit this doc" below). v1.1 (2026-05-16) revised the "Tamagui wall" framing post-HIGH-full landing (see triage block #3 below).
+**Status:** v1.3 — descriptive (not prescriptive). Living document. Updated 2026-06-10 — monorepo-wide Tamagui **2.2.0** stable adoption (exact pins + root overrides); tsc baselines re-measured. v1.2 (2026-05-21) refreshed shorthand-prop counts post-web-route-shape audit. v1.1 (2026-05-16) revised the "Tamagui wall" framing post-HIGH-full landing (see triage block #3 below).
 **Audience:** maintainers, contributors authoring web/native UI code, anyone debugging Tamagui-related lint/TS noise.
 **Owners:** maintainers
 **Related:** `docs/LINTING.md` (the lint phase log, including the post-mortem revision of the Tamagui-wall framing), `packages/platform/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
@@ -20,14 +20,16 @@ This document:
 2. Describes how we work around each one,
 3. Tells future maintainers when *not* to spend time fixing what is upstream.
 
-Concrete numbers (refreshed 2026-05-21):
+**Pinned version (2026-06-10):** `tamagui` and every declared `@tamagui/*` dependency use exact **`2.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (devDep). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps.
+
+Concrete numbers (refreshed 2026-06-10, post-2.2.0):
 
 | Where | TS errors (`tsc --noEmit`) | Notes |
 |---|---|---|
-| `packages/platform/ui` | 25 | Mostly `TS2322` (shorthand prop incompatibility) + `TS2590` (union too complex) — last measured 2026-05-16 |
-| `apps/web` | 1086 (760 `TS2322` shorthand/token) | Refreshed 2026-05-21 (up from 590 on 2026-05-16). Top offenders by property: `mt` 311, `bg` 184, `minW` 163, `w` 125, `ai` 69, `as` 58, `items` 57, `mb` 54. Spread across 56 files. **Crosses the >1000 trigger documented in "When to revisit this doc" below**; status quo retained pending Tamagui v2 stable / intermediate RC bump (see that section for the deliberation). |
-| `apps/native` | 0 | Native side typically doesn't hit the web-DOM-shorthand collision — last measured 2026-05-16 |
-| `packages/verticals/brewery/recipes-ui` | 0 | Uses a curated subset of Tamagui surface — last measured 2026-05-16 |
+| `packages/platform/ui` | 27 | Mostly `TS2322` (shorthand prop incompatibility) + `TS2590` (union too complex) — up from 25 at rc.17 |
+| `apps/web` | 1125 | Up from 1086 at rc.17 (2026-05-21). Still dominated by `TS2322` shorthand/token gaps. **>1000 trigger still active**; wrapper-layer work deferred — measure again on the next Tamagui minor. |
+| `apps/native` | 0 | Native side typically doesn't hit the web-DOM-shorthand collision — held at 0 through 2.2.0 (two `Accordion.Item` `mt` sites fixed via `YStack marginTop`) |
+| `packages/verticals/brewery/recipes-ui` | 0 | Uses a curated subset of Tamagui surface — held at 0 through 2.2.0 |
 
 ---
 
@@ -184,7 +186,7 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 
 - A new Tamagui major version is released and changes the type ecosystem materially.
 - A new bug class appears that needs another wrapper primitive.
-- The `no-explicit-any` count concentrated in Tamagui-adjacent code crosses a threshold where the cost/benefit of a more aggressive wrapper layer changes. Original framing (2026-05-16): "~590 in apps/web alone; if it grows to >1000 in a single app, reconsider." **Update 2026-05-21:** crossed — `apps/web` is at 1086 (760 `TS2322` shorthand). The "reconsider" trigger has fired and was deliberated; status-quo retained because (a) the project is already on Tamagui v2 RC (`^2.0.0-rc.11`) and `tamagui@latest` on npm is `2.0.0-rc.42` as of 2026-05-21 — 31 RC releases of shorthand-type fixes are available without a major-version jump, and (b) Tamagui v2 stable has not shipped yet, which means the canonical "shorthand audit vs upstream fix" fork in Caveat 2 still has a credible upstream-fix path on the same major version. The cheaper next step is an intra-RC bump (`rc.11 → rc.42`) measured against the same `tsc --noEmit` baseline before any wrapper-layer work is scoped. A roadmap commitment to track Tamagui v2 stable when it ships is captured in `docs/ROADMAP.md`.
+- The `no-explicit-any` count concentrated in Tamagui-adjacent code crosses a threshold where the cost/benefit of a more aggressive wrapper layer changes. Original framing (2026-05-16): "~590 in apps/web alone; if it grows to >1000 in a single app, reconsider." **Update 2026-06-10:** v2 stable **2.2.0** landed repo-wide; `apps/web` `tsc` is **1125** (up from 1086 at rc.17) — the >1000 trigger remains active but wrapper-layer work stays deferred until a Tamagui minor measurably reduces shorthand `TS2322` count or a feature PR needs typed shorthands urgently. Next hygiene step: re-measure on Tamagui **2.3.x** (or next minor) before scoping a project-local shorthand wrapper.
 - HIGH-full lint upgrade landed 2026-05-16 — see [`docs/LINTING.md`](LINTING.md) for the full phase log. Tamagui-adjacent type leakage turned out to be ~6 warnings, not the 266 originally predicted (95% of the apps/web `no-unsafe-*` surface was a stale `account → workspace` rename, not Tamagui — see triage block #3 above). The trigger to re-open the "should we build a Tamagui adapter wrapper layer?" question: a *new* surge of Tamagui-attributed `no-unsafe-*` errors in CI specifically (>50 in a single PR cycle, or >100 cumulative across two cycles) — that would suggest Tamagui upstream's typings have regressed and the cost/benefit of a project-local adapter has shifted. Until then, per-line `eslint-disable-next-line ... -- Tamagui ... ; see docs/TAMAGUI.md` is the right granularity.
 
 ---

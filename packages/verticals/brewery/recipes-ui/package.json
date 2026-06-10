@@ -29,7 +29,7 @@
     "@umbraculum/brewery-beerjson": "file:../beerjson",
     "@umbraculum/i18n-react": "file:../../../platform/i18n-react",
     "@umbraculum/ui": "file:../../../platform/ui",
-    "tamagui": "^2.0.0-rc.11",
+    "tamagui": "2.2.0",
     "victory": "^36.9.2",
     "victory-native": "^36.9.2"
   },

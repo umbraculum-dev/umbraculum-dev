@@ -16,12 +16,12 @@
     "i18n:guardrail": "node scripts/i18n-guardrail.mjs"
   },
   "dependencies": {
-    "@tamagui/animations-css": "^2.0.0-rc.11",
-    "@tamagui/config": "^2.0.0-rc.7",
-    "@tamagui/core": "^2.0.0-rc.12",
+    "@tamagui/animations-css": "2.2.0",
+    "@tamagui/config": "2.2.0",
+    "@tamagui/core": "2.2.0",
     "@umbraculum/api-client": "file:../../packages/platform/api-client",
-    "@umbraculum/brewery-api-client": "file:../../packages/verticals/brewery/api-client",
     "@umbraculum/automation-contracts": "file:../../packages/canonical/automation/contracts",
+    "@umbraculum/brewery-api-client": "file:../../packages/verticals/brewery/api-client",
     "@umbraculum/brewery-beerjson": "file:../../packages/verticals/brewery/beerjson",
     "@umbraculum/brewery-contracts": "file:../../packages/verticals/brewery/contracts",
     "@umbraculum/brewery-core": "file:../../packages/verticals/brewery/core",
@@ -42,12 +42,12 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native-web": "^0.20.0",
-    "tamagui": "^2.0.0-rc.11",
+    "tamagui": "2.2.0",
     "victory": "^36.9.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@tamagui/cli": "^2.0.0-rc.11",
+    "@tamagui/cli": "2.2.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

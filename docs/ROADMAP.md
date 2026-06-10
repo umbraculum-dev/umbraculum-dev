@@ -156,7 +156,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | **2f** | **MIT npm SDK publish batch** | **Pre-completed 2026-05-29** (before Stage 2 flip) — registry install live | [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md), [`LICENSING.md`](LICENSING.md) §6.2.1 |
 | **2g** | **DocSearch application submit** (Algolia) | Replaces lunr fallback on docs site | RFC-0005 P5 |
 | **2h** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 — **contract ✅ [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)**; implementation deferred; pairs with **F-mod** (optional reference vertical / platform-without-brewery) |
-| **2i** | **Tamagui intra-RC bump** | Hygiene | [`TAMAGUI.md`](TAMAGUI.md) |
+| **2i** | **Tamagui v2 stable (2.2.0)** | **Done 2026-06-10** — superseded intra-RC experiment | [`TAMAGUI.md`](TAMAGUI.md) |
 
 **Not in this H2 alpha slice:** WMS, native MRP/CRP operator screens, irreversible brewery→MRP schema migration, scheduling optimizer, ready-to-sell commercial MRP/CRP — see [§ H1 2027 mature](#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) below.
 
@@ -172,7 +172,7 @@ Goal: move from **read-only alpha proof** to **production-ready** manufacturing 
 - **Irreversible** promotion of brewery brew-session/recipe data into MRP-owned tables (alpha stays read-time projection; brewery remains source of truth today).
 - **Ready-to-sell** MRP/CRP product depth (optimizers, mature scheduling, multi-vertical configurations beyond brewery proof).
 
-**Foundation hardening — Tamagui RC → stable (ongoing hygiene, not blocking alpha):** On Tamagui v2 RC; committed ladder in [`TAMAGUI.md`](TAMAGUI.md) — **(1)** intra-RC bump experiment scheduled July 2026; **(2)** adopt v2 stable when upstream ships; **(3)** conditional project-local shorthand wrapper only if (1)+(2) leave `apps/web` well above the documented >1000-error trigger.
+**Foundation hardening — Tamagui RC → stable (ongoing hygiene, not blocking alpha):** **Step (2) landed 2026-06-10** — monorepo on Tamagui **2.2.0** stable (exact pins). Intra-RC bump (step 1) was superseded. Step **(3)** — conditional project-local shorthand wrapper — remains deferred: `apps/web` `tsc` is 1125 errors post-2.2.0 (still above the >1000 trigger in [`TAMAGUI.md`](TAMAGUI.md)); re-measure on the next Tamagui minor before scoping wrapper work.
 
 ### H2 2027 — WMS as second native-mandatory vertical; federation decision
 

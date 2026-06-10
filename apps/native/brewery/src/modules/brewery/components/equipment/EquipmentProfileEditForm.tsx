@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
-import { Accordion } from "tamagui";
+import { Accordion, YStack } from "tamagui";
 
 import type { NativeEquipmentPageModel } from "../../hooks/equipment/useNativeEquipmentPage";
 import { NumInput } from "./NumInput";
@@ -24,7 +24,8 @@ export function EquipmentProfileEditForm(props: { model: NativeEquipmentPageMode
   if (!editingId) return null;
 
   return (
-    <Accordion.Item value="edit" mt="$3">
+    <YStack marginTop="$3">
+    <Accordion.Item value="edit">
       <Card gap="$2" aria-label={t("editTitle")}>
         <Accordion.Header>
           <Accordion.Trigger
@@ -140,5 +141,6 @@ export function EquipmentProfileEditForm(props: { model: NativeEquipmentPageMode
         </Accordion.Content>
       </Card>
     </Accordion.Item>
+    </YStack>
   );
 }

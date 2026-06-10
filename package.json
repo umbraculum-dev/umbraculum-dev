@@ -63,7 +63,12 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
-    "react-native-svg": "15.12.1"
+    "react-native-svg": "15.12.1",
+    "tamagui": "2.2.0",
+    "@tamagui/core": "2.2.0",
+    "@tamagui/config": "2.2.0",
+    "@tamagui/animations-css": "2.2.0",
+    "@tamagui/animations-react-native": "2.2.0"
   },
   "engines": {
     "node": ">=20"

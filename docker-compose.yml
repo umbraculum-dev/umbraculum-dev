@@ -70,9 +70,9 @@ services:
     environment:
       - NEXT_PUBLIC_API_BASE_URL=/api
       - UMBRACULUM_MODULE_PROFILE=${UMBRACULUM_MODULE_PROFILE:-reference}
-      # NOTE: Previously required to bypass npm peer-dependency conflicts when React was pinned to 19.1.0.
-      # Monorepo React is 19.1.0 (Expo Go ABI via root overrides). Keep legacy_peer_deps disabled unless conflicts return.
-      # - npm_config_legacy_peer_deps=true
+      # NOTE: Required to bypass npm peer-dependency conflicts when React is pinned to 19.1.0
+      # (Expo Go ABI via root overrides) while Tamagui pulls react-native@0.85.x peers.
+      - npm_config_legacy_peer_deps=true
     ports:
       - "3000:3000"
     volumes:
