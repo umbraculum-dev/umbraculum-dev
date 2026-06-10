@@ -142,7 +142,7 @@ services:
 
   api:
     build: ./services/api
-    command: sh -c "npm install --no-audit --no-fund --prefer-offline && npm run dev"
+    command: sh -c "npm install --no-audit --no-fund --prefer-offline && rm -f package-lock.json && npm run dev"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@pgpool:5432/brewapp
       - DATABASE_URL_TEST=postgresql://postgres:postgres@postgres:5432/brewapp_test
@@ -210,7 +210,7 @@ services:
   beerproto-sync:
     profiles: ["jobs"]
     build: ./services/api
-    command: sh -c "npm install --no-audit --no-fund --prefer-offline && while true; do npm run job:beerproto-sync; sleep 604800; done"
+    command: sh -c "npm install --no-audit --no-fund --prefer-offline && rm -f package-lock.json && while true; do npm run job:beerproto-sync; sleep 604800; done"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/brewapp
     depends_on:

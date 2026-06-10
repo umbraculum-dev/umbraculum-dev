@@ -13,6 +13,8 @@ backups/
 
 # npm auth / registry config (often contains tokens)
 .npmrc
+# Committed policy file only — no secrets (package-lock=false); see DEVELOPMENT.md
+!services/api/.npmrc
 
 # ci-parity --ci mode writes ephemeral logs/scripts into the repo root
 .ci-parity-run.sh
@@ -40,6 +42,8 @@ __pycache__/
 # ------------------------------------------------------------
 # Node / Next.js / TypeScript
 # ------------------------------------------------------------
+# Ephemeral lockfile if someone runs npm install inside services/api (see services/api/.npmrc).
+services/api/package-lock.json
 node_modules/
 .expo/
 apps/native/.expo/

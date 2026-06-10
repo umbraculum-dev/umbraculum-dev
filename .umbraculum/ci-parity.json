@@ -47,6 +47,7 @@
       ],
       "commands": [
         "python3 scripts/docs/check-readmes.py",
+        "./scripts/check-monorepo-lockfiles.sh",
         "python3 scripts/docs/check-public-docs-no-internal-links.py",
         "python3 scripts/docs/check-public-docs-no-personal-paths.py",
         "python3 scripts/docs/check-docs-site-reference-registry.py",
