@@ -1680,16 +1680,18 @@ var it_default = {
   }
 };
 
-// src/index.ts
-var import_meta = {};
-var require2 = (0, import_node_module.createRequire)(import_meta.url);
-var en = en_default;
-var it = it_default;
+// src/locales.ts
 var locales = ["en", "it"];
 var defaultLocale = "en";
 function isLocale(value) {
   return locales.includes(value);
 }
+
+// src/index.ts
+var import_meta = {};
+var require2 = (0, import_node_module.createRequire)(import_meta.url);
+var en = en_default;
+var it = it_default;
 function deepMerge(target, source) {
   const result = { ...target };
   for (const key of Object.keys(source)) {

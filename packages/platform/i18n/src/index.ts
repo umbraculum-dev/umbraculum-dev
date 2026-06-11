@@ -10,20 +10,19 @@ import { isVerticalInstalled } from "@umbraculum/module-sdk";
 
 import enData from "./en.json";
 import itData from "./it.json";
+import {
+  defaultLocale,
+  isLocale,
+  locales,
+  type SupportedLocale,
+} from "./locales.js";
 
 const require = createRequire(import.meta.url);
 
 const en = enData as Record<string, unknown>;
 const it = itData as Record<string, unknown>;
 
-export const locales = ["en", "it"] as const;
-export type SupportedLocale = (typeof locales)[number];
-
-export const defaultLocale: SupportedLocale = "en";
-
-export function isLocale(value: string): value is SupportedLocale {
-  return (locales as readonly string[]).includes(value);
-}
+export { defaultLocale, isLocale, locales, type SupportedLocale };
 
 function deepMerge(
   target: Record<string, unknown>,

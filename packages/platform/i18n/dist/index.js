@@ -1,3 +1,9 @@
+import {
+  defaultLocale,
+  isLocale,
+  locales
+} from "./chunk-6XLFIMGT.js";
+
 // src/index.ts
 import { createRequire } from "module";
 import { isVerticalInstalled } from "@umbraculum/module-sdk";
@@ -1655,11 +1661,6 @@ var it_default = {
 var require2 = createRequire(import.meta.url);
 var en = en_default;
 var it = it_default;
-var locales = ["en", "it"];
-var defaultLocale = "en";
-function isLocale(value) {
-  return locales.includes(value);
-}
 function deepMerge(target, source) {
   const result = { ...target };
   for (const key of Object.keys(source)) {

@@ -5,7 +5,7 @@
   "description": "Generic locale-bundle framework (TypeScript types + JSON bundles + copy-json build step). Platform + canonical namespaces only; brewery-vertical strings live in @umbraculum/brewery-i18n and merge in getSharedMessages().",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json && node scripts/copy-json.mjs",
+    "build": "tsup src/index.ts src/locales.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json && node scripts/copy-json.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "exports": {
@@ -20,6 +20,12 @@
     },
     "./it": {
       "default": "./dist/it.json"
+    },
+    "./locales": {
+      "types": "./dist/locales.d.ts",
+      "import": "./dist/locales.js",
+      "require": "./dist/locales.cjs",
+      "default": "./dist/locales.js"
     }
   },
   "main": "./dist/index.js",
