@@ -97,6 +97,11 @@ export const WEBVIEW_WHITELIST_ROUTE_IDS = [
   "resources",
 ] as const satisfies readonly RouteId[];
 
+export {
+  BREWERY_ROUTE_IDS,
+  isBreweryRouteId,
+  type BreweryRouteId,
+} from "./breweryRouteIds.js";
 export { clearNativeRoutePolicyForTests, configureNativeRoutePolicy };
 
 export function isWebviewWhitelistRouteId(id: RouteId): boolean {

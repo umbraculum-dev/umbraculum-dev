@@ -82,13 +82,13 @@ describe("module profile — platform SKU", () => {
   });
 });
 
-describe("module profile — reference default", () => {
+describe("module profile — reference", () => {
   const previousProfile = process.env["UMBRACULUM_MODULE_PROFILE"];
   const savedRedis = disableRedisForProfileTests();
   let app: ReturnType<typeof buildApp>;
 
   beforeAll(async () => {
-    delete process.env["UMBRACULUM_MODULE_PROFILE"];
+    process.env["UMBRACULUM_MODULE_PROFILE"] = "reference";
     clearModuleRegistryForTests();
     clearWebModuleRegistryForTests();
     app = buildApp();
@@ -101,7 +101,7 @@ describe("module profile — reference default", () => {
     restoreRedisAfterProfileTests(savedRedis);
   });
 
-  it("registers brewery module metadata by default", () => {
+  it("registers brewery module metadata when reference profile is set", () => {
     const codes = listRegisteredModules().map((m) => m.code);
     expect(codes).toContain("brewery");
   });

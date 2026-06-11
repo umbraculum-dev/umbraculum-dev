@@ -23,12 +23,28 @@ describe("EntitlementsService", () => {
       } as never,
       "tier_and_addons",
     );
-    await expect(svc.hasActiveAddon("ws-1", "brewery_module")).resolves.toBe(true);
+    await expect(svc.hasActiveAddon("ws-1", "automation_module")).resolves.toBe(true);
     if (prev === undefined) delete process.env["UMBRACULUM_GRANT_ALL_ADDONS"];
     else process.env["UMBRACULUM_GRANT_ALL_ADDONS"] = prev;
   });
 
+  it("tier_and_addons denies brewery_module when brewery vertical is not installed", async () => {
+    const prev = process.env["UMBRACULUM_MODULE_PROFILE"];
+    process.env["UMBRACULUM_MODULE_PROFILE"] = "platform";
+    const findFirst = vi.fn();
+    const svc = new EntitlementsService(
+      { workspaceBillingAddon: { findFirst } } as never,
+      "tier_and_addons",
+    );
+    await expect(svc.hasActiveAddon("ws-1", "brewery_module")).resolves.toBe(false);
+    expect(findFirst).not.toHaveBeenCalled();
+    if (prev === undefined) delete process.env["UMBRACULUM_MODULE_PROFILE"];
+    else process.env["UMBRACULUM_MODULE_PROFILE"] = prev;
+  });
+
   it("tier_and_addons mode queries WorkspaceBillingAddon rows", async () => {
+    const prev = process.env["UMBRACULUM_MODULE_PROFILE"];
+    process.env["UMBRACULUM_MODULE_PROFILE"] = "reference";
     const findFirst = vi.fn().mockResolvedValue({ id: "addon-1" });
     const svc = new EntitlementsService(
       { workspaceBillingAddon: { findFirst } } as never,
@@ -39,14 +55,20 @@ describe("EntitlementsService", () => {
       where: { workspaceId: "ws-1", addonCode: "brewery_module", status: "active" },
       select: { id: true },
     });
+    if (prev === undefined) delete process.env["UMBRACULUM_MODULE_PROFILE"];
+    else process.env["UMBRACULUM_MODULE_PROFILE"] = prev;
   });
 
   it("tier_and_addons mode denies when no active row", async () => {
+    const prev = process.env["UMBRACULUM_MODULE_PROFILE"];
+    process.env["UMBRACULUM_MODULE_PROFILE"] = "reference";
     const svc = new EntitlementsService(
       { workspaceBillingAddon: { findFirst: vi.fn().mockResolvedValue(null) } } as never,
       "tier_and_addons",
     );
     await expect(svc.hasActiveAddon("ws-1", "brewery_module")).resolves.toBe(false);
+    if (prev === undefined) delete process.env["UMBRACULUM_MODULE_PROFILE"];
+    else process.env["UMBRACULUM_MODULE_PROFILE"] = prev;
   });
 });
 

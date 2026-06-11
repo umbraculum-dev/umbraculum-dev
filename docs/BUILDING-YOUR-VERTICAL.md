@@ -160,21 +160,23 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 
 `brewery_module` is already declared as an add-on code; **enforcement is deferred** ([`design/canonical-workspace-billing-addons-surface.md`](design/canonical-workspace-billing-addons-surface.md)).
 
-### Today (F-mod Phase 1 shipped 2026-05-31)
+### Installation profile (Waves A–F shipped 2026-06)
 
-| Layer | Default (`reference` profile) | Platform opt-out (`UMBRACULUM_MODULE_PROFILE=platform` or [`docker-compose.platform.yml`](../../docker-compose.platform.yml)) |
+| Layer | Core profile (default) | Reference opt-in (`UMBRACULUM_MODULE_PROFILE=reference`) |
 |---|---|---|
-| **API** | `registerBreweryModule(app)` when profile is `reference` ([`services/api/src/app.ts`](../../services/api/src/app.ts)) | Brewery module + `/platform/recipes/*` not registered |
-| **Web nav** | `brewery` in [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/sdk/module-sdk/src/builtinWebModules.ts) | Brewery segments omitted |
-| **Native** | Brewery routes in [`registerPlatformNativeModules`](../../apps/native/src/navigation/registerPlatformNativeModules.ts) | Brewery native module skipped |
-| **Database** | `brewery.*` schema always migrated | Same — runtime opt-out only; schema remains |
-| **Workspace UI toggle** | **None** — deploy profile + optional add-on rows | `WorkspaceBillingAddon` + `tier_and_addons` enforcement (Phase 3 slice); full purchase UI deferred H1 2027 |
+| **API** | Brewery module not registered ([`services/api/src/app.ts`](../../services/api/src/app.ts)) | `registerBreweryModule(app)` |
+| **Web nav** | Brewery segments omitted | `brewery` in builtin web modules |
+| **Native** | [`apps/native/starter`](../../apps/native/starter) (minimal shell) | [`apps/native/brewery`](../../apps/native/brewery) |
+| **Database** | `brewery.*` stripped after migrate ([`installation-profile.md`](design/installation-profile.md)) | Full `brewery.*` schema |
+| **Workspace UI toggle** | Install profile gate + optional add-on rows (RFC-0009 prep) | Same |
 
-**Fresh clone:** `docker compose up` → **`reference`** profile (brewery on) — see [`.env.sample`](../../.env.sample) and [`design/platform-module-profile.md`](design/platform-module-profile.md).
+**Fresh clone:** `docker compose up` → **core** profile (brewery off) — see [`.env.sample`](../../.env.sample) and [`design/installation-profile.md`](design/installation-profile.md).
 
 **Public demo host:** [`demo.umbraculum.dev`](https://demo.umbraculum.dev) intentionally runs the **reference** profile (platform core **plus** brewery vertical) — one hosted illustration of how a Tier 6 vertical sits alongside canonical modules ([`design/demo-host-runbook.md`](design/demo-host-runbook.md)). It is **not** a second demo for platform-only; integrators who omit brewery use `UMBRACULUM_MODULE_PROFILE=platform` in their own deploy (below).
 
-**Integrator without brewery:** set `UMBRACULUM_MODULE_PROFILE=platform` in `.env` or `docker compose -f docker-compose.yml -f docker-compose.platform.yml up -d`.
+**Integrator without brewery:** default fresh clone uses the **core installation profile** (`UMBRACULUM_MODULE_PROFILE=platform`). See [`docs/design/installation-profile.md`](design/installation-profile.md).
+
+**Opt in to brewery (demo / walkthrough):** `UMBRACULUM_MODULE_PROFILE=reference` or `docker compose -f docker-compose.yml -f docker-compose.reference.yml up -d`.
 
 **OpenAPI:** ISVs on the platform profile should consume [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) only — the brewery add-on spec (`openapi/brewery.json`) documents the reference vertical and is omitted from platform-profile generation. Browse interactively on [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform) (platform) or [docs.umbraculum.dev/openapi-brewery](https://docs.umbraculum.dev/openapi-brewery) (reference vertical). For typed HTTP calls from your repo, prefer [`@umbraculum/api-client`](../../packages/platform/api-client/README.md) facades over raw `fetch`. See [`API-OPENAPI.md`](API-OPENAPI.md).
 
@@ -182,8 +184,7 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 
 ### Roadmap hooks
 
-- **H1 2027 — F-mod:** optional reference vertical / **platform-without-brewery install SKU** (decouple `brewery` from unconditional core boot) — [`ROADMAP.md`](ROADMAP.md) post-α wave table + [§ H1 2027 mature scope](ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027)
-- **H1 2027 — 2h / Wave E-full:** workspace add-on entitlements + enforcement ([RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)) — prerequisite for workspace-level "uninstall brewery"
+- **H1 2027 — RFC-0009 full enforcement:** workspace add-on billing UI, Stripe, `tier_and_addons` purchase flows — installation profile gate already ships in 2026-06 ([`design/installation-profile.md`](design/installation-profile.md))
 - **AI / nav:** respect installed modules only ([`design/canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md) §5 — today all boot-registered modules contribute)
 - **Packaging:** plugin-driven module registration from installed npm packages ([RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3 — future packaging detail)
 
@@ -197,7 +198,7 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 | Step-by-step vertical scaffold | Yes | [`modules/contribute/vertical-configuration.md`](modules/contribute/vertical-configuration.md) |
 | Brewery worked example | Yes | [`modules/verticals/brewery/README.md`](modules/verticals/brewery/README.md) §6 |
 | Vertical in your repo, not monorepo | Yes | [`GLOSSARY.md`](GLOSSARY.md) §"Where code lives"; [`MODULES.md`](MODULES.md) §3.2 |
-| Uninstall brewery / optional reference | Partial | [`GLOSSARY.md`](GLOSSARY.md) FAQ #5 — **this page** adds Magento parallel + today/target table |
+| Uninstall brewery / optional reference | Yes (2026-06) | [`design/installation-profile.md`](design/installation-profile.md), [`design/brewery-vertical-lifecycle.md`](design/brewery-vertical-lifecycle.md), FAQ #5 — **this page** adds Magento parallel |
 | **Single landing for both questions** | **This page** | [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) |
 | First-time contributor (not vertical ISV) | Different path | [`GETTING-STARTED.md`](GETTING-STARTED.md) |
 

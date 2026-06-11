@@ -1,13 +1,17 @@
 /**
  * Shared i18n messages for web and native apps.
- * Platform + canonical namespaces live here; brewery-vertical namespaces are
- * merged from @umbraculum/brewery-i18n (reference vertical until F-mod profile).
+ * Platform + canonical namespaces live here; brewery-vertical namespaces merge
+ * only when brewery is in the active installation profile.
  */
 
-import { en as breweryEn, it as breweryIt } from "@umbraculum/brewery-i18n";
+import { createRequire } from "node:module";
+
+import { isVerticalInstalled } from "@umbraculum/module-sdk";
 
 import enData from "./en.json";
 import itData from "./it.json";
+
+const require = createRequire(import.meta.url);
 
 const en = enData as Record<string, unknown>;
 const it = itData as Record<string, unknown>;
@@ -48,17 +52,24 @@ function deepMerge(
   return result;
 }
 
+function loadBreweryMessages(locale: SupportedLocale): Record<string, unknown> {
+  if (!isVerticalInstalled("brewery")) {
+    return {};
+  }
+  const mod = require("@umbraculum/brewery-i18n") as {
+    en: Record<string, unknown>;
+    it: Record<string, unknown>;
+  };
+  return locale === "it" ? mod.it : mod.en;
+}
+
 /**
  * Get shared messages for the given locale.
  * Returns the full message tree for next-intl (web) or i18next (native).
- *
- * @arch-boundary platform i18n merges reference-vertical (@umbraculum/brewery-i18n)
- * bundles so apps keep a single import. Integrators on UMBRACULUM_MODULE_PROFILE=platform
- * may omit brewery-i18n when F-mod lands.
  */
 export function getSharedMessages(locale: SupportedLocale): Record<string, unknown> {
   const platform = locale === "it" ? it : en;
-  const brewery = locale === "it" ? breweryIt : breweryEn;
+  const brewery = loadBreweryMessages(locale);
   return deepMerge(platform, brewery);
 }
 

@@ -25,6 +25,21 @@ These docs are the project's load-bearing references. Read them before broad wor
 - [`docs/MODULES.md`](docs/MODULES.md) — module/vertical surface map.
 - [`docs/DOCS-README-STANDARDS.md`](docs/DOCS-README-STANDARDS.md) — module-README authoring standard.
 - [`docs/NATIVE-STRATEGY-AND-CI.md`](docs/NATIVE-STRATEGY-AND-CI.md) — native app build + CI strategy.
+- [`docs/design/installation-profile.md`](docs/design/installation-profile.md) — which modules/native apps boot per deployment (core vs reference).
+
+## Installation profile (default change — 2026-06)
+
+Fresh `git clone` + `docker compose up` now uses the **core installation profile** (`UMBRACULUM_MODULE_PROFILE=platform`): canonical modules only, native app [`apps/native/starter`](apps/native/starter), **no brewery vertical** at boot or in Postgres after [`prisma-migrate-install-profile.sh`](scripts/prisma-migrate-install-profile.sh).
+
+| Need | Action |
+|------|--------|
+| Brewery reference / E2E personas / demo walkthrough | `docker compose -f docker-compose.yml -f docker-compose.reference.yml up -d` or set `UMBRACULUM_MODULE_PROFILE=reference` in `.env` |
+| Integrator product without brewery | Default — no action |
+| Opt in brewery on existing core DB | [`design/brewery-vertical-lifecycle.md`](docs/design/brewery-vertical-lifecycle.md) |
+
+Manifest SoT: [`.umbraculum/install*.json`](.umbraculum/install.core.json). Resolver: [`packages/sdk/module-sdk/src/installProfile.ts`](packages/sdk/module-sdk/src/installProfile.ts).
+
+**Breaking change vs pre-2026-06:** compose default flipped from `reference` → `platform`. E2E seed and brewery smoke require reference profile or explicit manifest opt-in — see [`docs/TESTING.md`](docs/TESTING.md) § E2E fixture identities.
 
 ## Cross-platform shape (web + native, one source of truth)
 

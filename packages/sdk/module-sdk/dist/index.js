@@ -624,21 +624,9 @@ function fromParser(parser) {
   };
 }
 
-// src/enabledModules.ts
-var BUILTIN_MODULE_CODES = [
-  "automation",
-  "brewery",
-  "crp",
-  "mrp",
-  "pim"
-];
-var PLATFORM_PROFILE_MODULES = [
-  "automation",
-  "pim",
-  "mrp",
-  "crp"
-];
-var REFERENCE_PROFILE_MODULES = BUILTIN_MODULE_CODES;
+// src/installProfile.ts
+import { readFileSync, existsSync } from "fs";
+import { resolve } from "path";
 var InvalidModuleProfileError = class extends Error {
   constructor(value) {
     super(
@@ -647,16 +635,123 @@ var InvalidModuleProfileError = class extends Error {
     this.name = "InvalidModuleProfileError";
   }
 };
-function resolveModuleProfile(env = process.env) {
+var DEFAULT_REPO_ROOT_CANDIDATES = [
+  process.env["UMBRACULUM_REPO_ROOT"],
+  process.cwd(),
+  resolve(process.cwd(), "../.."),
+  resolve(process.cwd(), "../../..")
+].filter(Boolean);
+function resolveRepoRoot(env = process.env) {
+  const explicit = env["UMBRACULUM_REPO_ROOT"]?.trim();
+  if (explicit) return explicit;
+  for (const candidate of DEFAULT_REPO_ROOT_CANDIDATES) {
+    if (existsSync(resolve(candidate, ".umbraculum/install.core.json"))) {
+      return candidate;
+    }
+  }
+  return process.cwd();
+}
+function resolveInstallManifestPath(env = process.env) {
+  const override = env["UMBRACULUM_INSTALL_MANIFEST"]?.trim();
+  if (override) {
+    return resolve(override);
+  }
+  const repoRoot = resolveRepoRoot(env);
+  const profileRaw = env["UMBRACULUM_MODULE_PROFILE"]?.trim();
+  if (profileRaw) {
+    const profile = profileRaw === "reference" ? "reference" : profileRaw === "platform" ? "platform" : null;
+    if (profile === "reference") {
+      return resolve(repoRoot, ".umbraculum/install.reference.json");
+    }
+    if (profile === "platform") {
+      return resolve(repoRoot, ".umbraculum/install.core.json");
+    }
+    throw new InvalidModuleProfileError(profileRaw);
+  }
+  const active = resolve(repoRoot, ".umbraculum/install.json");
+  if (existsSync(active)) {
+    return active;
+  }
+  return resolve(repoRoot, ".umbraculum/install.core.json");
+}
+function resolveModuleProfileFromEnv(env = process.env) {
   const raw = env["UMBRACULUM_MODULE_PROFILE"]?.trim();
-  if (!raw) return "reference";
+  if (!raw) return "platform";
   if (raw === "platform" || raw === "reference") return raw;
   throw new InvalidModuleProfileError(raw);
 }
+function loadInstallationProfileManifest(env = process.env) {
+  const path = resolveInstallManifestPath(env);
+  if (!existsSync(path)) {
+    return fallbackManifestFromProfile(resolveModuleProfileFromEnv(env));
+  }
+  const raw = JSON.parse(readFileSync(path, "utf8"));
+  return normalizeManifest(raw, resolveModuleProfileFromEnv(env));
+}
+function fallbackManifestFromProfile(profile) {
+  if (profile === "reference") {
+    return {
+      id: "reference",
+      verticals: ["brewery"],
+      canonical: ["automation", "pim", "mrp", "crp"],
+      nativeApps: ["brewery"]
+    };
+  }
+  return {
+    id: "core",
+    verticals: [],
+    canonical: ["automation", "pim", "mrp", "crp"],
+    nativeApps: ["starter"]
+  };
+}
+function normalizeManifest(raw, profile) {
+  const id = raw.id ?? (profile === "reference" ? "reference" : "core");
+  const canonical = raw.canonical?.length ? raw.canonical : ["automation", "pim", "mrp", "crp"];
+  const verticals = raw.verticals ?? (id === "reference" ? ["brewery"] : []);
+  const nativeApps = raw.nativeApps?.length ? raw.nativeApps : id === "reference" ? ["brewery"] : ["starter"];
+  return {
+    id,
+    ...raw.description !== void 0 ? { description: raw.description } : {},
+    verticals,
+    canonical,
+    nativeApps
+  };
+}
+function resolveEnabledModuleCodesFromManifest(env = process.env) {
+  const manifest = loadInstallationProfileManifest(env);
+  return /* @__PURE__ */ new Set([...manifest.canonical, ...manifest.verticals]);
+}
+function isVerticalInstalled(code, env = process.env) {
+  return loadInstallationProfileManifest(env).verticals.includes(code);
+}
+function resolveNativeAppCodes(env = process.env) {
+  return loadInstallationProfileManifest(env).nativeApps;
+}
+function resolvePrimaryNativeAppCode(env = process.env) {
+  const apps = resolveNativeAppCodes(env);
+  if (apps.length === 0) return "starter";
+  return apps[0] ?? "starter";
+}
+
+// src/enabledModules.ts
+var BUILTIN_MODULE_CODES = [
+  "automation",
+  "brewery",
+  "crp",
+  "mrp",
+  "pim"
+];
+function resolveModuleProfile(env = process.env) {
+  try {
+    return resolveModuleProfileFromEnv(env);
+  } catch (err) {
+    if (err instanceof InvalidModuleProfileError) throw err;
+    const raw = env["UMBRACULUM_MODULE_PROFILE"]?.trim() ?? "";
+    throw new InvalidModuleProfileError(raw);
+  }
+}
 function resolveEnabledModuleCodes(env = process.env) {
-  const profile = resolveModuleProfile(env);
-  const codes = profile === "reference" ? REFERENCE_PROFILE_MODULES : PLATFORM_PROFILE_MODULES;
-  return new Set(codes);
+  return resolveEnabledModuleCodesFromManifest(env);
 }
 function isModuleEnabled(code, env = process.env) {
   return resolveEnabledModuleCodes(env).has(code);
@@ -811,6 +906,7 @@ export {
   getSegmentOwner,
   isCanonicalModuleCode,
   isModuleEnabled,
+  isVerticalInstalled,
   listOwnedUrlSegments,
   listRegisteredAddonCodes,
   listRegisteredDocumentTemplates,
@@ -818,6 +914,7 @@ export {
   listRegisteredNativeModules,
   listRegisteredTierLimitKeys,
   listRegisteredWebModules,
+  loadInstallationProfileManifest,
   recordModuleRegistration,
   registerBuiltinWebModulesIfAbsent,
   registerModule,
@@ -825,7 +922,11 @@ export {
   registerRegisteredModuleAiTools,
   registerWebModule,
   resolveEnabledModuleCodes,
+  resolveInstallManifestPath,
   resolveModuleProfile,
+  resolveNativeAppCodes,
+  resolvePrimaryNativeAppCode,
+  resolveRepoRoot,
   resolveRoutePromptOverlay,
   resolveWebSharedLayoutNotice,
   snapshotAddonCodeOwnership,

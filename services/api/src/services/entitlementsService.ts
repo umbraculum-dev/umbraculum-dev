@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import { isVerticalInstalled } from "@umbraculum/module-sdk";
 
 /**
  * RFC-0009 enforcement mode.
@@ -6,6 +7,11 @@ import type { PrismaClient } from "@prisma/client";
  * - tier_and_addons (F-mod slice + H1 2027): query platform.WorkspaceBillingAddon rows.
  */
 export type EntitlementEnforcementMode = "tier_only" | "tier_and_addons";
+
+/** Vertical add-on codes require the vertical in the server-wide installation profile first. */
+const ADDON_VERTICAL_CODES: Readonly<Record<string, string>> = {
+  brewery_module: "brewery",
+};
 
 export function resolveEntitlementEnforcementMode(
   env: Record<string, string | undefined> = process.env,
@@ -33,8 +39,16 @@ export class EntitlementsService {
    * Whether the workspace has an active entitlement for the given add-on SKU.
    * In tier_only mode (public α), returns true without a DB lookup so call sites
    * can be wired before WorkspaceBillingAddon lands.
+   *
+   * Installation profile is checked before workspace add-on rows — a workspace cannot
+   * be entitled to brewery_module when brewery is not installed on this stack.
    */
   async hasActiveAddon(workspaceId: string, addonCode: string): Promise<boolean> {
+    const verticalCode = ADDON_VERTICAL_CODES[addonCode];
+    if (verticalCode && !isVerticalInstalled(verticalCode)) {
+      return false;
+    }
+
     if (process.env["UMBRACULUM_GRANT_ALL_ADDONS"] === "1") {
       return true;
     }

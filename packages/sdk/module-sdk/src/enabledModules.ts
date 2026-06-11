@@ -1,9 +1,29 @@
 /**
- * Deploy-time module profile — F-mod optional reference vertical.
- * @see docs/design/platform-module-profile.md
+ * Deploy-time installation profile — F-mod optional reference vertical.
+ * @see docs/design/installation-profile.md
  */
 
-export type ModuleProfile = "platform" | "reference";
+export {
+  InvalidModuleProfileError,
+  type ModuleProfile,
+  loadInstallationProfileManifest,
+  resolveModuleProfileFromEnv,
+  resolveEnabledModuleCodesFromManifest,
+  isVerticalInstalled,
+  resolveNativeAppCodes,
+  resolvePrimaryNativeAppCode,
+  resolveInstallManifestPath,
+  resolveRepoRoot,
+  type InstallationProfileManifest,
+  type InstallationProfileId,
+} from "./installProfile.js";
+
+import {
+  resolveModuleProfileFromEnv,
+  resolveEnabledModuleCodesFromManifest,
+  InvalidModuleProfileError,
+  type ModuleProfile,
+} from "./installProfile.js";
 
 /** First-party module codes registered by the monorepo stock build. */
 export const BUILTIN_MODULE_CODES = [
@@ -16,38 +36,20 @@ export const BUILTIN_MODULE_CODES = [
 
 export type BuiltinModuleCode = (typeof BUILTIN_MODULE_CODES)[number];
 
-const PLATFORM_PROFILE_MODULES: readonly BuiltinModuleCode[] = [
-  "automation",
-  "pim",
-  "mrp",
-  "crp",
-];
-
-const REFERENCE_PROFILE_MODULES: readonly BuiltinModuleCode[] = BUILTIN_MODULE_CODES;
-
-export class InvalidModuleProfileError extends Error {
-  constructor(value: string) {
-    super(
-      `Invalid UMBRACULUM_MODULE_PROFILE: "${value}". Expected "platform" or "reference".`,
-    );
-    this.name = "InvalidModuleProfileError";
-  }
-}
-
 export function resolveModuleProfile(env: NodeJS.ProcessEnv = process.env): ModuleProfile {
-  const raw = env["UMBRACULUM_MODULE_PROFILE"]?.trim();
-  if (!raw) return "reference";
-  if (raw === "platform" || raw === "reference") return raw;
-  throw new InvalidModuleProfileError(raw);
+  try {
+    return resolveModuleProfileFromEnv(env);
+  } catch (err) {
+    if (err instanceof InvalidModuleProfileError) throw err;
+    const raw = env["UMBRACULUM_MODULE_PROFILE"]?.trim() ?? "";
+    throw new InvalidModuleProfileError(raw);
+  }
 }
 
 export function resolveEnabledModuleCodes(
   env: NodeJS.ProcessEnv = process.env,
 ): ReadonlySet<string> {
-  const profile = resolveModuleProfile(env);
-  const codes =
-    profile === "reference" ? REFERENCE_PROFILE_MODULES : PLATFORM_PROFILE_MODULES;
-  return new Set(codes);
+  return resolveEnabledModuleCodesFromManifest(env);
 }
 
 export function isModuleEnabled(

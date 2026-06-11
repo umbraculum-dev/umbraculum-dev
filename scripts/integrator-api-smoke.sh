@@ -11,6 +11,7 @@ set -u
 set -o pipefail
 
 BASE_URL="${1:-http://localhost:18080}"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PERSONA_EMAIL="${E2E_ADMIN_EMAIL:-e2e-admin@brewery.local}"
 PERSONA_PASSWORD="${E2E_ADMIN_PASSWORD:-e2e-admin-pw!}"
 COLD_START_RETRIES=15
@@ -86,19 +87,25 @@ assert_ok_field "GET /api/auth/me" "${ME_BODY}"
 WS_BODY="$(curl -fsS "${BASE_URL}/api/workspaces" -b "${COOKIE_JAR}" 2>/dev/null || true)"
 assert_ok_field "GET /api/workspaces" "${WS_BODY}"
 
-STYLES_BODY="$(curl -fsS "${BASE_URL}/api/styles" -b "${COOKIE_JAR}" 2>/dev/null || true)"
-assert_ok_field "GET /api/styles" "${STYLES_BODY}"
+HAS_BREWERY="$( (command -v python3 >/dev/null && python3 "${REPO_ROOT}/scripts/lib/resolve-install-manifest.py" --field hasBrewery) || node "${REPO_ROOT}/scripts/lib/resolve-install-manifest.mjs" --field hasBrewery 2>/dev/null || echo true)"
 
-STYLE_COUNT="$(printf '%s' "${STYLES_BODY}" | jq -r '.styles | length' 2>/dev/null || echo 0)"
-if [ "${STYLE_COUNT}" -gt 0 ] 2>/dev/null; then
-  FIRST_VERSION="$(printf '%s' "${STYLES_BODY}" | jq -r '.styles[0].version // empty' 2>/dev/null || true)"
-  if [ -n "${FIRST_VERSION}" ] && [ "${FIRST_VERSION}" != "null" ]; then
-    green "[integrator-smoke] GET /api/styles -> ${STYLE_COUNT} styles; first.version=${FIRST_VERSION} (string wire shape OK)"
+if [ "${HAS_BREWERY}" = "true" ]; then
+  STYLES_BODY="$(curl -fsS "${BASE_URL}/api/styles" -b "${COOKIE_JAR}" 2>/dev/null || true)"
+  assert_ok_field "GET /api/styles" "${STYLES_BODY}"
+
+  STYLE_COUNT="$(printf '%s' "${STYLES_BODY}" | jq -r '.styles | length' 2>/dev/null || echo 0)"
+  if [ "${STYLE_COUNT}" -gt 0 ] 2>/dev/null; then
+    FIRST_VERSION="$(printf '%s' "${STYLES_BODY}" | jq -r '.styles[0].version // empty' 2>/dev/null || true)"
+    if [ -n "${FIRST_VERSION}" ] && [ "${FIRST_VERSION}" != "null" ]; then
+      green "[integrator-smoke] GET /api/styles -> ${STYLE_COUNT} styles; first.version=${FIRST_VERSION} (string wire shape OK)"
+    else
+      yellow "[integrator-smoke] GET /api/styles -> styles present but first.version empty"
+    fi
   else
-    yellow "[integrator-smoke] GET /api/styles -> styles present but first.version empty"
+    yellow "[integrator-smoke] GET /api/styles returned zero styles (seed may be minimal)"
   fi
 else
-  yellow "[integrator-smoke] GET /api/styles returned zero styles (seed may be minimal)"
+  yellow "[integrator-smoke] core installation profile — skipping brewery catalog (/api/styles)"
 fi
 
 if [ "${FAILED}" -eq 0 ]; then

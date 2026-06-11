@@ -1,0 +1,9 @@
+# Reference installation profile — brewery reference vertical + native brewery app.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.reference.yml up -d
+services:
+  api:
+    environment:
+      UMBRACULUM_MODULE_PROFILE: reference
+  web:
+    environment:
+      UMBRACULUM_MODULE_PROFILE: reference

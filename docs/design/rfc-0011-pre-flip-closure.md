@@ -45,7 +45,7 @@ Full audit trail: [wave-6 build log §12 audit](rfc-0011-wave-6-doc-capstone-bui
 | Item | Decision | Notes |
 |------|----------|-------|
 | **Rule 63 E2E prefixes** | **Closed** | All 11 specs under `apps/web/e2e/` use `b2b-registered-*` filenames |
-| **F-mod brewery-less SKU** | **Keep deferred (product SKU)** | Runtime `UMBRACULUM_MODULE_PROFILE=platform` **documented pre-flip** ([`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md)); full install SKU post-alpha. **Demo:** `demo.umbraculum.dev` stays reference profile (core + brewery), not platform-only. |
+| **F-mod brewery-less install** | **Shipped (2026-06)** — core installation profile default; reference opt-in via manifest / compose overlay. Runtime + build + Prisma follow profile. Demo host stays reference. | [`installation-profile.md`](installation-profile.md) |
 | **Second native app scaffold** | **Keep deferred** | Pattern in [`apps/native/README.md`](../../apps/native/README.md). **2026-06-07:** choose PIM vs quality module app **after** application-surface structure is stable — not pre-flip. |
 | **`docs-site/` extraction** | **Keep deferred** | R-POLICY — monorepo through public alpha; foundations pass pre-flip |
 | **API flat-services eslint fence** | **Done pre-flip (2026-06-07)** | [solid-boundaries-eslint-api-flat-services-spike.md](solid-boundaries-eslint-api-flat-services-spike.md) |

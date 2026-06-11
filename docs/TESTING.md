@@ -188,7 +188,9 @@ Skill + job catalog split:
 
 ## E2E fixture identities (single source of truth)
 
-These are the personas every E2E layer (L3, L5, L6) shares. Seeded by [services/api/src/cli/seedE2eFixture.ts](../services/api/src/cli/seedE2eFixture.ts) (idempotent — re-run anytime):
+These are the personas every E2E layer (L3, L5, L6) shares. Seeded by [services/api/src/cli/seedE2eFixture.ts](../services/api/src/cli/seedE2eFixture.ts) (idempotent — re-run anytime).
+
+**Requires reference installation profile** — brewery vertical must be installed (`UMBRACULUM_MODULE_PROFILE=reference` or [`docker-compose.reference.yml`](../docker-compose.reference.yml)). Core profile fresh clones skip brewery routes; seed still runs but brewery API paths return 404 until opt-in. See [`design/installation-profile.md`](design/installation-profile.md).
 
 | Persona | Email | Password | Role | Workspace(s) |
 |---|---|---|---|---|

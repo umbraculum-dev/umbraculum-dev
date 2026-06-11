@@ -27,8 +27,11 @@ keeps contributions aligned with the architecture. A framework gives you
 building blocks; Umbraculum aims to give you the whole toolbox and the
 quality discipline for using it.
 
-The **brewery reference vertical** (`code: brewery`) is the first vertical
-configuration shipping on this platform. It is a fully working product on
+The **brewery reference vertical** (`code: brewery`) is an **opt-in** vertical
+configuration on this platform — like Magento Sample Data, not part of the
+default **core installation profile**. Opt in via the **reference installation
+profile** ([`docs/design/installation-profile.md`](docs/design/installation-profile.md)).
+It is a fully working product on
 its own — brew-day logging, water chemistry, recipe management, brew
 sessions — and simultaneously a complex **worked example** for how teams
 build a specific product on Umbraculum via seed data, prompts, and

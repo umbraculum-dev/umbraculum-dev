@@ -109,7 +109,7 @@ Browsable specs on **docs.umbraculum.dev** are **Redoc standalone** inside Docus
 
 ## Integrator workflow
 
-1. **Pick your SKU** — platform-only integrators: `openapi.json` only; reference vertical evaluators: both files.
+1. **Pick your installation profile** — core integrators: `openapi.json` only; reference vertical evaluators: platform + `openapi/brewery.json`. See [`design/installation-profile.md`](design/installation-profile.md).
 2. **Browse machine-readable paths** — [platform Redoc on docs.umbraculum.dev](https://docs.umbraculum.dev/openapi-platform) or [brewery add-on Redoc](https://docs.umbraculum.dev/openapi-brewery); filter by tag in Swagger UI locally (`http://localhost:18080/api/documentation`).
 3. **Pick the module** — [`MODULES.md`](MODULES.md) + per-module route tables.
 4. **Pin types** — `@umbraculum/<code>-contracts` for canonical domains; `@umbraculum/contracts` for platform auth/workspaces/rendering parsers.

@@ -475,16 +475,36 @@ declare function aggregateNativeAvailableRouteIds(): readonly NativeRouteId[];
 declare function clearNativeModuleRegistryForTests(): void;
 
 /**
- * Deploy-time module profile — F-mod optional reference vertical.
- * @see docs/design/platform-module-profile.md
+ * Installation profile manifest — which modules and native apps are enabled for this deployment.
+ * @see docs/design/installation-profile.md
  */
 type ModuleProfile = "platform" | "reference";
-/** First-party module codes registered by the monorepo stock build. */
-declare const BUILTIN_MODULE_CODES: readonly ["automation", "brewery", "crp", "mrp", "pim"];
-type BuiltinModuleCode = (typeof BUILTIN_MODULE_CODES)[number];
 declare class InvalidModuleProfileError extends Error {
     constructor(value: string);
 }
+type InstallationProfileId = "core" | "reference";
+type InstallationProfileManifest = {
+    id: InstallationProfileId;
+    description?: string;
+    verticals: readonly string[];
+    canonical: readonly string[];
+    nativeApps: readonly string[];
+};
+declare function resolveRepoRoot(env?: NodeJS.ProcessEnv): string;
+declare function resolveInstallManifestPath(env?: NodeJS.ProcessEnv): string;
+declare function loadInstallationProfileManifest(env?: NodeJS.ProcessEnv): InstallationProfileManifest;
+declare function isVerticalInstalled(code: string, env?: NodeJS.ProcessEnv): boolean;
+declare function resolveNativeAppCodes(env?: NodeJS.ProcessEnv): readonly string[];
+declare function resolvePrimaryNativeAppCode(env?: NodeJS.ProcessEnv): string;
+
+/**
+ * Deploy-time installation profile — F-mod optional reference vertical.
+ * @see docs/design/installation-profile.md
+ */
+
+/** First-party module codes registered by the monorepo stock build. */
+declare const BUILTIN_MODULE_CODES: readonly ["automation", "brewery", "crp", "mrp", "pim"];
+type BuiltinModuleCode = (typeof BUILTIN_MODULE_CODES)[number];
 declare function resolveModuleProfile(env?: NodeJS.ProcessEnv): ModuleProfile;
 declare function resolveEnabledModuleCodes(env?: NodeJS.ProcessEnv): ReadonlySet<string>;
 declare function isModuleEnabled(code: string, env?: NodeJS.ProcessEnv): boolean;
@@ -546,4 +566,4 @@ interface WebSharedLayoutNoticeConfig {
  */
 declare function resolveWebSharedLayoutNotice(env?: NodeJS.ProcessEnv): WebSharedLayoutNoticeConfig | null;
 
-export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_MODULE_CODES, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type BuiltinModuleCode, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidModuleProfileError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleProfile, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, WEB_SHARED_LAYOUT_NOTICE_IDS, type WebSharedLayoutNavItem, type WebSharedLayoutNoticeConfig, type WebSharedLayoutNoticeId, type WebSharedLayoutNoticeVariant, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebSharedLayoutNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, isModuleEnabled, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredTierLimitKeys, listRegisteredWebModules, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveEnabledModuleCodes, resolveModuleProfile, resolveRoutePromptOverlay, resolveWebSharedLayoutNotice, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };
+export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_MODULE_CODES, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type BuiltinModuleCode, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, type InstallationProfileId, type InstallationProfileManifest, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidModuleProfileError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleProfile, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, WEB_SHARED_LAYOUT_NOTICE_IDS, type WebSharedLayoutNavItem, type WebSharedLayoutNoticeConfig, type WebSharedLayoutNoticeId, type WebSharedLayoutNoticeVariant, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebSharedLayoutNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, isModuleEnabled, isVerticalInstalled, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredTierLimitKeys, listRegisteredWebModules, loadInstallationProfileManifest, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveEnabledModuleCodes, resolveInstallManifestPath, resolveModuleProfile, resolveNativeAppCodes, resolvePrimaryNativeAppCode, resolveRepoRoot, resolveRoutePromptOverlay, resolveWebSharedLayoutNotice, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };

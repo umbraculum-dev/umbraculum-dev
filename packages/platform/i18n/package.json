@@ -25,6 +25,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@umbraculum/brewery-i18n": "file:../../verticals/brewery/i18n"
+    "@umbraculum/brewery-i18n": "file:../../verticals/brewery/i18n",
+    "@umbraculum/module-sdk": "file:../../sdk/module-sdk"
   }
 }

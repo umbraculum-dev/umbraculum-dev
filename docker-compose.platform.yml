@@ -1,5 +1,8 @@
-# Platform SKU — canonical modules only; no brewery reference vertical.
+# Core installation profile — canonical modules only; no brewery reference vertical.
+# Default since 2026-06: docker-compose.yml already sets UMBRACULUM_MODULE_PROFILE=platform.
+# This overlay is optional explicit documentation for integrators.
 # Usage: docker compose -f docker-compose.yml -f docker-compose.platform.yml up -d
+# Reference vertical (demo): docker compose -f docker-compose.yml -f docker-compose.reference.yml up -d
 services:
   api:
     environment:

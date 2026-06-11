@@ -1,0 +1,7 @@
+{
+  "id": "core",
+  "description": "Platform + canonical modules; no verticals. Default fresh clone.",
+  "verticals": [],
+  "canonical": ["automation", "pim", "mrp", "crp"],
+  "nativeApps": ["starter"]
+}

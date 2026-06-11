@@ -26,7 +26,9 @@ the platform is brewery-only.
 
 **Building product X on Umbraculum (vertical ISV / integrator)?** Read
 [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) — how to start your
-vertical, omit the brewery reference, and the Magento sample-data parallel.
+vertical, omit the brewery reference (default **core profile**), and the Magento sample-data parallel.
+
+**Default stack (2026-06):** `docker compose up` boots the **core installation profile** — no brewery until you opt in. See [`design/installation-profile.md`](design/installation-profile.md).
 
 ## Who this is for
 

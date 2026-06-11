@@ -1,0 +1,7 @@
+{
+  "id": "reference",
+  "description": "Core installation profile plus brewery reference vertical (opt-in template).",
+  "verticals": ["brewery"],
+  "canonical": ["automation", "pim", "mrp", "crp"],
+  "nativeApps": ["brewery"]
+}

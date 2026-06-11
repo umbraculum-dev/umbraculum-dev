@@ -234,6 +234,19 @@ From repo root (run Node/npm inside the project container, not on the host — s
 - **Test**: `npm run test -w @umbraculum/module-sdk`
 - **Typecheck**: `npm run typecheck -w @umbraculum/module-sdk`
 
+## Installation profile (F-mod — 2026-06)
+
+Which modules boot in a deployment is controlled by the **installation profile manifest** (`.umbraculum/install*.json`) and env `UMBRACULUM_MODULE_PROFILE` (`platform` = core, `reference` = brewery opt-in).
+
+| API | Purpose |
+|-----|---------|
+| `loadInstallationProfileManifest()` | Read manifest (verticals, canonical, nativeApps) |
+| `resolveEnabledModuleCodes()` | Set of module codes for boot |
+| `isModuleEnabled(code)` / `isVerticalInstalled(code)` | Gate registration |
+| `resolvePrimaryNativeAppCode()` | `starter` or `brewery` for CI/native-deps |
+
+Canonical doc: [`docs/design/installation-profile.md`](../../../docs/design/installation-profile.md). Implementation: [`src/installProfile.ts`](src/installProfile.ts), [`src/enabledModules.ts`](src/enabledModules.ts).
+
 ## Cross-references
 
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../../docs/PLATFORM-ARCHITECTURE.md) §4.4 — registration sketch

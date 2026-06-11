@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import { isVerticalInstalled } from "@umbraculum/module-sdk";
 
 import type {
   BreweryScheduleProjection,
@@ -8,6 +9,44 @@ import type {
   ProjectedRecipe,
   ProjectedVessel,
 } from "./breweryScheduleProjection.js";
+
+/** Empty projection when brewery vertical is not installed (core installation profile). */
+class NullBreweryScheduleProjection implements BreweryScheduleProjection {
+  listRecipes(_workspaceId: string): Promise<readonly ProjectedRecipe[]> {
+    return Promise.resolve([]);
+  }
+
+  getRecipe(_workspaceId: string, _recipeId: string): Promise<ProjectedRecipe | null> {
+    return Promise.resolve(null);
+  }
+
+  listBrewSessionsWithSteps(_workspaceId: string): Promise<readonly ProjectedBrewSession[]> {
+    return Promise.resolve([]);
+  }
+
+  getBrewSessionWithSteps(
+    _workspaceId: string,
+    _sessionId: string,
+  ): Promise<ProjectedBrewSession | null> {
+    return Promise.resolve(null);
+  }
+
+  getBrewdaySettings(_workspaceId: string): Promise<ProjectedBrewdaySettings | null> {
+    return Promise.resolve(null);
+  }
+
+  listVessels(_workspaceId: string): Promise<readonly ProjectedVessel[]> {
+    return Promise.resolve([]);
+  }
+
+  getVessel(_workspaceId: string, _vesselId: string): Promise<ProjectedVessel | null> {
+    return Promise.resolve(null);
+  }
+
+  listEquipmentProfiles(_workspaceId: string): Promise<readonly ProjectedEquipmentProfile[]> {
+    return Promise.resolve([]);
+  }
+}
 
 /**
  * Sole cross-schema Prisma reader for MRP/CRP brewery schedule projections (SOLID B3).
@@ -75,5 +114,8 @@ export class PrismaBreweryScheduleProjection implements BreweryScheduleProjectio
 export function createPrismaBreweryScheduleProjection(
   prisma: PrismaClient,
 ): BreweryScheduleProjection {
+  if (!isVerticalInstalled("brewery")) {
+    return new NullBreweryScheduleProjection();
+  }
   return new PrismaBreweryScheduleProjection(prisma);
 }

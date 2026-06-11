@@ -106,9 +106,17 @@ export {
   BUILTIN_MODULE_CODES,
   InvalidModuleProfileError,
   isModuleEnabled,
+  isVerticalInstalled,
+  loadInstallationProfileManifest,
   resolveEnabledModuleCodes,
+  resolveInstallManifestPath,
   resolveModuleProfile,
+  resolveNativeAppCodes,
+  resolvePrimaryNativeAppCode,
+  resolveRepoRoot,
   type BuiltinModuleCode,
+  type InstallationProfileId,
+  type InstallationProfileManifest,
   type ModuleProfile,
 } from "./enabledModules.js";
 

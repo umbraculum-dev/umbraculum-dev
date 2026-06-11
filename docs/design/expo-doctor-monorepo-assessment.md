@@ -9,7 +9,7 @@
 
 ## 1. Summary
 
-`npx expo-doctor` (18 checks) must pass from **`apps/native/brewery/`** after **root `npm ci`** — the same context as EAS ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)) and [`native-deps.yml`](../../.github/workflows/native-deps.yml).
+`npx expo-doctor` (18 checks) must pass from the **primary native app** in the active [installation profile](installation-profile.md) after **root `npm ci`** — core profile: [`apps/native/starter/`](../../apps/native/starter/); reference profile: [`apps/native/brewery/`](../../apps/native/brewery/). [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) resolves the app from `.umbraculum/install*.json`. Same context as EAS ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)) and [`native-deps.yml`](../../.github/workflows/native-deps.yml).
 
 **Baseline (2026-06-07, pre-remediation):** **16/18** — two failures:
 
@@ -38,7 +38,8 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 
 | Path | Role |
 |------|------|
-| `apps/native/brewery/` | `@umbraculum/native-brewery` — Expo SDK 54 app (EAS, Metro, screens) |
+| `apps/native/starter/` | `@umbraculum/native-starter` — minimal Expo app (core installation profile; CI expo-doctor default) |
+| `apps/native/brewery/` | `@umbraculum/native-brewery` — Expo SDK 54 app (reference profile; EAS, Metro, screens) |
 | `apps/native/` | Umbrella index only — **must not** retain `node_modules/` after Wave 4A |
 | `packages/platform/native-shell/` | `@umbraculum/native-shell` — shared auth/i18n/bootstrap (`file:` dep) |
 | Repo root `node_modules/` | Hoisted monorepo stack (`react@19.1.0` via `overrides`; phantom `expo@56` / `react@19.2.x` **before** Path A remediation) |
@@ -95,7 +96,8 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 | Phase 1 | `apps/native/brewery/app.config.js` → `({ config }) =>` spread pattern |
 | Phase 2a | Root `overrides` (`expo`, `expo-font`, `react`, `react-dom`, `react-native`, `react-native-svg`); `apps/web` → `react@19.1.0`; `@umbraculum/native-shell` peer pins; `@umbraculum/ui` `react-native-svg@15.12.1` exact; Metro React pin from brewery `node_modules` |
 | Phase 2a cleanup | [`scripts/check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) — rm stale `apps/native/node_modules`, `packages/platform/ui/node_modules`, phantom root `expo-font` only (keep hoisted root `react-native-svg@15.12.1`) |
-| Phase 3 | `native-deps.yml` runs script + `typecheck -w @umbraculum/native-brewery`; [`AGENTS.md`](../../AGENTS.md) + [`EAS-DEMO-SETUP.md`](../../apps/native/brewery/EAS-DEMO-SETUP.md) agent gates |
+| Phase 3 | `native-deps.yml` runs [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) (manifest-selected app + typecheck); [`AGENTS.md`](../../AGENTS.md) + [`EAS-DEMO-SETUP.md`](../../apps/native/brewery/EAS-DEMO-SETUP.md) agent gates |
+| 2026-06 | **Installation profile:** core → `starter`, reference → `brewery`; see [`installation-profile.md`](installation-profile.md) |
 
 ---
 

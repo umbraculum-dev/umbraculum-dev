@@ -40,11 +40,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Run check-native-expo-doctor.sh + typecheck (Docker, EAS-like)
-        # RFC-0011 Wave 4A: root npm ci → scripts/check-native-expo-doctor.sh (runs from apps/native/brewery — sole reference native app today) → typecheck @umbraculum/native-brewery.
+      - name: Run check-native-expo-doctor.sh (Docker, EAS-like)
+        # Installation profile selects apps/native/starter (core) or apps/native/brewery (reference).
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/repo" \
             -w /repo \
             node:20-slim \
-            bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
+            bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh"

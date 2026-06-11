@@ -38,7 +38,7 @@ None of that is “moving fast”; it is **undefined behavior** that wastes days
 Using **Expo Go** on a physical device with **documented** version pins and **monorepo-wide React alignment** (`react@19.1.0` via root `overrides` as of 2026-06-07) is **acceptable** when:
 
 1. Pins and overrides are **explicit** (baseline table in `DEVELOPMENT-NATIVE-LOCAL.md`, assessment in [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md)).
-2. Everyone touching native deps runs **[`scripts/check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh)** (or CI `native-deps.yml`) before merging — not brewery-only `expo install --check`.
+2. Everyone touching native deps runs **[`scripts/check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh)** (or CI `native-deps.yml`) before merging — the script targets the **primary native app** from the [installation profile manifest](../.umbraculum/install.core.json) (`starter` on core profile, `brewery` when opted in).
 3. Shared packages (`packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, etc.) stick to **public, stable React APIs** — no version-sensitive internals.
 4. You keep the **triage order** in `docs/DEVELOPMENT-NATIVE-LOCAL.md` (API → LAN → phone browser → versions → cache → device log).
 
