@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Fail when forbidden per-workspace lockfiles appear on disk.
 # @umbraculum/api deps are pinned in the root package-lock.json only.
+# Committed locks: root, apps/web, apps/web/e2e, test-mcp, brochure vendor — see DEVELOPMENT.md.
 # See DEVELOPMENT.md § "npm lockfiles (monorepo policy)".
 set -euo pipefail
 

@@ -443,24 +443,28 @@ docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
 Not in ci-parity today; agents own it on the Tamagui hoist surface before push.
 Human SoT: [`docs/TAMAGUI.md`](docs/TAMAGUI.md) § Tamagui CLI check.
 
-**Monorepo lockfile gate (agent-owned — do not delegate to operator):** When **you**
-change root **`package-lock.json`**, any workspace **`package.json`** dependency that
-affects root install, or see **`services/api/package-lock.json`** on disk, run skill
-**`monorepo-lockfile-gate`** (toolset rule **`80-monorepo-lockfile-agent-gate`**).
-**Enforcement:** plugin `alwaysApply` is unreliable — this repo commits
-[`.cursor/rules/80-monorepo-lockfile-agent-gate.mdc`](.cursor/rules/80-monorepo-lockfile-agent-gate.mdc)
-as the binding copy. **`verify:pre-push`** always runs **`npm run check:lockfiles`**
-in the validate phase (forbidden api lockfile + root sync in `node:20-slim`).
+**Monorepo lockfile gate (agent-owned — do not delegate to operator):** Committed
+`package-lock.json` files are **`composer.lock` equivalents** — if one changed locally,
+dependencies changed; **always commit lock + matching `package.json`** after testing.
+**`npm ci`** / **`npm run lock:install`** = composer install; **`npm run lock:update:*`**
+= composer update. Full revert after accidental update: **`npm run lock:revert`** (not
+`git restore` alone). Run skill **`monorepo-lockfile-gate`** when any tracked lockfile or
+workspace **`package.json`** deps change, or **`services/api/package-lock.json`** appears
+on disk. Binding copy:
+[`.cursor/rules/80-monorepo-lockfile-agent-gate.mdc`](.cursor/rules/80-monorepo-lockfile-agent-gate.mdc).
+**`verify:pre-push`** runs **`npm run check:lockfiles`** (forbidden api lockfile + root
++ web sync in `node:20-slim`).
 
-Agent sequence when the change set includes **`package-lock.json`**:
+Agent sequence when the change set includes any **`package-lock.json`**:
 
-1. Regenerate in container — not host npm alone (skill **`monorepo-lockfile-gate`**).
-2. **`npm run check:lockfiles`** before commit.
-3. Commit, clean tree, **`npm run verify:pre-push`** before push.
+1. Update via **`npm run lock:update:root`** / **`lock:update:web`** in container (skill).
+2. Test surfaces that consume those deps.
+3. **`npm run check:lockfiles`** before commit.
+4. Commit **`package.json` + lockfile(s)** together; clean tree; **`npm run verify:pre-push`**.
 
-Never commit **`services/api/package-lock.json`** (gitignored; ephemeral api compose
-artifact). If present: **`rm -f services/api/package-lock.json`**. Human SoT:
-[`DEVELOPMENT.md`](DEVELOPMENT.md) § npm lockfiles.
+Never commit **`services/api/package-lock.json`** (gitignored ephemeral artifact).
+**`rm -f services/api/package-lock.json`**. Human SoT: [`DEVELOPMENT.md`](DEVELOPMENT.md)
+§ npm lockfiles.
 
 **During iteration (not the push gate):** `./scripts/ci-parity-check.sh run`
 (`--ci`, working tree + warm volumes) is fine for fast WIP feedback — but

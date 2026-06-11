@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 COPY scripts ./scripts
-RUN npm install
+RUN npm ci
 
 # Copy source
 COPY next-env.d.ts ./
