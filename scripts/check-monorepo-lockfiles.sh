@@ -22,6 +22,12 @@ for path in "${FORBIDDEN[@]}"; do
   fi
 done
 
+if git diff --cached --name-only 2>/dev/null | grep -qx 'services/api/package-lock.json'; then
+  echo "check-monorepo-lockfiles: FAIL — services/api/package-lock.json is staged for commit" >&2
+  echo "  Unstage: git restore --staged services/api/package-lock.json && rm -f services/api/package-lock.json" >&2
+  fail=1
+fi
+
 if [[ "$fail" -ne 0 ]]; then
   exit 1
 fi

@@ -186,9 +186,12 @@ run_t2() {
   elif ! "${REPO_ROOT}/scripts/ci-parity-check.sh" validate --strict; then
     validate_status="FAIL"
     rc=1
+  elif ! npm run check:lockfiles; then
+    validate_status="FAIL"
+    rc=1
   fi
   if [[ "$rc" -ne 0 ]]; then
-    echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: validate=FAIL (ci-parity-validate parity — fix before ci-parity jobs)" >&2
+    echo "VERIFY-SLICE ${tier_label} @ ${SHORT_SHA}: validate=FAIL (ci-parity-validate and/or lockfile gate — fix before ci-parity jobs)" >&2
     return 1
   fi
 

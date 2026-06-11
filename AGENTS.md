@@ -443,6 +443,25 @@ docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
 Not in ci-parity today; agents own it on the Tamagui hoist surface before push.
 Human SoT: [`docs/TAMAGUI.md`](docs/TAMAGUI.md) § Tamagui CLI check.
 
+**Monorepo lockfile gate (agent-owned — do not delegate to operator):** When **you**
+change root **`package-lock.json`**, any workspace **`package.json`** dependency that
+affects root install, or see **`services/api/package-lock.json`** on disk, run skill
+**`monorepo-lockfile-gate`** (toolset rule **`80-monorepo-lockfile-agent-gate`**).
+**Enforcement:** plugin `alwaysApply` is unreliable — this repo commits
+[`.cursor/rules/80-monorepo-lockfile-agent-gate.mdc`](.cursor/rules/80-monorepo-lockfile-agent-gate.mdc)
+as the binding copy. **`verify:pre-push`** always runs **`npm run check:lockfiles`**
+in the validate phase (forbidden api lockfile + root sync in `node:20-slim`).
+
+Agent sequence when the change set includes **`package-lock.json`**:
+
+1. Regenerate in container — not host npm alone (skill **`monorepo-lockfile-gate`**).
+2. **`npm run check:lockfiles`** before commit.
+3. Commit, clean tree, **`npm run verify:pre-push`** before push.
+
+Never commit **`services/api/package-lock.json`** (gitignored; ephemeral api compose
+artifact). If present: **`rm -f services/api/package-lock.json`**. Human SoT:
+[`DEVELOPMENT.md`](DEVELOPMENT.md) § npm lockfiles.
+
 **During iteration (not the push gate):** `./scripts/ci-parity-check.sh run`
 (`--ci`, working tree + warm volumes) is fine for fast WIP feedback — but
 **never** treat `--ci` green alone as push proof if you have not yet run archive
