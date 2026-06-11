@@ -1,4 +1,4 @@
-import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 const DOCS_URL = "https://github.com/umbraculum-dev/umbraculum-dev/blob/master/docs/BUILDING-YOUR-VERTICAL.md";
