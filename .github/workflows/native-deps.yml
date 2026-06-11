@@ -13,6 +13,7 @@ on:
       - "packages/**"
       - "package.json"
       - "package-lock.json"
+      - "scripts/check-native-expo-doctor.sh"
       - ".github/workflows/native-deps.yml"
   pull_request:
     branches: [master]
@@ -21,6 +22,7 @@ on:
       - "packages/**"
       - "package.json"
       - "package-lock.json"
+      - "scripts/check-native-expo-doctor.sh"
       - ".github/workflows/native-deps.yml"
   workflow_dispatch:
 
@@ -38,8 +40,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Run expo-doctor + native-brewery typecheck (Docker, EAS-like)
-        # RFC-0011 Wave 4A: root npm ci, then scripts/check-native-expo-doctor.sh; typecheck @umbraculum/native-brewery (reference vertical native app).
+      - name: Run check-native-expo-doctor.sh + typecheck (Docker, EAS-like)
+        # RFC-0011 Wave 4A: root npm ci → scripts/check-native-expo-doctor.sh (runs from apps/native/brewery — sole reference native app today) → typecheck @umbraculum/native-brewery.
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/repo" \

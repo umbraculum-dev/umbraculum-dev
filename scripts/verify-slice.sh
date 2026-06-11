@@ -110,7 +110,7 @@ run_native_step() {
       (cd "$REPO_ROOT" && ./scripts/docker-npm-run.sh -r 'npm run check-web-url-segments')
       ;;
     expo-doctor)
-      echo "==> [expo-doctor] check-native-expo-doctor.sh + native-brewery typecheck (EAS-like)"
+      echo "==> [expo-doctor] check-native-expo-doctor.sh + @umbraculum/native-brewery typecheck (EAS-like)"
       docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:20-slim \
         bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
       ;;

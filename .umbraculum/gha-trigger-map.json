@@ -95,6 +95,7 @@
         "packages/**",
         "package.json",
         "package-lock.json",
+        "scripts/check-native-expo-doctor.sh",
         ".github/workflows/native-deps.yml"
       ]
     },

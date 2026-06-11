@@ -94,7 +94,7 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 |------|--------|
 | Phase 1 | `apps/native/brewery/app.config.js` → `({ config }) =>` spread pattern |
 | Phase 2a | Root `overrides` (`expo`, `expo-font`, `react`, `react-dom`, `react-native`, `react-native-svg`); `apps/web` → `react@19.1.0`; `@umbraculum/native-shell` peer pins; `@umbraculum/ui` `react-native-svg@15.12.1` exact; Metro React pin from brewery `node_modules` |
-| Phase 2a cleanup | [`scripts/check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) — rm stale `apps/native/node_modules`, `packages/platform/ui/node_modules`, phantom root `expo-font` / `react-native-svg` peers |
+| Phase 2a cleanup | [`scripts/check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) — rm stale `apps/native/node_modules`, `packages/platform/ui/node_modules`, phantom root `expo-font` only (keep hoisted root `react-native-svg@15.12.1`) |
 | Phase 3 | `native-deps.yml` runs script + `typecheck -w @umbraculum/native-brewery`; [`AGENTS.md`](../../AGENTS.md) + [`EAS-DEMO-SETUP.md`](../../apps/native/brewery/EAS-DEMO-SETUP.md) agent gates |
 
 ---
