@@ -11,7 +11,7 @@ The shared rules / skills / subagents this repo relies on are now delivered by t
 | `umbraculum-platform-tsjs-cursor-assistant` | Umbraculum-platform specifics (foundation-hardening, module-README authoring, package-scope migration, L2 isolation scaffolding) |
 | `rf-magento-cursor-assistant` | Magento 2 / PHP rules + skills + subagents (only relevant if a task touches Magento code) |
 
-Their rules / skills / subagents live under `~/.cursor/plugins/local/<plugin-name>/{rules,skills,agents}/` on each contributor's machine after install.
+Their rules / skills / subagents are loaded via the [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen) from your **umbraculum-toolset** source clone when this workspace is open (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) and toolset [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)). Do **not** globalize them under `~/.cursor/plugins/local/` — that loads every plugin in every workspace and degrades agent precision.
 
 The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved as the fallback location described in [`AGENTS.md`](AGENTS.md) §"Repo-side fallback for unenforced `alwaysApply` rules" — if a plugin-shipped `alwaysApply: true` rule is observed not being enforced reliably, the immediate fix is to **copy** the rule from the plugin install path into `.cursor/rules/` (consistency-first; COPY not move; don't delete the plugin copy; report the gap upstream). Do not use this directory as the primary location for new rules.
 

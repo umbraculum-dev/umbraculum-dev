@@ -19,7 +19,7 @@ PR 1 has a scope envelope of ~50 file changes (5 parser source files + 5 test fi
 | `packages/platform/contracts/src/auth/meResponse.ts` — full Zod v4 migration (worked example, behavior-preserving via preprocess + per-field soft transforms) | Landed |
 | `packages/platform/contracts/src/auth/meResponse.test.ts` — rewritten assertions via `ZodError` + `expectFirstIssuePathStartsWith` helper; behavior tests preserved 1:1 | Landed |
 | `eslint.config.mjs` — added `no-restricted-syntax` rule for `packages/*-contracts/**/*.{ts,tsx}` forbidding hand-rolled `function isX(v: unknown): v is X` drift | Landed |
-| `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` — rewritten from "do NOT introduce Zod" to "Zod v4 is the project's strategy", with library-agnostic SDK interface + backward-compat tunnel + soft-tolerance patterns documented | Landed |
+| `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` — rewritten from "do NOT introduce Zod" to "Zod v4 is the project's strategy", with library-agnostic SDK interface + backward-compat tunnel + soft-tolerance patterns documented | Landed |
 
 ## Mandatory prep before any consumer-side verification (containerized rebuild)
 

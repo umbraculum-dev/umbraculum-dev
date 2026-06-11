@@ -164,7 +164,7 @@ For each slice: what it locks down, what bug class it owns, what artifacts ship 
 - **PR 3 — Fastify route migration**: prep + worked example pattern documented in [`docs/design/pr3-routes-migration-handoff.md`](design/pr3-routes-migration-handoff.md) (28 routes, ~30 `assert*` helpers, ~80-100 integration tests, `apps/web` + `apps/native` client updates co-landed per RFC-0003 Decision G — no bridge layer). Container-side verification deferred from this session; PR3 is staged for the next session.
 - **PR 4 — packages/sdk/module-sdk SDK boundary**: `ValidatedSchema<T>` interface + `fromParser` adapter published; README documents the Zod-internal / library-agnostic-SDK split; tests verify the structural contract (hand-rolled, inline-object, and parser-wrapper all satisfy the interface).
 - **Lint guardrail** (co-landed in PR 1): `no-restricted-syntax` rule in `eslint.config.mjs` forbids hand-rolled type-guard helpers (`function isX(v: unknown): v is X`) in `packages/*-contracts/src/**`. This is the *post-migration* enforcement layer; existing helpers grandfathered until each parser migrates.
-- **Plugin-pack rule** (rewritten in PR 1): `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` rewritten to encode Zod v4 as the standard. Schema-first declaration via `z.object/...`, type inference via `z.infer<typeof Schema>`, backward-compat via `z.preprocess()`, soft-tolerance fallbacks via `z.transform()`, structured errors via `ZodError.issues[]`, library-agnostic SDK boundary discipline, explicit anti-patterns.
+- **Plugin-pack rule** (rewritten in PR 1): `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` rewritten to encode Zod v4 as the standard. Schema-first declaration via `z.object/...`, type inference via `z.infer<typeof Schema>`, backward-compat via `z.preprocess()`, soft-tolerance fallbacks via `z.transform()`, structured errors via `ZodError.issues[]`, library-agnostic SDK boundary discipline, explicit anti-patterns.
 - **Spike scaffold** (`spike/validation-library/`): side-by-side Zod v4 + Valibot implementations of `MAILBOX_SPEC`, `parseMashAcidBlock` (discriminated union), and `/auth/signup` (Fastify type provider integration); LOC + DX + bundle-size paper-design comparison recorded in the spike README and in RFC-0003 §Evidence. Falsifiable tests F1–F7 enumerated; F7 (container-side bundle measurement) deferred to a follow-up.
 
 **CI gate (today)**:
@@ -175,7 +175,7 @@ For each slice: what it locks down, what bug class it owns, what artifacts ship 
 - No new dedicated CI gate (the validation slice is enforced through the existing lint + types + tests gates, plus the boundary-runtime guarantee from Fastify type provider). This matches RFC-0003 Decision F (no new workflow added to the matrix; reuse existing gates).
 
 **Plugin-pack alignment today**:
-- `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` — **rewritten 2026-05-19** to Zod v4 standard.
+- `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` — **rewritten 2026-05-19** to Zod v4 standard.
 - *Gap*: no Cursor skill yet that scaffolds the canonical Zod schema pattern (preprocess + transform + superRefine + Fastify-type-provider integration) — the pattern is exemplified in `meResponse.ts` and the spike, but a future plugin-pack PR will add a `zod-schema-scaffold.md` skill. Tracked in `plugin-pack-build` todo.
 - *Gap*: no Cursor subagent yet that audits a `packages/*-contracts/` file against the lint guardrail + the rewritten rule. Tracked in `plugin-pack-build` todo.
 
@@ -231,7 +231,7 @@ On 2026-05-19 the user raised the validation question explicitly, framed as "the
 
 ### 6.3 What this means for the plugin pack
 
-The plugin-pack rule [`.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc`](../.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc) was **rewritten 2026-05-19** to encode Zod v4 as the standard. The rewrite was a discrete deliverable inside PR 1 of the migration (per RFC-0003 Decision E — plugin pack must land with the migration so the AI assistant produces correctly-shaped code as the migration proceeds, not after). The lint guardrail (`no-restricted-syntax` in `eslint.config.mjs`, forbidding `function isX(v: unknown): v is X` helpers in `packages/*-contracts/src/**`) co-landed with the rewritten rule. See §8.6 for the v2.0 plugin-pack mapping (replacing the v1.x version that pointed to the 6-criteria audit cadence).
+The plugin-pack rule `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` was **rewritten 2026-05-19** to encode Zod v4 as the standard. The rewrite was a discrete deliverable inside PR 1 of the migration (per RFC-0003 Decision E — plugin pack must land with the migration so the AI assistant produces correctly-shaped code as the migration proceeds, not after). The lint guardrail (`no-restricted-syntax` in `eslint.config.mjs`, forbidding `function isX(v: unknown): v is X` helpers in `packages/*-contracts/src/**`) co-landed with the rewritten rule. See §8.6 for the v2.0 plugin-pack mapping (replacing the v1.x version that pointed to the 6-criteria audit cadence).
 
 ### 6.4 Lesson: orthogonal-axis tracking did its job
 
@@ -381,7 +381,7 @@ The skill must follow the Skill Contract (≤5 commands, no loops, output-constr
 | Field | Value |
 |---|---|
 | **Type** | Skill |
-| **File** | `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/skills/zod-schema-scaffold/SKILL.md` (proposed) |
+| **File** | `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/skills/zod-schema-scaffold/SKILL.md` (proposed) |
 | **Inputs required** | `<SCHEMA_NAME>` (the schema being introduced), `<TARGET_FILE>` (where it should land), `<BACK_COMPAT_PAYLOAD_KEYS>` (optional list of legacy field names to preprocess), `<SOFT_TOLERANCE_FIELDS>` (optional list of fields that should fall back to `null` / a default when input is malformed) |
 | **Output format** | Returns the canonical Zod schema template (preprocess → object → transform; `z.superRefine` example for cross-entry constraints if needed; `z.infer<typeof Schema>` type alias; thin wrapper function for legacy API compatibility), plus a paired `*.test.ts` template using `expectFirstIssuePathStartsWith` per PR 1's pattern. |
 | **Bounds** | ≤5 commands. Stops at: schema name conflicts with existing exports; target file is outside `packages/*-contracts/src/`; back-compat keys requested but the destination has no upstream rename history. |
@@ -391,7 +391,7 @@ The skill must follow the Skill Contract (≤5 commands, no loops, output-constr
 | Field | Value |
 |---|---|
 | **Type** | Subagent |
-| **File** | `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/agents/contracts-zod-auditor.md` (proposed) |
+| **File** | `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/agents/contracts-zod-auditor.md` (proposed) |
 | **readonly** | `true` |
 | **Description** | "Auditor for the validation slice. Use proactively after editing any file under `packages/*-contracts/src/**` or after adding a new schema-bound route under `services/api/src/routes/**`. Confirms: (1) no hand-rolled type-guard helpers (lint rule satisfied); (2) every exported schema has `z.infer` type aliases; (3) route schemas register via the Fastify type provider (`fastify-type-provider-zod` + `setValidatorCompiler` + `setSerializerCompiler`); (4) tests assert on `ZodError.issues[]` paths, not error message regexes." |
 | **Body** | ≤30 lines; references the proposed `zod-schema-scaffold` skill + the rewritten 22-* rule; reports OK / FAIL ≤1 line per check. |

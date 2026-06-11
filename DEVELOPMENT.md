@@ -7,7 +7,7 @@
 
 ## Development guide (read first)
 
-This file is a **high-signal index + policy** for working in this repo. It intentionally avoids long command blocks; detailed runbooks live as **Skills** inside the umbraculum-toolset Cursor plugin pack (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md)), and specialized **subagents** ship in the same plugins.
+This file is a **high-signal index + policy** for working in this repo. It intentionally avoids long command blocks; detailed runbooks live as **Skills** inside the umbraculum-toolset Cursor plugin pack (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) — workspace-scoped install via the [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen) and toolset [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)), and specialized **subagents** ship in the same plugins.
 
 If a `DEVELOPMENT-LOCAL.md` exists at the repo root, read it immediately after this file for per-developer parameters (containers, paths, defaults). It is per-developer and gitignored. To bootstrap one from this file, ask the agent: *"create my DEVELOPMENT-LOCAL.md"* — that invokes the `generate-development-local` skill from `umbraculum-toolset-common`.
 

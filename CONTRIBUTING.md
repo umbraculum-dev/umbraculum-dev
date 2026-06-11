@@ -57,7 +57,8 @@ translations, and thoughtful issue triage.
   [`MANIFESTO.md`](./MANIFESTO.md) §1.3 + §2.2 call "the equalizer that keeps
   the contribution bar low" — it is the project lowering the bar, not
   raising it. See [`docs/CURSOR-PLUGINS.md`](./docs/CURSOR-PLUGINS.md) for
-  the install procedure and [`AGENTS.md`](./AGENTS.md) for the agent self-
+  the install procedure (hook + source clone until marketplace listings
+  publish; per-workspace enablement after) and [`AGENTS.md`](./AGENTS.md) for the agent self-
   check that runs first thing in any Cursor session in this repo. Human
   authorship is welcome: a contribution may begin as manually-written code,
   but before it lands it should pass through the same apparatus discipline

@@ -7,8 +7,8 @@ This document defines what the **frontier agent** (Cursor's main agent) owns vs 
 > Companion documents:
 >
 > - [DEVELOPMENT-LOCAL-OLLAMA.md](DEVELOPMENT-LOCAL-OLLAMA.md) — local-model integration patterns.
-> - `14-subagent-contract.mdc` — subagent file structure (plugin install: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/14-subagent-contract.mdc`).
-> - Skill Contract — shipped by `umbraculum-toolset-common` (plugin install: `~/.cursor/plugins/local/umbraculum-toolset-common/rules/12-skill-contract.mdc`).
+> - `14-subagent-contract.mdc` — subagent file structure (plugin source: `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/14-subagent-contract.mdc`).
+> - Skill Contract — shipped by `umbraculum-toolset-common` (plugin source: `<umbraculum-toolset>/cursor-plugins/umbraculum-toolset-common/rules/12-skill-contract.mdc`).
 
 ## Goal
 

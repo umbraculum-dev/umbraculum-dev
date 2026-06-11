@@ -32,9 +32,9 @@ Purpose:
   - **Scope**: reusable-across-repos
   - **Status**: ✅ Migrated to the `umbraculum-node-react-cursor-assistant` plugin.
   - **Notes/Links**:
-    - Plugin file: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/20-tests-must-follow-changes.mdc`
+    - Plugin file: `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/20-tests-must-follow-changes.mdc`
     - Project-local single source of truth (brewery): [`docs/TESTING.md`](docs/TESTING.md)
-    - Companion skill consulted by the new section: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/skills/node-npm-container-only/SKILL.md`
+    - Companion skill consulted by the new section: `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/skills/node-npm-container-only/SKILL.md`
 
 - **Title**: New skill `agentic-browser-web-app.md` — agent-driven integrated-browser E2E for TS/JS web apps
   - **Rule_or_Skill**: Skill
@@ -42,7 +42,7 @@ Purpose:
   - **Scope**: reusable-across-repos
   - **Status**: ✅ Migrated to the `umbraculum-node-react-cursor-assistant` plugin.
   - **Notes/Links**:
-    - Plugin file: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/skills/agentic-browser-web-app/SKILL.md`
+    - Plugin file: `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/skills/agentic-browser-web-app/SKILL.md`
     - Brewery job catalog (where the upstream skill defers to): [`docs/AGENTIC-JOBS.md`](docs/AGENTIC-JOBS.md)
     - Brewery test-MCP package (provides `loginAs`, etc.): [`packages/platform/test-mcp`](packages/platform/test-mcp)
   - **Inputs_required (do_not_assume)**: `<APP_BASE_URL>`, `<PERSONA_EMAIL>`, `<PERSONA_PASSWORD>`, `<FIXTURE_FILE>`, `<JOB>`, optional `<RUN_DIR_ROOT>`, `<MCP_BASE_URL>`
@@ -55,7 +55,7 @@ Purpose:
   - **Scope**: reusable-across-repos
   - **Status**: ✅ Migrated to the `umbraculum-node-react-cursor-assistant` plugin.
   - **Notes/Links**:
-    - Plugin file: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/skills/test-mcp-server/SKILL.md`
+    - Plugin file: `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/skills/test-mcp-server/SKILL.md`
     - Brewery implementation (reference subset): [`packages/platform/test-mcp`](packages/platform/test-mcp), [`packages/platform/test-mcp/README.md`](packages/platform/test-mcp/README.md)
   - **Inputs_required (do_not_assume)**: `<TEST_MCP_BASE_URL>`, `<TOOL>`, `<ARGS>`, optional `<RUN_DIR_ROOT>`, `<APP_BASE_URL>`
   - **Commands**: max 5 (discover → smoke → optional seed → invoke tool → read run-dir)
@@ -101,6 +101,6 @@ Purpose:
   - **Scope**: reusable-across-repos
   - **Notes/Links**:
     - Canonical policy: [`AGENTS.md`](../../AGENTS.md) § "Repo-side fallback for unenforced `alwaysApply` rules".
-    - Copy from `~/.cursor/plugins/local/<plugin-name>/rules/<rule>.mdc` into `.cursor/rules/<rule>.mdc`; COPY not move; do not edit installed plugin mirrors.
+    - Copy from `<umbraculum-toolset>/cursor-plugins/<plugin-name>/rules/<rule>.mdc` into `.cursor/rules/<rule>.mdc`; COPY not move; do not edit plugin source in-place (edit umbraculum-toolset repo instead).
     - Use only for observed enforcement failures, not as the primary authoring path for new rules.
 

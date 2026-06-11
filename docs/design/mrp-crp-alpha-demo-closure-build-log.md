@@ -56,7 +56,7 @@
 ## Follow-up (tooling)
 
 - **Repo docs are canonical** for Playwright prereqs: [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md) § Quick gates, [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md), [`docs/TESTING.md`](../TESTING.md) § L5.
-- **Plugin (shipped 2026-05-27):** `umbraculum-node-react-cursor-assistant` v0.0.2 — rule `67-playwright-quick-gates-before-run.mdc` + expanded `playwright-runner-docs-gate` skill in `umbraculum-toolset` (`cursor-plugins/`). Re-run `bash cursor-plugins/scripts/install-local.sh` and reload Cursor to pick up.
+- **Plugin (shipped 2026-05-27):** `umbraculum-node-react-cursor-assistant` v0.0.2 — rule `67-playwright-quick-gates-before-run.mdc` + expanded `playwright-runner-docs-gate` skill in `umbraculum-toolset` (`cursor-plugins/`). After `git pull` in umbraculum-toolset, **Developer: Reload Window** to pick up (hook install — superseded pre-2026-06-11 `install-local.sh` rsync).
 
 ---
 

@@ -70,7 +70,7 @@ Install / refresh the plugin pack using [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGIN
 
 Plugin rollback is handled by disabling or reverting the plugin install in Cursor, not by running an npm package-sync cleanup. Brewery's project-local files in `docs/AGENTIC-JOBS.md` and `packages/platform/test-mcp/` are unaffected by plugin enablement either way.
 
-Repo-local `.cursor/rules/` remains available only as the troubleshooting fallback documented in [`AGENTS.md`](../AGENTS.md): if a plugin-shipped `alwaysApply: true` rule is present but not reliably enforced, copy that rule from `~/.cursor/plugins/local/<plugin-name>/rules/` into `.cursor/rules/` and report the enforcement gap upstream.
+Repo-local `.cursor/rules/` remains available only as the troubleshooting fallback documented in [`AGENTS.md`](../AGENTS.md): if a plugin-shipped `alwaysApply: true` rule is present but not reliably enforced, copy that rule from your umbraculum-toolset source clone (`<umbraculum-toolset>/cursor-plugins/<plugin-name>/rules/`) into `.cursor/rules/` and report the enforcement gap upstream.
 
 ---
 

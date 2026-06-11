@@ -214,7 +214,9 @@ translations, and security reports.
   required on every commit.
 - AI assistants and contributors using Cursor: install the
   *umbraculum-toolset Cursor plugin pack* — see
-  [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md). The plugin pack is
+  [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) (workspace-scoped via
+  [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen), not
+  global `~/.cursor/plugins/local/`). The plugin pack is
   the apparatus referenced in [`MANIFESTO.md`](MANIFESTO.md) §1.2 and is
   what keeps the contribution bar low ([`MANIFESTO.md`](MANIFESTO.md) §1.3,
   §2.2). The repo-root [`AGENTS.md`](AGENTS.md) is the agent self-check

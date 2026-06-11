@@ -2,12 +2,12 @@
 
 Local-model integration for the Cursor subagent system (the umbraculum-toolset plugin pack).
 
-This document covers how to drive [Ollama](https://ollama.com/) (or any OpenAI-compatible local endpoint) from the same subagents that ship with the umbraculum-toolset plugins (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for the install procedure). The plugin install drops canonical subagent files under `~/.cursor/plugins/local/<plugin-name>/agents/*.md`; this doc explains how to add local-model variants of those agents.
+This document covers how to drive [Ollama](https://ollama.com/) (or any OpenAI-compatible local endpoint) from the same subagents that ship with the umbraculum-toolset plugins (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for the install procedure). Canonical subagent files live under `<umbraculum-toolset>/cursor-plugins/<plugin-name>/agents/*.md` (loaded via the [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen) when the workspace matches); this doc explains how to add local-model variants of those agents in this repo's `.cursor/agents/`.
 
 > Companion documents:
 >
 > - [DEVELOPMENT-LOCAL-MODELS-DELEGATION.md](DEVELOPMENT-LOCAL-MODELS-DELEGATION.md) — frontier-vs-executor policy.
-> - `14-subagent-contract.mdc` — subagent file structure (lives in the plugin install at `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/14-subagent-contract.mdc`).
+> - `14-subagent-contract.mdc` — subagent file structure (plugin source: `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/14-subagent-contract.mdc`).
 > - [Cursor subagents docs](https://cursor.com/docs/subagents)
 
 ## Why use Ollama?
@@ -23,7 +23,7 @@ You should NOT use Ollama for planning, architecture, or final validation — ke
 
 ### Pattern A (preferred): Cursor-native subagent with custom model id
 
-This pattern reuses the same subagent files the umbraculum-toolset plugins ship (under `~/.cursor/plugins/local/<plugin-name>/agents/*.md`), only swapping the `model:` field by creating a sibling `.local.md` in this repo's `.cursor/agents/`. Cursor manages context isolation, parallelism, and tool access for you.
+This pattern reuses the same subagent files the umbraculum-toolset plugins ship (under `<umbraculum-toolset>/cursor-plugins/<plugin-name>/agents/*.md`), only swapping the `model:` field by creating a sibling `.local.md` in this repo's `.cursor/agents/`. Cursor manages context isolation, parallelism, and tool access for you.
 
 **Prerequisites:**
 
@@ -58,11 +58,11 @@ This pattern reuses the same subagent files the umbraculum-toolset plugins ship 
    readonly: true
    ---
 
-   You are a skeptical validator running on a local model. Same instructions as the canonical `verifier` subagent shipped at `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/agents/verifier.md` (or the matching plugin for the verifier variant you want — the Magento plugin ships its own at `~/.cursor/plugins/local/rf-magento-cursor-assistant/agents/verifier.md`):
+   You are a skeptical validator running on a local model. Same instructions as the canonical `verifier` subagent shipped at `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/agents/verifier.md` (or the matching plugin for the verifier variant you want — the Magento plugin ships its own at `<cursor-plugins>/rf-magento-cursor-assistant/agents/verifier.md`):
 
    1. Read `DEVELOPMENT.md` and `DEVELOPMENT-LOCAL.md` first.
-   2. For URL/exception fixes, follow the `curl-exception-verification` skill exactly (lives in the plugin install at `~/.cursor/plugins/local/<plugin-name>/skills/curl-exception-verification/SKILL.md`).
-   3. For PHPUnit claims, follow the `phpunit-unit-runbook` skill exactly (lives in the Magento plugin at `~/.cursor/plugins/local/rf-magento-cursor-assistant/skills/phpunit-unit-runbook/SKILL.md`).
+   2. For URL/exception fixes, follow the `curl-exception-verification` skill exactly (lives at `<umbraculum-toolset>/cursor-plugins/<plugin-name>/skills/curl-exception-verification/SKILL.md`).
+   3. For PHPUnit claims, follow the `phpunit-unit-runbook` skill exactly (lives in the Magento plugin at `<cursor-plugins>/rf-magento-cursor-assistant/skills/phpunit-unit-runbook/SKILL.md`).
    4. Do not modify files. Do not run state-changing shell commands.
 
    Final report format:
@@ -165,7 +165,7 @@ EOF
 ## Cross-links
 
 - [DEVELOPMENT-LOCAL-MODELS-DELEGATION.md](DEVELOPMENT-LOCAL-MODELS-DELEGATION.md)
-- `14-subagent-contract.mdc` — subagent file structure (plugin install: `~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/14-subagent-contract.mdc`).
-- Plugin-shipped subagents (Pattern A starting points) — under `~/.cursor/plugins/local/<plugin-name>/agents/*.md` after install (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for install).
+- `14-subagent-contract.mdc` — subagent file structure (plugin source: `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/14-subagent-contract.mdc`).
+- Plugin-shipped subagents (Pattern A starting points) — under `<umbraculum-toolset>/cursor-plugins/<plugin-name>/agents/*.md` (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for install).
 - [Cursor subagents docs](https://cursor.com/docs/subagents)
 - [Ollama OpenAI-compatible API](https://github.com/ollama/ollama/blob/main/docs/openai.md)

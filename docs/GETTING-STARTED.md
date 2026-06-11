@@ -478,11 +478,16 @@ bar — not how it raises it.
 
 Follow [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) end-to-end:
 
-1. Install the four required plugins (local-from-source today; Cursor
-   marketplace once the listings publish).
-2. Restart Cursor.
-3. Open the repo in Cursor and start a fresh agent session.
-4. Run the *Verify the install* step from `docs/CURSOR-PLUGINS.md` —
+1. Set up **workspace-scoped** plugin loading: [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen)
+   + umbraculum-toolset source clone per toolset
+   [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)
+   §0 (marketplace per-workspace once listings publish). **Do not** rsync into
+   `~/.cursor/plugins/local/` — that loads every plugin in every workspace.
+2. **Developer: Reload Window** after hook setup or toolset `git pull`.
+3. Open this repo in Cursor and start a fresh agent session.
+4. **Settings → Plugins** (workspace filter) — confirm exactly **three**
+   umbraculum extensions for this workspace (common, node-react, platform-tsjs).
+5. Run the *Verify the install* step from `docs/CURSOR-PLUGINS.md` —
    ask the agent literally to list the three witness rule filenames.
 
 When the agent's first action in any non-trivial task hits

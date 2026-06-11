@@ -341,7 +341,7 @@ export default [
   // (they may still use hand-rolled assertion helpers).
   //
   // See `docs/rfcs/0003-validation-library-adoption.md` Decision E, and
-  // `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/
+  // `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/
   // 22-typescript-contracts-runtime-validation.mdc` for the IDE guidance.
   // -------------------------------------------------------------------
   {

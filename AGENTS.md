@@ -51,8 +51,17 @@ that scope the rule to TS/JS files under `apps/`, `services/`, and
 the conversation's active context, so they can be **silently absent** from
 your loaded rule list in conversations with no TS file open even when the
 plugin is correctly installed. **Verify by attempting to Read the rule
-file at its canonical installed path**
-`~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc`:
+file at its canonical path on disk.** With the recommended
+[`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen) install
+(see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) and toolset
+[`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)),
+that path is your **umbraculum-toolset source clone**, for example:
+
+`<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc`
+
+(Legacy global rsync installs use
+`~/.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc`
+instead.)
 
 - **Read succeeds** → the plugin is installed AND the rule's full content
   has now entered your conversation context as a side effect of the Read.
@@ -148,8 +157,11 @@ If any of plugins 1–3 is missing (or 4 is missing on a Magento-touching task),
    > not raising it.*
 
 4. Point the user at [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for
-   the install procedure (marketplace install where available; local install
-   from the public `umbraculum-toolset` sister-repo as the fallback).
+   the install procedure (marketplace per-workspace when listings are live;
+   until then: [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen)
+   + source clone per toolset
+   [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)
+   — **not** global rsync into `~/.cursor/plugins/local/`).
 
 5. Offer an explicit override:
 
@@ -180,7 +192,9 @@ user's explicit choice.
   to be enforced reliably on this project (rule is present per the
   witness-rule check, but the agent's behavior is observably not honoring
   the rule's directives), the documented immediate fix is to **copy** the
-  rule from `~/.cursor/plugins/local/<plugin-name>/rules/<rule>.mdc` into
+  rule from your umbraculum-toolset source clone
+  (`<umbraculum-toolset>/cursor-plugins/<plugin-name>/rules/<rule>.mdc`; legacy
+  global rsync: `~/.cursor/plugins/local/<plugin-name>/rules/<rule>.mdc`) into
   this repo's `.cursor/rules/<rule>.mdc` (consistency-first; COPY not
   move; do not refactor the content; do not delete the plugin copy; and
   **report the enforcement gap to the plugin core team via a
