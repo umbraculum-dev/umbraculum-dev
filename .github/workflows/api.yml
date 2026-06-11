@@ -82,6 +82,10 @@ jobs:
           - 3000:3000
 
     env:
+      # Integration suite exercises brewery reference vertical routes (recipes,
+      # brewday, platform-admin recipes, MRP/CRP brewery templates). Core profile
+      # omits registerBreweryModule → 404 on those paths. See install.core.json.
+      UMBRACULUM_MODULE_PROFILE: reference
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/brewapp_test
       DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:5432/brewapp_test
       DATABASE_URL_DIRECT: postgresql://postgres:postgres@localhost:5432/brewapp_test

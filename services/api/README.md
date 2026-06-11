@@ -33,7 +33,7 @@ Per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor
 
 - **Build (production)**: `docker compose exec api npm run build` (`tsc -p tsconfig.json`).
 - **Test (unit — no DB reset)**: `docker compose exec api npm run test:unit` (openapi artifact, entitlements, promptComposer, … — T0 fast path).
-- **Test (integration — full suite)**: `docker compose exec api npm run test:integration` or `docker compose exec api npm test` (resets test DB once per run, all vitest specs including contract snapshots).
+- **Test (integration — full suite)**: `docker compose exec api npm run test:integration` or `docker compose exec api npm test` (resets test DB once per run, all vitest specs including contract snapshots). The suite targets brewery reference routes — set `UMBRACULUM_MODULE_PROFILE=reference` (or use [`docker-compose.reference.yml`](../../docker-compose.reference.yml)); GHA `api.yml` sets this env. Core profile alone returns 404 on brewery paths.
 - **Verification slices (T1)**: from repo root — `npm run verify:openapi`, `npm run verify:api-platform`, etc. See [`docs/VERIFICATION-TIERS.md`](../../docs/VERIFICATION-TIERS.md).
 - **Test (single filter)**: `docker compose exec api npm test -- -t "<vitest filter>"`.
 - **Contract snapshot check**: `docker compose exec api npm run contracts:check` (fails CI if the API's serialized response shape diverges from the snapshots; refresh with `npm run contracts:update`).
