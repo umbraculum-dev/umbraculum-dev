@@ -73,8 +73,10 @@ Use these terms in reviews and plans to avoid talking past each other. For onboa
 |---|---|---|
 | **API service** | HTTP monolith: routes, Prisma, jobs | Operator UI, "admin theme" |
 | **Horizontal platform** | Auth, workspace, billing, AI orchestrator, rendering, notifications boundary, … | A single package named `core` |
-| **Workspace web UI** | Federated web + native app workspace members use daily | Storefront, brochure site, Qt/QML Lomiri rewrite |
-| **Workspace-member app** | Same as workspace web UI — one audience, one AI context ([ROADMAP](../ROADMAP.md) standing principle) | B2C shopper app |
+| **Workspace web UI** | Federated **web** shell (`apps/web`) workspace members use daily | Storefront, brochure site; not “all native binaries” |
+| **Workspace-member app** | Primarily **workspace web UI** — one web shell, one AI workspace context ([ROADMAP](../ROADMAP.md)) | B2C shopper app; not one mega-native shell |
+| **Native purpose-built binary** | One Expo store app at `apps/native/<app-code>/` (brew-day, future floor/scanner apps) | `@umbraculum/native-shell` package; `apps/web` |
+| **Native app composition** | Which module native slices a binary registers at build time (`registerNativeModule` subset) | Installation profile listing every server module in one app |
 | **Module registration** | Boot-time declaration via `registerModule()` / `registerWebModule()` / `registerNativeModule()` | Runtime shared layout registration (partially deferred — see §5) |
 | **Public surface (marketing)** | Static orientation HTML | Operational "public API" |
 | **Storefront / commerce** (future) | Separate deployable; read-only consumer of PIM/CRM master data | PIM admin UI |
@@ -91,13 +93,14 @@ Use these terms in reviews and plans to avoid talking past each other. For onboa
 
 ### 4.2 Umbraculum-style (committed)
 
-- **Workspace members** (planners, brewers, warehouse staff, admins) use **one shell** with federated module routes
+- **Workspace members** (planners, brewers, warehouse staff, admins) use **one web shell** (`apps/web`) with federated module routes — the ecosystem can grow large on web (Odoo-class operator UI is in scope on this surface)
+- **Native** ships **many purpose-built binaries** (`apps/native/<app-code>/`), each **composed** from a subset of module native slices — not one native deployable that mirrors every web route ([RFC-0011](../rfcs/0011-application-surface-shell-layering.md) Decision C; [`installation-profile.md`](installation-profile.md) § Web vs native)
 - Canonical modules are **operator systems** (Akeneo / SAP / Odoo class admin), not storefronts
-- **AI consultant** requires workspace-scope context — splitting operator modules across disconnected apps breaks the cornerstone principle ([PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) §4.0)
+- **AI consultant** requires workspace-scope context on **web + API** — multiple native task apps do not split that context; a single mega-native shell is not required and is not the target shape
 
-Standing principle ([ROADMAP.md](../ROADMAP.md)):
+Standing principle ([ROADMAP.md](../ROADMAP.md)) — read **web vs native**:
 
-> **One audience per app.** Workspace-member modules share one shell. Shopper-facing surfaces (if any) are separate apps.
+> **One audience per app.** Workspace-member modules share **one web shell**. Shopper-facing surfaces (if any) are separate apps. **Native** uses separate store binaries where mobile form factor is intrinsic (offline, scanning, floor input) — see [`apps/native/README.md`](../../apps/native/README.md).
 
 ### 4.3 Where Drupal *does* apply — the optional edge
 

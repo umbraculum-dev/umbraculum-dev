@@ -38,7 +38,7 @@ function loadManifest(root, env) {
     if (profile === "reference") {
       return { id: "reference", verticals: ["brewery"], nativeApps: ["brewery"] };
     }
-    return { id: "core", verticals: [], nativeApps: ["starter"] };
+    return { id: "core", verticals: [], nativeApps: ["blank"] };
   }
   return JSON.parse(readFileSync(path, "utf8"));
 }
@@ -67,7 +67,7 @@ switch (field) {
     console.log((manifest.nativeApps ?? []).join(","));
     break;
   case "primaryNativeApp":
-    console.log((manifest.nativeApps ?? ["starter"])[0] ?? "starter");
+    console.log((manifest.nativeApps ?? ["blank"])[0] ?? "blank");
     break;
   case "hasBrewery":
     console.log((manifest.verticals ?? []).includes("brewery") ? "true" : "false");

@@ -166,7 +166,7 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 |---|---|---|
 | **API** | Brewery module not registered ([`services/api/src/app.ts`](../../services/api/src/app.ts)) | `registerBreweryModule(app)` |
 | **Web nav** | Brewery segments omitted | `brewery` in builtin web modules |
-| **Native** | [`apps/native/starter`](../../apps/native/starter) (minimal shell) | [`apps/native/brewery`](../../apps/native/brewery) |
+| **Native** | [`apps/native/blank`](../../apps/native/blank) (blank app) | [`apps/native/brewery`](../../apps/native/brewery) |
 | **Database** | `brewery.*` stripped after migrate ([`installation-profile.md`](design/installation-profile.md)) | Full `brewery.*` schema |
 | **Workspace UI toggle** | Install profile gate + optional add-on rows (RFC-0009 prep) | Same |
 

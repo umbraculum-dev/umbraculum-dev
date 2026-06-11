@@ -21,6 +21,8 @@ Deploy-time knob **`UMBRACULUM_MODULE_PROFILE`** selects which first-party modul
 
 Manifest + resolver: [`.umbraculum/install*.json`](../../.umbraculum/) and [`packages/sdk/module-sdk/src/installProfile.ts`](../../packages/sdk/module-sdk/src/installProfile.ts).
 
+**Web vs native:** one federated web shell; many composed native binaries — [`installation-profile.md`](installation-profile.md) § Web vs native.
+
 ---
 
 ## Compose wiring
@@ -43,7 +45,7 @@ See [`installation-profile.md`](installation-profile.md) for manifest format, bu
 |-------|-------------|-------------------|
 | API `registerBreweryModule` | Yes | No |
 | Web brewery URL segments | Yes | No |
-| Native app | `apps/native/brewery` | `apps/native/starter` |
+| Native app | `apps/native/brewery` | `apps/native/blank` |
 | Prisma `brewery.*` schema | Present | Stripped after migrate (core) |
 | i18n brewery strings | Merged | Omitted |
 | MRP/CRP brewery projections | Live reads | Empty adapter |

@@ -3,5 +3,5 @@
   "description": "Active installation profile pointer — defaults to core. Override with UMBRACULUM_INSTALL_MANIFEST or switch to install.reference.json for brewery opt-in.",
   "verticals": [],
   "canonical": ["automation", "pim", "mrp", "crp"],
-  "nativeApps": ["starter"]
+  "nativeApps": ["blank"]
 }

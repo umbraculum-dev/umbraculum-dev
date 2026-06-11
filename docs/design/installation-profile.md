@@ -15,8 +15,29 @@ An **installation profile** selects which modules and native apps are enabled fo
 |------|---------|
 | **Installation profile** | Platform + canonical modules + optional verticals installed on this stack |
 | **`UMBRACULUM_MODULE_PROFILE`** | Env selector (`platform` \| `reference`) — a view over the manifest |
-| **Core profile** | No verticals; native app = `starter` |
+| **Core profile** | No verticals; native app = `blank` |
 | **Reference profile** | Brewery reference vertical + native `brewery` app |
+
+---
+
+## Web vs native — asymmetric surfaces
+
+Installation profile controls **which modules boot on the API** and **which native store binaries** are in scope for a deployment. It does **not** imply the same federation shape on web and native.
+
+| Surface | Federation model | Grows with ecosystem by… |
+|---------|------------------|---------------------------|
+| **Web** (`apps/web`) | **One** federated workspace-member shell | Adding route groups `(pim)/`, `(mrp)/`, … inside the same deployable |
+| **Native** (`apps/native/<app-code>/`) | **Many** purpose-built binaries | Adding new Expo workspaces; each binary **composes** a subset of module native slices |
+
+**Why native does not mirror web.** Web-first for heavy desktop workflows; native only where mobile form factor is intrinsic ([`ROADMAP.md`](../ROADMAP.md) standing principles). A single native binary that registered every enabled module would be the wrong default: app-store size and permissions, role/device mismatch (scanner vs office), integrator choice, and release coupling. Bundling **related** floor apps (for example PIM + quality in one binary) is intentional **composition** at app definition time — not one runtime shell for the whole installation profile.
+
+**`nativeApps` in the manifest** lists **deployable native binaries** for this stack (today `blank` or `brewery`; future examples `pim-floor`, `wms-scanner`). It is not a one-to-one map of every canonical module on the server. Canonical modules can be live on API + web while native UIs for them are absent, web-fallback only, or shipped as separate apps when product need justifies a store binary.
+
+**`blank` (core profile):** the blank native app — interim CI/monorepo target for Expo (`expo-doctor`, typecheck) until the first canonical native product app ships. Not sample data (brewery reference vertical), not `apps/web`'s native twin. See [`apps/native/README.md`](../../apps/native/README.md) § Web vs native.
+
+**AI consultant:** workspace context is carried on **web + API**; mobile apps are task-bound surfaces. Multiple native binaries do not split AI workspace scope.
+
+RFC: [RFC-0011](../rfcs/0011-application-surface-shell-layering.md) Decision C (native multi-app). Backbone: [`pre-flip-application-surface-backbone.md`](pre-flip-application-surface-backbone.md) §4.
 
 ---
 
@@ -35,7 +56,7 @@ Example core manifest:
   "id": "core",
   "verticals": [],
   "canonical": ["automation", "pim", "mrp", "crp"],
-  "nativeApps": ["starter"]
+  "nativeApps": ["blank"]
 }
 ```
 
@@ -77,7 +98,7 @@ docker compose -f docker-compose.yml -f docker-compose.reference.yml up -d
 ## Build / CI / native
 
 - **`npm run build:packages`** — builds core packages always; vertical packages only when manifest includes brewery ([`build-packages-install-profile.sh`](../../scripts/build-packages-install-profile.sh)).
-- **`native-deps` / expo-doctor** — runs against manifest `nativeApps[0]` (`starter` or `brewery`) via [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh).
+- **`native-deps` / expo-doctor** — runs against manifest `nativeApps[0]` (`blank` or `brewery`) via [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh).
 - **Smoke** — [`integrator-api-smoke.sh`](../../scripts/integrator-api-smoke.sh) skips brewery catalog checks on core profile.
 
 ---

@@ -8,6 +8,8 @@ Operational commands remain in `docs/DEVELOPMENT-NATIVE-LOCAL.md`.
 
 **Ubuntu Touch** is **not** an Expo/React Native target. Operator UI on Lomiri uses the **web slice** in a Click Morph webapp wrapper — see [`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md). Native strategy in this doc applies to **iOS/Android only**.
 
+**Surface shape:** Web = one federated workspace-member shell; native = many purpose-built store binaries composed from module slices (not one native mirror of web). See [`apps/native/README.md`](../apps/native/README.md) § Web vs native and [`design/installation-profile.md`](design/installation-profile.md) § Web vs native.
+
 ---
 
 ## 1. Context you confirmed
@@ -38,7 +40,7 @@ None of that is “moving fast”; it is **undefined behavior** that wastes days
 Using **Expo Go** on a physical device with **documented** version pins and **monorepo-wide React alignment** (`react@19.1.0` via root `overrides` as of 2026-06-07) is **acceptable** when:
 
 1. Pins and overrides are **explicit** (baseline table in `DEVELOPMENT-NATIVE-LOCAL.md`, assessment in [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md)).
-2. Everyone touching native deps runs **[`scripts/check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh)** (or CI `native-deps.yml`) before merging — the script targets the **primary native app** from the [installation profile manifest](../.umbraculum/install.core.json) (`starter` on core profile, `brewery` when opted in).
+2. Everyone touching native deps runs **[`scripts/check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh)** (or CI `native-deps.yml`) before merging — the script targets the **primary native app** from the [installation profile manifest](../.umbraculum/install.core.json) (`blank` on core profile, `brewery` when opted in).
 3. Shared packages (`packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, etc.) stick to **public, stable React APIs** — no version-sensitive internals.
 4. You keep the **triage order** in `docs/DEVELOPMENT-NATIVE-LOCAL.md` (API → LAN → phone browser → versions → cache → device log).
 

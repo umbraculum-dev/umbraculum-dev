@@ -17,7 +17,7 @@ resolve_manifest() {
 NATIVE_APP="${NATIVE_APP:-$(resolve_manifest --field primaryNativeApp)}"
 
 case "$NATIVE_APP" in
-  starter) NATIVE_WS="@umbraculum/native-starter" ;;
+  blank) NATIVE_WS="@umbraculum/native-blank" ;;
   brewery) NATIVE_WS="@umbraculum/native-brewery" ;;
   *)
     echo "[native-expo-doctor] unknown nativeApps entry: ${NATIVE_APP}" >&2

@@ -243,7 +243,7 @@ Which modules boot in a deployment is controlled by the **installation profile m
 | `loadInstallationProfileManifest()` | Read manifest (verticals, canonical, nativeApps) |
 | `resolveEnabledModuleCodes()` | Set of module codes for boot |
 | `isModuleEnabled(code)` / `isVerticalInstalled(code)` | Gate registration |
-| `resolvePrimaryNativeAppCode()` | `starter` or `brewery` for CI/native-deps |
+| `resolvePrimaryNativeAppCode()` | `blank` or `brewery` for CI/native-deps |
 
 Canonical doc: [`docs/design/installation-profile.md`](../../../docs/design/installation-profile.md). Implementation: [`src/installProfile.ts`](src/installProfile.ts), [`src/enabledModules.ts`](src/enabledModules.ts).
 

@@ -795,14 +795,14 @@ function fallbackManifestFromProfile(profile) {
     id: "core",
     verticals: [],
     canonical: ["automation", "pim", "mrp", "crp"],
-    nativeApps: ["starter"]
+    nativeApps: ["blank"]
   };
 }
 function normalizeManifest(raw, profile) {
   const id = raw.id ?? (profile === "reference" ? "reference" : "core");
   const canonical = raw.canonical?.length ? raw.canonical : ["automation", "pim", "mrp", "crp"];
   const verticals = raw.verticals ?? (id === "reference" ? ["brewery"] : []);
-  const nativeApps = raw.nativeApps?.length ? raw.nativeApps : id === "reference" ? ["brewery"] : ["starter"];
+  const nativeApps = raw.nativeApps?.length ? raw.nativeApps : id === "reference" ? ["brewery"] : ["blank"];
   return {
     id,
     ...raw.description !== void 0 ? { description: raw.description } : {},
@@ -823,8 +823,8 @@ function resolveNativeAppCodes(env = process.env) {
 }
 function resolvePrimaryNativeAppCode(env = process.env) {
   const apps = resolveNativeAppCodes(env);
-  if (apps.length === 0) return "starter";
-  return apps[0] ?? "starter";
+  if (apps.length === 0) return "blank";
+  return apps[0] ?? "blank";
 }
 
 // src/enabledModules.ts

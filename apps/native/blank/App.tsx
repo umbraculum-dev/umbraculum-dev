@@ -8,14 +8,16 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.title}>Umbraculum native starter</Text>
+          <Text style={styles.title}>Umbraculum Blank</Text>
           <Text style={styles.body}>
-            This is the minimal native shell for the core installation profile. It proves Expo
-            monorepo bootstrap without any vertical packages.
+            Blank native app for the core installation profile — no vertical packages and no
+            canonical module screens yet. It proves the Expo monorepo bootstrap for self-hosters
+            and CI.
           </Text>
           <Text style={styles.body}>
-            For a full product example, opt in to a reference or custom vertical (brewery is the
-            first reference vertical).
+            Product native apps (brew-day, floor PIM, scanners, and similar) ship as separate
+            binaries under apps/native/. Opt in to the brewery reference vertical or add your own
+            vertical when you need a full example.
           </Text>
           <Text
             accessibilityRole="link"

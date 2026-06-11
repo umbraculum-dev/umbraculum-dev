@@ -29,7 +29,7 @@ These docs are the project's load-bearing references. Read them before broad wor
 
 ## Installation profile (default change — 2026-06)
 
-Fresh `git clone` + `docker compose up` now uses the **core installation profile** (`UMBRACULUM_MODULE_PROFILE=platform`): canonical modules only, native app [`apps/native/starter`](apps/native/starter), **no brewery vertical** at boot or in Postgres after [`prisma-migrate-install-profile.sh`](scripts/prisma-migrate-install-profile.sh).
+Fresh `git clone` + `docker compose up` now uses the **core installation profile** (`UMBRACULUM_MODULE_PROFILE=platform`): canonical modules only, native app [`apps/native/blank`](apps/native/blank), **no brewery vertical** at boot or in Postgres after [`prisma-migrate-install-profile.sh`](scripts/prisma-migrate-install-profile.sh).
 
 | Need | Action |
 |------|--------|
@@ -44,6 +44,8 @@ Manifest SoT: [`.umbraculum/install*.json`](.umbraculum/install.core.json). Reso
 ## Cross-platform shape (web + native, one source of truth)
 
 Umbraculum commits to **one source of truth shipping to both web and native almost out of the box** ([`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §1.1; [`MANIFESTO.md`](MANIFESTO.md) §2.2 reach-both-surfaces clause). That commitment is what selected Tamagui (one component tree → real DOM on web + real React Native on device — see [`docs/TAMAGUI.md`](docs/TAMAGUI.md) for the alternatives comparison and accepted-cost discipline) and what shapes the per-module β layout where `apps/native/src/modules/<code>/` is one of the four coordinated slices ([RFC-0002](docs/rfcs/0002-canonical-module-physical-layout.md) §3).
+
+**Asymmetric surfaces (not a contradiction):** **Web** = one federated workspace-member shell; the operator ecosystem can grow large there. **Native** = many purpose-built store binaries under `apps/native/<app-code>/`, each **composed** from a subset of module native slices — not one native app that mirrors every web module. Installation profile `nativeApps` selects which binaries ship. See [`apps/native/README.md`](apps/native/README.md) § Web vs native and [`docs/design/installation-profile.md`](docs/design/installation-profile.md) § Web vs native.
 
 The native-facing operational docs form one bundle — read them together when touching `apps/native/**` or any cross-platform package (`packages/platform/ui/`, `packages/verticals/brewery/recipes-ui/`, `packages/platform/navigation/`, `packages/platform/i18n-react/`, `packages/platform/api-client/`, `packages/platform/media/`):
 

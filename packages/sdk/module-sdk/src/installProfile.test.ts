@@ -13,7 +13,7 @@ describe("installProfile", () => {
     const manifest = loadInstallationProfileManifest(env);
     expect(manifest.id).toBe("core");
     expect(manifest.verticals).toEqual([]);
-    expect(manifest.nativeApps).toEqual(["starter"]);
+    expect(manifest.nativeApps).toEqual(["blank"]);
     expect(resolveEnabledModuleCodesFromManifest(env).has("brewery")).toBe(false);
     expect(resolveEnabledModuleCodesFromManifest(env).has("pim")).toBe(true);
   });

@@ -69,7 +69,7 @@
         "packages/*-contracts/**",
         "apps/web/package.json",
         "apps/native/brewery/package.json",
-        "apps/native/starter/package.json",
+        "apps/native/blank/package.json",
         "services/api/package.json",
         "packages/platform/rendering/package.json",
         "scripts/dogfood-npm-smoke.sh",

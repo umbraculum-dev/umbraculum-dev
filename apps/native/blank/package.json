@@ -1,8 +1,8 @@
 {
-  "name": "@umbraculum/native-starter",
+  "name": "@umbraculum/native-blank",
   "private": true,
   "version": "0.0.1",
-  "description": "Minimal Umbraculum native app for the core installation profile — proves Expo monorepo bootstrap without any vertical packages.",
+  "description": "Blank Umbraculum native app for the core installation profile — minimal Expo workspace with no vertical or canonical module UI.",
   "main": "index.js",
   "scripts": {
     "start": "expo start",

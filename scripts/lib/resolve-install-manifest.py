@@ -46,7 +46,7 @@ def load_manifest(root: Path, env: dict[str, str]) -> dict:
             "id": "core",
             "verticals": [],
             "canonical": ["automation", "pim", "mrp", "crp"],
-            "nativeApps": ["starter"],
+            "nativeApps": ["blank"],
         }
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -79,8 +79,8 @@ def main() -> int:
     elif args.field == "nativeApps":
         print(",".join(manifest.get("nativeApps", [])))
     elif args.field == "primaryNativeApp":
-        apps = manifest.get("nativeApps", ["starter"])
-        print(apps[0] if apps else "starter")
+        apps = manifest.get("nativeApps", ["blank"])
+        print(apps[0] if apps else "blank")
     elif args.field == "hasBrewery":
         print("true" if "brewery" in manifest.get("verticals", []) else "false")
     else:

@@ -24,7 +24,7 @@ describe("enabledModules", () => {
     expect(isModuleEnabled("pim", env)).toBe(true);
     expect(isModuleEnabled("automation", env)).toBe(true);
     expect(isVerticalInstalled("brewery", env)).toBe(false);
-    expect(resolveNativeAppCodes(env)).toEqual(["starter"]);
+    expect(resolveNativeAppCodes(env)).toEqual(["blank"]);
   });
 
   it("reference profile includes brewery vertical", () => {
@@ -43,7 +43,7 @@ describe("enabledModules", () => {
     const manifest = loadInstallationProfileManifest(env);
     expect(manifest.id).toBe("core");
     expect(manifest.verticals).toEqual([]);
-    expect(manifest.nativeApps).toEqual(["starter"]);
+    expect(manifest.nativeApps).toEqual(["blank"]);
   });
 
   it("throws on unknown profile values", () => {

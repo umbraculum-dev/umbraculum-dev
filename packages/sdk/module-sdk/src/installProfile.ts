@@ -109,7 +109,7 @@ function fallbackManifestFromProfile(profile: ModuleProfile): InstallationProfil
     id: "core",
     verticals: [],
     canonical: ["automation", "pim", "mrp", "crp"],
-    nativeApps: ["starter"],
+    nativeApps: ["blank"],
   };
 }
 
@@ -123,7 +123,7 @@ function normalizeManifest(
     : ["automation", "pim", "mrp", "crp"];
   const verticals = raw.verticals ?? (id === "reference" ? ["brewery"] : []);
   const nativeApps =
-    raw.nativeApps?.length ? raw.nativeApps : id === "reference" ? ["brewery"] : ["starter"];
+    raw.nativeApps?.length ? raw.nativeApps : id === "reference" ? ["brewery"] : ["blank"];
 
   return {
     id: id as InstallationProfileId,
@@ -159,6 +159,6 @@ export function resolvePrimaryNativeAppCode(
   env: NodeJS.ProcessEnv = process.env,
 ): string {
   const apps = resolveNativeAppCodes(env);
-  if (apps.length === 0) return "starter";
-  return apps[0] ?? "starter";
+  if (apps.length === 0) return "blank";
+  return apps[0] ?? "blank";
 }
