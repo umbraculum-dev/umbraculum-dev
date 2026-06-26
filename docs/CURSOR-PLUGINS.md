@@ -19,6 +19,19 @@ The repo-root agent interceptor in [`../AGENTS.md`](../AGENTS.md) is what
 *enforces* this — every AI session that touches non-trivial code starts
 with the apparatus self-check.
 
+> [!CAUTION]
+> **Install only the plugins this workspace needs — not the whole toolset.**
+> Loading every umbraculum-toolset plugin (global rsync into
+> `~/.cursor/plugins/local/`, legacy `install-local.sh.legacy`, or enabling
+> all marketplace plugins across every workspace) **breaks agent sessions**:
+> unrelated `alwaysApply` rules, skills, and subagents consume context; the
+> model misses load-bearing guidance; you get wrong guardrails and false "the agent
+> ignored the rule" reports. **For this repo:** exactly **three** plugins —
+> see [Required plugin pack](#required-plugin-pack). Use the
+> [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen) +
+> [WORKSPACE-PLUGIN-LOADING.md](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)
+> — not global install.
+
 ## Why the apparatus matters (one paragraph)
 
 [`MANIFESTO.md`](../MANIFESTO.md) §1.3 + §2.2 commit to keeping the
@@ -33,29 +46,42 @@ project lowering the bar for the contributor, not raising it. This is
 the inverse of how most OSS projects frame contributor tooling, and it
 is the most concrete expression of the manifesto's §1.2 + §1.3 claims.
 
-## Why workspace-scoped loading matters
+## Why workspace-scoped loading matters (read before install)
 
 Custom umbraculum-toolset plugins must load **only in workspaces where they
-apply**. If every plugin is copied into `~/.cursor/plugins/local/` (the old
-`install-local.sh` / rsync path), Cursor loads **all** of them in **every**
-workspace on your machine — Magento shops, OpenPLC brewery repos, random
-projects, and umbraculum-dev alike.
+apply**. This is not optional hygiene — **too many active plugins is a primary
+failure mode** for AI-assisted work in this project.
+
+If every plugin is copied into `~/.cursor/plugins/local/` (the old
+`install-local.sh` / rsync path), or you enable the full toolset from the
+marketplace in **every** workspace, Cursor loads **all** of them in **every**
+session — Magento shops, OpenPLC brewery repos, random projects, and
+umbraculum-dev alike.
 
 That global load causes:
 
-- **Wrong guardrails** — Magento sessions surfacing umbraculum-only gates
-  (`npm run verify:pre-push`, Tamagui CLI, ci-parity tiers); umbraculum-dev
-  sessions surfacing Magento-only rules (`final` class guard, `setup:di:compile`
-  as default wrap-up).
-- **Noisy context** — unrelated rules, skills, and subagents inflate every
-  prompt; agent precision degrades.
+- **Context collapse** — dozens of `alwaysApply: true` rules, skills, and
+  subagent descriptions compete for the same prompt budget. The agent **loses
+  precision** on the rules that actually matter for the open repo; quality
+  drops even when "everything is installed."
+- **Wrong guardrails** — unrelated domain plugins surfacing gates that do not
+  apply to this monorepo (e.g. ci-parity tiers from another stack family, or
+  PHP/Magento-only wrap-up commands).
 - **False failure reports** — "the agent ignored the rule" when the wrong
-  plugin family was active.
+  plugin family was active, or when the right rule was drowned out by noise.
 
 **For umbraculum-dev:** when this repo is open, exactly **three** umbraculum
 plugins should load (see [Required plugin pack](#required-plugin-pack) below).
-`rf-magento-cursor-assistant` and `umbraculum-openplc-python-cursor-assistant`
-must **not** appear in Settings → Plugins for this workspace.
+Do not enable extra toolset plugins for this workspace.
+
+### Common mistakes (avoid)
+
+| Mistake | Why it hurts |
+|---------|----------------|
+| `install-local.sh.legacy` or rsync into `~/.cursor/plugins/local/` | Loads **all** umbraculum plugins **globally** — hook cannot undo this |
+| Marketplace: "Add for Myself" on every plugin for all workspaces | Same global noise; use **per-workspace** enablement only |
+| Enabling extra toolset plugins while working in umbraculum-dev | Wrong rules + wasted context |
+| Double-load: hook **and** marketplace copy of the same plugin | Duplicate rules; remove one path |
 
 Empirical verification steps live in the toolset runbook
 [`WORKSPACE-PLUGIN-LOADING.md` §5](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md#5-verification-checklist).
@@ -63,20 +89,13 @@ Empirical verification steps live in the toolset runbook
 ## Required plugin pack
 
 When **this repo** (`umbraculum-dev`) is the open workspace, the hook (or
-post-marketplace per-workspace enablement) loads **three** plugins — not all
-four rows in the table:
+post-marketplace per-workspace enablement) loads **three** plugins:
 
-| Plugin | Role | Loads in umbraculum-dev? | Witness rule |
-|---|---|---|---|
-| [`umbraculum-toolset-common`](#umbraculum-toolset-common) | Language-agnostic meta-framework — DEVELOPMENT-LOCAL gate, Skill Contract, commit-message ticket-prefix discipline, public-endpoint verification gate, plugin-source-vs-installed-mirror guardrail. | **Yes** | `00-development-local-addendum-gate.mdc` |
-| [`umbraculum-node-react-cursor-assistant`](#umbraculum-node-react-cursor-assistant) | Node/TypeScript/React/E2E guardrails — TS strict flags, Zod v4 contracts validation, ESLint flat-config hygiene, Playwright/E2E conventions, React accessibility, monorepo package boundaries, frontend known-issues. | **Yes** | `22-typescript-contracts-runtime-validation.mdc` |
-| [`umbraculum-platform-tsjs-cursor-assistant`](#umbraculum-platform-tsjs-cursor-assistant) | Umbraculum-platform-specific — foundation-hardening cross-slice anchor, module-README authoring standard, package-scope migration preflight, L2 workspace isolation scaffolding, types-baseline + module-README subagents. | **Yes** | `02-foundation-hardening.mdc` |
-| [`rf-magento-cursor-assistant`](#rf-magento-cursor-assistant) | Magento 2 / PHP rules + skills + subagents — DI patterns, area scoping, template / ViewModel migration, integration + unit test runbooks. | **No** (Magento workspaces only) | `00-core.mdc` |
-
-A **fifth** plugin in the umbraculum-toolset family —
-`umbraculum-openplc-python-cursor-assistant` — applies to the OpenPLC +
-Python industrial-automation **sister-repo**, not to umbraculum-dev. Do
-**not** install or hook-load it for this workspace.
+| Plugin | Role | Witness rule |
+|---|---|---|
+| [`umbraculum-toolset-common`](#umbraculum-toolset-common) | Language-agnostic meta-framework — DEVELOPMENT-LOCAL gate, Skill Contract, commit-message ticket-prefix discipline, public-endpoint verification gate, plugin-source-vs-installed-mirror guardrail. | `00-development-local-addendum-gate.mdc` |
+| [`umbraculum-node-react-cursor-assistant`](#umbraculum-node-react-cursor-assistant) | Node/TypeScript/React/E2E guardrails — TS strict flags, Zod v4 contracts validation, ESLint flat-config hygiene, Playwright/E2E conventions, React accessibility, monorepo package boundaries, frontend known-issues. | `22-typescript-contracts-runtime-validation.mdc` |
+| [`umbraculum-platform-tsjs-cursor-assistant`](#umbraculum-platform-tsjs-cursor-assistant) | Umbraculum-platform-specific — foundation-hardening cross-slice anchor, module-README authoring standard, package-scope migration preflight, L2 workspace isolation scaffolding, types-baseline + module-README subagents. | `02-foundation-hardening.mdc` |
 
 ## Strongly recommended — Prisma (official Cursor marketplace plugin)
 
@@ -113,15 +132,17 @@ or migrations; that reminder is advisory, not a hard gate.
 
 ## Install
 
-The four umbraculum-toolset plugins are **submitted to the Cursor
-marketplace during the June cutover-prep window** per
+The three umbraculum-toolset plugins for this monorepo are **submitted to the
+Cursor marketplace during the June cutover-prep window** per
 [`ROADMAP.md`](ROADMAP.md) §"Late H1 / July 2026" — Week 3; marketplace
 approval is Cursor-side and may take days to weeks. **The public-alpha
-procedure is COMPLETE only when the four marketplace listings are
+procedure is COMPLETE only when those three marketplace listings are
 live** — recorded as the architectural closure criterion in
-[`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1. Until
-the listings publish, the canonical install path is **workspace-scoped
-hook + source clone** via the sister-repo
+[`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1. (The
+`umbraculum-openplc-python-cursor-assistant` listing in the toolset repo is
+**deferred** until the OpenPLC sister repo is public.) Until the three
+listings publish, the canonical install path is **workspace-scoped hook +
+source clone** via the sister-repo
 [`umbraculum-toolset`](https://github.com/umbraculum-dev/umbraculum-toolset)
 (URL becomes live when the **toolset sister-repo** flips visibility from
 private → public — same atomic moment as the `umbraculum-dev` public flip,
@@ -136,8 +157,8 @@ criterion; pre-flip contributors use a private mirror).
 | **A — Cursor Marketplace** | Published plugins (Prisma; umbraculum-toolset **after** listings go live) | **Settings → Plugins** per-workspace toggle (`state.vscdb`) | Post-publication steady state |
 | **B — `workspaceOpen` hook + source paths** | Pre-marketplace; plugin HEAD development | Hook script matches `workspace_roots` → returns `pluginPaths` | **Current canonical path** |
 
-**Do not** rsync umbraculum or rf-magento plugins into `~/.cursor/plugins/local/`
-for day-to-day use — anything there loads **globally in every workspace**,
+**Do not** rsync umbraculum plugins into `~/.cursor/plugins/local/` for
+day-to-day use — anything there loads **globally in every workspace**,
 regardless of the hook. The plugin manifest cannot express workspace gating.
 
 **Double-load warning:** If marketplace plugin X is enabled for a workspace
@@ -167,25 +188,24 @@ Mechanical runbook (clone, `~/.cursor/hooks.json`, discriminator script, empty
 Summary for umbraculum-dev contributors:
 
 1. **Clone** [`umbraculum-toolset`](https://github.com/umbraculum-dev/umbraculum-toolset) once on your machine.
-2. **Copy** `cursor-plugins/scripts/register-workspace-plugins.example.sh` to
+2. **Copy** `cursor-plugins/scripts/register-workspace-plugins.umbraculum-dev.example.sh`
+   (or the umbraculum-dev branch of `register-workspace-plugins.example.sh`) to
    `~/.cursor/hooks/register-workspace-plugins.sh` and register it in
    `~/.cursor/hooks.json` (see runbook §0 step 1–2).
 3. **Edit path constants** in the hook script so `UMBRACULUM_PLATFORM_REPO`
    points at **your** umbraculum-dev clone (and `UMB_BASE` at your toolset
    `cursor-plugins/` directory). Paths in the example script are one maintainer's
    layout — every developer must adjust them.
-4. **Remove** any umbraculum or rf-magento folders from `~/.cursor/plugins/local/`
+4. **Remove** any umbraculum plugin folders from `~/.cursor/plugins/local/`
    (runbook §0 step 3).
 5. **Developer: Reload Window** (`Ctrl+Shift+P` / `Cmd+Shift+P`) — the hook
    runs on workspace open, not when the script file is saved mid-session.
 6. After `git pull` in umbraculum-toolset: **Reload Window** again (no rsync).
 
-You do **not** need the Magento plugin repo for umbraculum-dev work.
-
 **Deprecated — do not use for normal install:**
 
 ```bash
-# LEGACY ROLLBACK ONLY — globalizes all four umbraculum plugins everywhere
+# LEGACY ROLLBACK ONLY — globalizes all umbraculum plugins everywhere
 bash ~/path/to/umbraculum-toolset/cursor-plugins/scripts/install-local.sh.legacy
 ```
 
@@ -201,9 +221,6 @@ With this repo open, use the **workspace filter chip** (folder name) in
 - `Umbraculum Node React Cursor Assistant` (or similar marketplace label)
 - `Umbraculum Platform Tsjs Cursor Assistant` (or similar)
 
-**Must NOT appear** for this workspace: `Rf Magento Cursor Assistant`,
-`Umbraculum Openplc Python Cursor Assistant`.
-
 Marketplace add-ons (e.g. **Prisma**) are independent and follow their own
 per-workspace toggles.
 
@@ -212,12 +229,20 @@ per-workspace toggles.
 
 ### Cursor marketplace install (post-publication — preferred steady state)
 
-When the four umbraculum-toolset listings publish:
+When the three umbraculum-dev marketplace listings publish:
+
+> [!CAUTION]
+> Marketplace publication does **not** mean "install every umbraculum-toolset
+> listing on every workspace." For umbraculum-dev, enable **three** only
+> (common, node-react, platform-tsjs). Enabling extra toolset plugins here
+> recreates the same context-noise failure mode as global rsync.
 
 1. Open **Cursor → Settings → Plugins → Browse Marketplace** and install
    the three plugins required for umbraculum-dev (common, node-react,
-   platform-tsjs) **for this workspace only** — use per-workspace enablement,
-   not "Add for Myself" across all workspaces unless you want them everywhere.
+   platform-tsjs) **for this workspace only** — use the **workspace filter
+   chip** and per-workspace enablement. Do **not** use "Add for Myself" /
+   enable-all-workspaces unless you deliberately want those plugins everywhere
+   (usually you do not).
 2. **Remove** the corresponding `add()` lines from
    `~/.cursor/hooks/register-workspace-plugins.sh` for plugins now installed
    from the marketplace (avoid double-load).
@@ -225,8 +250,8 @@ When the four umbraculum-toolset listings publish:
    or for repos not yet on the marketplace.
 
 > **Status**: as of writing, the umbraculum-toolset plugins are not yet
-> on the marketplace. This section activates when the four marketplace
-> listings go live (see [`ROADMAP.md`](ROADMAP.md) and
+> on the marketplace. This section activates when the three umbraculum-dev
+> marketplace listings go live (see [`ROADMAP.md`](ROADMAP.md) and
 > [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1).
 
 ### Extended rules (umbraculum-toolset-common ≥ 0.0.2)
@@ -405,7 +430,7 @@ See [`docs/CI-PARITY.md`](CI-PARITY.md).
 
 ### `umbraculum-toolset-common`
 
-Common meta-framework rules + skills shared by the four umbraculum-toolset
+Common meta-framework rules + skills shared by the umbraculum-toolset
 plugins. Carries language- and domain-agnostic discipline (DEVELOPMENT-LOCAL
 addendum gate, Skill Contract, commit-message ticket-prefix discipline,
 plugin-source-vs-installed-mirror guardrail, public-endpoint verification
@@ -443,12 +468,4 @@ multi-tenant workspace-scoped architectural patterns. Ships the
 skills. Install **only** in umbraculum-platform projects; not useful in
 generic TS/JS projects.
 
-### `rf-magento-cursor-assistant`
-
-Magento 2 / PHP rules + skills + subagents. Required only when the change
-set touches Magento code (in **Magento workspaces**, not umbraculum-dev).
-Covers DI patterns, area scoping, ObjectManager fallback discipline,
-template / ViewModel migration, integration test sandboxing, unit test
-runbooks, debug-mode MySQL access policy, and the Magento-specific subagents
-(`magento-debugger`, `phpunit-runner`, `template-refactor-verifier`,
-`verifier`, `e2e-smoke`).
+---

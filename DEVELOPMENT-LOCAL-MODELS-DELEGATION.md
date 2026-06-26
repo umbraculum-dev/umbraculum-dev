@@ -66,13 +66,12 @@ If a required input is missing, return a `Stop conditions` entry that blocks exe
 
 ## Recommended initial subagent set (plugin-shipped)
 
-The frontier agent automatically delegates to these based on their `description` field:
+The frontier agent automatically delegates to these based on their `description` field (umbraculum-dev apparatus):
 
-- `verifier.md` — `model: fast`, `readonly: true`. Validates URL/exception fixes and unit-test claims. Shipped by both the Node/React and Magento plugins with surface-specific instructions.
-- `magento-debugger.md` — `model: inherit`. Triages PHP/Magento exceptions. Shipped by `rf-magento-cursor-assistant`.
+- `verifier.md` — `model: fast`, `readonly: true`. Validates URL/exception fixes and test claims. Shipped by `umbraculum-node-react-cursor-assistant`.
 - `e2e-smoke.md` — `model: fast`, `readonly: true`, `is_background: true`. Bounded agentic E2E. Shipped by `umbraculum-node-react-cursor-assistant`.
-- `phpunit-runner.md` — `model: fast`. Module-scoped unit tests. Shipped by `rf-magento-cursor-assistant`.
-- `template-refactor-verifier.md` — `model: fast`, `readonly: true`. Post-template-refactor sanity. Shipped by `rf-magento-cursor-assistant`.
+- `types-baseline-verifier.md` — `model: inherit`, `readonly: true`. TypeScript strict-flag + `tsc` gate. Shipped by `umbraculum-platform-tsjs-cursor-assistant`.
+- `module-readme-checker.md` — `model: fast`, `readonly: true`. Module README structural audit. Shipped by `umbraculum-platform-tsjs-cursor-assistant`.
 
 For local-model variants of any of these (Ollama et al.), see `DEVELOPMENT-LOCAL-OLLAMA.md`.
 
@@ -119,15 +118,13 @@ This is functionally what a Cursor subagent does internally — the packet is ju
 
 ## Example workflow (real task)
 
-Scenario: a developer reports "PDP throws a `TypeError` after a template refactor".
+Scenario: a developer reports a Zod contract parse failure on a new API route.
 
 1. **Frontier**: read `DEVELOPMENT.md` + `DEVELOPMENT-LOCAL.md`. Decide which subagents apply.
-2. **Frontier**: invoke `/template-refactor-verifier` with the URL.
-3. **Subagent** (per its frontmatter): runs the bounded skill, returns OK/FAIL summary.
-4. **Frontier**: if FAIL, invoke `/magento-debugger` with the error excerpt.
-5. **Frontier**: implements the fix (ViewModel wiring, template changes, DI decisions).
-6. **Frontier**: invoke `/verifier` to confirm the URL no longer throws AND the unit suite still passes.
-7. **Frontier**: report the final, integrated result.
+2. **Frontier**: invoke `/contracts-zod-auditor` or read rule 22 and fix the schema boundary.
+3. **Frontier**: run scoped integration tests per `api-integration-tests-pre-push` skill.
+4. **Frontier**: invoke `/verifier` to confirm the public endpoint and test claims.
+5. **Frontier**: report the final, integrated result.
 
 ## Operational notes
 

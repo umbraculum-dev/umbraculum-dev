@@ -69,6 +69,18 @@ translations, and thoughtful issue triage.
   of what is worth building, which problem is the right problem, and when to
   stay with uncertainty remain yours; see [`MANIFESTO.md`](./MANIFESTO.md) §1.2
   for the full framing.
+
+> [!CAUTION]
+> **Enable only the three plugins this workspace needs — not the whole toolset.**
+> For **umbraculum-dev**, Settings → Plugins (workspace filter) must show
+> exactly **three** umbraculum extensions: common, node-react, platform-tsjs.
+> Do **not** rsync into `~/.cursor/plugins/local/`, run
+> `install-local.sh.legacy`, or enable extra toolset plugins beyond the three
+> required for this workspace.
+> Loading too many plugins **degrades every agent session** (context noise,
+> wrong guardrails, missed CI rules). Full pairing matrix:
+> [`docs/CURSOR-PLUGINS.md`](./docs/CURSOR-PLUGINS.md) §"Why workspace-scoped
+> loading matters".
 - Security issues do **not** go through public issues or pull requests.
   Please follow [`SECURITY.md`](./SECURITY.md).
 

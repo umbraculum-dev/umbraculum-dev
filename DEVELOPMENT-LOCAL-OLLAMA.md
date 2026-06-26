@@ -58,11 +58,11 @@ This pattern reuses the same subagent files the umbraculum-toolset plugins ship 
    readonly: true
    ---
 
-   You are a skeptical validator running on a local model. Same instructions as the canonical `verifier` subagent shipped at `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/agents/verifier.md` (or the matching plugin for the verifier variant you want — the Magento plugin ships its own at `<cursor-plugins>/rf-magento-cursor-assistant/agents/verifier.md`):
+   You are a skeptical validator running on a local model. Same instructions as the canonical `verifier` subagent shipped at `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/agents/verifier.md`:
 
    1. Read `DEVELOPMENT.md` and `DEVELOPMENT-LOCAL.md` first.
-   2. For URL/exception fixes, follow the `curl-exception-verification` skill exactly (lives at `<umbraculum-toolset>/cursor-plugins/<plugin-name>/skills/curl-exception-verification/SKILL.md`).
-   3. For PHPUnit claims, follow the `phpunit-unit-runbook` skill exactly (lives in the Magento plugin at `<cursor-plugins>/rf-magento-cursor-assistant/skills/phpunit-unit-runbook/SKILL.md`).
+   2. For URL/exception fixes, follow the `curl-exception-verification` skill exactly (lives at `<umbraculum-toolset>/cursor-plugins/umbraculum-node-react-cursor-assistant/skills/curl-exception-verification/SKILL.md`).
+   3. For API/integration test claims in this monorepo, follow the `api-integration-tests-pre-push` skill exactly.
    4. Do not modify files. Do not run state-changing shell commands.
 
    Final report format:
@@ -128,10 +128,8 @@ If a required input is missing, return a `Stop conditions` entry and STOP.
 | Task | Recommended local model size | Notes |
 |---|---|---|
 | `verifier` (OK/FAIL summaries) | 7B–14B | `qwen2.5-coder:14b` is a good default. |
-| `phpunit-runner` | 7B–14B | Mostly bounded command output; doesn't need deep reasoning. |
 | `e2e-smoke` | 7B–14B | Bounded; just enqueue + status fetch. |
-| `magento-debugger` | 14B–32B+ or `model: inherit` | Root-cause analysis benefits from frontier reasoning; prefer Cursor-hosted unless privacy demands local. |
-| `template-refactor-verifier` | 7B–14B | Bounded URL/UI checks. |
+| `types-baseline-verifier` / `module-readme-checker` | 7B–14B | Read-only structural checks. |
 
 Models that handle structured output and tool calls reliably tend to do better here. If you see hallucinated container names or fabricated paths, your model is too small for the task — increase size or fall back to `model: inherit`.
 

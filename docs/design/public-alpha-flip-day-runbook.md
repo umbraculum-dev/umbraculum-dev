@@ -12,16 +12,26 @@
 
 ## 0. Before you start
 
-**Automated prep status (2026-05-30):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` / `finance@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-brochure`, `umbraculum-dev-docs-docusaurus`) ✅; forum infra docs + `infra/community-forum/` ✅; Contabo VPS 10 ordered ⏳ (awaiting activation). **Remaining before §1:** donation channel accounts (2d) ✅; forum live on VPS (maintainer).
+**Automated prep status (2026-06-26):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` / `finance@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-brochure`, `umbraculum-dev-docs-docusaurus`) ✅. **Production surfaces (pre-flip `noindex` on brochure/docs only — hosts are live):**
+
+| Surface | URL | Status |
+|---------|-----|--------|
+| Brochure + support | [umbraculum.dev](https://umbraculum.dev/) · [umbraculum.dev/support/](https://umbraculum.dev/support/) | ✅ Live — Liberapay + Buy Me a Coffee wired (**2d ✅ 2026-06-26**) |
+| Docs | [docs.umbraculum.dev](https://docs.umbraculum.dev/) | ✅ Live — pre-flip `noindex` until **2c** |
+| Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) | ✅ Live — Discourse on Contabo VPS; §7.5 governance pins (2026-06-08) |
+| Public demo | [demo.umbraculum.dev](https://demo.umbraculum.dev/) | ✅ Live since 2026-06-03 — [`demo-host-runbook.md`](demo-host-runbook.md) |
+
+**Remaining before §1 (Stage 2 `2c` only):** GitHub repo visibility public; remove brochure/docs `noindex`; marketplace submission started same session.
 
 | Gate | Doc |
 |------|-----|
 | Stage 1 hygiene signed off | [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md) §7 |
-| **Donation channel accounts live** | [`donation-channels.md`](donation-channels.md) §3 + §8 — **roadmap Phase 2 `2d`** (before removing `noindex`) |
+| **Donation channel accounts live** | [`donation-channels.md`](donation-channels.md) §3 + §8 — **✅ 2026-06-26** — [umbraculum.dev/support/](https://umbraculum.dev/support/) (Liberapay + Buy Me a Coffee) |
 | Contact mailboxes live | `security@`, `conduct@`, `finance@` on `umbraculum.dev` — ✅ 2026-05-30 ([`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), [`donation-channels.md`](donation-channels.md) §3.0) |
 | Toolset parity | [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) — ✅ CoC + SECURITY (2026-05-30) |
 | Cloudflare projects created (can be pre-flip while repos still private — use preview URLs first) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) — ✅ Workers Builds (2026-05-30) |
-| Community forum ready (or scheduled same week as flip) | [`community-forum-runbook.md`](community-forum-runbook.md) — VPS ordered; complete §3.1 hardening → DNS → `./discourse-setup` → §7 before flip comms |
+| Community forum live | [`community-forum-runbook.md`](community-forum-runbook.md) — **✅ [forum.umbraculum.dev](https://forum.umbraculum.dev/)** (§7.5 complete 2026-06-08) |
+| Public demo host live | [`demo-host-runbook.md`](demo-host-runbook.md) — **✅ [demo.umbraculum.dev](https://demo.umbraculum.dev/)** (2026-06-03) |
 
 ---
 
@@ -96,17 +106,19 @@ Follow [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-page
 | URL | Expect |
 |-----|--------|
 | `https://umbraculum.dev/` | Brochure + Umbi |
-| `https://umbraculum.dev/support/` | Support page |
+| `https://umbraculum.dev/support/` | Support page — Liberapay + Buy Me a Coffee (already live pre-flip) |
 | `https://docs.umbraculum.dev/` | Docs home |
 | `https://docs.umbraculum.dev/GETTING-STARTED` | Renders |
+| `https://forum.umbraculum.dev/` | Discourse forum (already live pre-flip) |
+| `https://demo.umbraculum.dev/` | Brewery reference demo — sign-in banner + E2E fixture accounts (already live pre-flip) |
 
 ---
 
 ## 5. Cursor marketplace (toolset)
 
-Submit four plugins per [`docs/CURSOR-PLUGINS.md`](../CURSOR-PLUGINS.md) — source must resolve publicly on flip day.
+Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.md`](../CURSOR-PLUGINS.md) — source must resolve publicly on flip day. (`umbraculum-openplc-python-cursor-assistant` listing deferred until the OpenPLC sister repo is public.)
 
-**Closure criterion:** public-alpha procedure complete only when all four listings are **live** ([`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Approval may trail flip by days/weeks.
+**Closure criterion:** public-alpha procedure complete only when all **three** listings are **live** ([`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Approval may trail flip by days/weeks.
 
 ---
 
@@ -129,14 +141,16 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 | GitHub Release | Publish `v0.0.1-alpha` body from announcement draft |
 | [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1) per [`community-forum-runbook.md`](community-forum-runbook.md) |
 | Brochure / social | Optional short post linking docs + clone URL |
-| Support page | Confirm Liberapay + Buy Me a Coffee links (completed in **2d** before flip) |
+| Support page | Liberapay + Buy Me a Coffee — **✅ live** at [umbraculum.dev/support/](https://umbraculum.dev/support/) since **2d (2026-06-26)**; re-smoke after `noindex` removal |
 
 ---
 
 ## 9. Post-flip smoke (15 min)
 
 - [ ] `GETTING-STARTED` clone + `docker compose up` path (or document known gaps)
-- [ ] `https://forum.umbraculum.dev/` live — [`community-forum-runbook.md`](community-forum-runbook.md) §12 sign-off; §7 hardening complete
+- [x] `https://forum.umbraculum.dev/` live — pre-flip since 2026-06-08 ([`community-forum-runbook.md`](community-forum-runbook.md) §7.5); re-smoke at flip comms
+- [x] `https://demo.umbraculum.dev/` live — pre-flip since 2026-06-03 ([`demo-host-runbook.md`](demo-host-runbook.md)); re-smoke login banner + demo accounts
+- [x] [umbraculum.dev/support/](https://umbraculum.dev/support/) donation links live — **2d ✅ 2026-06-26**
 - [ ] Contabo **Auto Backup** enabled on forum VPS (kick-off — [`community-forum-runbook.md`](community-forum-runbook.md) §10; [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) §2)
 - [ ] Pinned **How we communicate** topic in **Community policy** (§6.1 — runbook §6 item 5, §7.5)
 - [ ] `docs-readmes` + `docs-site-build` + `website-build` green on `master`

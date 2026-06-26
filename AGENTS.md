@@ -37,9 +37,8 @@ different verification mechanisms:
 | 1 | `umbraculum-toolset-common` | every task | `00-development-local-addendum-gate.mdc` | unconditional |
 | 2 | `umbraculum-node-react-cursor-assistant` | every task | `22-typescript-contracts-runtime-validation.mdc` | **conditional** |
 | 3 | `umbraculum-platform-tsjs-cursor-assistant` | every task | `02-foundation-hardening.mdc` | unconditional |
-| 4 | `rf-magento-cursor-assistant` | tasks touching Magento code only | `00-core.mdc` | unconditional |
 
-**Unconditional witnesses** (rules 1, 3, 4) have `alwaysApply: true` in
+**Unconditional witnesses** (rules 1 and 3) have `alwaysApply: true` in
 their frontmatter, so Cursor loads them into your agent context regardless
 of which files are open. **Verify by introspecting your own active rule
 set** — the witness rule's filename must appear in the always-applied or
@@ -81,12 +80,26 @@ this as the **witness-rule contract**; see `cursor-plugins/README.md`
 full version.
 
 Plugins 1–3 are required for **every** non-trivial task in this repo.
-Plugin 4 is required only when the change set touches the Magento sub-tree
-(check the change set scope before declaring it required).
 
-A fifth plugin in the umbraculum-toolset — `umbraculum-openplc-python-cursor-assistant`
-— applies to the OpenPLC + Python industrial-automation **sister-repo**, not
-to this repo. Do **not** require it here.
+### Workspace scoping — exactly three plugins in this repo (hard discipline)
+
+The toolset ships **multiple** plugins for **different** project types.
+**Do not install or enable them all in this workspace.** Too many active
+plugins is a primary agent failure mode: unrelated `alwaysApply` rules and
+subagent descriptions consume context; the model misses load-bearing guidance
+for this repo; sessions surface wrong guardrails or false "ignored the rule"
+reports.
+
+**In umbraculum-dev:** exactly **three** plugins — `umbraculum-toolset-common`,
+`umbraculum-node-react-cursor-assistant`, `umbraculum-platform-tsjs-cursor-assistant`.
+The hook (or per-workspace marketplace toggles) must load **only** those three
+when this repo is open — see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md).
+
+**Install path:** [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen)
++ source clone per [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) — **not**
+global rsync into `~/.cursor/plugins/local/` or `install-local.sh.legacy`.
+When advising humans, state this explicitly if they report noisy or incoherent
+agent behavior after a fresh plugin install.
 
 ### Strongly recommended — Prisma (official Cursor marketplace plugin)
 
@@ -122,8 +135,8 @@ Prisma".
 
 ### Fail-mode (soft block — recommended workflow)
 
-If any of plugins 1–3 is missing (or 4 is missing on a Magento-touching task),
-**do not silently proceed**. In your first reply to the user:
+If any of plugins 1–3 is missing, **do not silently proceed**. In your first
+reply to the user:
 
 1. **Advise a window reload as the first attempt** — *cheap, frequent
    false-positive fix; try this before the heavier install procedure*. A
@@ -205,11 +218,6 @@ user's explicit choice.
   for the full policy, the discipline boundaries (NOT a workaround for
   conditional / glob-scoped rules — see the witness-rule anti-pattern),
   and the deferred-questions list.
-
-- **Magento conditional.** The `rf-magento-cursor-assistant` requirement
-  applies only when the change set touches files under the Magento sub-tree.
-  Inspect the change set before declaring it required, to avoid blocking
-  pure-TS/JS tasks on a Magento-only plugin.
 
 - **Non-Cursor agents** (Claude Code, Codex CLI, others). If you are an
   agent that does not natively load Cursor plugins, see
@@ -722,7 +730,7 @@ Forum and demo **VPS operator** scripts live in separate public repos — **not*
 |------|---------|
 | `github.com/umbraculum-dev/umbraculum-hosting-common` | Shared VPS hardening (`vps-hardening-baseline.sh`) |
 | `github.com/umbraculum-dev/umbraculum-hosting-forum` | `forum.umbraculum.dev` — Discourse ops, `bin/pull`, `bin/harden` |
-| `github.com/umbraculum-dev/umbraculum-hosting-demo` | `demo.umbraculum.dev` — Traefik/compose (scaffold; product build still here) |
+| `github.com/umbraculum-dev/umbraculum-hosting-demo` | `demo.umbraculum.dev` — Traefik/compose; **live** public demo ([`docs/design/demo-host-runbook.md`](docs/design/demo-host-runbook.md)) |
 | `github.com/umbraculum-dev/umbraculum-brochure` | `umbraculum.dev` — static brochure (`@umbraculum/brochure`); not product `apps/web` |
 
 Local maintainer layout: `/home/rf/dkprojects/rfapps/umbraculum-hosting/{common,forum,demo}/` and sibling `umbraculum-brochure/` — see [`docs/design/production-hosts.md`](docs/design/production-hosts.md).

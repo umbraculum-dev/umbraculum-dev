@@ -2,14 +2,13 @@
 
 This file is the project's companion to the repo-root [`DEVELOPMENT.md`](DEVELOPMENT.md). Assistants should read it immediately after `DEVELOPMENT.md`.
 
-The shared rules / skills / subagents this repo relies on are now delivered by the **umbraculum-toolset Cursor plugin pack** (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) and the apparatus self-check in [`AGENTS.md`](AGENTS.md)), not by an in-repo sync. The four plugins relevant to this monorepo:
+The shared rules / skills / subagents this repo relies on are now delivered by the **umbraculum-toolset Cursor plugin pack** (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) and the apparatus self-check in [`AGENTS.md`](AGENTS.md)), not by an in-repo sync. The **three** plugins for this monorepo:
 
 | Plugin | Role |
 |---|---|
 | `umbraculum-toolset-common` | Language-agnostic meta-framework (DEVELOPMENT-LOCAL gate, Skill Contract, commit-message ticket-prefix, public-endpoint verification, plugin-source-vs-installed-mirror guardrail) |
 | `umbraculum-node-react-cursor-assistant` | Node/TS/React guardrails (strict flags, Zod v4 contracts, ESLint flat-config hygiene, Playwright, accessibility, monorepo boundaries, frontend known-issues) |
 | `umbraculum-platform-tsjs-cursor-assistant` | Umbraculum-platform specifics (foundation-hardening, module-README authoring, package-scope migration, L2 isolation scaffolding) |
-| `rf-magento-cursor-assistant` | Magento 2 / PHP rules + skills + subagents (only relevant if a task touches Magento code) |
 
 Their rules / skills / subagents are loaded via the [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen) from your **umbraculum-toolset** source clone when this workspace is open (see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) and toolset [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)). Do **not** globalize them under `~/.cursor/plugins/local/` — that loads every plugin in every workspace and degrades agent precision.
 
@@ -214,7 +213,7 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
   - If you identify a reusable Cursor Rule/Skill improvement while working, add it to `internal/working-notes/CURSOR-RULES-SKILLS-TODO.md` so it can be periodically upstreamed into the canonical rules/skills repo/plugin.
 
 - **Cursor plugin install / refresh**:
-  - Shared rules / skills / subagents arrive via the umbraculum-toolset Cursor plugin pack — see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for the install procedure (marketplace install where available; local install from the public `umbraculum-toolset` sister-repo as the fallback). The four plugins relevant to this repo are listed in the header of this file.
+  - Shared rules / skills / subagents arrive via the umbraculum-toolset Cursor plugin pack — see [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for the install procedure (marketplace install where available; local install from the public `umbraculum-toolset` sister-repo as the fallback). The three plugins for this repo are listed in the header of this file.
   - Sanity check that an install is loaded: every Cursor session in this repo runs the [`AGENTS.md`](AGENTS.md) apparatus self-check on the first non-trivial task; if a witness rule is missing, follow the soft-block instructions there.
 
 - **Coding standards (TypeScript/React)**

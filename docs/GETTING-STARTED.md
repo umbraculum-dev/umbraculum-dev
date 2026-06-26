@@ -30,6 +30,20 @@ vertical, omit the brewery reference (default **core profile**), and the Magento
 
 **Default stack (2026-06):** `docker compose up` boots the **core installation profile** — no brewery until you opt in. See [`design/installation-profile.md`](design/installation-profile.md).
 
+## Community and production surfaces (live)
+
+These URLs are **already reachable** while the GitHub repos remain private until Stage 2 **2c** (brochure/docs stay on pre-flip `noindex` until then):
+
+| Surface | URL |
+|---------|-----|
+| Brochure | [umbraculum.dev](https://umbraculum.dev/) |
+| Support / sponsorship | [umbraculum.dev/support/](https://umbraculum.dev/support/) — Liberapay + Buy Me a Coffee |
+| Documentation | [docs.umbraculum.dev](https://docs.umbraculum.dev/) |
+| Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) |
+| Public brewery demo | [demo.umbraculum.dev](https://demo.umbraculum.dev/) — E2E fixture accounts on the sign-in banner |
+
+Operator runbooks: [`design/production-hosts.md`](design/production-hosts.md), [`design/community-forum-runbook.md`](design/community-forum-runbook.md), [`design/demo-host-runbook.md`](design/demo-host-runbook.md), [`design/donation-channels.md`](design/donation-channels.md).
+
 ## Who this is for
 
 - A developer with a working laptop and a GitHub account who wants to
@@ -477,6 +491,22 @@ plugin pack**. Installing it is how the project lowers the contribution
 bar — not how it raises it.
 
 Follow [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) end-to-end:
+
+> [!CAUTION]
+> **Common mistake — installing too many plugins.** This monorepo needs exactly
+> **three** umbraculum-toolset plugins (common + node-react + platform-tsjs).
+> Do **not**:
+>
+> - run `install-local.sh.legacy` or rsync into `~/.cursor/plugins/local/`
+>   (loads all plugins in **every** workspace on your machine);
+> - enable extra toolset plugins while this repo is open;
+> - use marketplace **"Add for Myself"** across all workspaces when listings
+>   publish — use **per-workspace** toggles only.
+>
+> Symptom when overloaded: agent "ignores" rules, suggests wrong commands,
+> or misses ci-parity / Zod gates — often because unrelated `alwaysApply`
+> rules consumed the context budget. See [`CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md)
+> §"Why workspace-scoped loading matters".
 
 1. Set up **workspace-scoped** plugin loading: [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen)
    + umbraculum-toolset source clone per toolset
