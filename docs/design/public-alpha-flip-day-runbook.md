@@ -183,8 +183,9 @@ Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.
 | **Applicant account** | **GitHub OAuth** — same as Cursor C2: [`github.com/umbraculum-dev`](https://github.com/umbraculum-dev) · **`umbraculum-dev@proton.me`** ([`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md)) |
 | Contact email (form) | **`toolset@umbraculum.dev`** (public toolset contact) |
 | After approval | Swap lunr → `@docusaurus/theme-search-algolia` per draft §4 — credentials in Cloudflare env only |
+| **Index refresh** | **Not on every deploy** — Algolia crawler schedule **§7** (~monthly); use **Start Crawling** in dashboard for urgent re-index |
 
-Approval and crawler setup may trail submission by weeks (same pattern as C2).
+Approval and crawler setup may trail submission by weeks (same pattern as C2). **Search results on production lag doc merges** until the next crawl finishes — see [`docsearch-application-draft.md`](docsearch-application-draft.md) §7.
 
 ---
 
@@ -233,7 +234,7 @@ Track flip-day and immediate post-flip work here. **C2** and **C5** are independ
 | **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
 | **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) | ☐ |
 | **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) | ☐ |
-| **C5** | **Algolia DocSearch** application submitted | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) | ☐ **Next** — docs indexable after §3 |
+| **C5** | **Algolia DocSearch** application submitted | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) | ☑ **Submitted 2026-06-27** — crawler `umbraculum-docs`, domain verified; **§4 Docusaurus swap** + crawl schedule **§7** still apply |
 | **C6** | Three Cursor marketplace listings **live** (architectural closure) | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 | ☐ trails **C2** |
 | **C7** | Post-flip smoke checklist complete | §9 | ☐ partial (2026-06-27) |
 | **C8** | [`AGENTS.md`](../../AGENTS.md) marketplace-first install documented | §9 | ☐ after **C6** |

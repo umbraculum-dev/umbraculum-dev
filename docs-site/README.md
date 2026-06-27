@@ -13,7 +13,16 @@ A **build-only** npm workspace: configuration, theme CSS, and sidebar wiring for
 ## Scope
 
 - **Contains**: `docusaurus.config.ts` (v4 future flags, Mermaid, i18n scaffold), `sidebars.ts`, `src/css/custom.css`, `src/theme/` (swizzled theme components — see below), `V4-UPGRADE.md` (flag tracker), build output under `build/`.
-- **Does not contain**: Authoritative prose (that lives in `docs/`), production Algolia DocSearch credentials (Phase 2 submit — see [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md)). **Local search** uses `@easyops-cn/docusaurus-search-local` (lunr.js) until DocSearch approval. Navbar/favicon use **Umbi** from [`docs/media/umbi.png`](../docs/media/umbi.png), copied into `static/img/umbi.png` by `scripts/copy-brand-assets.mjs` on `prestart` / `prebuild` (generated file; not committed).
+- **Does not contain**: Authoritative prose (that lives in `docs/`), production Algolia DocSearch credentials (Cloudflare env only — see [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §4). **Local search** uses `@easyops-cn/docusaurus-search-local` (lunr.js) until §4 lands on production.
+
+## Search (lunr now; Algolia after §4)
+
+| Surface | Index updates when |
+|---------|-------------------|
+| **Local dev** (`docker compose` / `npm run start`) | **lunr** rebuild on dev server start / rebuild — reflects your working tree |
+| **Production** (`docs.umbraculum.dev`) after DocSearch theme wired | Algolia crawler **`umbraculum-docs`** — scheduled **`main`**, **day 12 monthly** (~weekly-to-monthly lag vs merge); not on every deploy |
+
+Contributors: doc PRs go live on the site after Cloudflare build, but **production Algolia search can lag weeks** until the next crawl. Maintainer manual re-crawl: [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §6. Algolia login: [`maintainer-external-service-accounts.md`](../docs/design/maintainer-external-service-accounts.md).
 
 ## Build / test / lint (local)
 

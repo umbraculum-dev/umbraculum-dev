@@ -1,7 +1,7 @@
 # Algolia DocSearch application — maintainer draft (do not submit from CI)
 
 **Tier:** Public  
-**Status:** v1 draft for Phase 2 submit (**ROADMAP** item **2f** / RFC-0005 **P5**)  
+**Status:** v1 — **C5 submitted 2026-06-27** (crawler `umbraculum-docs`, domain verified); Docusaurus Algolia theme swap still pending (§4).  
 **Audience:** maintainer applying at [docsearch.algolia.com/apply](https://docsearch.algolia.com/apply)  
 **Related:** [`docs/rfcs/0005-docs-site.md`](../rfcs/0005-docs-site.md) §9 (Decision G), [`docs-site/README.md`](../../docs-site/README.md)
 
@@ -65,7 +65,7 @@ Use the live form fields as authoritative; names may differ slightly in the Algo
    - Set `themeConfig.algolia` with `appId`, `apiKey`, `indexName`.
    - Remove or disable `@easyops-cn/docusaurus-search-local` theme entry.
 4. Rebuild, deploy, smoke-test search on production.
-5. Mark **ROADMAP** **2f** done and note approval date in this file §6.
+5. Mark **ROADMAP** **2f** done and note approval date in this file §7.
 
 Reference: [Docusaurus search — using Algolia DocSearch](https://docusaurus.io/docs/search#using-algolia-docsearch).
 
@@ -75,10 +75,47 @@ Reference: [Docusaurus search — using Algolia DocSearch](https://docusaurus.io
 
 Follow Algolia’s emailed/Dashboard instructions (DNS TXT, meta tag, or file upload on `docs.umbraculum.dev`). Complete within **7 days** of approval or the crawler may be paused.
 
+**Umbraculum (2026-06-27):** verified via Cloudflare DNS TXT (`algolia-site-verification.umbraculum.dev`).
+
 ---
 
-## 6. Submission log (fill when done)
+## 6. Production crawl schedule (developer expectation)
+
+DocSearch indexes **`docs.umbraculum.dev`** with Algolia’s hosted crawler — **not** on every Cloudflare deploy or `master` merge.
+
+| Item | Value (as configured 2026-06-27) |
+|------|----------------------------------|
+| Crawler | **`umbraculum-docs`** |
+| Schedule name | **`main`** |
+| Cadence | **Monthly — day 12 of each month** (dashboard may show “Next crawl in ~14 days” mid-cycle) |
+| Dashboard | [Algolia Crawler](https://dashboard.algolia.com/crawler) → **`umbraculum-docs`** → Monitoring / schedule |
+
+### What contributors should expect
+
+- **Merging doc changes** updates the live HTML on `docs.umbraculum.dev` **immediately** after Workers Builds deploy.
+- **Production DocSearch** (once §4 is wired) queries Algolia’s **index**, which refreshes on the **crawler schedule** above — typically **up to ~4 weeks** after merge unless someone triggers a manual crawl.
+- **Do not** expect same-day search hits for new pages on production Algolia search after a doc PR lands.
+- **Local / preview:** `docker compose` docs-site and **`npm run start`** still use **lunr** (`@easyops-cn/docusaurus-search-local`) until §4 removes it — local search reflects the working tree on rebuild, not Algolia.
+
+### Maintainer: urgent re-index
+
+When a doc change must appear in **production Algolia search** before the next scheduled crawl:
+
+1. Sign in with the account in [`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md).
+2. Open **Algolia Crawler** → crawler **`umbraculum-docs`**.
+3. Click **Start Crawling** (or equivalent on the crawler home page).
+4. Wait for the crawl to finish; smoke-test search on `https://docs.umbraculum.dev/`.
+
+Do **not** commit Algolia admin keys or crawler API tokens to the repo.
+
+### Monitoring noise (normal)
+
+The crawler **Monitoring → HTTP redirect (301, 302)** list often shows sitemap URLs **without** a trailing slash that **307** to the canonical **`/…/`** URL. That is expected Docusaurus behavior; content is indexed on the trailing-slash URL. See crawler record counts — not the redirect count alone.
+
+---
+
+## 7. Submission log
 
 | Date | Actor | Notes |
 |------|-------|-------|
-| — | — | *Not submitted yet — draft ready; flip queue **C5** ([`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §7, §11).* |
+| 2026-06-27 | Maintainer | Onboarding complete: domain **`docs.umbraculum.dev`**, crawler **`umbraculum-docs`**, test crawl OK (~6.9k records). Domain verified (Cloudflare DNS TXT). Schedule **`main`** — **12th of month**. Credentials issued — store in Cloudflare env only; **§4 Docusaurus swap pending**. |
