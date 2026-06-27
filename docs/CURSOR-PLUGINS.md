@@ -161,6 +161,7 @@ criterion; pre-flip contributors use a private mirror).
 | Listings (3) | `umbraculum-toolset-common`, `umbraculum-node-react-cursor-assistant`, `umbraculum-platform-tsjs-cursor-assistant` |
 | OpenPLC | `umbraculum-openplc-python-cursor-assistant/` remains for **hook** install only — omitted from marketplace `plugins[]` |
 | Maintainer runbook | [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) (verify, submit, rollback) |
+| **Publisher account** | **GitHub OAuth** — [`github.com/umbraculum-dev`](https://github.com/umbraculum-dev) · **`umbraculum-dev@proton.me`** ([`maintainer-external-service-accounts.md`](design/maintainer-external-service-accounts.md)) |
 
 Hooks do **not** read `marketplace.json`; local install paths are unchanged. See [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md).
 

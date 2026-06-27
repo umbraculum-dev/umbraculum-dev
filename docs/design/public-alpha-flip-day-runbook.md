@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** v1 maintainer checklist — execute only after Stage 1 sign-off  
 **Audience:** maintainer performing the atomic July 2026 public-alpha flip  
-**Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-runbook.md`](community-forum-runbook.md), [`donation-channels.md`](donation-channels.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1
+**Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-runbook.md`](community-forum-runbook.md), [`donation-channels.md`](donation-channels.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1, [`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md) (Cursor + Algolia login identity)
 
 > [!IMPORTANT]
 > **Atomic moment:** **`umbraculum-dev`**, **`umbraculum-toolset`**, and **`umbraculum-brochure`** visibility → **public** in the **same** maintenance window (docs site source stays in the monorepo; §3.2 edits land there). Start Cursor marketplace submission the same day. See [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 and marketplace closure criterion. **Out of scope for §1:** hosting operator repos and `umbraculum-integrator-sample` — already public.
@@ -149,6 +149,7 @@ Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.
 | Manifest SoT | [`umbraculum-toolset/.cursor-plugin/marketplace.json`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/.cursor-plugin/marketplace.json) — `pluginRoot: cursor-plugins`, **three** entries in `plugins[]` |
 | Runbook | [`cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) — verify, submit, rollback |
 | Submit URL | [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish) — repo `https://github.com/umbraculum-dev/umbraculum-toolset` |
+| **Publisher account** | **GitHub OAuth** — [`github.com/umbraculum-dev`](https://github.com/umbraculum-dev) · login email **`umbraculum-dev@proton.me`** ([`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md)) |
 | OpenPLC | On disk under `cursor-plugins/` for hooks only — **not** in marketplace manifest |
 
 **Closure criterion:** public-alpha procedure complete only when all **three** listings are **live** ([`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Approval may trail flip by days/weeks. **Submission started** satisfies flip-day “start marketplace” gate; live listings satisfy architectural closure.
@@ -179,7 +180,8 @@ Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.
 |------|--------|
 | Apply | [docsearch.algolia.com/apply](https://docsearch.algolia.com/apply) |
 | Draft answers | [`docsearch-application-draft.md`](docsearch-application-draft.md) |
-| Contact email | **`toolset@umbraculum.dev`** (or maintainer Proton if form requires a login you control) |
+| **Applicant account** | **GitHub OAuth** — same as Cursor C2: [`github.com/umbraculum-dev`](https://github.com/umbraculum-dev) · **`umbraculum-dev@proton.me`** ([`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md)) |
+| Contact email (form) | **`toolset@umbraculum.dev`** (public toolset contact) |
 | After approval | Swap lunr → `@docusaurus/theme-search-algolia` per draft §4 — credentials in Cloudflare env only |
 
 Approval and crawler setup may trail submission by weeks (same pattern as C2).

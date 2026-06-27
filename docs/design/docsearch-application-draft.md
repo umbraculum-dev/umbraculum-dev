@@ -13,6 +13,8 @@ Submit after **`docs.umbraculum.dev`** is live with HTTPS, **`noindex` removed**
 
 **Flip queue:** maintainer action **C5** — [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §7 and §11. Do **now** (post-§3), in parallel with waiting on Cursor marketplace **C2**.
 
+**Applicant account (SoT):** sign in at Algolia with **GitHub OAuth** — same identity as Cursor marketplace **C2**: GitHub org context [`umbraculum-dev`](https://github.com/umbraculum-dev), login email **`umbraculum-dev@proton.me`**. Full matrix: [`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md). Do not create a separate personal or ad-hoc Algolia login.
+
 Until credentials arrive, the docs site uses **local lunr.js search** (`@easyops-cn/docusaurus-search-local`) — wired in `docs-site/docusaurus.config.ts`.
 
 ---
@@ -43,7 +45,8 @@ Use the live form fields as authoritative; names may differ slightly in the Algo
 | **License** | AGPL-3.0 (core monorepo); MIT for published SDK packages — see [`docs/LICENSING.md`](../LICENSING.md) |
 | **Short description** | Technical documentation for Umbraculum, an open-source toolset for building workspace-shaped operational applications (ERP-style modules, AI consultant, web + native shells). Includes platform architecture, RFCs, module READMEs, and development runbooks. |
 | **Crawler / sitemap** | `https://docs.umbraculum.dev/sitemap.xml` (available after first production Docusaurus build) |
-| **Contact email** | **`toolset@umbraculum.dev`** (public toolset contact; or maintainer Proton if the form requires the applying account email) |
+| **Contact email** | **`toolset@umbraculum.dev`** (public project contact on the form) |
+| **Account login** | **GitHub OAuth** — [`umbraculum-dev`](https://github.com/umbraculum-dev) / **`umbraculum-dev@proton.me`** (see [`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md)) |
 | **Framework** | Docusaurus 3.x |
 | **Search already on site** | Yes — local lunr.js fallback until DocSearch credentials are configured |
 
