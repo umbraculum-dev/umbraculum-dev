@@ -70,7 +70,7 @@ Repeat **Create application** with the same repo; different project name and Wra
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production branch deploy command | `npx wrangler versions upload --config docs-site/wrangler.toml` |
 | Path | `/` |
-| Environment variables | **`NODE_VERSION`** = `20.19.4` |
+| Environment variables | **`NODE_VERSION`** = `20.19.4` · **`DOCSEARCH_APP_ID`** · **`DOCSEARCH_API_KEY`** (search-only) · **`DOCSEARCH_INDEX_NAME`** — see [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4 |
 
 Custom domain: `docs.umbraculum.dev`. Remove docs-site `noindex` / `robots.txt` gating per RFC-0005 P7 in the same flip window as brochure.
 

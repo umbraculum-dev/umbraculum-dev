@@ -234,7 +234,7 @@ Track flip-day and immediate post-flip work here. **C2** and **C5** are independ
 | **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
 | **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) | ☐ |
 | **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) | ☐ |
-| **C5** | **Algolia DocSearch** application submitted | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) | ☑ **Submitted 2026-06-27** — crawler `umbraculum-docs`, domain verified; **§4 Docusaurus swap** + crawl schedule **§7** still apply |
+| **C5** | **Algolia DocSearch** application submitted | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) | ☑ **Submitted 2026-06-27** — crawler + domain verified; **§4 Docusaurus wired** — set **`DOCSEARCH_*`** on Cloudflare build + redeploy to switch production off lunr |
 | **C6** | Three Cursor marketplace listings **live** (architectural closure) | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 | ☐ trails **C2** |
 | **C7** | Post-flip smoke checklist complete | §9 | ☐ partial (2026-06-27) |
 | **C8** | [`AGENTS.md`](../../AGENTS.md) marketplace-first install documented | §9 | ☐ after **C6** |

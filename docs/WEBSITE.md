@@ -38,7 +38,7 @@ Brochure and docs site share announcement copy from **`umbraculum-brochure`** (S
 
 - **Stack:** Docusaurus 3.10.x ([RFC-0005](rfcs/0005-docs-site.md)).
 - **CI:** [`.github/workflows/docs-site-build.yml`](../.github/workflows/docs-site-build.yml).
-- **Search:** lunr locally; production **Algolia DocSearch** crawler **`umbraculum-docs`** (index refreshes **~monthly, day 12** — not on every deploy). See [`design/docsearch-application-draft.md`](design/docsearch-application-draft.md) §6–§7.
+- **Search:** **Algolia DocSearch** on production when Cloudflare build env **`DOCSEARCH_*`** is set ([`design/docsearch-application-draft.md`](design/docsearch-application-draft.md) §4); lunr fallback in CI/local without env. Crawler **`umbraculum-docs`** — index refresh **~monthly, day 12**.
 
 ---
 

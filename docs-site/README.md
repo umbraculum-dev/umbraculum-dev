@@ -20,7 +20,7 @@ A **build-only** npm workspace: configuration, theme CSS, and sidebar wiring for
 | Surface | Index updates when |
 |---------|-------------------|
 | **Local dev** (`docker compose` / `npm run start`) | **lunr** rebuild on dev server start / rebuild — reflects your working tree |
-| **Production** (`docs.umbraculum.dev`) after DocSearch theme wired | Algolia crawler **`umbraculum-docs`** — scheduled **`main`**, **day 12 monthly** (~weekly-to-monthly lag vs merge); not on every deploy |
+| **Production** (`docs.umbraculum.dev`) after DocSearch theme wired | Algolia crawler **`umbraculum-docs`** — scheduled **`main`**, **day 12 monthly** (~weekly-to-monthly lag vs merge); not on every deploy. Requires **`DOCSEARCH_*`** build env on Cloudflare (§4 of draft). |
 
 Contributors: doc PRs go live on the site after Cloudflare build, but **production Algolia search can lag weeks** until the next crawl. Maintainer manual re-crawl: [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §6. Algolia login: [`maintainer-external-service-accounts.md`](../docs/design/maintainer-external-service-accounts.md).
 

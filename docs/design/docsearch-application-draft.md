@@ -56,16 +56,26 @@ Use the live form fields as authoritative; names may differ slightly in the Algo
 
 ---
 
-## 4. After approval — code swap (maintainer + agent)
+## 4. After approval — Docusaurus + Cloudflare env (§4 landed 2026-06-27)
 
-1. Algolia emails **Application ID**, **Search API key** (search-only), and **index name**.
-2. Add to Cloudflare Pages env (or build-time secrets) — **do not commit secrets**.
-3. In `docs-site/docusaurus.config.ts`:
-   - Add `@docusaurus/theme-search-algolia` to `themes` (or `presets` theme config per Docusaurus docs).
-   - Set `themeConfig.algolia` with `appId`, `apiKey`, `indexName`.
-   - Remove or disable `@easyops-cn/docusaurus-search-local` theme entry.
-4. Rebuild, deploy, smoke-test search on production.
-5. Mark **ROADMAP** **2f** done and note approval date in this file §7.
+**Code (in repo):** `docs-site/docusaurus.config.ts` uses **`@docusaurus/theme-search-algolia`** when all three build env vars are set; otherwise **lunr** fallback (CI + local dev without secrets).
+
+| Cloudflare / build env | Value |
+|------------------------|--------|
+| **`DOCSEARCH_APP_ID`** | Application ID from Algolia DocSearch onboarding |
+| **`DOCSEARCH_API_KEY`** | **Search-only** API key (public in client bundle — DocSearch design) |
+| **`DOCSEARCH_INDEX_NAME`** | Index name from onboarding |
+
+**Maintainer — Cloudflare Workers Builds** (project **`umbraculum-dev-docs-docusaurus`**):
+
+1. Dashboard → **Workers & Pages** → **`umbraculum-dev-docs-docusaurus`** → **Settings** → **Build** (or **Variables and Secrets** for the build environment).
+2. Add the three **`DOCSEARCH_*`** variables above (Production; mirror on Preview if you use branch previews).
+3. **Retry deployment** (or push to `master` — Cloudflare rebuilds on every `master` push per [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) §4).
+4. Smoke: open `https://docs.umbraculum.dev/`, use navbar search — results from Algolia (not lunr). Optional: `curl -sI https://docs.umbraculum.dev/search/` → 200.
+
+**Local smoke (optional):** copy [`docs-site/.env.example`](../../docs-site/.env.example) → `docs-site/.env.local` with your keys; `npm run start --workspace=@umbraculum/docs-site` (Docusaurus loads `.env` files from site directory).
+
+**Do not** commit `.env.local` or paste keys into git.
 
 Reference: [Docusaurus search — using Algolia DocSearch](https://docusaurus.io/docs/search#using-algolia-docsearch).
 

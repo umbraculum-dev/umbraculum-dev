@@ -10,6 +10,30 @@ import {
 
 const announcementBar = toDocusaurusAnnouncementBar(announcementConfig);
 
+/** Production DocSearch (Cloudflare build env). Local dev falls back to lunr when unset. */
+const docsearchAppId = process.env.DOCSEARCH_APP_ID?.trim();
+const docsearchApiKey = process.env.DOCSEARCH_API_KEY?.trim();
+const docsearchIndexName = process.env.DOCSEARCH_INDEX_NAME?.trim();
+const useDocSearch = Boolean(
+  docsearchAppId && docsearchApiKey && docsearchIndexName,
+);
+
+const localSearchTheme: NonNullable<Config['themes']>[number] = [
+  require.resolve('@easyops-cn/docusaurus-search-local'),
+  {
+    hashed: true,
+    language: ['en'],
+    indexDocs: true,
+    docsRouteBasePath: [
+      '/',
+      'reference',
+      'reference/apps',
+      'reference/services',
+      'reference/packages',
+    ],
+  },
+];
+
 const repoRoot = path.resolve(__dirname, '..');
 const docsRoot = path.resolve(repoRoot, 'docs');
 const githubBase = 'https://github.com/umbraculum-dev/umbraculum-dev';
@@ -361,21 +385,9 @@ const config: Config = {
 
   themes: [
     '@docusaurus/theme-mermaid',
-  [
-      require.resolve('@easyops-cn/docusaurus-search-local'),
-      {
-        hashed: true,
-        language: ['en'],
-        indexDocs: true,
-        docsRouteBasePath: [
-          '/',
-          'reference',
-          'reference/apps',
-          'reference/services',
-          'reference/packages',
-        ],
-      },
-    ],
+    ...(useDocSearch
+      ? ['@docusaurus/theme-search-algolia']
+      : [localSearchTheme]),
   ],
 
   markdown: {
@@ -409,6 +421,17 @@ const config: Config = {
       respectPrefersColorScheme: false,
     },
     ...(announcementBar !== undefined ? {announcementBar} : {}),
+    ...(useDocSearch
+      ? {
+          algolia: {
+            appId: docsearchAppId!,
+            apiKey: docsearchApiKey!,
+            indexName: docsearchIndexName!,
+            contextualSearch: true,
+            searchPagePath: 'search',
+          },
+        }
+      : {}),
     navbar: {
       title: 'Umbraculum',
       logo: {
