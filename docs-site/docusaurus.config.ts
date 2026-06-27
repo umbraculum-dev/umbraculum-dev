@@ -248,6 +248,8 @@ const config: Config = {
   favicon: 'img/umbi.png',
   url: 'https://docs.umbraculum.dev',
   baseUrl: '/',
+  // Match canonical URLs and sitemap entries (trailing slash) — avoids 307 noise for Algolia DocSearch crawler.
+  trailingSlash: true,
   organizationName: 'umbraculum-dev',
   projectName: 'umbraculum-dev',
 

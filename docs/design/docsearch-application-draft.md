@@ -108,9 +108,9 @@ When a doc change must appear in **production Algolia search** before the next s
 
 Do **not** commit Algolia admin keys or crawler API tokens to the repo.
 
-### Monitoring noise (normal)
+### Monitoring noise (redirects)
 
-The crawler **Monitoring → HTTP redirect (301, 302)** list often shows sitemap URLs **without** a trailing slash that **307** to the canonical **`/…/`** URL. That is expected Docusaurus behavior; content is indexed on the trailing-slash URL. See crawler record counts — not the redirect count alone.
+With **`trailingSlash: true`** in [`docs-site/docusaurus.config.ts`](../../docs-site/docusaurus.config.ts) (2026-06-27), the sitemap and canonical URLs both use trailing slashes — Algolia should see far fewer **HTTP redirect (301, 302)** ignored URLs on the next crawl. Until that deploy lands, legacy sitemap URLs without `/` may still 307 once.
 
 ---
 

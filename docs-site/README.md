@@ -24,6 +24,8 @@ A **build-only** npm workspace: configuration, theme CSS, and sidebar wiring for
 
 Contributors: doc PRs go live on the site after Cloudflare build, but **production Algolia search can lag weeks** until the next crawl. Maintainer manual re-crawl: [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §6. Algolia login: [`maintainer-external-service-accounts.md`](../docs/design/maintainer-external-service-accounts.md).
 
+**Sitemap / crawler alignment:** `trailingSlash: true` in [`docusaurus.config.ts`](docusaurus.config.ts) keeps sitemap URLs on trailing-slash canonical paths (fewer Algolia redirect ignores after deploy).
+
 ## Build / test / lint (local)
 
 Per the `node-npm-container-only` project rule, run Node/npm **inside** a `node:20-slim` container with the repo bind-mounted (same pattern as CI — see [`docs/LINTING.md`](../docs/LINTING.md)):
