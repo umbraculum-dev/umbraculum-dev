@@ -385,9 +385,9 @@ const config: Config = {
 
   themes: [
     '@docusaurus/theme-mermaid',
-    ...(useDocSearch
-      ? ['@docusaurus/theme-search-algolia']
-      : [localSearchTheme]),
+    // Lunr fallback when DOCSEARCH_* unset. When set, preset-classic loads
+    // @docusaurus/theme-search-algolia from themeConfig.algolia — do not add it here (duplicate ID).
+    ...(useDocSearch ? [] : [localSearchTheme]),
   ],
 
   markdown: {
