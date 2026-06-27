@@ -79,7 +79,7 @@ After **all three** source repos are public, update clones and VPS trees that co
 
 ## 2. Release tag (monorepo)
 
-Per [`DEVELOPMENT.md`](../../DEVELOPMENT.md) release notation — Git tag **`v0.0.1-alpha`** (leading `v`); `package.json` versions stay **`0.0.1`** (no `v` prefix).
+Per [`DEVELOPMENT.md`](../../DEVELOPMENT.md) release notation — Git tag **`v0.0.1-alpha`** (leading `v`); `package.json` versions stay **`0.0.1`** (no `v` prefix). The May 2026 history anchor is **`v0.0.1-baseline`** (renamed from misleading bare `v0.0.1` on 2026-06-27). Reserve bare **`v0.0.1`** for a future stable cut after alpha graduates.
 
 ```bash
 cd $REPO_ROOT

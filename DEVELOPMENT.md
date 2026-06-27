@@ -104,7 +104,8 @@ Inspect resolved jobs: `python3 scripts/lib/verify-slice.py --repo-root . resolv
 
 ## Release and version notation
 
-- **Git release tags use a leading `v`**: the public repository baseline tag is `v0.0.1`, and future repository-level release tags should keep that shape (`vX.Y.Z`).
+- **Git release tags use a leading `v`**: future repository-level **stable** release tags use `vX.Y.Z` (for example `v0.0.1` when alpha graduates — not tagged yet).
+- **Named pre-release / anchor tags** use suffixes: **`v0.0.1-baseline`** (May 2026 post–org-transfer history anchor on `666f5f3`; not a product release) and **`v0.0.1-alpha`** (public alpha flip). Do not reuse bare `v0.0.1` for a baseline anchor — it reads as stable SemVer.
 - **Package manifests use plain SemVer with no `v` prefix**: `package.json` `version` fields are `0.0.1`, `1.2.3`, etc. This is the npm-compatible form and applies to root/workspace package manifests.
 - **Do not mix the two forms.** Never write `v0.0.1` into a `package.json` `version`, and do not create a duplicate Git tag named `0.0.1` for the same release.
 
