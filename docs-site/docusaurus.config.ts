@@ -253,8 +253,8 @@ const config: Config = {
 
   clientModules: [require.resolve('./src/clientModules/chunk-reload.ts')],
 
-  // RFC-0005 P7 — flip to false when public alpha is declared (with robots.txt).
-  noIndex: true,
+  // Public alpha (RFC-0005 P7) — indexed with robots.txt allow-all.
+  noIndex: false,
 
   onBrokenLinks: 'throw',
 
