@@ -5,7 +5,7 @@ import {
 } from "./chunk-6XLFIMGT.js";
 
 // src/index.ts
-import { createRequire } from "module";
+import { en as breweryEn, it as breweryIt } from "@umbraculum/brewery-i18n";
 import { isVerticalInstalled } from "@umbraculum/module-sdk";
 
 // src/en.json
@@ -1658,7 +1658,6 @@ var it_default = {
 };
 
 // src/index.ts
-var require2 = createRequire(import.meta.url);
 var en = en_default;
 var it = it_default;
 function deepMerge(target, source) {
@@ -1681,8 +1680,7 @@ function loadBreweryMessages(locale) {
   if (!isVerticalInstalled("brewery")) {
     return {};
   }
-  const mod = require2("@umbraculum/brewery-i18n");
-  return locale === "it" ? mod.it : mod.en;
+  return locale === "it" ? breweryIt : breweryEn;
 }
 function getSharedMessages(locale) {
   const platform = locale === "it" ? it : en;

@@ -28,7 +28,7 @@ __export(index_exports, {
   locales: () => locales
 });
 module.exports = __toCommonJS(index_exports);
-var import_node_module = require("module");
+var import_brewery_i18n = require("@umbraculum/brewery-i18n");
 var import_module_sdk = require("@umbraculum/module-sdk");
 
 // src/en.json
@@ -1688,8 +1688,6 @@ function isLocale(value) {
 }
 
 // src/index.ts
-var import_meta = {};
-var require2 = (0, import_node_module.createRequire)(import_meta.url);
 var en = en_default;
 var it = it_default;
 function deepMerge(target, source) {
@@ -1712,8 +1710,7 @@ function loadBreweryMessages(locale) {
   if (!(0, import_module_sdk.isVerticalInstalled)("brewery")) {
     return {};
   }
-  const mod = require2("@umbraculum/brewery-i18n");
-  return locale === "it" ? mod.it : mod.en;
+  return locale === "it" ? import_brewery_i18n.it : import_brewery_i18n.en;
 }
 function getSharedMessages(locale) {
   const platform = locale === "it" ? it : en;

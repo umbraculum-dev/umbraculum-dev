@@ -4,8 +4,7 @@
  * only when brewery is in the active installation profile.
  */
 
-import { createRequire } from "node:module";
-
+import { en as breweryEn, it as breweryIt } from "@umbraculum/brewery-i18n";
 import { isVerticalInstalled } from "@umbraculum/module-sdk";
 
 import enData from "./en.json";
@@ -16,8 +15,6 @@ import {
   locales,
   type SupportedLocale,
 } from "./locales.js";
-
-const require = createRequire(import.meta.url);
 
 const en = enData as Record<string, unknown>;
 const it = itData as Record<string, unknown>;
@@ -55,11 +52,7 @@ function loadBreweryMessages(locale: SupportedLocale): Record<string, unknown> {
   if (!isVerticalInstalled("brewery")) {
     return {};
   }
-  const mod = require("@umbraculum/brewery-i18n") as {
-    en: Record<string, unknown>;
-    it: Record<string, unknown>;
-  };
-  return locale === "it" ? mod.it : mod.en;
+  return locale === "it" ? breweryIt : breweryEn;
 }
 
 /**
