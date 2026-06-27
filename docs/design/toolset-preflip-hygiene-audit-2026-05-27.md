@@ -50,3 +50,4 @@ Commands equivalent to monorepo Stage 1:
 | Date | Maintainer | Result |
 |------|------------|--------|
 | 2026-05-30 | Agent + maintainer | CoC + SECURITY closed; items 3–4 remain flip-day / optional |
+| 2026-06-27 | Agent | Maintainer path scrub + history rewrite (`git filter-repo --replace-text` ×3); force-pushed `origin/master`. Full-history grep gate green on public flip checklist §2.3 terms. |
