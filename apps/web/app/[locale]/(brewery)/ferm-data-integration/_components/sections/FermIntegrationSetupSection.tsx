@@ -3,7 +3,7 @@
 import { Button, Input, SizableText, XStack, YStack } from "tamagui";
 
 import { CodeInline } from "../../../../../_shared-layout/_components/CodeInline";
-import { MessageBox } from "../../../../_shared-layout/_components/MessageBox";
+import { MessageBox } from "../../../../../_shared-layout/_components/MessageBox";
 import type { UseFermDataIntegrationPageModel } from "../../_hooks/useFermDataIntegrationPage";
 import type { IntegrationKind } from "../../_lib/fermIntegrationTypes";
 import { FermIntegrationDevicesSection } from "./FermIntegrationDevicesSection";

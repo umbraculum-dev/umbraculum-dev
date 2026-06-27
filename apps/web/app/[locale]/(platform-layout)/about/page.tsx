@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { H1, SizableText, YStack } from "tamagui";
-import { Link } from "../../../src/i18n/navigation";
+import { Link } from "../../../../src/i18n/navigation";
 
 export default function AboutPage() {
   const t = useTranslations("about");

@@ -2,8 +2,8 @@
 
 import type { RecipeImportFormProps } from "../_lib/recipeImportTypes";
 import type { RecipeImportFormState } from "./useRecipeImportFormState";
-import { createRecipeImportSubmitActions } from "./useRecipeImportFormSubmitActions.js";
-import { createRecipeImportPickHandlers } from "./useRecipeImportFormSubmitPickOps.js";
+import { createRecipeImportSubmitActions } from "./useRecipeImportFormSubmitActions";
+import { createRecipeImportPickHandlers } from "./useRecipeImportFormSubmitPickOps";
 
 type SubmitDeps = Pick<RecipeImportFormProps, "apiBasePath" | "workspaceId" | "accountId" | "canCall" | "onSingleImportSuccess">;
 
