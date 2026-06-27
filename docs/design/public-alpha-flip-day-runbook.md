@@ -174,8 +174,8 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 ## 9. Post-flip smoke (15 min)
 
 - [ ] `GETTING-STARTED` clone + `docker compose up` path (or document known gaps)
-- [x] `https://forum.umbraculum.dev/` live — pre-flip since 2026-06-08 ([`community-forum-runbook.md`](community-forum-runbook.md) §7.5); re-smoke at flip comms
-- [x] `https://demo.umbraculum.dev/` live — pre-flip since 2026-06-03 ([`demo-host-runbook.md`](demo-host-runbook.md)); re-smoke login banner + demo accounts
+- [x] `https://forum.umbraculum.dev/` live — pre-flip since 2026-06-08 ([`community-forum-runbook.md`](community-forum-runbook.md) §7.5); re-smoke at flip comms — GitHub doc link 200 (2026-06-27)
+- [x] `https://demo.umbraculum.dev/` live — pre-flip since 2026-06-03 ([`demo-host-runbook.md`](demo-host-runbook.md)); re-smoke login banner + demo accounts — `demo-host-verify.sh` + native API smoke green (2026-06-27)
 - [x] [umbraculum.dev/support/](https://umbraculum.dev/support/) donation links live — **2d ✅ 2026-06-26**
 - [ ] Contabo **Auto Backup** enabled on forum VPS (kick-off — [`community-forum-runbook.md`](community-forum-runbook.md) §10; [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) §2)
 - [ ] Pinned **How we communicate** topic in **Community policy** (§6.1 — runbook §6 item 5, §7.5)
@@ -191,4 +191,4 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 |------|------------|-------|
 | 2026-05-29 | Agent prep | Automated Stage 2 prep complete — npm SDK on registry, brochure/docs-site/workflows in repo. **Flip not executed** — maintainer runs §1–§9 when manual gates close. |
 | 2026-06-26 | Agent docs | §1 aligned to **three-repo** atomic flip (`umbraculum-dev` + `umbraculum-toolset` + `umbraculum-brochure`); hosting repos documented as already public. **Flip not executed.** |
-| — | — | Flip-day execution pending |
+| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`. **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **§5 / §8 / C1** remain maintainer follow-up. |
