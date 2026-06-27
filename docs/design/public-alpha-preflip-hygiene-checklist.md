@@ -135,12 +135,12 @@ Stage 1 automated + forum gates are **complete** (2026-06-08). Only **2c** and p
 | # | Action | Where | Time | Status |
 |---|--------|-------|------|--------|
 | **A** | **Forum §7.5 recheck** | [Discourse Admin](https://forum.umbraculum.dev/admin) + pinned topics | ~30 min | ☑ **Complete** (2026-06-08) |
-| **B** | **Run 2c flip-day runbook** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) | flip window | Not started |
-| **C1** | GitHub Release **`v0.0.1-alpha`** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §2 | flip window | ☐ maintainer confirm |
+| **B** | **Run 2c flip-day runbook** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) | flip window | **In progress** (2026-06-27 — §1–§3, C1, C2, C5; see §11) |
+| **C1** | GitHub Release **`v0.0.1-alpha`** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §2 | flip window | ☑ **Published 2026-06-27** |
 | **C2** | **Cursor marketplace** application | [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | same day as 2c | ☑ **Submitted 2026-06-27** — await Cursor; iterate toolset **only per review feedback** |
 | **C3** | Forum announcement cross-post | flip-day runbook §8 | after 2c | ☐ |
 | **C4** | Revoke demo VPS GitHub PAT | flip-day runbook §1.1 | after 2c | ☐ |
-| **C5** | **Algolia DocSearch** application | [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) · account [`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md) | **immediately after** `noindex` removal (2c §3) | ☐ **Next maintainer action** — GitHub OAuth same as C2 |
+| **C5** | **Algolia DocSearch** on production | [`docsearch-application-draft.md`](docsearch-application-draft.md) · Cloudflare **Variables and secrets** | after 2c §3 | ☑ **2026-06-27** — onboarded; **`DOCSEARCH_*`** set; await deploy + search smoke |
 | **C6–C9** | Listings live, §9 smoke, AGENTS marketplace-first, ROADMAP date | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §11 | after C2 / C5 | ☐ |
 
 **Pre-flip complete:** donation accounts (§6.7), docs + brochure deploy (§6.3), announcement draft (§6.5), forum §7.5 (§6.6).

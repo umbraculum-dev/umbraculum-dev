@@ -1,7 +1,7 @@
 # Algolia DocSearch application — maintainer draft (do not submit from CI)
 
 **Tier:** Public  
-**Status:** v1 — **C5 submitted 2026-06-27** (crawler `umbraculum-docs`, domain verified); Docusaurus Algolia theme swap still pending (§4).  
+**Status:** v1 — **C5 submitted 2026-06-27**; §4 Docusaurus wired on `master`; **`DOCSEARCH_*`** on Cloudflare **Variables and secrets** — await deploy green, then smoke Algolia search on production.  
 **Audience:** maintainer applying at [docsearch.algolia.com/apply](https://docsearch.algolia.com/apply)  
 **Related:** [`docs/rfcs/0005-docs-site.md`](../rfcs/0005-docs-site.md) §9 (Decision G), [`docs-site/README.md`](../../docs-site/README.md)
 
@@ -60,18 +60,18 @@ Use the live form fields as authoritative; names may differ slightly in the Algo
 
 **Code (in repo):** `docs-site/docusaurus.config.ts` uses **`@docusaurus/theme-search-algolia`** when all three build env vars are set; otherwise **lunr** fallback (CI + local dev without secrets).
 
-| Cloudflare / build env | Value |
-|------------------------|--------|
+| Cloudflare **Variables and secrets** (build) | Value |
+|--------------------------------------------|--------|
 | **`DOCSEARCH_APP_ID`** | Application ID from Algolia DocSearch onboarding |
 | **`DOCSEARCH_API_KEY`** | **Search-only** API key (public in client bundle — DocSearch design) |
-| **`DOCSEARCH_INDEX_NAME`** | Index name from onboarding |
+| **`DOCSEARCH_INDEX_NAME`** | **`umbraculum-docs`** (Algolia Crawler → Indices) |
 
 **Maintainer — Cloudflare Workers Builds** (project **`umbraculum-dev-docs-docusaurus`**):
 
-1. Dashboard → **Workers & Pages** → **`umbraculum-dev-docs-docusaurus`** → **Settings** → **Build** (or **Variables and Secrets** for the build environment).
-2. Add the three **`DOCSEARCH_*`** variables above (Production; mirror on Preview if you use branch previews).
-3. **Retry deployment** (or push to `master` — Cloudflare rebuilds on every `master` push per [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) §4).
-4. Smoke: open `https://docs.umbraculum.dev/`, use navbar search — results from Algolia (not lunr). Optional: `curl -sI https://docs.umbraculum.dev/search/` → 200.
+1. Dashboard → **Workers & Pages** → **`umbraculum-dev-docs-docusaurus`** → **Settings** → **Build** → section **Variables and secrets** (same page as **`NODE_VERSION`**).
+2. **+ Add** each **`DOCSEARCH_*`** variable above (type **Variable**; Production — mirror Preview if you use branch previews).
+3. **Retry deployment** after saving vars (or wait for in-progress **`master`** build, then **Retry** so the build sees the new vars).
+4. Smoke: open `https://docs.umbraculum.dev/`, use navbar search — Algolia modal (not lunr). Optional: `curl -sI https://docs.umbraculum.dev/search/` → 200.
 
 **Local smoke (optional):** copy [`docs-site/.env.example`](../../docs-site/.env.example) → `docs-site/.env.local` with your keys; `npm run start --workspace=@umbraculum/docs-site` (Docusaurus loads `.env` files from site directory).
 
@@ -105,7 +105,7 @@ DocSearch indexes **`docs.umbraculum.dev`** with Algolia’s hosted crawler — 
 - **Merging doc changes** updates the live HTML on `docs.umbraculum.dev` **immediately** after Workers Builds deploy.
 - **Production DocSearch** (once §4 is wired) queries Algolia’s **index**, which refreshes on the **crawler schedule** above — typically **up to ~4 weeks** after merge unless someone triggers a manual crawl.
 - **Do not** expect same-day search hits for new pages on production Algolia search after a doc PR lands.
-- **Local / preview:** `docker compose` docs-site and **`npm run start`** still use **lunr** (`@easyops-cn/docusaurus-search-local`) until §4 removes it — local search reflects the working tree on rebuild, not Algolia.
+- **Local / preview:** `docker compose` docs-site and **`npm run start`** use **lunr** when **`DOCSEARCH_*`** is unset locally; production uses Algolia after Cloudflare build env is set and deployed.
 
 ### Maintainer: urgent re-index
 
@@ -128,4 +128,4 @@ With **`trailingSlash: true`** in [`docs-site/docusaurus.config.ts`](../../docs-
 
 | Date | Actor | Notes |
 |------|-------|-------|
-| 2026-06-27 | Maintainer | Onboarding complete: domain **`docs.umbraculum.dev`**, crawler **`umbraculum-docs`**, test crawl OK (~6.9k records). Domain verified (Cloudflare DNS TXT). Schedule **`main`** — **12th of month**. Credentials issued — store in Cloudflare env only; **§4 Docusaurus swap pending**. |
+| 2026-06-27 | Maintainer | Onboarding complete: domain **`docs.umbraculum.dev`**, crawler **`umbraculum-docs`**, index **`umbraculum-docs`** (~6933 records). Domain verified (Cloudflare DNS TXT). Schedule **`main`** — **12th of month**. §4 code on `master`; **`DOCSEARCH_*`** added to Cloudflare **Variables and secrets** — deploy in progress. |

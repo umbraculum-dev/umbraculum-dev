@@ -13,7 +13,7 @@ A **build-only** npm workspace: configuration, theme CSS, and sidebar wiring for
 ## Scope
 
 - **Contains**: `docusaurus.config.ts` (v4 future flags, Mermaid, i18n scaffold), `sidebars.ts`, `src/css/custom.css`, `src/theme/` (swizzled theme components — see below), `V4-UPGRADE.md` (flag tracker), build output under `build/`.
-- **Does not contain**: Authoritative prose (that lives in `docs/`), production Algolia DocSearch credentials (Cloudflare env only — see [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §4). **Local search** uses `@easyops-cn/docusaurus-search-local` (lunr.js) until §4 lands on production.
+- **Does not contain**: Authoritative prose (that lives in `docs/`), production Algolia DocSearch credentials (Cloudflare **Variables and secrets** only — see [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §4). **Local search** uses `@easyops-cn/docusaurus-search-local` (lunr.js) until **`DOCSEARCH_*`** are set on the docs Worker build.
 
 ## Search (lunr now; Algolia after §4)
 

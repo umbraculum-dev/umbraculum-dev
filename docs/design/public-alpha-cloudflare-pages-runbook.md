@@ -70,7 +70,7 @@ Repeat **Create application** with the same repo; different project name and Wra
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production branch deploy command | `npx wrangler versions upload --config docs-site/wrangler.toml` |
 | Path | `/` |
-| Environment variables | **`NODE_VERSION`** = `20.19.4` · **`DOCSEARCH_APP_ID`** · **`DOCSEARCH_API_KEY`** (search-only) · **`DOCSEARCH_INDEX_NAME`** — see [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4 |
+| **Variables and secrets** (build) | **`NODE_VERSION`** = `20.19.4` · **`DOCSEARCH_APP_ID`** · **`DOCSEARCH_API_KEY`** (search-only) · **`DOCSEARCH_INDEX_NAME`** = **`umbraculum-docs`** — see [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4 |
 
 Custom domain: `docs.umbraculum.dev`. Remove docs-site `noindex` / `robots.txt` gating per RFC-0005 P7 in the same flip window as brochure.
 
@@ -82,7 +82,8 @@ Apply in each Worker → **Settings → Builds** after first green deploy:
 
 | Tuning | Action |
 |--------|--------|
-| **Node version** | Environment variable **`NODE_VERSION`** = **`20.19.4`** — avoids `npm warn EBADENGINE` (RN/Metro/Vite want ≥20.19.4; Cloudflare default was 20.18.1). |
+| **Node version** | **Variables and secrets** → **`NODE_VERSION`** = **`20.19.4`** — avoids `npm warn EBADENGINE` (RN/Metro/Vite want ≥20.19.4; Cloudflare default was 20.18.1). |
+| **DocSearch (docs worker only)** | **Variables and secrets** → **`DOCSEARCH_APP_ID`**, **`DOCSEARCH_API_KEY`**, **`DOCSEARCH_INDEX_NAME`** (`umbraculum-docs`) — [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4; **Retry deployment** after adding vars. |
 | **Build command** | Drop redundant **`npm ci &&`** — Cloudflare already runs `npm clean-install` before your command. Use workspace build only (see table §1). |
 | **Branch previews** | Optional: uncheck **Builds for non-production branches** to halve build count on feature-branch pushes (~500 builds/month free-tier budget). Keep on if you want preview URLs per branch. |
 | **Chunk load after deploy** | Docs ship `docs-site/static/_headers` (`/assets/*` immutable; HTML `no-cache`) + a client chunk-reload guard. Symptom on mobile: `Loading chunk N failed` — usually stale HTML after a deploy; hard refresh or wait for edge cache to clear. |

@@ -89,6 +89,8 @@ git push origin v0.0.1-alpha
 
 Draft GitHub Release notes from [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md).
 
+**Status (2026-06-27):** GitHub Release **`v0.0.1-alpha`** published on `umbraculum-dev/umbraculum-dev` (tag points at flip commit; see §11 **C1**).
+
 ---
 
 ## 3. Remove pre-flip SEO gates (commit on `master`, then deploy)
@@ -182,7 +184,8 @@ Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.
 | Draft answers | [`docsearch-application-draft.md`](docsearch-application-draft.md) |
 | **Applicant account** | **GitHub OAuth** — same as Cursor C2: [`github.com/umbraculum-dev`](https://github.com/umbraculum-dev) · **`umbraculum-dev@proton.me`** ([`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md)) |
 | Contact email (form) | **`toolset@umbraculum.dev`** (public toolset contact) |
-| After approval | Swap lunr → `@docusaurus/theme-search-algolia` per draft §4 — credentials in Cloudflare env only |
+| After approval | **`@docusaurus/theme-search-algolia`** when **`DOCSEARCH_*`** set at Cloudflare build — see draft §4 |
+| **Cloudflare credentials** | **Settings → Build → Variables and secrets** on **`umbraculum-dev-docs-docusaurus`**: `DOCSEARCH_APP_ID`, `DOCSEARCH_API_KEY`, `DOCSEARCH_INDEX_NAME` = **`umbraculum-docs`** |
 | **Index refresh** | **Not on every deploy** — Algolia crawler schedule **§7** (~monthly); use **Start Crawling** in dashboard for urgent re-index |
 
 Approval and crawler setup may trail submission by weeks (same pattern as C2). **Search results on production lag doc merges** until the next crawl finishes — see [`docsearch-application-draft.md`](docsearch-application-draft.md) §7.
@@ -193,7 +196,7 @@ Approval and crawler setup may trail submission by weeks (same pattern as C2). *
 
 | Channel | Action |
 |---------|--------|
-| GitHub Release | Publish `v0.0.1-alpha` body from announcement draft |
+| GitHub Release | **✅ Published `v0.0.1-alpha`** (2026-06-27) — body from announcement draft |
 | [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1) per [`community-forum-runbook.md`](community-forum-runbook.md) |
 | Brochure / social | Optional short post linking docs + clone URL |
 | Support page | Liberapay + Buy Me a Coffee — **✅ live** at [umbraculum.dev/support/](https://umbraculum.dev/support/) since **2d (2026-06-26)**; re-smoke after `noindex` removal |
@@ -220,7 +223,7 @@ Approval and crawler setup may trail submission by weeks (same pattern as C2). *
 |------|------------|-------|
 | 2026-05-29 | Agent prep | Automated Stage 2 prep complete — npm SDK on registry, brochure/docs-site/workflows in repo. **Flip not executed** — maintainer runs §1–§9 when manual gates close. |
 | 2026-06-26 | Agent docs | §1 aligned to **three-repo** atomic flip (`umbraculum-dev` + `umbraculum-toolset` + `umbraculum-brochure`); hosting repos documented as already public. **Flip not executed.** |
-| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`. **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **C2 ✅** marketplace application submitted (await Cursor). **C1 / C3–C9** — see §11. |
+| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`; **GitHub Release published** (**C1 ✅**). **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **C2 ✅** marketplace submitted. **C5 ✅** DocSearch onboarded; **`DOCSEARCH_*`** on Cloudflare **Variables and secrets** — deploy in progress. **C3–C4, C6–C9** — see §11. |
 
 ---
 
@@ -230,11 +233,11 @@ Track flip-day and immediate post-flip work here. **C2** and **C5** are independ
 
 | ID | Action | Where | Status |
 |----|--------|-------|--------|
-| **C1** | GitHub Release **`v0.0.1-alpha`** published | §2 · [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | ☐ maintainer confirm |
+| **C1** | GitHub Release **`v0.0.1-alpha`** published | §2 · §8 · [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | ☑ **Published 2026-06-27** on [`umbraculum-dev/umbraculum-dev`](https://github.com/umbraculum-dev/umbraculum-dev/releases) |
 | **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
 | **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) | ☐ |
 | **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) | ☐ |
-| **C5** | **Algolia DocSearch** application submitted | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) | ☑ **Submitted 2026-06-27** — crawler + domain verified; **§4 Docusaurus wired** — set **`DOCSEARCH_*`** on Cloudflare build + redeploy to switch production off lunr |
+| **C5** | **Algolia DocSearch** on production | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) | ☑ **2026-06-27** — crawler + domain verified; code on `master`; **`DOCSEARCH_*`** in Cloudflare **Variables and secrets** — **await deploy green**, then smoke Algolia search (not lunr) |
 | **C6** | Three Cursor marketplace listings **live** (architectural closure) | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 | ☐ trails **C2** |
 | **C7** | Post-flip smoke checklist complete | §9 | ☐ partial (2026-06-27) |
 | **C8** | [`AGENTS.md`](../../AGENTS.md) marketplace-first install documented | §9 | ☐ after **C6** |
