@@ -27,7 +27,7 @@
 1. ~~**Add `CODE_OF_CONDUCT.md`**~~ — **DONE** 2026-05-30 in toolset root.
 2. ~~**Add `SECURITY.md`**~~ — **DONE** 2026-05-30 in toolset root (toolset-scoped in/out of scope).
 3. **Confirm `repository` URL** in any future `package.json` at toolset root (none today — acceptable for a non-npm meta-repo).
-4. **Marketplace submission** — verify `cursor-plugins/.cursor-plugin/marketplace.json` points at public URLs only after visibility flip (flip-day gate — not a pre-flip blocker for adding the files).
+4. **Marketplace submission** — repo-root [`.cursor-plugin/marketplace.json`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/.cursor-plugin/marketplace.json) with `metadata.pluginRoot: cursor-plugins` (three listings; OpenPLC hook-only). Runbook: [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md). Submit at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish).
 
 ---
 

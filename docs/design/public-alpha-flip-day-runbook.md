@@ -144,7 +144,14 @@ Follow [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-page
 
 Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.md`](../CURSOR-PLUGINS.md) — source must resolve publicly on flip day. (`umbraculum-openplc-python-cursor-assistant` listing deferred until the OpenPLC sister repo is public.)
 
-**Closure criterion:** public-alpha procedure complete only when all **three** listings are **live** ([`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Approval may trail flip by days/weeks.
+| Step | Detail |
+|------|--------|
+| Manifest SoT | [`umbraculum-toolset/.cursor-plugin/marketplace.json`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/.cursor-plugin/marketplace.json) — `pluginRoot: cursor-plugins`, **three** entries in `plugins[]` |
+| Runbook | [`cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) — verify, submit, rollback |
+| Submit URL | [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish) — repo `https://github.com/umbraculum-dev/umbraculum-toolset` |
+| OpenPLC | On disk under `cursor-plugins/` for hooks only — **not** in marketplace manifest |
+
+**Closure criterion:** public-alpha procedure complete only when all **three** listings are **live** ([`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Approval may trail flip by days/weeks. **Submission started** satisfies flip-day “start marketplace” gate; live listings satisfy architectural closure.
 
 ---
 

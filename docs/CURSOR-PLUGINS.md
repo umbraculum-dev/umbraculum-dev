@@ -150,6 +150,19 @@ per [`ROADMAP.md`](ROADMAP.md) §"Late H1 / July 2026" Week 3 Stage 2 and
 [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 closure
 criterion; pre-flip contributors use a private mirror).
 
+### Marketplace manifest (C2)
+
+| Item | Detail |
+|------|--------|
+| Git repo submitted | `https://github.com/umbraculum-dev/umbraculum-toolset` |
+| Manifest path | Repo-root [`.cursor-plugin/marketplace.json`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/.cursor-plugin/marketplace.json) |
+| Plugin pack | `metadata.pluginRoot: cursor-plugins` — folders unchanged on disk |
+| Listings (3) | `umbraculum-toolset-common`, `umbraculum-node-react-cursor-assistant`, `umbraculum-platform-tsjs-cursor-assistant` |
+| OpenPLC | `umbraculum-openplc-python-cursor-assistant/` remains for **hook** install only — omitted from marketplace `plugins[]` |
+| Maintainer runbook | [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) (verify, submit, rollback) |
+
+Hooks do **not** read `marketplace.json`; local install paths are unchanged. See [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md).
+
 ### Two ways plugins get into a workspace
 
 | Mechanism | When to use | Scope control | umbraculum-toolset today |
