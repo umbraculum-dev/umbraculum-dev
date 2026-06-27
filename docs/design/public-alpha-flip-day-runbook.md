@@ -153,6 +153,16 @@ Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.
 
 **Closure criterion:** public-alpha procedure complete only when all **three** listings are **live** ([`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Approval may trail flip by days/weeks. **Submission started** satisfies flip-day “start marketplace” gate; live listings satisfy architectural closure.
 
+### 5.1 Submission status and review policy (C2)
+
+| When | Detail |
+|------|--------|
+| **Submitted** | **2026-06-27** — [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish); org `umbraculum-dev`; repo `https://github.com/umbraculum-dev/umbraculum-toolset` |
+| **Await** | Cursor follow-up at **`marketplace-publishing@cursor.com`** (no published SLA) |
+| **If approved** | Three listings go live; migrate per [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) § Post-approval migration + [`CURSOR-PLUGINS.md`](../CURSOR-PLUGINS.md) |
+| **If rejected or change-requested** | Apply Cursor feedback in **`umbraculum-toolset`** only (manifest, `plugin.json`, descriptions, logos, layout) — **do not** guess; change only what they specify; re-run manifest verification in the runbook; resubmit or reply on their thread |
+| **Until live** | Keep **`workspaceOpen` hook** as canonical install for umbraculum-dev contributors |
+
 ---
 
 ## 6. npm MIT SDK batch
@@ -161,9 +171,18 @@ Submit the **three** umbraculum-dev apparatus plugins per [`docs/CURSOR-PLUGINS.
 
 ---
 
-## 7. DocSearch (can trail flip)
+## 7. DocSearch / Algolia (C5 — do now)
 
-Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) after `docs.umbraculum.dev` is live.
+**Post-flip gate:** submit the Algolia DocSearch application (**C5** in §11) as soon as **`noindex` is removed** and `https://docs.umbraculum.dev/` is indexable.
+
+| Step | Detail |
+|------|--------|
+| Apply | [docsearch.algolia.com/apply](https://docsearch.algolia.com/apply) |
+| Draft answers | [`docsearch-application-draft.md`](docsearch-application-draft.md) |
+| Contact email | **`toolset@umbraculum.dev`** (or maintainer Proton if form requires a login you control) |
+| After approval | Swap lunr → `@docusaurus/theme-search-algolia` per draft §4 — credentials in Cloudflare env only |
+
+Approval and crawler setup may trail submission by weeks (same pattern as C2).
 
 ---
 
@@ -198,4 +217,22 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 |------|------------|-------|
 | 2026-05-29 | Agent prep | Automated Stage 2 prep complete — npm SDK on registry, brochure/docs-site/workflows in repo. **Flip not executed** — maintainer runs §1–§9 when manual gates close. |
 | 2026-06-26 | Agent docs | §1 aligned to **three-repo** atomic flip (`umbraculum-dev` + `umbraculum-toolset` + `umbraculum-brochure`); hosting repos documented as already public. **Flip not executed.** |
-| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`. **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **§5 / §8 / C1** remain maintainer follow-up. |
+| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`. **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **C2 ✅** marketplace application submitted (await Cursor). **C1 / C3–C9** — see §11. |
+
+---
+
+## 11. Post-2c maintainer queue (C items)
+
+Track flip-day and immediate post-flip work here. **C2** and **C5** are independent async reviews (Cursor marketplace vs Algolia DocSearch).
+
+| ID | Action | Where | Status |
+|----|--------|-------|--------|
+| **C1** | GitHub Release **`v0.0.1-alpha`** published | §2 · [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | ☐ maintainer confirm |
+| **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
+| **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) | ☐ |
+| **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) | ☐ |
+| **C5** | **Algolia DocSearch** application submitted | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) | ☐ **Next** — docs indexable after §3 |
+| **C6** | Three Cursor marketplace listings **live** (architectural closure) | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 | ☐ trails **C2** |
+| **C7** | Post-flip smoke checklist complete | §9 | ☐ partial (2026-06-27) |
+| **C8** | [`AGENTS.md`](../../AGENTS.md) marketplace-first install documented | §9 | ☐ after **C6** |
+| **C9** | [`ROADMAP.md`](../ROADMAP.md) Week 3 / Phase 2 flip date recorded | §9 | ☐ |

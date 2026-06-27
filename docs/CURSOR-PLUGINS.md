@@ -154,6 +154,7 @@ criterion; pre-flip contributors use a private mirror).
 
 | Item | Detail |
 |------|--------|
+| **Status** | **Application submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**. Listings may trail by days/weeks. If Cursor requests changes or rejects, update **`umbraculum-toolset`** manifest/plugins **only per their feedback** ([runbook § Review response](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md#review-response-cursor-feedback)). Until listings are live, keep the **`workspaceOpen` hook** as canonical install. |
 | Git repo submitted | `https://github.com/umbraculum-dev/umbraculum-toolset` |
 | Manifest path | Repo-root [`.cursor-plugin/marketplace.json`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/.cursor-plugin/marketplace.json) |
 | Plugin pack | `metadata.pluginRoot: cursor-plugins` — folders unchanged on disk |

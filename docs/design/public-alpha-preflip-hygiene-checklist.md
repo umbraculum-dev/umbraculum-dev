@@ -1,7 +1,7 @@
 # Public alpha — pre-flip hygiene checklist (Stage 1)
 
 **Tier:** Public  
-**Status:** Stage 1 **complete** (2026-06-08) — **2b signed off**; cleared for **2c** (DocSearch remains first step after flip)  
+**Status:** Stage 1 **complete** (2026-06-08) — **2c in progress** (2026-06-27); **C5 DocSearch** + remaining **C** items in [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §11  
 **Audience:** maintainer running Stage 1 before the atomic public flip (**2c**)  
 **Related:** [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1, [`ROADMAP.md`](../ROADMAP.md) Week 1 tail + Week 3 Stage 1, [RFC-0010](../rfcs/0010-platform-brewery-postgres-schema-split.md) runbook [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres-schema-split.md)
 
@@ -81,7 +81,7 @@ Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres
 | 6.1 | Docs: `noIndex: true` + `static/robots.txt` disallow until flip ([`docs-site/docusaurus.config.ts`](../../docs-site/docusaurus.config.ts)) | ☑ |
 | 6.2 | Brochure: `noindex` meta + `robots.txt` until flip (`umbraculum-brochure` `public/`) | ☑ |
 | 6.3 | Cloudflare Pages projects configured per [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | ☑ (2026-06-07 — Workers + custom domains 200; pre-flip noindex) |
-| 6.4 | DocSearch application submitted after docs URL live ([`docsearch-application-draft.md`](docsearch-application-draft.md)) | ☐ (**first step after 2c** — docs.umbraculum.dev already deployed with pre-flip `noindex`) |
+| 6.4 | DocSearch / Algolia application submitted ([`docsearch-application-draft.md`](docsearch-application-draft.md) · flip runbook **C5**) | ☐ (**submit after 2c §3** — `noindex` removed; docs indexable at `https://docs.umbraculum.dev/`) |
 | 6.5 | Flip announcement reviewed ([`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)) | ☑ (2026-06-08 — draft reviewed; **publish at 2c** only; fill `[Name]` / `[Date]` / `[Contact]` on flip day) |
 | 6.6 | Community forum provisioned — **live** at [forum.umbraculum.dev](https://forum.umbraculum.dev/) ([`community-forum-runbook.md`](community-forum-runbook.md)) — §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1) | ☑ (2026-06-08 — §7.5 complete; **production host live pre-flip**) |
 | 6.7 | **Donation channel accounts (before flip)** — Liberapay `Umbraculum` + Buy Me a Coffee live; URLs match `/support/` — **roadmap Phase 2 `2d`** | ☑ (2026-06-26 — re-verified live at [umbraculum.dev/support/](https://umbraculum.dev/support/); page stays `noindex` until 2c — expected) |
@@ -136,7 +136,12 @@ Stage 1 automated + forum gates are **complete** (2026-06-08). Only **2c** and p
 |---|--------|-------|------|--------|
 | **A** | **Forum §7.5 recheck** | [Discourse Admin](https://forum.umbraculum.dev/admin) + pinned topics | ~30 min | ☑ **Complete** (2026-06-08) |
 | **B** | **Run 2c flip-day runbook** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) | flip window | Not started |
-| **C** | **DocSearch application** | [`docsearch-application-draft.md`](docsearch-application-draft.md) | first step **after** 2c | Deferred (by design) |
+| **C1** | GitHub Release **`v0.0.1-alpha`** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §2 | flip window | ☐ maintainer confirm |
+| **C2** | **Cursor marketplace** application | [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | same day as 2c | ☑ **Submitted 2026-06-27** — await Cursor; iterate toolset **only per review feedback** |
+| **C3** | Forum announcement cross-post | flip-day runbook §8 | after 2c | ☐ |
+| **C4** | Revoke demo VPS GitHub PAT | flip-day runbook §1.1 | after 2c | ☐ |
+| **C5** | **Algolia DocSearch** application | [`docsearch-application-draft.md`](docsearch-application-draft.md) · [apply](https://docsearch.algolia.com/apply) | **immediately after** `noindex` removal (2c §3) | ☐ **Next maintainer action** |
+| **C6–C9** | Listings live, §9 smoke, AGENTS marketplace-first, ROADMAP date | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §11 | after C2 / C5 | ☐ |
 
 **Pre-flip complete:** donation accounts (§6.7), docs + brochure deploy (§6.3), announcement draft (§6.5), forum §7.5 (§6.6).
 
@@ -159,7 +164,7 @@ Maintainer confirmed all seven [runbook §7.5](community-forum-runbook.md) items
 3. Remove `noindex` / `robots.txt` disallow on **brochure** + **docs-site** → redeploy Cloudflare Workers
 4. Publish [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) (GitHub release + forum cross-post)
 5. Start Cursor marketplace submission (same day)
-6. **Step C:** submit DocSearch / Algolia application
+6. **C5:** submit Algolia DocSearch application ([`docsearch-application-draft.md`](docsearch-application-draft.md))
 
 ---
 

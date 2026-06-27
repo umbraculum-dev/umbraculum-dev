@@ -9,7 +9,11 @@
 
 ## 1. When to submit
 
-Submit only after **`docs.umbraculum.dev`** is live on Cloudflare Pages (or equivalent) with HTTPS and you can complete **domain verification** within **7 days** of approval ([DocSearch onboarding](https://docsearch.algolia.com/docs/who-can-apply)). Until credentials arrive, the docs site uses **local lunr.js search** (`@easyops-cn/docusaurus-search-local`) — wired in `docs-site/docusaurus.config.ts`.
+Submit after **`docs.umbraculum.dev`** is live with HTTPS, **`noindex` removed** (flip-day runbook §3), and you can complete **domain verification** within **7 days** of approval ([DocSearch onboarding](https://docsearch.algolia.com/docs/who-can-apply)).
+
+**Flip queue:** maintainer action **C5** — [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §7 and §11. Do **now** (post-§3), in parallel with waiting on Cursor marketplace **C2**.
+
+Until credentials arrive, the docs site uses **local lunr.js search** (`@easyops-cn/docusaurus-search-local`) — wired in `docs-site/docusaurus.config.ts`.
 
 ---
 
@@ -21,7 +25,7 @@ Submit only after **`docs.umbraculum.dev`** is live on Cloudflare Pages (or equi
 | Technical docs | Public `Tier: Public` markdown + workspace READMEs rendered (not a marketing-only site) |
 | Open source | Repo will be public at flip (`github.com/umbraculum-dev/umbraculum-dev`) |
 | License | AGPLv3 core + MIT SDK — acceptable for DocSearch OSS program |
-| `noindex` | May stay on until July α flip; DocSearch can index while `noindex` is on the HTML — confirm current Algolia policy if unsure |
+| `noindex` | Removed at flip **2c §3** (2026-06-27); sitemap at `https://docs.umbraculum.dev/sitemap.xml` |
 | Integration | Docusaurus 3.10.x — plan to use official `@docusaurus/theme-search-algolia` after approval |
 
 ---
@@ -39,7 +43,7 @@ Use the live form fields as authoritative; names may differ slightly in the Algo
 | **License** | AGPL-3.0 (core monorepo); MIT for published SDK packages — see [`docs/LICENSING.md`](../LICENSING.md) |
 | **Short description** | Technical documentation for Umbraculum, an open-source toolset for building workspace-shaped operational applications (ERP-style modules, AI consultant, web + native shells). Includes platform architecture, RFCs, module READMEs, and development runbooks. |
 | **Crawler / sitemap** | `https://docs.umbraculum.dev/sitemap.xml` (available after first production Docusaurus build) |
-| **Contact email** | *[maintainer email — fill at submit time]* |
+| **Contact email** | **`toolset@umbraculum.dev`** (public toolset contact; or maintainer Proton if the form requires the applying account email) |
 | **Framework** | Docusaurus 3.x |
 | **Search already on site** | Yes — local lunr.js fallback until DocSearch credentials are configured |
 
@@ -74,4 +78,4 @@ Follow Algolia’s emailed/Dashboard instructions (DNS TXT, meta tag, or file up
 
 | Date | Actor | Notes |
 |------|-------|-------|
-| — | — | *Not submitted yet — draft only (Phase 1 **1d**).* |
+| — | — | *Not submitted yet — draft ready; flip queue **C5** ([`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §7, §11).* |
