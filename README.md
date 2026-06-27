@@ -216,7 +216,10 @@ translations, and security reports.
   *umbraculum-toolset Cursor plugin pack* — see
   [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) (workspace-scoped via
   [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen), not
-  global `~/.cursor/plugins/local/`). The plugin pack is
+  global `~/.cursor/plugins/local/`). **Enable only the three plugins this
+  repo needs** (common + node-react + platform-tsjs) — loading the whole
+  toolset degrades agent context; see `CURSOR-PLUGINS.md` §"Why workspace-scoped
+  loading matters". The plugin pack is
   the apparatus referenced in [`MANIFESTO.md`](MANIFESTO.md) §1.2 and is
   what keeps the contribution bar low ([`MANIFESTO.md`](MANIFESTO.md) §1.3,
   §2.2). The repo-root [`AGENTS.md`](AGENTS.md) is the agent self-check
@@ -237,4 +240,5 @@ translations, and security reports.
 | Project identity                  | **Umbraculum** (namespace `umbraculum`, primary domain `umbraculum.dev`, GitHub org `umbraculum-dev`) |
 | GitHub org hosting                | **Done 2026-05-27** — `github.com/umbraculum-dev/umbraculum-dev` (private); sister-repo `umbraculum-toolset` also under org (private). Commits, tags, and Actions workflows preserved; full CI matrix green post-transfer. |
 | MIT npm SDK packages              | **On public npm registry** (2026-05-29) — `@umbraculum/module-sdk` and batch per [`docs/LICENSING.md`](docs/LICENSING.md) §6.2.1 |
-| Public release                    | Not flipped — target **July 2026 public alpha**; flip-day runbook [`docs/design/public-alpha-flip-day-runbook.md`](docs/design/public-alpha-flip-day-runbook.md) |
+| Public release                    | GitHub repos **private** until Stage 2 **2c** — target **July 2026 public alpha**; flip-day runbook [`docs/design/public-alpha-flip-day-runbook.md`](docs/design/public-alpha-flip-day-runbook.md) |
+| Production surfaces (pre-flip)    | **Live:** [forum.umbraculum.dev](https://forum.umbraculum.dev/) · [demo.umbraculum.dev](https://demo.umbraculum.dev/) · [umbraculum.dev/support/](https://umbraculum.dev/support/) (Liberapay + Buy Me a Coffee) · [docs.umbraculum.dev](https://docs.umbraculum.dev/) (pre-flip `noindex`) |

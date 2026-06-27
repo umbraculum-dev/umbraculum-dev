@@ -6,6 +6,20 @@
 
 ---
 
+## Production status (2026-06-26)
+
+These hosts are **live in production** before the GitHub visibility flip (Stage 2 **2c**). Brochure and docs remain on pre-flip `noindex` until flip; forum, demo, and `/support` donation URLs are reachable now.
+
+| Host | URL | Operator runbook | Notes |
+|------|-----|------------------|-------|
+| Brochure | [umbraculum.dev](https://umbraculum.dev/) | [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | Cloudflare Worker |
+| Support / sponsorship | [umbraculum.dev/support/](https://umbraculum.dev/support/) | [`donation-channels.md`](donation-channels.md) | **Liberapay** + **Buy Me a Coffee** live (**2d ✅ 2026-06-26**) |
+| Docs | [docs.umbraculum.dev](https://docs.umbraculum.dev/) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | Pre-flip `noindex` until **2c** |
+| Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) | [`community-forum-runbook.md`](community-forum-runbook.md) | Discourse — live 2026-06-08 |
+| Public demo | [demo.umbraculum.dev](https://demo.umbraculum.dev/) | [`demo-host-runbook.md`](demo-host-runbook.md) | Brewery reference vertical — live 2026-06-03 |
+
+---
+
 ## GitHub repositories (all public)
 
 | Repo | Hostname | Clone on |

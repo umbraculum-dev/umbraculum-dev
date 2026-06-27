@@ -1,8 +1,8 @@
 # Community forum runbook (`forum.umbraculum.dev`)
 
 **Tier:** Public  
-**Status:** v1 — Phase 0 bootstrap (Discourse on Contabo); execute before or during public-alpha flip comms  
-**Audience:** maintainer standing up the canonical community surface per [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6  
+**Status:** v1 — Phase 0 bootstrap (Discourse on Contabo); **LIVE** at [forum.umbraculum.dev](https://forum.umbraculum.dev/) since 2026-06-08 (§7.5 governance pins complete)  
+**Audience:** maintainer standing up or operating the canonical community surface per [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6  
 **Related:** [`production-hosts.md`](production-hosts.md), [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) (`docs/OPERATOR.md` — VPS steps), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-vps-security.md`](community-forum-vps-security.md), [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md), [`community-forum-secrets-inventory.md`](community-forum-secrets-inventory.md), [`donation-channels.md`](donation-channels.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)
 
 > [!IMPORTANT]

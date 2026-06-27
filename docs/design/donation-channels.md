@@ -1,7 +1,7 @@
 # Donation and sponsorship channels
 
 **Tier:** Public  
-**Status:** v1.1 — environmental accounting (Stripe Climate, forest stewardship) (2026-05-31)  
+**Status:** v1.1 — Phase 0 accounts **live** (2026-06-26) at [umbraculum.dev/support/](https://umbraculum.dev/support/); environmental accounting (Stripe Climate, forest stewardship) (2026-05-31)  
 **Audience:** maintainers wiring `/support`, prospective sponsors, community members reviewing payment infrastructure  
 **Related:** [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §5, [`MANIFESTO.md`](../../MANIFESTO.md) §3.2, [`umbraculum-brochure` support page](https://github.com/umbraculum-dev/umbraculum-brochure/blob/main/public/support/index.html), [`community-forum-runbook.md`](community-forum-runbook.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md)
 
@@ -150,10 +150,10 @@ Stay on Phase 0 until a **Proposals** forum topic passes (§4) to add or replace
 
 ## 8. Flip-day checklist
 
-- [ ] Liberapay **Umbraculum** live; Stripe connected; GitHub linked in profile copy
-- [ ] Buy Me a Coffee **Umbraculum** live; tiers/shop off
-- [ ] `/support` buttons point to live URLs
-- [ ] Forum **Community policy** pins: Phase 0 channels + §5 triggers ([`donation-channels.md`](donation-channels.md) §3); **How we communicate** (§6.1 — [`community-forum-runbook.md`](community-forum-runbook.md) §6 item 5)
+- [x] Liberapay **Umbraculum** live; Stripe connected; GitHub linked in profile copy — **2026-06-26** ([`liberapay.com/Umbraculum/`](https://liberapay.com/Umbraculum/))
+- [x] Buy Me a Coffee **Umbraculum** live; tiers/shop off — **2026-06-26** ([`buymeacoffee.com/Umbraculum`](https://buymeacoffee.com/Umbraculum))
+- [x] `/support` buttons point to live URLs — **2026-06-26** ([umbraculum.dev/support/](https://umbraculum.dev/support/); page `noindex` until Stage 2 **2c** — expected)
+- [x] Forum **Community policy** pins: Phase 0 channels + §5 triggers — **2026-06-08** ([`community-forum-runbook.md`](community-forum-runbook.md) §7.5; forum live at [forum.umbraculum.dev](https://forum.umbraculum.dev/))
 - [ ] [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) mentions `/support`
 - [ ] Stripe **Climate Commitments** at **1%** on payout account (§9.2)
 
@@ -212,4 +212,4 @@ Environmental giving **does not** buy votes, priority, private channels, or feat
 
 | Date | Maintainer | Liberapay | Buy Me a Coffee | `/support` | Forum pin |
 |------|------------|-----------|-----------------|------------|-----------|
-| — | — | ☐ | ☐ | ☐ | ☐ |
+| 2026-06-26 | maintainer | ☑ | ☑ | ☑ | ☐ (tail — [`community-forum-runbook.md`](community-forum-runbook.md) §6) |

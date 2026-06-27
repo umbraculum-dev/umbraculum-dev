@@ -3,7 +3,9 @@
 > umbraculum-toolset Cursor plugin pack is not loaded into your session,
 > stop and report this to the user before continuing — see `AGENTS.md` for
 > the soft-block protocol and [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md)
-> for the install procedure.
+> for the install procedure. **Load only the three plugins this workspace
+> needs** (not the whole toolset globally) — see `CURSOR-PLUGINS.md` §"Why
+> workspace-scoped loading matters".
 
 ## Development guide (read first)
 
