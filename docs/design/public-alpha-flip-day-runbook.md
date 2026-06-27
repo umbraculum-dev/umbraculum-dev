@@ -58,6 +58,23 @@ git ls-remote git@github.com:umbraculum-dev/umbraculum-toolset.git HEAD
 git ls-remote git@github.com:umbraculum-dev/umbraculum-brochure.git HEAD
 ```
 
+### 1.1 Refresh public consumers (same session)
+
+After **all three** source repos are public, update clones and VPS trees that consume them — visibility alone does not refresh checkouts.
+
+| Consumer | Location | Action |
+|----------|----------|--------|
+| **Maintainer laptop** | Sibling clones (`umbraculum-dev`, `umbraculum-toolset`, `umbraculum-brochure`) | `git pull` on each (brochure already public — pull if behind) |
+| **Demo VPS — product** | `/opt/umbraculum-dev` | Revoke temporary GitHub PAT + drop stored credentials — [`demo-host-runbook.md`](demo-host-runbook.md) §3; then `git fetch origin && git pull` (HTTPS anonymous fetch must work) |
+| **Demo VPS — operator** | `/opt/umbraculum-hosting-demo` | `bin/pull` when compose or submodule pins changed |
+| **Docs announcement vendor** | Monorepo `docs-site/vendor/brochure/` | If brochure moved since last sync: pull `umbraculum-brochure` → [`scripts/sync-brochure-vendor.sh`](../../scripts/sync-brochure-vendor.sh) → redeploy docs worker |
+| **Cloudflare Workers Builds** | `umbraculum-brochure`, `umbraculum-dev-docs-docusaurus` | No git pull on VPS — dashboard builds clone from GitHub on push; trigger or wait for first green build after visibility flip |
+| **Forum** | Discourse pinned topics | GitHub doc links that 404’d while repos were private should resolve after flip (re-smoke one pinned link) |
+
+**Not git consumers:** `umbraculum-integrator-sample` uses npm registry SDK pins, not monorepo clones.
+
+**Pre-flip hygiene (dev + toolset):** re-run 2026-06-27 — gitleaks toolset **0 leaks**; dev **48 hits = beerjson i18n false positives** (same as [`public-alpha-preflip-hygiene-audit-2026-06-07.md`](public-alpha-preflip-hygiene-audit-2026-06-07.md)); both repos commit author email **`umbraculum-dev@proton.me` only**; dev `check-public-docs-no-personal-paths` **OK**.
+
 ---
 
 ## 2. Release tag (monorepo)
