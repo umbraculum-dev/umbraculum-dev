@@ -1,7 +1,7 @@
 # Algolia DocSearch application — maintainer draft (do not submit from CI)
 
 **Tier:** Public  
-**Status:** v1 — **C5 submitted 2026-06-27**; §4 Docusaurus wired on `master`; **`DOCSEARCH_*`** on Cloudflare **Variables and secrets** — await deploy green, then smoke Algolia search on production.  
+**Status:** v1 — **C5 complete 2026-06-27** — Algolia DocSearch live on `https://docs.umbraculum.dev/` (Cloudflare build green after `5b2158f` duplicate-theme fix).  
 **Audience:** maintainer applying at [docsearch.algolia.com/apply](https://docsearch.algolia.com/apply)  
 **Related:** [`docs/rfcs/0005-docs-site.md`](../rfcs/0005-docs-site.md) §9 (Decision G), [`docs-site/README.md`](../../docs-site/README.md)
 
@@ -128,4 +128,4 @@ With **`trailingSlash: true`** in [`docs-site/docusaurus.config.ts`](../../docs-
 
 | Date | Actor | Notes |
 |------|-------|-------|
-| 2026-06-27 | Maintainer | Onboarding complete: domain **`docs.umbraculum.dev`**, crawler **`umbraculum-docs`**, index **`umbraculum-docs`** (~6933 records). Domain verified (Cloudflare DNS TXT). Schedule **`main`** — **12th of month**. §4 code on `master`; **`DOCSEARCH_*`** added to Cloudflare **Variables and secrets** — deploy in progress. |
+| 2026-06-27 | Maintainer | Onboarding complete: domain **`docs.umbraculum.dev`**, crawler **`umbraculum-docs`**, index **`umbraculum-docs`** (~6933 records). Domain verified (Cloudflare DNS TXT). Schedule **`main`** — **12th of month**. §4 on `master`; **`DOCSEARCH_*`** on Cloudflare **Variables and secrets**; deploy green — Algolia search on production. |

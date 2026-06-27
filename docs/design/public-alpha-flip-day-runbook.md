@@ -223,7 +223,7 @@ Approval and crawler setup may trail submission by weeks (same pattern as C2). *
 |------|------------|-------|
 | 2026-05-29 | Agent prep | Automated Stage 2 prep complete — npm SDK on registry, brochure/docs-site/workflows in repo. **Flip not executed** — maintainer runs §1–§9 when manual gates close. |
 | 2026-06-26 | Agent docs | §1 aligned to **three-repo** atomic flip (`umbraculum-dev` + `umbraculum-toolset` + `umbraculum-brochure`); hosting repos documented as already public. **Flip not executed.** |
-| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`; **GitHub Release published** (**C1 ✅**). **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **C2 ✅** marketplace submitted. **C5 ✅** DocSearch onboarded; **`DOCSEARCH_*`** on Cloudflare **Variables and secrets** — deploy in progress. **C3–C4, C6–C9** — see §11. |
+| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`; **GitHub Release published** (**C1 ✅**). **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **C2 ✅** marketplace submitted. **C5 ✅** DocSearch live — Cloudflare build green (`5b2158f`); Algolia theme on production. **C3–C4, C6–C9** — see §11. |
 
 ---
 
@@ -237,7 +237,7 @@ Track flip-day and immediate post-flip work here. **C2** and **C5** are independ
 | **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
 | **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) | ☐ |
 | **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) | ☐ |
-| **C5** | **Algolia DocSearch** on production | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) | ☑ **2026-06-27** — crawler + domain verified; code on `master`; **`DOCSEARCH_*`** in Cloudflare **Variables and secrets** — **await deploy green**, then smoke Algolia search (not lunr) |
+| **C5** | **Algolia DocSearch** on production | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) | ☑ **2026-06-27** — deploy green; Algolia on `docs.umbraculum.dev` (navbar search smoke recommended) |
 | **C6** | Three Cursor marketplace listings **live** (architectural closure) | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 | ☐ trails **C2** |
 | **C7** | Post-flip smoke checklist complete | §9 | ☐ partial (2026-06-27) |
 | **C8** | [`AGENTS.md`](../../AGENTS.md) marketplace-first install documented | §9 | ☐ after **C6** |
