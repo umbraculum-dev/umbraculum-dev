@@ -6,7 +6,7 @@
 **Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-runbook.md`](community-forum-runbook.md), [`donation-channels.md`](donation-channels.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1
 
 > [!IMPORTANT]
-> **Atomic moment:** `umbraculum-dev` and `umbraculum-toolset` visibility → **public** in the **same** maintenance window, with marketplace submission started the same day. See [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) marketplace closure criterion.
+> **Atomic moment:** **`umbraculum-dev`**, **`umbraculum-toolset`**, and **`umbraculum-brochure`** visibility → **public** in the **same** maintenance window (docs site source stays in the monorepo; §3.2 edits land there). Start Cursor marketplace submission the same day. See [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 and marketplace closure criterion. **Out of scope for §1:** hosting operator repos and `umbraculum-integrator-sample` — already public.
 
 ---
 
@@ -21,7 +21,7 @@
 | Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) | ✅ Live — Discourse on Contabo VPS; §7.5 governance pins (2026-06-08) |
 | Public demo | [demo.umbraculum.dev](https://demo.umbraculum.dev/) | ✅ Live since 2026-06-03 — [`demo-host-runbook.md`](demo-host-runbook.md) |
 
-**Remaining before §1 (Stage 2 `2c` only):** GitHub repo visibility public; remove brochure/docs `noindex`; marketplace submission started same session.
+**Remaining before §1 (Stage 2 `2c` only):** GitHub visibility **public** for the three source repos below; remove brochure/docs `noindex`; marketplace submission started same session.
 
 | Gate | Doc |
 |------|-----|
@@ -37,16 +37,22 @@
 
 ## 1. Repositories → public (same session)
 
-| Repo | Action |
-|------|--------|
-| `github.com/umbraculum-dev/umbraculum-dev` | Settings → Change visibility → **Public** |
-| `github.com/umbraculum-dev/umbraculum-toolset` | Settings → Change visibility → **Public** |
+Flip **all three** in one maintenance window (order within the window does not matter; do not leave any private overnight):
+
+| Repo | Role | Action |
+|------|------|--------|
+| `github.com/umbraculum-dev/umbraculum-dev` | Monorepo (API, web, docs-site, packages) | Settings → Change visibility → **Public** |
+| `github.com/umbraculum-dev/umbraculum-toolset` | Cursor plugin pack source | Settings → Change visibility → **Public** |
+| `github.com/umbraculum-dev/umbraculum-brochure` | Static `umbraculum.dev` + `/support` + announcement SoT | Settings → Change visibility → **Public** |
+
+**Already public (no §1 action):** `umbraculum-hosting-common`, `umbraculum-hosting-forum`, `umbraculum-hosting-demo`, `umbraculum-integrator-sample`.
 
 Verify clone URLs work anonymously:
 
 ```bash
 git ls-remote git@github.com:umbraculum-dev/umbraculum-dev.git HEAD
 git ls-remote git@github.com:umbraculum-dev/umbraculum-toolset.git HEAD
+git ls-remote git@github.com:umbraculum-dev/umbraculum-brochure.git HEAD
 ```
 
 ---
@@ -164,4 +170,5 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 | Date | Maintainer | Notes |
 |------|------------|-------|
 | 2026-05-29 | Agent prep | Automated Stage 2 prep complete — npm SDK on registry, brochure/docs-site/workflows in repo. **Flip not executed** — maintainer runs §1–§9 when manual gates close. |
+| 2026-06-26 | Agent docs | §1 aligned to **three-repo** atomic flip (`umbraculum-dev` + `umbraculum-toolset` + `umbraculum-brochure`); hosting repos documented as already public. **Flip not executed.** |
 | — | — | Flip-day execution pending |

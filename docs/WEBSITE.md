@@ -56,7 +56,7 @@ Canonical runbook: [`design/public-alpha-cloudflare-pages-runbook.md`](design/pu
 
 Execute [`design/public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md) in one maintenance window:
 
-1. Repos (`umbraculum-dev`, `umbraculum-toolset`, optionally `umbraculum-brochure`) → **public**
+1. Repos **`umbraculum-dev`**, **`umbraculum-toolset`**, and **`umbraculum-brochure`** → **public** (same session — aligns with [`public-alpha-preflip-hygiene-checklist.md`](design/public-alpha-preflip-hygiene-checklist.md) M1)
 2. Tag `v0.0.1-alpha` on monorepo (if not already present)
 3. Remove brochure + docs `noindex` / `robots.txt` gates (brochure edits in sister repo)
 4. Connect Cloudflare custom domains + TLS (if not already)

@@ -144,7 +144,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 
 **Phase 1 complete** except **1f** (deferred H1 2027). Remaining work is Phase 2 (manual).
 
-**Flip gates (2026-06-26):** **2d ✅** — Liberapay + Buy Me a Coffee at [umbraculum.dev/support/](https://umbraculum.dev/support/). **Forum ✅** — [forum.umbraculum.dev](https://forum.umbraculum.dev/) live. **Demo ✅** — [demo.umbraculum.dev](https://demo.umbraculum.dev/) live. **2c** remains: repo visibility, `noindex` removal, marketplace submission.
+**Flip gates (2026-06-26):** **2d ✅** — Liberapay + Buy Me a Coffee at [umbraculum.dev/support/](https://umbraculum.dev/support/). **Forum ✅** — [forum.umbraculum.dev](https://forum.umbraculum.dev/) live. **Demo ✅** — [demo.umbraculum.dev](https://demo.umbraculum.dev/) live. **2c** remains: GitHub visibility for **three source repos** (`umbraculum-dev`, `umbraculum-toolset`, `umbraculum-brochure`), `noindex` removal, marketplace submission.
 
 ##### Phase 2 — manual (group when back; flip week)
 
@@ -152,7 +152,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 |---|------|----------------|--------------|
 | **2a** | **Human alpha walkthrough + gap-log sign-off** | Closes MRP/CRP α proof without claiming mature product | [`mrp-crp-alpha-demo-walkthrough.md`](design/mrp-crp-alpha-demo-walkthrough.md) |
 | **2b** | **Stage 1 hygiene** — secrets scan, Tier: Public link audit, toolset repo parity | Automated pass 2026-05-27 ([`public-alpha-preflip-hygiene-audit-2026-05-27.md`](design/public-alpha-preflip-hygiene-audit-2026-05-27.md)); maintainer sign-off + toolset + gitleaks remain | [`public-alpha-preflip-hygiene-checklist.md`](design/public-alpha-preflip-hygiene-checklist.md) |
-| **2c** | **Stage 2 atomic flip** — repos public, `v0.0.1-alpha`, toolset marketplace submit, **Cloudflare deploy** (remove `noindex`) | July public α; **2d ✅** — `/support` donation URLs live | [`public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md), [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) |
+| **2c** | **Stage 2 atomic flip** — **three source repos** public (`umbraculum-dev`, `umbraculum-toolset`, `umbraculum-brochure`), `v0.0.1-alpha`, toolset marketplace submit, **Cloudflare deploy** (remove `noindex`) | July public α; **2d ✅** — `/support` donation URLs live | [`public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md), [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) |
 | **2d** | **Donation channel accounts (before flip)** — Liberapay + Buy Me a Coffee live; `/support` wired | **✅ Done 2026-06-26** — [umbraculum.dev/support/](https://umbraculum.dev/support/); sign-off [`donation-channels.md`](design/donation-channels.md) §10. **Tail:** forum pins (Community policy, Sponsorship channels, How we communicate) | [`donation-channels.md`](design/donation-channels.md) §3, §8–§9 |
 | **2e** | **Launch comms** — publish announcement; cross-post forum; optional sponsors list seed | After **2c** + **2d** | [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md), flip-day runbook §8 |
 | **2f** | **MIT npm SDK publish batch** | **Pre-completed 2026-05-29** (before Stage 2 flip) — registry install live | [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md), [`LICENSING.md`](LICENSING.md) §6.2.1 |

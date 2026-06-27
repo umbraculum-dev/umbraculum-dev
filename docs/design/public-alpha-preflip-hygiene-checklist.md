@@ -153,7 +153,7 @@ Maintainer confirmed all seven [runbook §7.5](community-forum-runbook.md) items
 
 #### 2c flip-day sequence (step B — when ready)
 
-1. Both repos → **Public** (same session): `umbraculum-dev` + `umbraculum-toolset`
+1. **Three source repos → Public** (same session): `umbraculum-dev` + `umbraculum-toolset` + `umbraculum-brochure` (see flip-day runbook §1; hosting repos already public)
 2. Tag and push **`v0.0.1-alpha`**
 3. Remove `noindex` / `robots.txt` disallow on **brochure** + **docs-site** → redeploy Cloudflare Workers
 4. Publish [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) (GitHub release + forum cross-post)

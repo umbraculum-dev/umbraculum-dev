@@ -6,7 +6,7 @@
 **Related:** [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 checklist item 5, [`LICENSING.md`](LICENSING.md), [`GETTING-STARTED.md`](../GETTING-STARTED.md)
 
 > [!IMPORTANT]
-> **Do not publish until** repositories are public, `v0.0.1-alpha` is tagged, docs/brochure `noindex` is removed, and maintainer has filled the bracketed placeholders below.
+> **Do not publish until** the **three source repos** are public (`umbraculum-dev`, `umbraculum-toolset`, `umbraculum-brochure`), `v0.0.1-alpha` is tagged, docs/brochure `noindex` is removed, and maintainer has filled the bracketed placeholders below.
 
 ---
 
@@ -18,7 +18,7 @@
 
 ## Body (edit before publish)
 
-Today we are opening the **Umbraculum** monorepo and the **umbraculum-toolset** Cursor plugin pack as a **public alpha** (`v0.0.1-alpha`).
+Today we are opening the **Umbraculum** monorepo, the **umbraculum-toolset** Cursor plugin pack, and the **umbraculum-brochure** marketing site repository as a **public alpha** (`v0.0.1-alpha`).
 
 **What Umbraculum is.** A toolset for building workspace-shaped operational applications — horizontal platform services (auth, workspaces, rendering, i18n) plus composable canonical modules (MRP, CRP, PIM, automation, and more) and a unified **AI consultant** with BYOK. Manufacturing is our stress test (brewery vertical configuration), not our identity.
 
@@ -52,6 +52,7 @@ No CLA. Contributions use **DCO sign-off** only ([`CONTRIBUTING.md`](../CONTRIBU
 |----------|-----|
 | Source | `https://github.com/umbraculum-dev/umbraculum-dev` |
 | Toolset plugins | `https://github.com/umbraculum-dev/umbraculum-toolset` |
+| Brochure source | `https://github.com/umbraculum-dev/umbraculum-brochure` |
 | Documentation | `https://docs.umbraculum.dev` |
 | Brochure | `https://umbraculum.dev` |
 | Community forum | `https://forum.umbraculum.dev` |

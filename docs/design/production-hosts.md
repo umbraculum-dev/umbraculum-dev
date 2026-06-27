@@ -20,16 +20,19 @@ These hosts are **live in production** before the GitHub visibility flip (Stage 
 
 ---
 
-## GitHub repositories (all public)
+## GitHub repositories — visibility at public alpha (2c)
 
-| Repo | Hostname | Clone on |
-|------|----------|----------|
-| [umbraculum-hosting-common](https://github.com/umbraculum-dev/umbraculum-hosting-common) | (dependency only) | Embedded as `common/` submodule — do not clone alone on VPS |
-| [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) | `forum.umbraculum.dev` | **Forum VPS only** |
-| [umbraculum-hosting-demo](https://github.com/umbraculum-dev/umbraculum-hosting-demo) | `demo.umbraculum.dev` | **Demo VPS only** |
-| [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | `umbraculum.dev` | **Brochure only** — static marketing site + announcement SoT |
+| Repo | Hostname / role | Visibility pre-flip (2026-06) | §1 flip action |
+|------|-----------------|----------------------------------|----------------|
+| [umbraculum-dev](https://github.com/umbraculum-dev/umbraculum-dev) | Monorepo — product + docs-site | **Private** | → **Public** (same session) |
+| [umbraculum-toolset](https://github.com/umbraculum-dev/umbraculum-toolset) | Cursor plugin pack | **Private** | → **Public** (same session) |
+| [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | `umbraculum.dev` — static marketing + announcement SoT | **Private** | → **Public** (same session) |
+| [umbraculum-hosting-common](https://github.com/umbraculum-dev/umbraculum-hosting-common) | (dependency only) | Public | None — already public |
+| [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) | `forum.umbraculum.dev` | Public | None — **Forum VPS only** |
+| [umbraculum-hosting-demo](https://github.com/umbraculum-dev/umbraculum-hosting-demo) | `demo.umbraculum.dev` | Public | None — **Demo VPS only** |
+| [umbraculum-integrator-sample](https://github.com/umbraculum-dev/umbraculum-integrator-sample) | npm integrator smoke sample | Public | None |
 
-**This repo (umbraculum-dev)** holds application code, governance runbooks (forum §6–§7), flip-day, and product docs — not VPS shell scripts.
+**This repo (umbraculum-dev)** holds application code, governance runbooks (forum §6–§7), flip-day, and product docs — not VPS shell scripts. Atomic flip procedure: [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §1.
 
 ---
 
@@ -44,7 +47,7 @@ $HOSTING_ROOT/
   umbraculum-hosting-common/
   umbraculum-hosting-forum/
   umbraculum-hosting-demo/
-  umbraculum-brochure/           # static umbraculum.dev (optional sibling)
+  umbraculum-brochure/           # static umbraculum.dev (private until Stage 2 §1; flip with monorepo)
 $REPO_ROOT/                    # this repo (umbraculum-dev)
 ```
 
