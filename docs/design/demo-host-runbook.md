@@ -128,21 +128,42 @@ docker compose -f docker-compose.demo.yml --env-file .env up -d traefik
 
 ### 3. Revoke the temporary GitHub PAT (after `umbraculum-dev` flips public)
 
-**Status:** while `umbraculum-dev` is private, the VPS clones it over HTTPS with a classic PAT (org policy disables deploy keys). When the repo flips public:
+**Status (2026-06-27):** VPS credential wipe at flip; run verification after GitHub revoke.
 
 1. **GitHub** → Profile → **Settings** → **Developer settings** → **Personal access tokens (classic)** → revoke `umbdemo-read` (or whatever you named it).
 2. **VPS** — wipe stored credentials:
 
    ```bash
-   git config --global --unset credential.helper
+   git config --global --unset credential.helper || true
    rm -f /root/.git-credentials
    ```
 
-3. Confirm anonymous clone still works:
+3. **Verify** (on VPS):
+
+   ```bash
+   /opt/umbraculum-dev/scripts/demo-vps-pat-revoke-verify.sh
+   ```
+
+   Or manually:
 
    ```bash
    cd /opt/umbraculum-dev && git fetch origin && git status
+   git ls-remote https://github.com/umbraculum-dev/umbraculum-dev.git HEAD
    ```
+
+---
+
+## Redeploy maintenance UX
+
+During **api** / **web** restarts, nginx serves a branded maintenance page (HTTP **503**) instead of raw **502 Bad Gateway**. Native clients get JSON `503` on `/api/*`.
+
+| Artifact | Repo |
+|----------|------|
+| `nginx/demo.conf` + `nginx/maintenance/maintenance.html` | [umbraculum-hosting-demo](https://github.com/umbraculum-dev/umbraculum-hosting-demo) |
+| Mirror | [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf) |
+| Operator runbook | [hosting-demo `docs/OPERATOR.md`](https://github.com/umbraculum-dev/umbraculum-hosting-demo/blob/main/docs/OPERATOR.md) — **`bin/redeploy`** |
+
+After `bin/pull` on the demo VPS: `docker compose … up -d nginx` then optional maintenance smoke (stop api/web briefly → curl expects 503 maintenance, not 502).
 
 ---
 

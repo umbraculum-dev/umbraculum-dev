@@ -70,5 +70,5 @@ No CLA. Contributions use **DCO sign-off** only ([`CONTRIBUTING.md`](../CONTRIBU
 |---------|--------|-------|
 | GitHub release notes | Paste adapted body; attach `v0.0.1-alpha` | ☑ **2026-06-27** |
 | Brochure / docs | Remove `noindex`; link announcement from home if desired | ☑ **2026-06-27** (docs); brochure per sister repo |
-| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; open **Proposals** category | ☐ |
+| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; open **Proposals** category | ☐ Paste [`forum-public-alpha-announcement-post.md`](design/forum-public-alpha-announcement-post.md) → **Community policy** |
 | Social / newsletter | Optional short version | ☐ |

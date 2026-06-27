@@ -235,8 +235,8 @@ Track flip-day and immediate post-flip work here. **C2** and **C5** are independ
 |----|--------|-------|--------|
 | **C1** | GitHub Release **`v0.0.1-alpha`** published | §2 · §8 · [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | ☑ **Published 2026-06-27** on [`umbraculum-dev/umbraculum-dev`](https://github.com/umbraculum-dev/umbraculum-dev/releases) |
 | **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
-| **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) | ☐ |
-| **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) | ☐ |
+| **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) · paste [`forum-public-alpha-announcement-post.md`](forum-public-alpha-announcement-post.md) | ☐ **Draft ready** — maintainer paste to **Community policy**; record topic URL |
+| **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) · [`scripts/demo-vps-pat-revoke-verify.sh`](../../scripts/demo-vps-pat-revoke-verify.sh) | ☐ **Run verify on VPS** after GitHub revoke (VPS creds wiped at flip) |
 | **C5** | **Algolia DocSearch** on production | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) | ☑ **2026-06-27** — deploy green; Algolia on `docs.umbraculum.dev` (navbar search smoke recommended) |
 | **C6** | Three Cursor marketplace listings **live** (architectural closure) | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 | ☐ trails **C2** |
 | **C7** | Post-flip smoke checklist complete | §9 | ☐ partial (2026-06-27) |
