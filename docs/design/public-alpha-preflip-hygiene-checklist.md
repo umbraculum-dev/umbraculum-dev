@@ -9,12 +9,13 @@
 
 ## 1. Scope
 
-Run this checklist on **both** repositories before Stage 2:
+Run this checklist on **all three source repos** before Stage 2 §1 visibility flip:
 
 | Repo | URL |
 |------|-----|
 | Monorepo | `github.com/umbraculum-dev/umbraculum-dev` |
 | Toolset (sister) | `github.com/umbraculum-dev/umbraculum-toolset` |
+| Brochure (sister) | `github.com/umbraculum-dev/umbraculum-brochure` — audit [`brochure-preflip-hygiene-audit-2026-06-26.md`](brochure-preflip-hygiene-audit-2026-06-26.md) |
 
 Record pass/fail and remediation commit SHAs in §6 when complete.
 

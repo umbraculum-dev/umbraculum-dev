@@ -29,6 +29,7 @@
 | **Donation channel accounts live** | [`donation-channels.md`](donation-channels.md) §3 + §8 — **✅ 2026-06-26** — [umbraculum.dev/support/](https://umbraculum.dev/support/) (Liberapay + Buy Me a Coffee) |
 | Contact mailboxes live | `security@`, `conduct@`, `finance@` on `umbraculum.dev` — ✅ 2026-05-30 ([`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), [`donation-channels.md`](donation-channels.md) §3.0) |
 | Toolset parity | [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) — ✅ CoC + SECURITY (2026-05-30) |
+| Brochure parity | [`brochure-preflip-hygiene-audit-2026-06-26.md`](brochure-preflip-hygiene-audit-2026-06-26.md) — ✅ tracked content + gitleaks; author mailmap pushed before §1 |
 | Cloudflare projects created (can be pre-flip while repos still private — use preview URLs first) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) — ✅ Workers Builds (2026-05-30) |
 | Community forum live | [`community-forum-runbook.md`](community-forum-runbook.md) — **✅ [forum.umbraculum.dev](https://forum.umbraculum.dev/)** (§7.5 complete 2026-06-08) |
 | Public demo host live | [`demo-host-runbook.md`](demo-host-runbook.md) — **✅ [demo.umbraculum.dev](https://demo.umbraculum.dev/)** (2026-06-03) |
@@ -46,6 +47,8 @@ Flip **all three** in one maintenance window (order within the window does not m
 | `github.com/umbraculum-dev/umbraculum-brochure` | Static `umbraculum.dev` + `/support` + announcement SoT | Settings → Change visibility → **Public** |
 
 **Already public (no §1 action):** `umbraculum-hosting-common`, `umbraculum-hosting-forum`, `umbraculum-hosting-demo`, `umbraculum-integrator-sample`.
+
+**Pre-flip on `umbraculum-brochure`:** confirm [`brochure-preflip-hygiene-audit-2026-06-26.md`](brochure-preflip-hygiene-audit-2026-06-26.md) — gitleaks clean, no secrets in tree, git author metadata uses project email (not personal Gmail).
 
 Verify clone URLs work anonymously:
 
