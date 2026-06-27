@@ -139,7 +139,7 @@ Stage 1 automated + forum gates are **complete** (2026-06-08). Only **2c** and p
 | **C1** | GitHub Release **`v0.0.1-alpha`** | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §2 | flip window | ☑ **Published 2026-06-27** |
 | **C2** | **Cursor marketplace** application | [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | same day as 2c | ☑ **Submitted 2026-06-27** — await Cursor; iterate toolset **only per review feedback** |
 | **C3** | Forum announcement cross-post | flip-day runbook §8 · [`forum-public-alpha-announcement-post.md`](forum-public-alpha-announcement-post.md) | after 2c | ☐ **Draft ready** — paste to Community policy |
-| **C4** | Revoke demo VPS GitHub PAT | flip-day runbook §1.1 · [`demo-vps-pat-revoke-verify.sh`](../../scripts/demo-vps-pat-revoke-verify.sh) | after 2c | ☐ GitHub revoke + VPS verify script |
+| **C4** | Revoke demo VPS GitHub PAT | flip-day runbook §1.1 · [`demo-vps-pat-revoke-verify.sh`](../../scripts/demo-vps-pat-revoke-verify.sh) | after 2c | ☑ **VPS 2026-06-27** — verify script green; GitHub UI revoke confirm |
 | **C5** | **Algolia DocSearch** on production | [`docsearch-application-draft.md`](docsearch-application-draft.md) · Cloudflare **Variables and secrets** | after 2c §3 | ☑ **2026-06-27** — deploy green; Algolia live on production |
 | **C6–C9** | Listings live, §9 smoke, AGENTS marketplace-first, ROADMAP date | [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §11 | after C2 / C5 | ☐ |
 

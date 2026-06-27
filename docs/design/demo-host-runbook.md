@@ -128,7 +128,7 @@ docker compose -f docker-compose.demo.yml --env-file .env up -d traefik
 
 ### 3. Revoke the temporary GitHub PAT (after `umbraculum-dev` flips public)
 
-**Status (2026-06-27):** VPS credential wipe at flip; run verification after GitHub revoke.
+**Status (2026-06-27):** VPS verified — `scripts/demo-vps-pat-revoke-verify.sh` green on demo VPS. **Confirm** classic PAT revoked in GitHub UI.
 
 1. **GitHub** → Profile → **Settings** → **Developer settings** → **Personal access tokens (classic)** → revoke `umbdemo-read` (or whatever you named it).
 2. **VPS** — wipe stored credentials:
