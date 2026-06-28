@@ -1,7 +1,7 @@
 # Public alpha — Cloudflare static-site deployment runbook
 
 **Tier:** Public  
-**Status:** v1 (brochure + docs; deploy in Phase 2 flip week)  
+**Status:** v1 — brochure + docs deployed; **public alpha flip ✅ 2026-06-27** (indexed, custom domains live)  
 **Audience:** maintainers preparing July 2026 public alpha  
 **Related:** [`docs/rfcs/0005-docs-site.md`](../rfcs/0005-docs-site.md) §4, [`docs/ROADMAP.md`](../ROADMAP.md) Phase 2 **2c**
 
@@ -16,7 +16,7 @@ Both public static surfaces use the same hosting pattern as RFC-0005:
 - **No deploy secrets in GitHub Actions** — Cloudflare Workers Builds connects to the repo and builds on merge to `master`.
 - **CI only validates build** — brochure: GHA in [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure); docs: [`docs-site-build.yml`](../../.github/workflows/docs-site-build.yml).
 - **Custom domains + HTTPS** — attach `umbraculum.dev` / `docs.umbraculum.dev` on each Worker; TLS at Cloudflare edge.
-- **`noindex` until flip** — brochure ships with `robots.txt` disallow + meta `noindex`; docs-site uses `noIndex: true` + `static/robots.txt`. Remove or replace in Phase 2 when announcing α.
+- **SEO (post-flip ✅ 2026-06-27):** brochure and docs are **search-indexable** — `noIndex: false` in Docusaurus; `robots.txt` allow-all in both repos. Pre-flip used `noindex` meta + `Disallow: /`; removal procedure: [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §3.
 
 | Site | Domain (target) | Preview URL (pre-flip) | Build command (tuned) |
 |------|-----------------|------------------------|------------------------|
@@ -46,8 +46,8 @@ Use **two Cloudflare Worker projects** (brochure repo + docs monorepo), separate
 
 3. **Repo file (required before Deploy):** `wrangler.toml` at brochure repo root — `[assets] directory = "./dist"`.
 4. **Custom domains** — add `umbraculum.dev` and `www.umbraculum.dev` after first green deploy (www → apex redirect in Cloudflare DNS rules). Can wait until flip day.
-5. **Pre-launch** — leave `public/robots.txt` as `Disallow: /` until Phase 2 **2c**.
-6. **At flip** — replace `robots.txt` with allow-all (or remove disallow), publish launch post, link from README.
+5. **Pre-launch (historical)** — `public/robots.txt` used `Disallow: /` until Phase 2 **2c** — **removed 2026-06-27**.
+6. **At flip ✅ 2026-06-27** — `robots.txt` allow-all; launch comms published; GitHub Release links forum topic.
 
 Local preview (brochure repo clone):
 
@@ -72,7 +72,7 @@ Repeat **Create application** with the same repo; different project name and Wra
 | Path | `/` |
 | **Variables and secrets** (build) | **`NODE_VERSION`** = `20.19.4` · **`DOCSEARCH_APP_ID`** · **`DOCSEARCH_API_KEY`** (search-only) · **`DOCSEARCH_INDEX_NAME`** = **`umbraculum-docs`** — see [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4 |
 
-Custom domain: `docs.umbraculum.dev`. Remove docs-site `noindex` / `robots.txt` gating per RFC-0005 P7 in the same flip window as brochure.
+Custom domain: `docs.umbraculum.dev`. **SEO gates removed 2026-06-27** (flip runbook §3.2).
 
 ---
 
@@ -94,7 +94,7 @@ Apply in each Worker → **Settings → Builds** after first green deploy:
 - Brochure: https://umbraculum-brochure.umbraculum-dev.workers.dev
 - Docs: https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev
 
-Custom domains (`umbraculum.dev`, `docs.umbraculum.dev`) wait until flip day.
+Custom domains **`umbraculum.dev`** and **`docs.umbraculum.dev`** live with TLS (flip **2026-06-27**).
 
 ---
 
@@ -115,10 +115,10 @@ RFC-0005 chose Cloudflare for docs (free tier, fast CNAME, no Actions deploy tok
 - [ ] Brochure copy reviewed (workspace-shaped positioning, not brewery-only)
 - [ ] Brochure design policy satisfied — no hype visuals/copy ([`brochure-site-design-policy.md`](brochure-site-design-policy.md))
 
-**At flip (Phase 2c):**
+**At flip (Phase 2c) — ✅ 2026-06-27:**
 
 - [x] Both Workers created; preview URLs smoke-tested (2026-05-30)
-- [ ] Post-deploy tuning applied (§4): `NODE_VERSION`, build commands without duplicate `npm ci`
-- [ ] Point DNS / custom domains; wait for TLS active
-- [ ] Remove `noindex` / open `robots.txt` on both sites
-- [x] Smoke: home → docs → GitHub → `GETTING-STARTED` on rendered docs (workers.dev previews, 2026-05-30)
+- [x] Post-deploy tuning applied (§4): `NODE_VERSION`, build commands without duplicate `npm ci`
+- [x] Point DNS / custom domains; TLS active
+- [x] Remove `noindex` / open `robots.txt` on both sites
+- [x] Smoke: home → docs → GitHub → `GETTING-STARTED` on rendered docs

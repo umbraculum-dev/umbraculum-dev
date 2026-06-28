@@ -1,8 +1,10 @@
 # umbraculum-brochure — pre-flip hygiene audit
 
+> **Historical audit (2026-06-26).** Brochure repo **public since 2026-06-27**; SEO gates removed same session.
+
 **Tier:** Public  
 **Status:** Audit **2026-06-26** — tracked content clean; git author metadata remediated before §1 flip  
-**Repo:** `github.com/umbraculum-dev/umbraculum-brochure` (private until Stage 2 §1)  
+**Repo:** `github.com/umbraculum-dev/umbraculum-brochure` (**public since 2026-06-27**)  
 **Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md) §2, [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §1
 
 ---
@@ -34,7 +36,7 @@ These are **policy copy**, synced from umbraculum-dev donation/support docs — 
 - Liberapay / Buy Me a Coffee public profile URLs
 - Infrastructure cost bands (forum ~€4–10/mo, demo €5/mo)
 - Maintainer AI tooling reference baseline ($200/mo Cursor Ultra + ~$100/mo API — transparency for sponsorship)
-- `noindex` / `robots.txt` disallow until Stage 2 §3
+- `noindex` / `robots.txt` disallow until Stage 2 §3 — **removed 2026-06-27** (historical pre-flip gate)
 
 ---
 

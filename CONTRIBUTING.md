@@ -295,7 +295,7 @@ threads as ordinary human participation. If AI helped you draft a post,
 say so briefly. Full rules: [`docs/CORE-DEVELOPMENT-AND-COMMUNITY.md`](./docs/CORE-DEVELOPMENT-AND-COMMUNITY.md)
 §6.1; enforcement via [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
 
-For **code-shaped questions** (when the repo is public): open a GitHub
+For **code-shaped questions**: open a GitHub
 Discussion or an issue with the `question` label.
 
 For security questions: see [`SECURITY.md`](./SECURITY.md).

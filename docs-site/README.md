@@ -112,7 +112,7 @@ Cloudflare **Workers Builds** — second Worker project (after brochure is green
 | `NODE_VERSION` | `20.19.4` (Cloudflare env var) |
 | Preview | https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev |
 
-Keep `noIndex: true` and `static/robots.txt` until public-alpha flip (RFC-0005 P7).
+**Post-flip (2026-06-27):** `noIndex: false` in [`docusaurus.config.ts`](docusaurus.config.ts); [`static/robots.txt`](static/robots.txt) allows crawling. Algolia DocSearch on production when Cloudflare **`DOCSEARCH_*`** env is set ([`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §4).
 
 ## How it fits in
 

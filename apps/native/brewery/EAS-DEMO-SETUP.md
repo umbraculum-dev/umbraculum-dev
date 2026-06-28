@@ -38,7 +38,7 @@ Commit the real `expo.extra.eas.projectId` written to `app.json` (replace `REPLA
 
 The workflow uses `eas.json` `preview.env` (`EXPO_PUBLIC_API_BASE_URL=https://demo.umbraculum.dev`).
 
-**Prefer GHA only when the repo is public.** While **umbraculum-dev** is private, a dispatched workflow allocates a GitHub-hosted runner for the **entire** `eas build` poll — including time spent in Expo’s queue — and that wall-clock time counts against the org’s **private-repo Actions minute pool**. For queued free-tier builds, run **`eas build` locally** (below) or watch the build on [expo.dev](https://expo.dev) without holding a GHA job open.
+**Prefer GHA for routine demo APK builds** now that **umbraculum-dev** is public. During long Expo free-tier queues, local `eas build` or expo.dev polling may still be faster than holding a GHA job open — see [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) § “Expo free tier”.
 
 ---
 

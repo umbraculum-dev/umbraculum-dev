@@ -1,27 +1,27 @@
 # Public alpha — flip-day runbook (Stage 2 / ROADMAP 2c)
 
 **Tier:** Public  
-**Status:** v1 maintainer checklist — execute only after Stage 1 sign-off  
+**Status:** v1 maintainer checklist — **Stage 2 / 2c executed 2026-06-27** (historical procedure + post-flip tail §11)  
 **Audience:** maintainer performing the atomic July 2026 public-alpha flip  
 **Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-runbook.md`](community-forum-runbook.md), [`donation-channels.md`](donation-channels.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1, [`maintainer-external-service-accounts.md`](maintainer-external-service-accounts.md) (Cursor + Algolia login identity)
 
-> [!IMPORTANT]
-> **Atomic moment:** **`umbraculum-dev`**, **`umbraculum-toolset`**, and **`umbraculum-brochure`** visibility → **public** in the **same** maintenance window (docs site source stays in the monorepo; §3.2 edits land there). Start Cursor marketplace submission the same day. See [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 and marketplace closure criterion. **Out of scope for §1:** hosting operator repos and `umbraculum-integrator-sample` — already public.
+> [!NOTE]
+> **Flip executed 2026-06-27.** Sections §1–§8 record what was done. **Post-flip tail (C6–C9)** — see §11.
 
 ---
 
-## 0. Before you start
+## 0. Before you start (historical — prep through 2026-06-26)
 
-**Automated prep status (2026-06-26):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` / `finance@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-brochure`, `umbraculum-dev-docs-docusaurus`) ✅. **Production surfaces (pre-flip `noindex` on brochure/docs only — hosts are live):**
+**Automated prep status (2026-06-26):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` / `finance@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-brochure`, `umbraculum-dev-docs-docusaurus`) ✅. **Production surfaces before SEO flip:**
 
-| Surface | URL | Status |
-|---------|-----|--------|
+| Surface | URL | Status (pre-2026-06-27) |
+|---------|-----|------------------------|
 | Brochure + support | [umbraculum.dev](https://umbraculum.dev/) · [umbraculum.dev/support/](https://umbraculum.dev/support/) | ✅ Live — Liberapay + Buy Me a Coffee wired (**2d ✅ 2026-06-26**) |
-| Docs | [docs.umbraculum.dev](https://docs.umbraculum.dev/) | ✅ Live — pre-flip `noindex` until **2c** |
+| Docs | [docs.umbraculum.dev](https://docs.umbraculum.dev/) | ✅ Live — **`noindex` until 2c** → **indexed 2026-06-27** |
 | Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) | ✅ Live — Discourse on Contabo VPS; §7.5 governance pins (2026-06-08) |
 | Public demo | [demo.umbraculum.dev](https://demo.umbraculum.dev/) | ✅ Live since 2026-06-03 — [`demo-host-runbook.md`](demo-host-runbook.md) |
 
-**Remaining before §1 (Stage 2 `2c` only):** GitHub visibility **public** for the three source repos below; remove brochure/docs `noindex`; marketplace submission started same session.
+**§1–§3 executed 2026-06-27:** GitHub visibility **public** for three source repos; `noindex` removed; marketplace submission started same session.
 
 | Gate | Doc |
 |------|-----|
@@ -196,7 +196,7 @@ Approval and crawler setup may trail submission by weeks (same pattern as C2). *
 
 | Channel | Action |
 |---------|--------|
-| GitHub Release | **✅ Published `v0.0.1-alpha`** (2026-06-27) — body from announcement draft |
+| GitHub Release | **✅ Published `v0.0.1-alpha`** (2026-06-27) — body from announcement draft; **forum [topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) linked in release body** (2026-06-28) |
 | [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening | **✅ 2026-06-28** — [announcement topic](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) pinned in **Community policy** (6 months) |
 | Brochure / social | Optional short post linking docs + clone URL |
 | Support page | Liberapay + Buy Me a Coffee — **✅ live** at [umbraculum.dev/support/](https://umbraculum.dev/support/) since **2d (2026-06-26)**; re-smoke after `noindex` removal |
@@ -234,7 +234,7 @@ Track flip-day and immediate post-flip work here. **C2** and **C5** are independ
 
 | ID | Action | Where | Status |
 |----|--------|-------|--------|
-| **C1** | GitHub Release **`v0.0.1-alpha`** published | §2 · §8 · [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | ☑ **Published 2026-06-27** on [`umbraculum-dev/umbraculum-dev`](https://github.com/umbraculum-dev/umbraculum-dev/releases) |
+| **C1** | GitHub Release **`v0.0.1-alpha`** published | §2 · §8 · [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | ☑ **Published 2026-06-27** — [release](https://github.com/umbraculum-dev/umbraculum-dev/releases/tag/v0.0.1-alpha) links [forum topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) (2026-06-28) |
 | **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
 | **C3** | Forum cross-post (announcement) | §8 · [`forum-public-alpha-announcement-post.md`](forum-public-alpha-announcement-post.md) | ☑ **2026-06-28** — [topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) pinned **Community policy** 6 months |
 | **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) · [`scripts/demo-vps-pat-revoke-verify.sh`](../../scripts/demo-vps-pat-revoke-verify.sh) | ☑ **VPS verified 2026-06-27** — `demo-vps-pat-revoke-verify.sh` green; **confirm GitHub UI revoke** of classic PAT |

@@ -1,12 +1,12 @@
 # Public alpha announcement (maintainer draft)
 
 **Tier:** Public  
-**Status:** Draft — publish at Stage 2 flip (**ROADMAP** Phase 2 **2c** / **2d**)  
-**Audience:** future contributors, evaluators, press, community channels  
+**Status:** **Published** — GitHub Release [`v0.0.1-alpha`](https://github.com/umbraculum-dev/umbraculum-dev/releases/tag/v0.0.1-alpha) (2026-06-27); forum [topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) (2026-06-28)  
+**Audience:** contributors, evaluators, press, community channels  
 **Related:** [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 checklist item 5, [`LICENSING.md`](LICENSING.md), [`GETTING-STARTED.md`](../GETTING-STARTED.md)
 
-> [!IMPORTANT]
-> **Do not publish until** the **three source repos** are public (`umbraculum-dev`, `umbraculum-toolset`, `umbraculum-brochure`), `v0.0.1-alpha` is tagged, docs/brochure `noindex` is removed, and maintainer has filled the bracketed placeholders below.
+> [!NOTE]
+> **Flip complete (2026-06-27).** This document is the canonical announcement copy. Live distribution: GitHub Release, forum cross-post, indexed brochure/docs. Pre-flip gate checklist below is **historical record**.
 
 ---
 
@@ -68,7 +68,7 @@ No CLA. Contributions use **DCO sign-off** only ([`CONTRIBUTING.md`](../CONTRIBU
 
 | Channel | Action | Done? |
 |---------|--------|-------|
-| GitHub release notes | Paste adapted body; attach `v0.0.1-alpha` | ☑ **2026-06-27** |
-| Brochure / docs | Remove `noindex`; link announcement from home if desired | ☑ **2026-06-27** (docs); brochure per sister repo |
+| GitHub release notes | Paste adapted body; attach `v0.0.1-alpha`; link [forum topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) in body | ☑ **2026-06-27** publish · **2026-06-28** forum link in [release body](https://github.com/umbraculum-dev/umbraculum-dev/releases/tag/v0.0.1-alpha) |
+| Brochure / docs | Remove `noindex`; link announcement from home if desired | ☑ **2026-06-27** — SEO gates removed; indexed on [umbraculum.dev](https://umbraculum.dev/) + [docs.umbraculum.dev](https://docs.umbraculum.dev/) |
 | [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; open **Proposals** category | ☑ **2026-06-28** — [topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) (**Community policy**, pinned 6 months) |
 | Social / newsletter | Optional short version | ☐ |

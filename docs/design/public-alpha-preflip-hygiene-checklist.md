@@ -1,5 +1,7 @@
 # Public alpha — pre-flip hygiene checklist (Stage 1)
 
+> **Historical record — Stage 1 (pre-flip).** Public alpha flip (**2c**) executed **2026-06-27**. Current production SEO/indexing state: [`WEBSITE.md`](../WEBSITE.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §3.
+
 **Tier:** Public  
 **Status:** Stage 1 **complete** (2026-06-08) — **2c in progress** (2026-06-27); **C5 DocSearch** + remaining **C** items in [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §11  
 **Audience:** maintainer running Stage 1 before the atomic public flip (**2c**)  

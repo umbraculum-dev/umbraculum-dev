@@ -25,7 +25,7 @@ Umbraculum publishes **two static HTML surfaces** on **Cloudflare Workers** (sta
 - **Design policy:** [`design/brochure-site-design-policy.md`](design/brochure-site-design-policy.md) — less ego, more facts; no startup marketing tropes.
 - **Repo README:** [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure).
 - **CI:** GHA `build` workflow in brochure repo; deploy is Cloudflare Workers Builds on merge to `main`.
-- **Pre-flip SEO:** `noindex` meta + `robots.txt` disallow until public-alpha cutover ([`design/public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md) §3.1 — paths in brochure repo `public/`).
+- **SEO (post-flip):** brochure and docs are **search-indexable** since **2026-06-27** — `robots.txt` allows crawling; no `noindex` meta on brochure home or `/support/`. Pre-flip gate removal: [`design/public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md) §3.
 - **Audience entry:** brochure `public/index.html` sections *Students & university labs* and *Is this for you?*; deep guide: [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md).
 
 ### Shared announcement bar
@@ -54,13 +54,13 @@ Canonical runbook: [`design/public-alpha-cloudflare-pages-runbook.md`](design/pu
 
 ## Flip-day coordination
 
-Execute [`design/public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md) in one maintenance window:
+Stage 2 **2c** executed **2026-06-27** — record: [`design/public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md). Summary:
 
-1. Repos **`umbraculum-dev`**, **`umbraculum-toolset`**, and **`umbraculum-brochure`** → **public** (same session — aligns with [`public-alpha-preflip-hygiene-checklist.md`](design/public-alpha-preflip-hygiene-checklist.md) M1)
-2. Tag `v0.0.1-alpha` on monorepo — **✅ tag + GitHub Release (2026-06-27)**
-3. Remove brochure + docs `noindex` / `robots.txt` gates (brochure edits in sister repo)
-4. Connect Cloudflare custom domains + TLS (if not already)
-5. Submit Cursor marketplace plugins ([`CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md))
+1. Repos **`umbraculum-dev`**, **`umbraculum-toolset`**, and **`umbraculum-brochure`** → **public** ☑
+2. Tag **`v0.0.1-alpha`** + GitHub Release ☑
+3. Brochure + docs **`noindex` removed** / `robots.txt` allow-all ☑
+4. Cloudflare custom domains + TLS ☑
+5. Cursor marketplace submission started ☑ — listings live pending **C6**
 
 MIT npm SDK packages were published **before** the visibility flip (2026-05-29) — see [`LICENSING.md`](LICENSING.md) §6.2.1 and flip-day runbook §6.
 

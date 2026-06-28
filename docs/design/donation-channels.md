@@ -152,7 +152,7 @@ Stay on Phase 0 until a **Proposals** forum topic passes (§4) to add or replace
 
 - [x] Liberapay **Umbraculum** live; Stripe connected; GitHub linked in profile copy — **2026-06-26** ([`liberapay.com/Umbraculum/`](https://liberapay.com/Umbraculum/))
 - [x] Buy Me a Coffee **Umbraculum** live; tiers/shop off — **2026-06-26** ([`buymeacoffee.com/Umbraculum`](https://buymeacoffee.com/Umbraculum))
-- [x] `/support` buttons point to live URLs — **2026-06-26** ([umbraculum.dev/support/](https://umbraculum.dev/support/); page `noindex` until Stage 2 **2c** — expected)
+- [x] `/support` buttons point to live URLs — **2026-06-26** ([umbraculum.dev/support/](https://umbraculum.dev/support/); **indexed since 2c ✅ 2026-06-27**)
 - [x] Forum **Community policy** pins: Phase 0 channels + §5 triggers — **2026-06-08** ([`community-forum-runbook.md`](community-forum-runbook.md) §7.5; forum live at [forum.umbraculum.dev](https://forum.umbraculum.dev/))
 - [ ] [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) mentions `/support`
 - [ ] Stripe **Climate Commitments** at **1%** on payout account (§9.2)

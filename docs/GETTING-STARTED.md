@@ -32,14 +32,14 @@ vertical, omit the brewery reference (default **core profile**), and the Magento
 
 ## Community and production surfaces (live)
 
-These URLs are **already reachable** while the GitHub repos remain private until Stage 2 **2c** (brochure/docs stay on pre-flip `noindex` until then):
+These URLs are **public production surfaces** — brochure and docs are **search-indexable** since the **2026-06-27** public-alpha flip ([`design/public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md) §3). Source repos are **public** on GitHub.
 
 | Surface | URL |
 |---------|-----|
 | Brochure | [umbraculum.dev](https://umbraculum.dev/) |
 | Support / sponsorship | [umbraculum.dev/support/](https://umbraculum.dev/support/) — Liberapay + Buy Me a Coffee |
-| Documentation | [docs.umbraculum.dev](https://docs.umbraculum.dev/) |
-| Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) |
+| Documentation | [docs.umbraculum.dev](https://docs.umbraculum.dev/) — Algolia DocSearch on production |
+| Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) — [public alpha announcement](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) pinned in Community policy |
 | Public brewery demo | [demo.umbraculum.dev](https://demo.umbraculum.dev/) — E2E fixture accounts on the sign-in banner |
 
 Operator runbooks: [`design/production-hosts.md`](design/production-hosts.md), [`design/community-forum-runbook.md`](design/community-forum-runbook.md), [`design/demo-host-runbook.md`](design/demo-host-runbook.md), [`design/donation-channels.md`](design/donation-channels.md).
@@ -678,7 +678,7 @@ You now have a working environment and one merged PR. From here:
 ## Getting help
 
 - For workflow questions: open an issue with the `question` label, or a
-  GitHub Discussion (once the repo is public).
+  GitHub Discussion.
 - For security issues: [`SECURITY.md`](../SECURITY.md), **not** a public
   issue.
 - For code-of-conduct concerns: [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md).

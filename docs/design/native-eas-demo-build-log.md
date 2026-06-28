@@ -114,7 +114,7 @@ Record last green run date here when executed: **2026-05-27** (agent): `check-pa
 | APK URL | _pending_ |
 | `EXPO_PUBLIC_API_BASE_URL` baked | `https://demo.umbraculum.dev` |
 
-**Trigger:** GitHub Actions → `native-eas-build` → `platform=android`, `profile=preview` (requires `EXPO_TOKEN`) — **prefer GHA when the repo is public**; while private, use local `eas build` or expo.dev only during long free-tier queues (see [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) § “Expo free tier”).
+**Trigger:** GitHub Actions → `native-eas-build` → `platform=android`, `profile=preview` (requires `EXPO_TOKEN`) — **GHA is appropriate now that the repo is public**; during long Expo free-tier queues, local `eas build` may still be faster (see [`EAS-DEMO-SETUP.md`](../../apps/native/brewery/EAS-DEMO-SETUP.md) § “Expo free tier”).
 
 ## Expo Doctor
 

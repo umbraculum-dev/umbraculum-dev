@@ -1,8 +1,10 @@
 # umbraculum-toolset — pre-flip hygiene audit (sister repo)
 
+> **Historical audit (2026-05-27).** Toolset repo **public since 2026-06-27** (Stage 2 **2c**).
+
 **Tier:** Public  
 **Status:** Agent-run 2026-05-27 on local clone — maintainer sign-off pending  
-**Repo:** `github.com/umbraculum-dev/umbraculum-toolset` (private until Stage 2 flip)  
+**Repo:** `github.com/umbraculum-dev/umbraculum-toolset` (**public since 2026-06-27**)  
 **Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md) §5.3, [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md)
 
 ---

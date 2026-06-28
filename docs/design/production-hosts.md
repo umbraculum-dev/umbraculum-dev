@@ -6,15 +6,15 @@
 
 ---
 
-## Production status (2026-06-26)
+## Production status (2026-06-27 — post-flip)
 
-These hosts are **live in production** before the GitHub visibility flip (Stage 2 **2c**). Brochure and docs remain on pre-flip `noindex` until flip; forum, demo, and `/support` donation URLs are reachable now.
+All listed hosts are **live in production**. Brochure, docs, and `/support` are **search-indexable** since Stage 2 **2c** (2026-06-27). Forum and demo were live before the GitHub visibility flip.
 
 | Host | URL | Operator runbook | Notes |
 |------|-----|------------------|-------|
-| Brochure | [umbraculum.dev](https://umbraculum.dev/) | [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | Cloudflare Worker |
-| Support / sponsorship | [umbraculum.dev/support/](https://umbraculum.dev/support/) | [`donation-channels.md`](donation-channels.md) | **Liberapay** + **Buy Me a Coffee** live (**2d ✅ 2026-06-26**) |
-| Docs | [docs.umbraculum.dev](https://docs.umbraculum.dev/) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | Pre-flip `noindex` until **2c** |
+| Brochure | [umbraculum.dev](https://umbraculum.dev/) | [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | Cloudflare Worker — indexed |
+| Support / sponsorship | [umbraculum.dev/support/](https://umbraculum.dev/support/) | [`donation-channels.md`](donation-channels.md) | **Liberapay** + **Buy Me a Coffee** live (**2d ✅ 2026-06-26**) — indexed |
+| Docs | [docs.umbraculum.dev](https://docs.umbraculum.dev/) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | Indexed; Algolia DocSearch live (**C5 ✅ 2026-06-27**) |
 | Community forum | [forum.umbraculum.dev](https://forum.umbraculum.dev/) | [`community-forum-runbook.md`](community-forum-runbook.md) | Discourse — live 2026-06-08 |
 | Public demo | [demo.umbraculum.dev](https://demo.umbraculum.dev/) | [`demo-host-runbook.md`](demo-host-runbook.md) | Brewery reference vertical — live 2026-06-03 |
 
@@ -22,15 +22,15 @@ These hosts are **live in production** before the GitHub visibility flip (Stage 
 
 ## GitHub repositories — visibility at public alpha (2c)
 
-| Repo | Hostname / role | Visibility pre-flip (2026-06) | §1 flip action |
-|------|-----------------|----------------------------------|----------------|
-| [umbraculum-dev](https://github.com/umbraculum-dev/umbraculum-dev) | Monorepo — product + docs-site | **Private** | → **Public** (same session) |
-| [umbraculum-toolset](https://github.com/umbraculum-dev/umbraculum-toolset) | Cursor plugin pack | **Private** | → **Public** (same session) |
-| [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | `umbraculum.dev` — static marketing + announcement SoT | **Private** | → **Public** (same session) |
-| [umbraculum-hosting-common](https://github.com/umbraculum-dev/umbraculum-hosting-common) | (dependency only) | Public | None — already public |
-| [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) | `forum.umbraculum.dev` | Public | None — **Forum VPS only** |
-| [umbraculum-hosting-demo](https://github.com/umbraculum-dev/umbraculum-hosting-demo) | `demo.umbraculum.dev` | Public | None — **Demo VPS only** |
-| [umbraculum-integrator-sample](https://github.com/umbraculum-dev/umbraculum-integrator-sample) | npm integrator smoke sample | Public | None |
+| Repo | Hostname / role | Visibility (2026-06-27) |
+|------|-----------------|---------------------------|
+| [umbraculum-dev](https://github.com/umbraculum-dev/umbraculum-dev) | Monorepo — product + docs-site | **Public** |
+| [umbraculum-toolset](https://github.com/umbraculum-dev/umbraculum-toolset) | Cursor plugin pack | **Public** |
+| [umbraculum-brochure](https://github.com/umbraculum-dev/umbraculum-brochure) | `umbraculum.dev` — static marketing + announcement SoT | **Public** |
+| [umbraculum-hosting-common](https://github.com/umbraculum-dev/umbraculum-hosting-common) | (dependency only) | Public |
+| [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) | `forum.umbraculum.dev` | Public |
+| [umbraculum-hosting-demo](https://github.com/umbraculum-dev/umbraculum-hosting-demo) | `demo.umbraculum.dev` | Public |
+| [umbraculum-integrator-sample](https://github.com/umbraculum-dev/umbraculum-integrator-sample) | npm integrator smoke sample | Public |
 
 **This repo (umbraculum-dev)** holds application code, governance runbooks (forum §6–§7), flip-day, and product docs — not VPS shell scripts. Atomic flip procedure: [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §1.
 
@@ -47,7 +47,7 @@ $HOSTING_ROOT/
   umbraculum-hosting-common/
   umbraculum-hosting-forum/
   umbraculum-hosting-demo/
-  umbraculum-brochure/           # static umbraculum.dev (private until Stage 2 §1; flip with monorepo)
+  umbraculum-brochure/           # static umbraculum.dev (public since 2026-06-27)
 $REPO_ROOT/                    # this repo (umbraculum-dev)
 ```
 
