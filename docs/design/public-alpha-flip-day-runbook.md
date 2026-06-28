@@ -197,7 +197,7 @@ Approval and crawler setup may trail submission by weeks (same pattern as C2). *
 | Channel | Action |
 |---------|--------|
 | GitHub Release | **✅ Published `v0.0.1-alpha`** (2026-06-27) — body from announcement draft |
-| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1) per [`community-forum-runbook.md`](community-forum-runbook.md) |
+| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening | **✅ 2026-06-28** — [announcement topic](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) pinned in **Community policy** (6 months) |
 | Brochure / social | Optional short post linking docs + clone URL |
 | Support page | Liberapay + Buy Me a Coffee — **✅ live** at [umbraculum.dev/support/](https://umbraculum.dev/support/) since **2d (2026-06-26)**; re-smoke after `noindex` removal |
 
@@ -223,7 +223,8 @@ Approval and crawler setup may trail submission by weeks (same pattern as C2). *
 |------|------------|-------|
 | 2026-05-29 | Agent prep | Automated Stage 2 prep complete — npm SDK on registry, brochure/docs-site/workflows in repo. **Flip not executed** — maintainer runs §1–§9 when manual gates close. |
 | 2026-06-26 | Agent docs | §1 aligned to **three-repo** atomic flip (`umbraculum-dev` + `umbraculum-toolset` + `umbraculum-brochure`); hosting repos documented as already public. **Flip not executed.** |
-| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`; **GitHub Release published** (**C1 ✅**). **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS pull + PAT creds wiped (maintainer revokes PAT). Agent smokes: demo host, native API, forum GitHub link. **C2 ✅** marketplace submitted. **C5 ✅** DocSearch live — Cloudflare build green (`5b2158f`); Algolia theme on production. **C3–C4, C6–C9** — see §11. |
+| 2026-06-28 | Maintainer | **C3 ✅** — public alpha announcement posted + pinned (6 months) in **Community policy**: [topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84). |
+| 2026-06-27 | Maintainer + agent | **§1 ✅** three repos public. **§2 ✅** `v0.0.1-alpha` retagged to `d205445`; **GitHub Release published** (**C1 ✅**). **§3 ✅** brochure + docs `noindex` removed; Cloudflare deploy verified. Demo VPS maintenance page deployed; **C4 ✅** VPS PAT verify. Agent smokes: demo host, native API, forum GitHub link. **C2 ✅** marketplace submitted. **C5 ✅** DocSearch live. **C6–C9** — see §11. |
 
 ---
 
@@ -235,7 +236,7 @@ Track flip-day and immediate post-flip work here. **C2** and **C5** are independ
 |----|--------|-------|--------|
 | **C1** | GitHub Release **`v0.0.1-alpha`** published | §2 · §8 · [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | ☑ **Published 2026-06-27** on [`umbraculum-dev/umbraculum-dev`](https://github.com/umbraculum-dev/umbraculum-dev/releases) |
 | **C2** | **Cursor marketplace** application submitted | §5 · [`MARKETPLACE-C2-MANIFEST.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/MARKETPLACE-C2-MANIFEST.md) | ☑ **Submitted 2026-06-27** — await **`marketplace-publishing@cursor.com`**; if not published, change plugins/manifest **only per Cursor feedback** (§5.1) |
-| **C3** | Forum cross-post (announcement) | §8 · [`community-forum-runbook.md`](community-forum-runbook.md) · paste [`forum-public-alpha-announcement-post.md`](forum-public-alpha-announcement-post.md) | ☐ **Draft ready** — maintainer paste to **Community policy**; record topic URL |
+| **C3** | Forum cross-post (announcement) | §8 · [`forum-public-alpha-announcement-post.md`](forum-public-alpha-announcement-post.md) | ☑ **2026-06-28** — [topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) pinned **Community policy** 6 months |
 | **C4** | Revoke demo VPS temporary GitHub PAT | §1.1 · [`demo-host-runbook.md`](demo-host-runbook.md) · [`scripts/demo-vps-pat-revoke-verify.sh`](../../scripts/demo-vps-pat-revoke-verify.sh) | ☑ **VPS verified 2026-06-27** — `demo-vps-pat-revoke-verify.sh` green; **confirm GitHub UI revoke** of classic PAT |
 | **C5** | **Algolia DocSearch** on production | §7 · [`docsearch-application-draft.md`](docsearch-application-draft.md) | ☑ **2026-06-27** — deploy green; Algolia on `docs.umbraculum.dev` (navbar search smoke recommended) |
 | **C6** | Three Cursor marketplace listings **live** (architectural closure) | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 | ☐ trails **C2** |

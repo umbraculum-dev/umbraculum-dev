@@ -70,5 +70,5 @@ No CLA. Contributions use **DCO sign-off** only ([`CONTRIBUTING.md`](../CONTRIBU
 |---------|--------|-------|
 | GitHub release notes | Paste adapted body; attach `v0.0.1-alpha` | ☑ **2026-06-27** |
 | Brochure / docs | Remove `noindex`; link announcement from home if desired | ☑ **2026-06-27** (docs); brochure per sister repo |
-| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; open **Proposals** category | ☐ Paste [`forum-public-alpha-announcement-post.md`](design/forum-public-alpha-announcement-post.md) → **Community policy** |
+| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; open **Proposals** category | ☑ **2026-06-28** — [topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) (**Community policy**, pinned 6 months) |
 | Social / newsletter | Optional short version | ☐ |

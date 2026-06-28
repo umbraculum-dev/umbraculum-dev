@@ -1,7 +1,7 @@
 # Forum post — public alpha announcement (C3)
 
 **Tier:** Public  
-**Status:** Ready to paste — **Community policy** category on [forum.umbraculum.dev](https://forum.umbraculum.dev/)  
+**Status:** **Posted 2026-06-28** — [forum topic/84](https://forum.umbraculum.dev/t/umbraculum-public-alpha-open-source-toolset-for-workspace-shaped-operational-applications/84) (**Community policy**, pinned 6 months).  
 **Related:** [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md), [`community-forum-runbook.md`](community-forum-runbook.md) §8
 
 > Paste the **Title** and **Body** below into a new topic in **Community policy**. Pin for 2–4 weeks optional. Record the topic URL in `PUBLIC-ALPHA-ANNOUNCEMENT.md` and flip runbook §11 **C3**.
