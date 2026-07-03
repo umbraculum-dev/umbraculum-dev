@@ -483,4 +483,13 @@ multi-tenant workspace-scoped architectural patterns. Ships the
 skills. Install **only** in umbraculum-platform projects; not useful in
 generic TS/JS projects.
 
+## Bugbot and Loop (portable policy)
+
+Portable architecture and guardrails live in **`umbraculum-toolset-common`**
+v0.0.3+: `docs/BUGBOT-ARCHITECTURE.md`, `docs/LOOP-ARCHITECTURE.md`, rules
+`56-bugbot-checks-only.mdc`, `57-loop-readonly-guardrails.mdc`, skill
+`ci-watch-loop`. This repo commits `.cursor/BUGBOT.md` (from
+`umbraculum-node-react-cursor-assistant` `docs/templates/BUGBOT.md`) and
+`.cursor/LOOP.md` (from toolset-common `docs/templates/LOOP.md`).
+
 ---

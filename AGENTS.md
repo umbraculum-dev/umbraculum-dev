@@ -743,6 +743,25 @@ Local maintainer layout: `/home/rf/dkprojects/rfapps/umbraculum-hosting/{common,
 - Tasks scoped to "forum VPS" may target the **hosting-forum** workspace, not umbraculum-dev.
 - Full apparatus / ci-parity gate applies to **this repo**; hosting repos are bash-only unless explicitly opened.
 
+## Bugbot (opt-in, checks only)
+
+This project adopts committed `.cursor/BUGBOT.md` (TS review rules). Without that file, agents skip Bugbot review and do not block work.
+
+- **Cloud:** manual only — dashboard "Run only when mentioned"; comment `bugbot run` on PR; Autofix OFF
+- **Local:** `typescript-bugbot-review` skill or `/review-bugbot` before push to **`master`** — suggest-not-block
+- **Policy:** `umbraculum-toolset-common` rules `56-bugbot-checks-only.mdc`; architecture: toolset-common `docs/BUGBOT-ARCHITECTURE.md`
+- **Not a done gate** — T0/T1 verification and `verifier` unchanged
+
+## Loop (opt-in, read-only CI watch)
+
+This project adopts committed `.cursor/LOOP.md`. Without that file, agents skip loop suggestions and do not block work.
+
+- **Read-only** — poll `gh pr checks`; no push, rerun, or fix-until-green in loop prompts
+- **Skill:** `ci-watch-loop` (toolset-common); **`master`** PR base
+- **Policy:** `umbraculum-toolset-common` rules `57-loop-readonly-guardrails.mdc`; architecture: toolset-common `docs/LOOP-ARCHITECTURE.md`
+- **`/babysit`** is user-invoked only — do not suggest when suggesting loops
+- **Not a done gate** — verification tiers unchanged
+
 ## Forward
 
 If the apparatus check passes (or the user explicitly overrides it),

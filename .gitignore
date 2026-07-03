@@ -9,6 +9,8 @@ backups/
 # Repo-side enforcement copies for plugin alwaysApply gaps (see AGENTS.md)
 !.cursor/rules/
 !.cursor/rules/*.mdc
+!.cursor/BUGBOT.md
+!.cursor/LOOP.md
 .cursorignore
 
 # npm auth / registry config (often contains tokens)
