@@ -1,5 +1,5 @@
-import * as react_jsx_runtime from 'react/jsx-runtime';
-import React, { ReactNode, ComponentProps } from 'react';
+import * as React from 'react';
+import React__default, { ReactNode, ComponentProps } from 'react';
 import { Button as Button$1, YStack, Input as Input$1, Spinner as Spinner$1, SizableText } from 'tamagui';
 
 /**
@@ -23,15 +23,15 @@ interface AdSlotCardProps {
     contactLine: ReactNode;
     upgradeLine: ReactNode;
 }
-declare function AdSlotCard(props: AdSlotCardProps): react_jsx_runtime.JSX.Element;
+declare function AdSlotCard(props: AdSlotCardProps): React__default.JSX.Element;
 
 type ButtonProps = ComponentProps<typeof Button$1>;
-declare function Button(props: ButtonProps): react_jsx_runtime.JSX.Element;
+declare function Button(props: ButtonProps): React__default.JSX.Element;
 
 type CardProps = Omit<ComponentProps<typeof YStack>, "children"> & {
     children: ReactNode;
 };
-declare function Card(props: CardProps): react_jsx_runtime.JSX.Element;
+declare function Card(props: CardProps): React__default.JSX.Element;
 
 interface CollapsibleProps {
     title: string;
@@ -41,10 +41,10 @@ interface CollapsibleProps {
     onExpandedChange: (next: boolean) => void;
     accessibilityLabel?: string;
 }
-declare function Collapsible(props: CollapsibleProps): react_jsx_runtime.JSX.Element;
+declare function Collapsible(props: CollapsibleProps): React__default.JSX.Element;
 
 type InputProps = ComponentProps<typeof Input$1>;
-declare function Input(props: InputProps): react_jsx_runtime.JSX.Element;
+declare function Input(props: InputProps): React__default.JSX.Element;
 
 type ModeOption<T extends string> = {
     value: T;
@@ -56,32 +56,32 @@ declare function ModeFieldset<T extends string>(props: {
     value: T;
     onChange: (next: T) => void;
     options: ModeOption<T>[];
-}): react_jsx_runtime.JSX.Element;
+}): React__default.JSX.Element;
 
 interface ReadOnlyFieldLabelProps {
     children: ReactNode;
 }
-declare function ReadOnlyFieldLabel({ children }: ReadOnlyFieldLabelProps): react_jsx_runtime.JSX.Element;
+declare function ReadOnlyFieldLabel({ children }: ReadOnlyFieldLabelProps): React__default.JSX.Element;
 interface ReadOnlyFieldValueProps {
     children: ReactNode;
 }
-declare function ReadOnlyFieldValue({ children }: ReadOnlyFieldValueProps): react_jsx_runtime.JSX.Element;
+declare function ReadOnlyFieldValue({ children }: ReadOnlyFieldValueProps): React__default.JSX.Element;
 interface ReadOnlyFieldProps {
     label: ReactNode;
     value: ReactNode;
     minWidth?: number;
     flex?: number;
 }
-declare function ReadOnlyField({ label, value, minWidth, flex }: ReadOnlyFieldProps): react_jsx_runtime.JSX.Element;
+declare function ReadOnlyField({ label, value, minWidth, flex }: ReadOnlyFieldProps): React__default.JSX.Element;
 interface ReadOnlyFieldRowProps {
     children: ReactNode;
 }
-declare function ReadOnlyFieldRow({ children }: ReadOnlyFieldRowProps): react_jsx_runtime.JSX.Element;
+declare function ReadOnlyFieldRow({ children }: ReadOnlyFieldRowProps): React__default.JSX.Element;
 
 type ScreenProps = Omit<ComponentProps<typeof YStack>, "children"> & {
     children: ReactNode;
 };
-declare function Screen({ flex, style, ...props }: ScreenProps): react_jsx_runtime.JSX.Element;
+declare function Screen({ flex, style, ...props }: ScreenProps): React__default.JSX.Element;
 
 interface SelectOption {
     value: string;
@@ -100,17 +100,17 @@ interface SelectFieldProps {
     renderValue?: (value: string) => string;
     closeLabel?: string;
 }
-declare function SelectField({ value, onValueChange, options, placeholder, disabled, id, width, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, renderValue, closeLabel, }: SelectFieldProps): react_jsx_runtime.JSX.Element;
+declare function SelectField({ value, onValueChange, options, placeholder, disabled, id, width, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, renderValue, closeLabel, }: SelectFieldProps): React__default.JSX.Element;
 
-type SpinnerProps = React.ComponentProps<typeof Spinner$1>;
-declare function Spinner(props: SpinnerProps): react_jsx_runtime.JSX.Element;
+type SpinnerProps = React__default.ComponentProps<typeof Spinner$1>;
+declare function Spinner(props: SpinnerProps): React__default.JSX.Element;
 
 type TextProps = ComponentProps<typeof SizableText>;
-declare function Text(props: TextProps): react_jsx_runtime.JSX.Element;
+declare function Text(props: TextProps): React__default.JSX.Element;
 type HeadingProps = Omit<TextProps, "size"> & {
     size?: TextProps["size"];
 };
-declare function Heading({ size, fontWeight, ...props }: HeadingProps): react_jsx_runtime.JSX.Element;
+declare function Heading({ size, fontWeight, ...props }: HeadingProps): React__default.JSX.Element;
 
 /** AI chat stream wire types — shared by useAiChatStream and SSE parsers. */
 type AiToolCallView = {
@@ -237,6 +237,6 @@ interface AiChatPanelProps {
  *   - The composer Button has an explicit aria-label.
  *   - Submit-on-Enter is wired via `onSubmitEditing` (cross-platform).
  */
-declare function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps): react_jsx_runtime.JSX.Element;
+declare function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps): React.JSX.Element;
 
 export { AdSlotCard, type AdSlotCardProps, type AiChatMessage, AiChatPanel, type AiChatPanelProps, type AiChatTranslate, type AiChatTurn, type AiToolCallView, Button, type ButtonProps, Card, type CardProps, Collapsible, type CollapsibleProps, FIELD_READONLY_BG, FIELD_READONLY_BORDER, Heading, type HeadingProps, Input, type InputProps, ModeFieldset, type ModeOption, ReadOnlyField, ReadOnlyFieldLabel, type ReadOnlyFieldLabelProps, type ReadOnlyFieldProps, ReadOnlyFieldRow, type ReadOnlyFieldRowProps, ReadOnlyFieldValue, type ReadOnlyFieldValueProps, Screen, type ScreenProps, SelectField, type SelectFieldProps, type SelectOption, Spinner, type SpinnerProps, Text, type TextProps, ThemeVarsInjector, type UseAiChatStreamInput, consumeSseStream, useAiChatStream };
