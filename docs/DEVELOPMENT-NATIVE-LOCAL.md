@@ -119,7 +119,7 @@ docker run -d --rm --name brewery-metro \
   -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native/brewery \
   node:20-slim \
-  bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo start --lan -c"
+  bash -lc 'cd /repo && npm install --no-audit --no-fund -w @umbraculum/native-brewery && cd /repo/apps/native/brewery && EXPO_OFFLINE=1 /repo/node_modules/.bin/expo start --lan -c'
 ```
 
 - `--rm` removes the container on stop, so `docker stop brewery-metro` is all you need; otherwise `docker run --name brewery-metro` next time will fail with `Conflict. The container name "/brewery-metro" is already in use`. Recover with `docker rm brewery-metro`.

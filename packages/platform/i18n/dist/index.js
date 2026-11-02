@@ -6,7 +6,7 @@ import {
 
 // src/index.ts
 import { en as breweryEn, it as breweryIt } from "@umbraculum/brewery-i18n";
-import { isVerticalInstalled } from "@umbraculum/module-sdk";
+import { resolveEnabledModuleCodesEdge } from "@umbraculum/module-sdk/edge";
 
 // src/en.json
 var en_default = {
@@ -1662,6 +1662,13 @@ var it_default = {
 // src/index.ts
 var en = en_default;
 var it = it_default;
+function isBreweryVerticalInstalled(env = process.env) {
+  const profile = env["UMBRACULUM_MODULE_PROFILE"]?.trim() || env["EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE"]?.trim() || void 0;
+  return resolveEnabledModuleCodesEdge({
+    ...env,
+    ...profile ? { UMBRACULUM_MODULE_PROFILE: profile } : {}
+  }).has("brewery");
+}
 function deepMerge(target, source) {
   const result = { ...target };
   for (const key of Object.keys(source)) {
@@ -1679,7 +1686,7 @@ function deepMerge(target, source) {
   return result;
 }
 function loadBreweryMessages(locale) {
-  if (!isVerticalInstalled("brewery")) {
+  if (!isBreweryVerticalInstalled()) {
     return {};
   }
   return locale === "it" ? breweryIt : breweryEn;

@@ -5,7 +5,7 @@
  */
 
 import { en as breweryEn, it as breweryIt } from "@umbraculum/brewery-i18n";
-import { isVerticalInstalled } from "@umbraculum/module-sdk";
+import { resolveEnabledModuleCodesEdge } from "@umbraculum/module-sdk/edge";
 
 import enData from "./en.json";
 import itData from "./it.json";
@@ -20,6 +20,27 @@ const en = enData as Record<string, unknown>;
 const it = itData as Record<string, unknown>;
 
 export { defaultLocale, isLocale, locales, type SupportedLocale };
+
+/**
+ * Edge/RN-safe brewery gate (no Node `fs`).
+ * Native Expo may only see `EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE`; server/web
+ * uses `UMBRACULUM_MODULE_PROFILE`. Prefer the public mirror when set.
+ */
+function isBreweryVerticalInstalled(
+  env: Record<string, string | undefined> = process.env as Record<
+    string,
+    string | undefined
+  >,
+): boolean {
+  const profile =
+    env["UMBRACULUM_MODULE_PROFILE"]?.trim() ||
+    env["EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE"]?.trim() ||
+    undefined;
+  return resolveEnabledModuleCodesEdge({
+    ...env,
+    ...(profile ? { UMBRACULUM_MODULE_PROFILE: profile } : {}),
+  }).has("brewery");
+}
 
 function deepMerge(
   target: Record<string, unknown>,
@@ -49,7 +70,7 @@ function deepMerge(
 }
 
 function loadBreweryMessages(locale: SupportedLocale): Record<string, unknown> {
-  if (!isVerticalInstalled("brewery")) {
+  if (!isBreweryVerticalInstalled()) {
     return {};
   }
   return locale === "it" ? breweryIt : breweryEn;

@@ -1,9 +1,8 @@
 import {
   aggregateNativeAvailableRouteIds,
   clearNativeModuleRegistryForTests,
-  isModuleEnabled,
   registerNativeModule,
-} from "@umbraculum/module-sdk";
+} from "@umbraculum/module-sdk/native";
 import {
   clearNativeRoutePolicyForTests,
   configureNativeRoutePolicy,
@@ -30,17 +29,19 @@ let bootstrapped = false;
 /**
  * Register installed native modules and sync route availability policy.
  * Idempotent — safe to call once at app entry.
+ *
+ * This binary is the brewery vertical app, so brewery is always registered.
+ * Do not call `isModuleEnabled` from the main `@umbraculum/module-sdk` barrel —
+ * that pulls install-profile Node `fs` into the Metro graph and breaks Expo Go.
  */
 export function registerPlatformNativeModules(): void {
   if (bootstrapped) return;
 
-  if (isModuleEnabled("brewery")) {
-    registerNativeModule({
-      code: "brewery",
-      availableRouteIds: [...BREWERY_NATIVE_ROUTE_IDS],
-      tabEntry: { labelKey: "nav.recipes", order: 10 },
-    });
-  }
+  registerNativeModule({
+    code: "brewery",
+    availableRouteIds: [...BREWERY_NATIVE_ROUTE_IDS],
+    tabEntry: { labelKey: "nav.recipes", order: 10 },
+  });
 
   const available = aggregateNativeAvailableRouteIds() as RouteId[];
   configureNativeRoutePolicy({

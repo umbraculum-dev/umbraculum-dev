@@ -57,18 +57,27 @@ if docker inspect "${CONTAINER_NAME}" >/dev/null 2>&1; then
 fi
 
 # 3. Start Metro. --rm so the container auto-cleans on stop. The inline
-#    `npm install` keeps node_modules aligned with package.json before
+#    workspace install keeps node_modules aligned with package.json before
 #    expo start, which prevents the React/react-dom ABI errors we tracked
 #    in DEVELOPMENT-LOCAL.md → "Expo Go ABI exception".
+#
+#    Expo is hoisted to the monorepo root `node_modules` (npm workspaces), so
+#    `apps/native/brewery/node_modules/.bin/expo` is usually absent. Always
+#    invoke the root CLI (or fall back to a workspace-local bin if present).
+#    Do not pass `--offline` together with `--lan` (Expo rejects that combo).
+#    `EXPO_OFFLINE=1` still skips Expo-account network calls in Docker.
 echo "Starting Metro with REACT_NATIVE_PACKAGER_HOSTNAME=${LAN_IP}" >&2
 docker run -d --rm \
   --name "${CONTAINER_NAME}" \
   -p 19000:19000 -p 19001:19001 -p 19002:19002 -p 8081:8081 \
   -e REACT_NATIVE_PACKAGER_HOSTNAME="${LAN_IP}" \
+  -e UMBRACULUM_MODULE_PROFILE=reference \
+  -e EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE=reference \
+  -e EXPO_OFFLINE=1 \
   -v "${REPO_ROOT}:/repo" \
   -w /repo/apps/native/brewery \
   node:20-slim \
-  bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo start --lan -c"
+  bash -lc 'cd /repo && npm install --no-audit --no-fund -w @umbraculum/native-brewery && EXPO_BIN=/repo/node_modules/.bin/expo; if [ ! -x "$EXPO_BIN" ]; then EXPO_BIN=/repo/apps/native/brewery/node_modules/.bin/expo; fi; if [ ! -x "$EXPO_BIN" ]; then echo "ERROR: expo CLI not found under /repo/node_modules or brewery workspace" >&2; exit 1; fi; cd /repo/apps/native/brewery && exec "$EXPO_BIN" start --lan -c'
 
 echo
 echo "Container: ${CONTAINER_NAME}"

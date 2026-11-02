@@ -25,7 +25,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "build": "tsup src/index.ts src/native.ts src/edge.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
@@ -35,6 +35,18 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "default": "./dist/index.js"
+    },
+    "./native": {
+      "types": "./dist/native.d.ts",
+      "import": "./dist/native.js",
+      "require": "./dist/native.cjs",
+      "default": "./dist/native.js"
+    },
+    "./edge": {
+      "types": "./dist/edge.d.ts",
+      "import": "./dist/edge.js",
+      "require": "./dist/edge.cjs",
+      "default": "./dist/edge.js"
     }
   },
   "main": "./dist/index.js",
