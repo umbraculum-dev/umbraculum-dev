@@ -224,6 +224,24 @@ For deeper device-side debugging, shake the phone (or Cmd-D / Cmd-M on emulators
 - **iOS device:** Expo Go from App Store, same Wi-Fi, Step 2 URL or QR.
 - **iOS simulator:** requires macOS + Xcode (cannot run the iOS Simulator on Linux). Not part of the Mac-free flow — see `docs/NATIVE-STRATEGY-AND-CI.md`.
 
+## Pre-release: cold Metro / clean graph
+
+Warm `node_modules` and a warm Metro/Hermes cache can make **one** laptop look healthy while a **new clone**, **backup restore**, or **junior first install** fails. That is the opposite of the project’s junior-equalizer stance ([`MANIFESTO.md`](../MANIFESTO.md) §1.3): local green must not hide “no one else can boot native.”
+
+**Before calling a native/shared-package change release-ready**, run a cold Android graph smoke (no phone required):
+
+```bash
+cd $REPO_ROOT
+./scripts/check-native-metro-cold.sh
+# Expect: [native-metro-cold] OK Android bundle HTTP 200 (…)
+```
+
+The script restarts Metro with `-c` (cleared bundler cache) and `curl`s the brewery `platform=android` bundle. It fails on HTTP ≠ 200 or Metro JSON resolve errors (including Node `fs` leaking into the graph via `@umbraculum/module-sdk`).
+
+Automation proposal (path-aware T2 companion — not wired yet): [`docs/design/native-metro-cold-bundle-gate.md`](design/native-metro-cold-bundle-gate.md).
+
+**Separate device constraint:** this repo pins **Expo SDK 54**. Play Store Expo Go may auto-update to a newer SDK (e.g. 58) and refuse the project — that is **not** a project downgrade. Install Expo Go for SDK 54: [expo.dev/go (Android, SDK 54)](https://expo.dev/go?device=true&platform=android&sdkVersion=54). See also [Expo Go version mismatch](https://docs.expo.dev/troubleshooting/expo-go-version-mismatch/).
+
 ## Quick validation checklist
 
 - **i18n**: open the app and change language; locale should switch and persist across reloads.
@@ -237,9 +255,15 @@ For deeper device-side debugging, shake the phone (or Cmd-D / Cmd-M on emulators
 
 These are recurring traps. Walk through them in order.
 
+### `Project is incompatible with this version of Expo Go` (SDK N vs project SDK 54)
+
+Cause: the Expo Go binary on the phone (often Play Store auto-updated) ships a **different** Expo SDK than `apps/native/brewery` (`expo ~54.x`). The project did not silently downgrade.
+
+Fix: install Expo Go built for **SDK 54** from [expo.dev/go](https://expo.dev/go?device=true&platform=android&sdkVersion=54) (do not rely on the latest Play Store build). Do **not** bump the monorepo to SDK 58 just to match the store — that is Path B ([§ Long-term](#long-term-moving-web-ahead-of-expo-go-path-b--deferred)).
+
 ### `java.io.IOException: Failed to download remote update` (Android Expo Go)
 
-Cause: Expo Go is fetching the JS bundle from a host it cannot reach (almost always a stale `REACT_NATIVE_PACKAGER_HOSTNAME` — typically because the laptop joined a new network after Metro was started, or the helper script picked an interface the phone can't reach).
+Cause: Expo Go is fetching the JS bundle from a host it cannot reach (almost always a stale `REACT_NATIVE_PACKAGER_HOSTNAME` — typically because the laptop joined a new network after Metro was started, or the helper script picked an interface the phone can't reach). **Also** check Metro logs for Android bundling failures (`Unable to resolve module fs`, etc.) — a 500 bundle can surface as the same blue screen; run `./scripts/check-native-metro-cold.sh`.
 
 Fix:
 
