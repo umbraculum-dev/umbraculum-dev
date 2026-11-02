@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { resolveEnabledModuleCodesEdge } from "@umbraculum/module-sdk";
+import { resolveEnabledModuleCodesEdge } from "@umbraculum/module-sdk/edge";
 
 import { HomeAuthenticated } from "./HomeAuthenticated";
 
