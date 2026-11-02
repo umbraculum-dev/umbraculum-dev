@@ -90,10 +90,12 @@ function Card(props) {
 var import_jsx_runtime2 = require("react/jsx-runtime");
 function AdSlotCard(props) {
   const isNative = import_react_native.Platform.OS === "ios" || import_react_native.Platform.OS === "android";
+  const webAsideProps = { as: "aside", "aria-label": props.ariaLabel };
+  const a11yProps = isNative ? { accessibilityLabel: props.ariaLabel } : webAsideProps;
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_tamagui2.YStack, { marginVertical: 12, gap: "$1.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
     Card,
     {
-      ...isNative ? { accessibilityLabel: props.ariaLabel } : { as: "aside", "aria-label": props.ariaLabel },
+      ...a11yProps,
       backgroundColor: "$background",
       borderWidth: 1,
       borderColor: "$borderColor",

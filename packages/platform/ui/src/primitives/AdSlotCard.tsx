@@ -17,13 +17,17 @@ export function AdSlotCard(props: AdSlotCardProps) {
   // Prefer native-only branching (not `=== "web"`) so Next.js SSR cannot take the
   // RN accessibilityLabel path and hydrate into a mismatched `as="aside"` tree.
   const isNative = Platform.OS === "ios" || Platform.OS === "android";
+  // Tamagui Card supports `as="aside"` at runtime but does not expose it in its prop types.
+  // See docs/TAMAGUI.md (Tamagui type-system caveats).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see comment above
+  const webAsideProps = { as: "aside", "aria-label": props.ariaLabel } as any;
+  const a11yProps = isNative
+    ? { accessibilityLabel: props.ariaLabel }
+    : webAsideProps;
   return (
     <YStack marginVertical={12} gap="$1.5">
       <Card
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Tamagui Card supports `as="aside"` at runtime but does not expose it in its prop types. See docs/TAMAGUI.md (Tamagui type-system caveats).
-        {...(isNative
-          ? { accessibilityLabel: props.ariaLabel }
-          : ({ as: "aside", "aria-label": props.ariaLabel } as any))}
+        {...a11yProps}
         backgroundColor="$background"
         borderWidth={1}
         borderColor="$borderColor"
