@@ -126,6 +126,12 @@ export {
   registerBuiltinWebModulesIfAbsent,
 } from "./builtinWebModules.js";
 
+/** Edge-safe profile → module set (Next middleware / RSC; no filesystem). */
+export {
+  BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
+  resolveEnabledModuleCodesEdge,
+} from "./edgeEnabledModules.js";
+
 export {
   composeWebSharedLayoutNavItems,
   type WebSharedLayoutNavItem,
