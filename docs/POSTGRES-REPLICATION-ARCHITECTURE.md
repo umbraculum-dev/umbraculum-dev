@@ -43,11 +43,13 @@ docker compose exec -T postgres psql -U postgres -d postgres -c \
 docker compose restart pgpool api
 ```
 
-### pgpool image source (why not Docker Hub `bitnami/pgpool`)
+### pgpool image source (project-owned Debian — not Bitnami)
 
-- Docker Hub `bitnami/pgpool` is listed as “active”, but in this environment it had **no pullable tags** (attempts to pull `bitnami/pgpool:latest` / `bitnami/pgpool:4.x` returned `manifest unknown`).
-- We therefore use the maintained Bitnami image from AWS Public ECR:
-  - `public.ecr.aws/bitnami/pgpool:4.6.3`
+Bitnami removed community container images from Docker Hub / ECR Public (2026-06-10). This repo **does not** depend on `bitnami/pgpool` or `public.ecr.aws/bitnami/pgpool`.
+
+- **Images:** compose builds `umbraculum/pgpool:bookworm-4.3.5` and `umbraculum/db-guard:bookworm-4.3.5` from `debian:bookworm-slim` + pinned `pgpool2=4.3.5-1+deb12u1` (`infra/pgpool/Dockerfile`, `infra/db-guard/Dockerfile`).
+- **Config:** full project `infra/pgpool/pgpool.conf` + `pool_hba.conf` (entrypoint generates AES `pool_passwd` for SCRAM backends and PCP `pcp.conf`).
+- **Migration log:** [`docs/design/pgpool-non-bitnami-migration-build-log.md`](design/pgpool-non-bitnami-migration-build-log.md).
 
 ### Connection strings
 
@@ -90,15 +92,16 @@ pgpool-II provides a **single DB endpoint** and routes:
 - Writes → primary
 - Eligible reads → replica (load balancing enabled)
 
-“Mostly-safe” defaults in this repo:
+“Mostly-safe” defaults in this repo (`infra/pgpool/pgpool.conf`):
 
-- `PGPOOL_DISABLE_LOAD_BALANCE_ON_WRITE=transaction` (reduces surprise read routing after a write inside a transaction)
+- `disable_load_balance_on_write = 'transaction'` (reduces surprise read routing after a write inside a transaction)
 - `black_function_list` includes sequence + advisory-lock functions (treat them as “writes” and route to primary)
 
 pgpool config lives under:
 
-- `infra/pgpool/pgpool-extra.conf`
+- `infra/pgpool/pgpool.conf` (full SoT)
 - `infra/pgpool/pool_hba.conf`
+- `infra/pgpool/pgpool-extra.conf` (deprecated stub — do not mount)
 
 ## Sync replication + auto-degrade (`db-guard`)
 
@@ -129,6 +132,7 @@ Replica continues catching up via streaming + archive restore, and will be re-at
 
 Use the runbook(s):
 
-- `docs/PGPOOL-VERIFICATION.md`
+- `docs/PGPOOL-VERIFICATION.md` — manual checks + host pgAdmin note
+- `scripts/verify-pgpool-stack.sh` — bounded T1–T10 / T12 automation
 - `docs/DB-REPLICATION-AND-ROUTING-VERIFICATION.md`
 

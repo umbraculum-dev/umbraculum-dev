@@ -384,7 +384,8 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Web app desktop-first + app mobile native, log del brew-day offline-first.",
+    "subtitle": "Web app desktop-first + app mobile native per workspace operativi.",
+    "subtitleBrewery": "Web app desktop-first + app mobile native, log del brew-day offline-first.",
     "links": {
       "title": "Brew day e dati di produzione",
       "fermDataIntegration": "Dati fermentazione e integrazione",
@@ -557,7 +558,7 @@
     "subtitle": "Richiesta di {url} dal browser (via Nginx).",
     "appPermissions": {
       "title": "Permessi app",
-      "subtitle": "User = identità di accesso. Workspace = confine di condivisione/tenant. Ruoli (brewery_admin/member/viewer) e ACL determinano cosa puoi fare.",
+      "subtitle": "User = identità di accesso. Workspace = confine di condivisione/tenant. Ruoli del workspace e ACL determinano cosa puoi fare.",
       "userLabel": "User",
       "activeWorkspaceLabel": "Workspace attivo",
       "roleLabel": "Il tuo ruolo in questo workspace",
