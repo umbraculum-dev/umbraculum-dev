@@ -418,7 +418,8 @@ var en_default = {
   },
   dashboard: {
     title: "Dashboard",
-    subtitle: "Desktop-first web app + native mobile apps, offline-first brew-day logging.",
+    subtitle: "Desktop-first web app + native mobile apps for operational workspaces.",
+    subtitleBrewery: "Desktop-first web app + native mobile apps, offline-first brew-day logging.",
     links: {
       title: "Brew day & Brewing data",
       fermDataIntegration: "Ferm Data & Integration",
@@ -591,7 +592,7 @@ var en_default = {
     subtitle: "Fetching {url} from the browser (via Nginx).",
     appPermissions: {
       title: "App permissions",
-      subtitle: "User = your login identity. Workspace = shared tenant boundary. Roles (brewery_admin/member/viewer) and ACL determine what you can do.",
+      subtitle: "User = your login identity. Workspace = shared tenant boundary. Workspace roles and ACL determine what you can do.",
       userLabel: "User",
       activeWorkspaceLabel: "Active workspace",
       roleLabel: "Your role in this workspace",
@@ -1246,7 +1247,8 @@ var it_default = {
   },
   dashboard: {
     title: "Dashboard",
-    subtitle: "Web app desktop-first + app mobile native, log del brew-day offline-first.",
+    subtitle: "Web app desktop-first + app mobile native per workspace operativi.",
+    subtitleBrewery: "Web app desktop-first + app mobile native, log del brew-day offline-first.",
     links: {
       title: "Brew day e dati di produzione",
       fermDataIntegration: "Dati fermentazione e integrazione",
@@ -1419,7 +1421,7 @@ var it_default = {
     subtitle: "Richiesta di {url} dal browser (via Nginx).",
     appPermissions: {
       title: "Permessi app",
-      subtitle: "User = identit\xE0 di accesso. Workspace = confine di condivisione/tenant. Ruoli (brewery_admin/member/viewer) e ACL determinano cosa puoi fare.",
+      subtitle: "User = identit\xE0 di accesso. Workspace = confine di condivisione/tenant. Ruoli del workspace e ACL determinano cosa puoi fare.",
       userLabel: "User",
       activeWorkspaceLabel: "Workspace attivo",
       roleLabel: "Il tuo ruolo in questo workspace",

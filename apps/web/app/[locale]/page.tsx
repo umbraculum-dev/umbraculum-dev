@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { resolveEnabledModuleCodesEdge } from "@umbraculum/module-sdk";
 
 import { HomeAuthenticated } from "./HomeAuthenticated";
 
@@ -20,5 +21,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     redirect(`/${locale}/login`);
   }
 
-  return <HomeAuthenticated />;
+  const breweryEnabled = resolveEnabledModuleCodesEdge(process.env).has("brewery");
+  return <HomeAuthenticated breweryEnabled={breweryEnabled} />;
 }

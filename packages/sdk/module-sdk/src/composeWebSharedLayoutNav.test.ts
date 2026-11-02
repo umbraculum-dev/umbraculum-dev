@@ -54,6 +54,18 @@ describe("composeWebSharedLayoutNavItems", () => {
     else process.env["UMBRACULUM_MODULE_PROFILE"] = prev;
   });
 
+  it("omits brewery and canonical module nav on minimal profile", () => {
+    const prev = process.env["UMBRACULUM_MODULE_PROFILE"];
+    process.env["UMBRACULUM_MODULE_PROFILE"] = "minimal";
+    registerBuiltinWebModulesIfAbsent({ enabledCodes: new Set() });
+
+    const items = composeWebSharedLayoutNavItems();
+    expect(items.map((item) => item.href)).toEqual(["/", "/ai", "/about"]);
+    expect(items.some((item) => item.href === "/recipes")).toBe(false);
+    if (prev === undefined) delete process.env["UMBRACULUM_MODULE_PROFILE"];
+    else process.env["UMBRACULUM_MODULE_PROFILE"] = prev;
+  });
+
   it("includes third-party module nav entries once registered", () => {
     registerWebModule({
       code: "quality",
@@ -74,10 +86,14 @@ describe("registerBuiltinWebModulesIfAbsent", () => {
   });
 
   it("is idempotent across repeated calls", () => {
+    const prev = process.env["UMBRACULUM_MODULE_PROFILE"];
+    process.env["UMBRACULUM_MODULE_PROFILE"] = "platform";
     registerBuiltinWebModulesIfAbsent();
     registerBuiltinWebModulesIfAbsent();
 
     const items = composeWebSharedLayoutNavItems();
     expect(items.some((item) => item.href === "/production-orders")).toBe(true);
+    if (prev === undefined) delete process.env["UMBRACULUM_MODULE_PROFILE"];
+    else process.env["UMBRACULUM_MODULE_PROFILE"] = prev;
   });
 });
