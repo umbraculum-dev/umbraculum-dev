@@ -89,11 +89,11 @@ function Card(props) {
 // src/primitives/AdSlotCard.tsx
 var import_jsx_runtime2 = require("react/jsx-runtime");
 function AdSlotCard(props) {
-  const isWeb = import_react_native.Platform.OS === "web";
+  const isNative = import_react_native.Platform.OS === "ios" || import_react_native.Platform.OS === "android";
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_tamagui2.YStack, { marginVertical: 12, gap: "$1.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
     Card,
     {
-      ...isWeb ? { as: "aside", "aria-label": props.ariaLabel } : { accessibilityLabel: props.ariaLabel },
+      ...isNative ? { accessibilityLabel: props.ariaLabel } : { as: "aside", "aria-label": props.ariaLabel },
       backgroundColor: "$background",
       borderWidth: 1,
       borderColor: "$borderColor",

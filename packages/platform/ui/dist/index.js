@@ -43,11 +43,11 @@ function Card(props) {
 // src/primitives/AdSlotCard.tsx
 import { jsx as jsx2, jsxs } from "react/jsx-runtime";
 function AdSlotCard(props) {
-  const isWeb = Platform.OS === "web";
+  const isNative = Platform.OS === "ios" || Platform.OS === "android";
   return /* @__PURE__ */ jsx2(YStack2, { marginVertical: 12, gap: "$1.5", children: /* @__PURE__ */ jsx2(
     Card,
     {
-      ...isWeb ? { as: "aside", "aria-label": props.ariaLabel } : { accessibilityLabel: props.ariaLabel },
+      ...isNative ? { accessibilityLabel: props.ariaLabel } : { as: "aside", "aria-label": props.ariaLabel },
       backgroundColor: "$background",
       borderWidth: 1,
       borderColor: "$borderColor",

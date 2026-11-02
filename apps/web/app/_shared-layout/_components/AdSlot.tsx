@@ -20,6 +20,9 @@ export type AdPlacementV1 =
 export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
   const t = useTranslations("ads");
 
+  // Defer card paint until after mount so Tamagui/next-intl Link markup cannot
+  // diverge between SSR HTML and the first client render (Next hydration overlay).
+  const [mounted, setMounted] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [ad, setAd] = useState<{
     id: string;
@@ -30,6 +33,11 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
   const mediaHeightPx = placement === "global_top" ? 120 : 160;
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     let cancelled = false;
 
     (async () => {
@@ -47,7 +55,21 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
     return () => {
       cancelled = true;
     };
-  }, [placement]);
+  }, [mounted, placement]);
+
+  if (!mounted) {
+    return (
+      <div
+        aria-hidden
+        style={{
+          marginTop: 12,
+          marginBottom: 12,
+          // media + card padding + two text lines — limits CLS when the card mounts
+          minHeight: mediaHeightPx + 52,
+        }}
+      />
+    );
+  }
 
   if (disabled) return null;
 
