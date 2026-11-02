@@ -18,16 +18,14 @@ SYNC_STANDBY_NAME="${SYNC_STANDBY_NAME:-walreceiver}"
 REPLAY_LAG_MAX_MS="${REPLAY_LAG_MAX_MS:-1000}"
 CHECK_INTERVAL_SECONDS="${CHECK_INTERVAL_SECONDS:-5}"
 
-export PATH="/opt/bitnami/postgresql/bin:/opt/bitnami/pgpool/bin:${PATH}"
+# Debian pgpool2 / postgresql-client (project-owned images — not Bitnami).
+export PATH="/usr/sbin:/usr/bin:/bin:${PATH}"
 
-HOME_DIR="${HOME:-/tmp}"
-HOME_DIR="/tmp"
-mkdir -p "${HOME_DIR}"
-
-PCPPASS_FILE="${HOME_DIR}/.pcppass"
+# libpcp reads .pcppass via getpwuid()->pw_dir (ignores $HOME). Prefer PCPPASSFILE.
+PCPPASS_FILE="${PCPPASS_FILE:-/tmp/umbraculum-pcppass}"
 printf '%s:%s:%s:%s\n' "${PGPOOL_HOST}" "${PCP_PORT}" "${PCP_USER}" "${PCP_PASSWORD}" >"${PCPPASS_FILE}"
 chmod 0600 "${PCPPASS_FILE}"
-export HOME="${HOME_DIR}"
+export PCPPASSFILE="${PCPPASS_FILE}"
 
 export PGPASSWORD="${PRIMARY_PASSWORD}"
 
@@ -98,6 +96,9 @@ while true; do
       set_sync_on || true
       attach_replica
       mode="sync_on"
+    elif ! replica_node_is_up_in_pgpool; then
+      echo "[db-guard] replica healthy but detached in pgpool; re-attaching"
+      attach_replica
     fi
   else
     if [ "${mode}" != "sync_off" ]; then

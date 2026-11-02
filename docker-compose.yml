@@ -271,33 +271,31 @@ services:
       - wal_archive:/wal-archive:ro
       - ./infra/postgres/replica/replica-entrypoint.sh:/replica-entrypoint.sh:ro
 
+  # Project-owned Debian pgpool2 (no Bitnami / no ECR Public). Config under infra/pgpool/.
   pgpool:
-    image: public.ecr.aws/bitnami/pgpool:4.6.3
+    build:
+      context: ./infra/pgpool
+      dockerfile: Dockerfile
+    image: umbraculum/pgpool:bookworm-4.3.5
     environment:
-      - PGPOOL_BACKEND_NODES=0:postgres:5432,1:postgres-replica:5432
-      - PGPOOL_SR_CHECK_USER=postgres
-      - PGPOOL_SR_CHECK_PASSWORD=postgres
       - PGPOOL_POSTGRES_USERNAME=postgres
       - PGPOOL_POSTGRES_PASSWORD=postgres
       - PGPOOL_ADMIN_USERNAME=pgpooladmin
       - PGPOOL_ADMIN_PASSWORD=pgpooladmin
-      - PGPOOL_ENABLE_LOAD_BALANCING=yes
-      - PGPOOL_DISABLE_LOAD_BALANCE_ON_WRITE=transaction
-      - PGPOOL_AUTHENTICATION_METHOD=scram-sha-256
-      - PGPOOL_USER_CONF_FILE=/config/pgpool-extra.conf
-      - PGPOOL_USER_HBA_FILE=/config/pool_hba.conf
     depends_on:
       - postgres
       - postgres-replica
     ports:
       - "5434:5432"
     volumes:
-      - ./infra/pgpool/pgpool-extra.conf:/config/pgpool-extra.conf:ro
+      - ./infra/pgpool/pgpool.conf:/config/pgpool.conf:ro
       - ./infra/pgpool/pool_hba.conf:/config/pool_hba.conf:ro
 
   db-guard:
-    image: public.ecr.aws/bitnami/pgpool:4.6.3
-    command: bash /db-guard.sh
+    build:
+      context: ./infra/db-guard
+      dockerfile: Dockerfile
+    image: umbraculum/db-guard:bookworm-4.3.5
     environment:
       - PGPOOL_HOST=pgpool
       - PCP_USER=pgpooladmin

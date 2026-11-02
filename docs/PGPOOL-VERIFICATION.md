@@ -12,6 +12,33 @@ Set `REPO_ROOT` to your clone (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)), then:
 
 - `cd $REPO_ROOT`
 
+## Automated check (preferred)
+
+```bash
+cd $REPO_ROOT
+./scripts/verify-pgpool-stack.sh
+# Optional: SKIP_DEGRADE=1 ./scripts/verify-pgpool-stack.sh
+```
+
+Covers compose health, recovery, streaming+sync, slot, WAL archive, `show pool_nodes`, `smoke:stack`, degrade/recover, and image provenance (no Bitnami/ECR). See the matrix in [`docs/design/pgpool-non-bitnami-migration-build-log.md`](design/pgpool-non-bitnami-migration-build-log.md).
+
+## Host tooling (pgAdmin)
+
+pgAdmin is a **local verifier**, not a compose service. On a developer laptop with desktop pgAdmin installed, register:
+
+| Field | Value |
+|-------|--------|
+| Host | `127.0.0.1` |
+| Port | `5434` (compose publishes pgpool) |
+| User / password | `postgres` / `postgres` |
+| Maintenance DB | `postgres` or `brewapp` |
+
+Then run `show pool_nodes;` in the Query Tool. Equivalent CLI proof:
+
+```bash
+PGPASSWORD=postgres psql -h 127.0.0.1 -p 5434 -U postgres -d postgres -c "show pool_nodes"
+```
+
 ## 1) Service health (compose)
 
 ```bash
@@ -78,7 +105,7 @@ What to look for:
 The guard toggles:
 
 - Postgres sync requirement (`synchronous_standby_names`)
-- pgpool replica eligibility (PCP attach/detach)
+- pgpool replica eligibility (PCP attach/detach via `PCPPASSFILE`)
 
 ### 6.1 Confirm guard is running
 
@@ -104,12 +131,6 @@ Expected:
 - `synchronous_standby_names` becomes empty (writes won’t block).
 - pgpool marks replica backend as down/unusable.
 
-## Pgpool image source note
-
-- Docker Hub `bitnami/pgpool` did not have pullable tags in this environment.
-- We use the maintained Bitnami image from AWS Public ECR:
-  - `public.ecr.aws/bitnami/pgpool:4.6.3`
-
 Restart replica and wait:
 
 ```bash
@@ -127,12 +148,36 @@ Expected:
 - Replica returns to `state=streaming`, `sync_state=sync`.
 - pgpool sees the standby as up again.
 
+## Pgpool image source
+
+Project-owned Debian images (not Bitnami / not ECR Public):
+
+- `umbraculum/pgpool:bookworm-4.3.5` — `infra/pgpool/Dockerfile`
+- `umbraculum/db-guard:bookworm-4.3.5` — `infra/db-guard/Dockerfile`
+
+Bring-up:
+
+```bash
+cd $REPO_ROOT
+docker compose build pgpool db-guard
+docker compose up -d pgpool db-guard
+```
+
+Migration notes: [`docs/design/pgpool-non-bitnami-migration-build-log.md`](design/pgpool-non-bitnami-migration-build-log.md).
+
 ## 7) Auth/session + read-after-write checks (manual)
 
 Because auth uses httpOnly cookies, the simplest check is via browser:
 
 - Log in via `http://localhost:${NGINX_HTTP_PORT:-18080}/en/login` (or your configured port)
 - Confirm normal navigation works.
+
+Or run the stack smoke:
+
+```bash
+cd $REPO_ROOT
+npm run smoke:stack
+```
 
 Then run the degrade test (Section 6.2) while staying on a protected page:
 
@@ -152,4 +197,3 @@ curl -sS -c "$COOKIE_JAR" -H "Content-Type: application/json" \
 # Immediate read-after-write check
 curl -sS -b "$COOKIE_JAR" "http://localhost:${NGINX_HTTP_PORT:-18080}/api/auth/me" | head
 ```
-
