@@ -20,7 +20,7 @@
 
 **Decision (historical):** **Path A** (shipped 2026-06-07) — keep Expo Go + `react@19.1.0`; align `apps/web` to `19.1.0`; root `expo@54` override. **Path B** was deferred until store Expo Go shipped SDK 58-only (junior install friction).
 
-**Decision (current):** **Path B executed (2026-11)** — Expo Go remains the primary loop; monorepo on **Expo SDK 58** / **React 19.3.0** / **RN 0.88.1** / **Node ≥22.13** via root `overrides`; `native-shell` peers `~58.0.22`; doctor **20/20**.
+**Decision (current):** **Path B executed (2026-11)** — Expo Go remains the primary loop; monorepo on **Expo SDK 58** / **React 19.3.0** / **RN 0.88.1** / **Node ≥22.13** via root `overrides`; `native-shell` peers `~58.0.23`; doctor **20/20**.
 
 ---
 
@@ -44,7 +44,7 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 | `apps/native/brewery/` | `@umbraculum/native-brewery` — Expo SDK **58** app (reference profile; EAS, Metro, screens) |
 | `apps/native/` | Umbrella index only — **must not** retain `node_modules/` after Wave 4A |
 | `packages/platform/native-shell/` | `@umbraculum/native-shell` — shared auth/i18n/bootstrap (`file:` dep); peers `expo ~58` |
-| Repo root `node_modules/` | Hoisted monorepo stack (`react@19.3.0` / `expo@58.0.22` via `overrides`) |
+| Repo root `node_modules/` | Hoisted monorepo stack (`react@19.3.0` / `expo@58.0.23` via `overrides`) |
 
 ---
 
@@ -85,7 +85,7 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 |---|----------------|-------------------|
 | Expo Go | Primary loop on SDK 54 | Still primary loop — now **SDK 58** (store Expo Go) |
 | React | `19.1.0` monorepo-wide | `19.3.0` monorepo-wide |
-| SDK | Expo 54 | Expo **58** (`expo@58.0.22`, RN `0.88.1`) |
+| SDK | Expo 54 | Expo **58** (`expo@58.0.23`, RN `0.88.1`) |
 | Node | 20 | **22.13+** (`node:22-slim`) |
 | Doctor | 18/18 | **20/20** |
 

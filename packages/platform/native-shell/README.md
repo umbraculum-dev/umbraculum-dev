@@ -43,7 +43,7 @@ When you change `packages/platform/native-shell/src/**`, rebuild before native a
 
 | Peer | Pin | Do not |
 |------|-----|--------|
-| `expo` | `~58.0.22` | `>=58` or open range |
+| `expo` | `~58.0.23` | `>=58` or open range |
 | `react-native` | `0.88.1` | Floating minor |
 | `react` | `>=19` (resolved to `19.3.0` via root overrides) | — |
 | `expo-constants`, `expo-image`, `expo-localization`, `expo-secure-store` | SDK-aligned ranges in `package.json` | Move to `devDependencies` |

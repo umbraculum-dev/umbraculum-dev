@@ -17,7 +17,7 @@ These pinned versions are an **ABI requirement** of the Expo Go binary on the de
 
 | Package | Pinned version | Why |
 | --- | --- | --- |
-| `expo` | `~58.0.22` | SDK 58 |
+| `expo` | `~58.0.23` | SDK 58 |
 | `react` | `19.3.0` (exact) | React Native renderer bundled by RN 0.88.1 requires exact match |
 | `react-dom` | `19.3.0` (exact) | Metro web target preview at `:8081/` requires `react-dom` to match `react` exactly |
 | `react-native` | `0.88.1` | SDK 58 default |
@@ -283,7 +283,7 @@ Cause: `react-native` ships a renderer that requires an **exact** React version 
 - `react-dom` `19.3.0`
 - `react-native` `0.88.1`
 - `react-native-svg` `15.16.0`
-- `expo` `~58.0.22`
+- `expo` `~58.0.23`
 
 If `apps/native/brewery/package.json` drifts off those (or root hoisting leaves a nested copy), the bundle compiles fine but crashes on the first native commit with this exact error.
 

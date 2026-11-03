@@ -442,7 +442,7 @@ docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
 ```
 
 **Do not regress Path B (2026-11):** monorepo `react@19.3.0` overrides; Expo SDK **58**; tight `native-shell`
-`expo` peer (`~58.0.22`, never `>=58`); no `expo-*` in `native-shell` `devDependencies`;
+`expo` peer (`~58.0.23`, never `>=58`); no `expo-*` in `native-shell` `devDependencies`;
 `app.config.js` `({ config }) =>` spread; Metro pins brewery `react`; Node **22** (`node:22-slim`).
 
 CI: [`.github/workflows/native-deps.yml`](.github/workflows/native-deps.yml). Assessment +
