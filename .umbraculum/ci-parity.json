@@ -11,9 +11,9 @@
       { "name": "umbraculum_root_node_modules", "containerPath": "/repo/node_modules" }
     ],
     "resources": {
-      "memory": "4096m",
+      "memory": "7168m",
       "cpus": "2",
-      "maxParallel": 2
+      "maxParallel": 1
     }
   },
   "snapshot": {

@@ -86,7 +86,7 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 | Job selection | Only jobs whose GHA workflow would trigger on the diff | All manifest jobs (`docs-readmes`, `lint`, `typecheck`, `sdk-publish-prep`, `dogfood-npm-smoke`) |
 | Execution | Parallel containers (`--parallel --isolated-install`), **capped** (see Resource safety); native companions run **after** ci-parity on laptops (overlap on GHA / `VERIFY_SLICE_OVERLAP_NATIVE=1`) | Sequential in one container (warm shared volumes) |
 | API vitest | Auto-runs when `api.yml` paths match (after ci-parity on laptops; overlapped on GHA) | Not auto-run — use `api-integration-tests-pre-push` when needed |
-| Typical wall clock | Path-aware jobs with max-2 local concurrency (~3–8 min) | ~sum(job times) (~8–15 min) |
+| Typical wall clock | Path-aware jobs with max-1 local concurrency by default (~sum of heavy jobs; use `--max-parallel 2` on 32 GiB+) | ~sum(job times) (~8–15 min) |
 
 ## Resource safety (laptops / juniors)
 
@@ -94,34 +94,34 @@ Unbounded `--parallel` + `--max-old-space-size=6144` × N containers has OOMed d
 
 | Cap | Default | Override |
 |-----|---------|----------|
-| Docker `--memory` / `--memory-swap` | `4096m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
+| Docker `--memory` / `--memory-swap` | `7168m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
 | Docker `--cpus` | `2` | `CI_PARITY_DOCKER_CPUS` or `docker.resources.cpus` |
-| Concurrent job containers | `2` | `--max-parallel <n>`, `CI_PARITY_MAX_PARALLEL`, or manifest `docker.resources.maxParallel` |
+| Concurrent job containers | `1` | `--max-parallel <n>`, `CI_PARITY_MAX_PARALLEL`, or manifest `docker.resources.maxParallel` |
 | `NODE_OPTIONS` heap | ≤ memory−512 MiB (manifest may request more; never raised above cgroup) | manifest `runtime.nodeOptions` |
 | Escape hatch | — | `CI_PARITY_NO_RESOURCE_LIMITS=1` (not for juniors) |
 
 Requires `@umbraculum/ci-parity` **≥ 1.0.13** (sibling toolset `dist/cli.js` or published pin). GHA runners use a higher profile automatically.
 
-**maxParallel precedence:** CLI `--max-parallel` → env `CI_PARITY_MAX_PARALLEL` → manifest `docker.resources.maxParallel` → laptop default `2` (or CI default `8` under `GITHUB_ACTIONS`/`CI`).
+**maxParallel precedence:** CLI `--max-parallel` → env `CI_PARITY_MAX_PARALLEL` → manifest `docker.resources.maxParallel` → laptop default `1` (or CI default `8` under `GITHUB_ACTIONS`/`CI`).
+
+### Why default concurrency is 1 (not 2)
+
+Measured on this monorepo: a single `lint` job (`npm ci` + `build:packages` + eslint) needs about **7 GiB** inside the cgroup. Two of those at once ≈ 14 GiB Docker pressure — fine on 32 GiB hosts, hostile to 16 GiB junior laptops once the IDE/browser are counted. So the **safe default is `maxParallel: 1` + `7168m`**; parallelism is an explicit opt-in.
 
 ### Stronger laptop (opt-in more parallelism)
 
-Default **2** concurrent job containers is the safe floor for juniors and typical 16 GiB laptops. If you know the machine has headroom (e.g. 32 GiB+ RAM, you are not also overlapping heavy native companions), raise concurrency for that one run — do **not** change the repo manifest default for everyone.
+If you know the machine has headroom (32 GiB+ RAM, not overlapping heavy native companions), raise concurrency for that one run — do **not** change the repo manifest default for everyone.
 
 ```bash
 # One-shot via CLI (forwarded through ci-parity-check.sh)
 ./scripts/ci-parity-check.sh --archive run --parallel --isolated-install \
-  --jobs lint,typecheck,docs-readmes --max-parallel 4
+  --jobs lint,typecheck,docs-readmes --max-parallel 2
 
 # Or via env (works for npm run verify:pre-push, which does not take --max-parallel itself)
-CI_PARITY_MAX_PARALLEL=4 npm run verify:pre-push
-
-# Optional: also give each container more RAM/CPU when raising concurrency
-CI_PARITY_MAX_PARALLEL=4 CI_PARITY_DOCKER_MEMORY=3g CI_PARITY_DOCKER_CPUS=3 \
-  npm run verify:pre-push
+CI_PARITY_MAX_PARALLEL=2 npm run verify:pre-push
 ```
 
-**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (e.g. default 2 × 4096 m ≈ 8 GiB Docker pressure). Prefer raising memory/cpus per container *or* concurrency — not both blindly. Do **not** lower `runtime.nodeOptions` below what eslint/`npm ci` need — the cgroup clamp is the safety valve; a 2048 MiB heap aborts lint on this monorepo. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
+**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (default 1 × 7168 m ≈ 7 GiB; opt-in 2 × 7168 m ≈ 14 GiB). Do **not** lower `runtime.nodeOptions` below what eslint/`npm ci` need — the cgroup clamp is the safety valve; a 2048 MiB heap aborts lint here. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
 
 ## Pre-push commands reference (contributors and agents)
 
@@ -135,7 +135,7 @@ CI_PARITY_MAX_PARALLEL=4 CI_PARITY_DOCKER_MEMORY=3g CI_PARITY_DOCKER_CPUS=3 \
 | Validate trigger map vs GHA workflow `paths:` | `npm run validate:gha-triggers` |
 | WIP iteration only (not push proof) | `./scripts/ci-parity-check.sh run` |
 | Low-level parallel ci-parity subset | `./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,docs-readmes` |
-| Same with more concurrent containers (strong laptop) | `… --max-parallel 4` or `CI_PARITY_MAX_PARALLEL=4 npm run verify:pre-push` |
+| Same with more concurrent containers (32 GiB+ laptop) | `… --max-parallel 2` or `CI_PARITY_MAX_PARALLEL=2 npm run verify:pre-push` |
 
 **Agents:** run T2-PR yourself before push — do not tell the contributor to run it. Skill: `path-aware-pre-push` (toolset). **T2 validate** always runs **`npm run check:lockfiles`** (forbidden `services/api/package-lock.json` + root lockfile sync in `node:20-slim`) before ci-parity jobs — see rule **`80-monorepo-lockfile-agent-gate`**. Human contributors use the same commands from repo root (host needs `git`, Docker, Node for the wrapper — jobs run in `node:20-slim`).
 
