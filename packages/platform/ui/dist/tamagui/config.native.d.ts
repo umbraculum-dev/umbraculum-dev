@@ -4,7 +4,16 @@ import * as tamagui from 'tamagui';
 import * as _tamagui_themes_v5 from '@tamagui/themes/v5';
 
 declare const config: tamagui.TamaguiInternalConfig<{
-    readonly radius: {
+    radius: {
+        xs: 2;
+        sm: 4;
+        md: 6;
+        lg: 8;
+        xl: 12;
+        "2xl": 16;
+        "3xl": 24;
+        "4xl": 32;
+        full: 9999;
         0: number;
         1: number;
         2: number;
@@ -19,7 +28,7 @@ declare const config: tamagui.TamaguiInternalConfig<{
         11: number;
         12: number;
     };
-    readonly zIndex: {
+    zIndex: {
         0: number;
         1: number;
         2: number;
@@ -27,7 +36,7 @@ declare const config: tamagui.TamaguiInternalConfig<{
         4: number;
         5: number;
     };
-    readonly space: {
+    space: {
         "-0-25": number;
         "-0-5": number;
         "-0-75": number;
@@ -84,7 +93,7 @@ declare const config: tamagui.TamaguiInternalConfig<{
         8: number;
         9: number;
     };
-    readonly size: {
+    size: {
         0: number;
         "0-25": number;
         "0-5": number;

@@ -27,8 +27,30 @@ module.exports = __toCommonJS(config_native_exports);
 var import_animations_react_native = require("@tamagui/animations-react-native");
 var import_v5 = require("@tamagui/config/v5");
 var import_tamagui = require("tamagui");
+
+// src/tamagui/radiusNamedAliases.ts
+var radiusNamedAliases = {
+  xs: 2,
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 12,
+  "2xl": 16,
+  "3xl": 24,
+  "4xl": 32,
+  full: 9999
+};
+
+// src/tamagui/config.native.ts
 var config = (0, import_tamagui.createTamagui)({
   ...import_v5.defaultConfig,
+  tokens: {
+    ...import_v5.defaultConfig.tokens,
+    radius: {
+      ...import_v5.defaultConfig.tokens.radius,
+      ...radiusNamedAliases
+    }
+  },
   animations: (0, import_animations_react_native.createAnimations)({
     quick: {
       damping: 20,

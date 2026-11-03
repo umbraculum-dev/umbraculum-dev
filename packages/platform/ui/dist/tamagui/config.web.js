@@ -1,9 +1,20 @@
+import {
+  radiusNamedAliases
+} from "../chunk-PRJ6FR2T.js";
+
 // src/tamagui/config.web.ts
 import { createAnimations } from "@tamagui/animations-css/extras";
 import { defaultConfig } from "@tamagui/config/v5";
 import { createTamagui } from "tamagui";
 var config = createTamagui({
   ...defaultConfig,
+  tokens: {
+    ...defaultConfig.tokens,
+    radius: {
+      ...defaultConfig.tokens.radius,
+      ...radiusNamedAliases
+    }
+  },
   animations: createAnimations({
     quick: "ease-out 150ms",
     medium: "ease-in 300ms",

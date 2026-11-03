@@ -2,8 +2,17 @@ import { createAnimations } from "@tamagui/animations-react-native";
 import { defaultConfig } from "@tamagui/config/v5";
 import { createTamagui } from "tamagui";
 
+import { radiusNamedAliases } from "./radiusNamedAliases";
+
 export const config = createTamagui({
   ...defaultConfig,
+  tokens: {
+    ...defaultConfig.tokens,
+    radius: {
+      ...defaultConfig.tokens.radius,
+      ...radiusNamedAliases,
+    },
+  },
   animations: createAnimations({
     quick: {
       damping: 20,
