@@ -43,7 +43,7 @@ export function WaterBoilAdjustmentSection(props: { model: WaterBoilScreenModel 
     <Accordion.Item value="adjustment">
       <Card gap="2" mt="2">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("adjustmentHeading")}</Heading>
               <Text opacity={0.7}>{openSections.includes("adjustment") ? "▾" : "▸"}</Text>

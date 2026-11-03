@@ -32,7 +32,7 @@ export function WaterProfileCreateForm(props: { model: Model }) {
     <Accordion.Item value="admin" mt="3">
       <View className="brew-panel" aria-labelledby="admin-profiles-heading">
         <Accordion.Header>
-          <Accordion.Trigger unstyled cursor="pointer">
+          <Accordion.Trigger cursor="pointer">
             <XStack alignItems="center" justifyContent="space-between" width="100%">
               <H2 id="admin-profiles-heading" mt={0}>
                 {t("adminAddTitle")}

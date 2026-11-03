@@ -29,7 +29,6 @@ export function RecipeEditFermentablesRowEditor({
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
             <Accordion.Trigger
               flex={1}
-              unstyled
               accessibilityRole="button"
               accessibilityLabel={`${idx + 1}. ${row.name || "(unnamed)"}`}
               accessibilityState={{ expanded: openFermentableIds.includes(`grist-${row.id}`) }}

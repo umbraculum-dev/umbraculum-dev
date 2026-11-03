@@ -22,7 +22,7 @@ export function WaterHubStatusSection(props: { model: NativeWaterHubScreenModel 
     <Accordion.Item value="status">
       <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("quickStatus")}</Heading>
               <Text opacity={0.7}>{openSections.includes("status") ? "▾" : "▸"}</Text>

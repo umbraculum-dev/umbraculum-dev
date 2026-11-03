@@ -33,7 +33,7 @@ export function WaterMashMashStepsSection(props: { model: WaterMashScreenModel }
     <Accordion.Item value="mashSteps">
       <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("mashStepsHeading")}</Heading>
               <Text opacity={0.7}>{openSections.includes("mashSteps") ? "▾" : "▸"}</Text>

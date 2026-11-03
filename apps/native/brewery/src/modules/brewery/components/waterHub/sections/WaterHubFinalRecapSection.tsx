@@ -13,7 +13,7 @@ export function WaterHubFinalRecapSection(props: { model: NativeWaterHubScreenMo
     <Accordion.Item value="finalRecap">
       <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("finalRecapTitle")}</Heading>
               <Text opacity={0.7}>{openSections.includes("finalRecap") ? "▾" : "▸"}</Text>

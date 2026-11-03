@@ -23,7 +23,7 @@ export function WaterProfileListSection(props: { model: Model }) {
     <Accordion.Item value="table">
       <View className="brew-panel" aria-labelledby="profiles-table-heading">
         <Accordion.Header>
-          <Accordion.Trigger unstyled cursor="pointer">
+          <Accordion.Trigger cursor="pointer">
             <XStack alignItems="center" justifyContent="space-between" width="100%">
               <H2 id="profiles-table-heading" mt={0}>
                 {t("viewAllTableTitle")}

@@ -21,7 +21,7 @@ export function WaterMashSaltsSection(props: { model: WaterMashScreenModel }) {
     <Accordion.Item value="salts">
       <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("saltAdditionsManualV0")}</Heading>
               <Text opacity={0.7}>{openSections.includes("salts") ? "▾" : "▸"}</Text>

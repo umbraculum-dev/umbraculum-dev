@@ -14,7 +14,7 @@ export function BrewAccordionHeader(props: {
 
   return (
     <Accordion.Header>
-      <Accordion.Trigger unstyled width="100%">
+      <Accordion.Trigger width="100%">
         <XStack justifyContent="space-between" alignItems="center" width="100%" gap="2">
           <H2 id={headingId} mt={0}>
             {title}

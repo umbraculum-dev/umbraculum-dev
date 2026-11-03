@@ -53,7 +53,6 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                           <Accordion.Header>
                             <Accordion.Trigger
                               width="100%"
-                              unstyled
                               accessibilityRole="button"
                               accessibilityLabel={`${idx + 1}. ${r.name || "(unnamed)"}`}
                               accessibilityState={{ expanded: openYeastIds.includes(`yeast-${r.id}`) }}

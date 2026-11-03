@@ -54,7 +54,7 @@ export function NavSheet({
   return (
     <>
       <Button
-        unstyled
+        variant="quiet"
         ai="center"
         px="2"
         py="1"
@@ -95,7 +95,7 @@ export function NavSheet({
         >
           <Sheet.Background background="var(--surface)" borderColor="var(--border)" borderWidth={1} borderTopLeftRadius="var(--radius)" borderTopRightRadius="var(--radius)" />
           <Button
-            unstyled
+            variant="quiet"
             position="absolute"
             top={8}
             right={8}

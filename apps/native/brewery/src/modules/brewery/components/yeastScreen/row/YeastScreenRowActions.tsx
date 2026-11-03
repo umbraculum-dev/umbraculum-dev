@@ -39,7 +39,7 @@ export function YeastScreenRowActions(props: {
       >
         <Accordion.Item value={`advanced-${r.id}`}>
           <Accordion.Header>
-            <Accordion.Trigger unstyled>
+            <Accordion.Trigger>
               <View
                 style={{
                   flexDirection: "row",
