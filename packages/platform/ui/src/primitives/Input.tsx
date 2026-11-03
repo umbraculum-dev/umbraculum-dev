@@ -14,7 +14,7 @@ export function Input(props: InputProps) {
   if (Platform.OS === "web") {
     return (
       <TamaguiInput
-        fontFamily={props.fontFamily ?? "$body"}
+        fontFamily={props.fontFamily ?? "body"}
         aria-label={accessibilityLabel}
         {...(rest as InputProps)}
       />
@@ -23,7 +23,7 @@ export function Input(props: InputProps) {
 
   return (
     <TamaguiInput
-      fontFamily={props.fontFamily ?? "$body"}
+      fontFamily={props.fontFamily ?? "body"}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
       {...(rest as InputProps)}

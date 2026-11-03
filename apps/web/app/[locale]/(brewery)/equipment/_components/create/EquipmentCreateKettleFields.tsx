@@ -36,9 +36,9 @@ export function EquipmentCreateKettleFields(props: {
   return (
     <fieldset className="brew-fieldset">
       <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-kettle-vol">
               {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -48,18 +48,18 @@ export function EquipmentCreateKettleFields(props: {
               inputMode="decimal"
               value={createKettleVolumeLiters}
               onChangeText={setCreateKettleVolumeLiters}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-kettle-losses">
               {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -69,18 +69,18 @@ export function EquipmentCreateKettleFields(props: {
               inputMode="decimal"
               value={createKettleLossesLiters}
               onChangeText={setCreateKettleLossesLiters}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-evap">
               {t("kettleBoilEvaporationRatePercentPerHourLabel")}
             </RecipeEditFieldLabel>
@@ -90,18 +90,18 @@ export function EquipmentCreateKettleFields(props: {
               inputMode="decimal"
               value={createKettleBoilEvaporationRatePercentPerHour}
               onChangeText={setCreateKettleBoilEvaporationRatePercentPerHour}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-shrink">
               {t("kettleCoolingShrinkagePercentLabel")}
             </RecipeEditFieldLabel>
@@ -111,18 +111,18 @@ export function EquipmentCreateKettleFields(props: {
               inputMode="decimal"
               value={createKettleCoolingShrinkagePercent}
               onChangeText={setCreateKettleCoolingShrinkagePercent}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-hops-abs">
               {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
             </RecipeEditFieldLabel>
@@ -132,13 +132,13 @@ export function EquipmentCreateKettleFields(props: {
               inputMode="decimal"
               value={createKettleHopsAbsorptionLiters}
               onChangeText={setCreateKettleHopsAbsorptionLiters}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

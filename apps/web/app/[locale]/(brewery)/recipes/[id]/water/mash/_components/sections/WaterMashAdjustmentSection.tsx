@@ -21,7 +21,7 @@ export function WaterMashAdjustmentSection({ model }: { model: WaterMashPageMode
           open={openMashSections.includes("adjustment")}
         />
         <Accordion.Content>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
             Choose source/target/dilution profiles and volumes to compute a mixed starting water profile. Manage
             profiles on <Link href="/water-profiles">Water profiles</Link>.
           </SizableText>
@@ -29,13 +29,13 @@ export function WaterMashAdjustmentSection({ model }: { model: WaterMashPageMode
           <WaterMashProfilePickersBlock model={model} />
           <WaterMashAdjustmentActionsBlock model={model} />
 
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3" mb={0}>
             {t("adjustmentHint")}
           </SizableText>
 
           <WaterMashMixedIonsBlock model={model} />
 
-          {profilesError ? <ErrorBox mt="$3">{profilesError}</ErrorBox> : null}
+          {profilesError ? <ErrorBox mt="3">{profilesError}</ErrorBox> : null}
         </Accordion.Content>
       </View>
     </Accordion.Item>

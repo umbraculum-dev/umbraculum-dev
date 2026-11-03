@@ -21,7 +21,7 @@ export function RecipeEditHopsSection({ model }: { model: RecipeEditPageModel })
             open={openSections['hops']}
             onOpenChange={(open) => setSectionOpen("hops", open)}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {t("hopsHelp")}
             </SizableText>
 

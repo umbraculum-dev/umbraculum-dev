@@ -31,10 +31,10 @@ function Card(props) {
     YStack,
     {
       borderWidth: props.borderWidth ?? 1,
-      borderColor: props.borderColor ?? "$borderColor",
-      borderRadius: props.borderRadius ?? "$4",
-      backgroundColor: props.backgroundColor ?? "$background",
-      padding: props.padding ?? "$3",
+      borderColor: props.borderColor ?? "borderColor",
+      borderRadius: props.borderRadius ?? "4",
+      backgroundColor: props.backgroundColor ?? "background",
+      padding: props.padding ?? "3",
       ...props
     }
   );
@@ -46,16 +46,16 @@ function AdSlotCard(props) {
   const isNative = Platform.OS === "ios" || Platform.OS === "android";
   const webAsideProps = { as: "aside", "aria-label": props.ariaLabel };
   const a11yProps = isNative ? { accessibilityLabel: props.ariaLabel } : webAsideProps;
-  return /* @__PURE__ */ jsx2(YStack2, { marginVertical: 12, gap: "$1.5", children: /* @__PURE__ */ jsx2(
+  return /* @__PURE__ */ jsx2(YStack2, { marginVertical: 12, gap: "1-5", children: /* @__PURE__ */ jsx2(
     Card,
     {
       ...a11yProps,
-      backgroundColor: "$background",
+      backgroundColor: "background",
       borderWidth: 1,
-      borderColor: "$borderColor",
-      borderRadius: "$2",
+      borderColor: "borderColor",
+      borderRadius: "2",
       padding: 10,
-      children: /* @__PURE__ */ jsxs(YStack2, { gap: "$1.5", children: [
+      children: /* @__PURE__ */ jsxs(YStack2, { gap: "1-5", children: [
         /* @__PURE__ */ jsx2(
           Card,
           {
@@ -63,8 +63,8 @@ function AdSlotCard(props) {
             width: "100%",
             maxWidth: "100%",
             overflow: "hidden",
-            borderRadius: "$2",
-            backgroundColor: "$background",
+            borderRadius: "2",
+            backgroundColor: "background",
             padding: 0,
             children: props.media
           }
@@ -87,7 +87,7 @@ function Button(props) {
     return /* @__PURE__ */ jsx3(
       TamaguiButton,
       {
-        fontFamily: props.fontFamily ?? "$body",
+        fontFamily: props.fontFamily ?? "body",
         "aria-label": accessibilityLabel,
         ...rest
       }
@@ -96,7 +96,7 @@ function Button(props) {
   return /* @__PURE__ */ jsx3(
     TamaguiButton,
     {
-      fontFamily: props.fontFamily ?? "$body",
+      fontFamily: props.fontFamily ?? "body",
       accessibilityLabel,
       accessibilityRole,
       ...rest
@@ -114,15 +114,15 @@ import "react";
 import { SizableText } from "tamagui";
 import { jsx as jsx4 } from "react/jsx-runtime";
 function Text(props) {
-  return /* @__PURE__ */ jsx4(SizableText, { fontFamily: props.fontFamily ?? "$body", ...props });
+  return /* @__PURE__ */ jsx4(SizableText, { fontFamily: props.fontFamily ?? "body", ...props });
 }
 function Heading({ size, fontWeight, ...props }) {
   return /* @__PURE__ */ jsx4(
     SizableText,
     {
-      fontFamily: props.fontFamily ?? "$body",
+      fontFamily: props.fontFamily ?? "body",
       fontWeight: fontWeight ?? "700",
-      size: size ?? "$8",
+      size: size ?? "8",
       ...props
     }
   );
@@ -146,13 +146,13 @@ function Collapsible(props) {
       children
     ] });
   }
-  return /* @__PURE__ */ jsxs2(YStack3, { gap: "$2", children: [
+  return /* @__PURE__ */ jsxs2(YStack3, { gap: "2", children: [
     /* @__PURE__ */ jsx5(
       Button,
       {
         onPress: () => onExpandedChange(!expanded),
-        chromeless: true,
-        size: "$4",
+        variant: "quiet",
+        size: "lg",
         accessibilityRole: "button",
         accessibilityLabel: accessibilityLabel ?? title,
         accessibilityState: { expanded },
@@ -174,7 +174,7 @@ function Input(props) {
     return /* @__PURE__ */ jsx6(
       TamaguiInput,
       {
-        fontFamily: props.fontFamily ?? "$body",
+        fontFamily: props.fontFamily ?? "body",
         "aria-label": accessibilityLabel,
         ...rest
       }
@@ -183,7 +183,7 @@ function Input(props) {
   return /* @__PURE__ */ jsx6(
     TamaguiInput,
     {
-      fontFamily: props.fontFamily ?? "$body",
+      fontFamily: props.fontFamily ?? "body",
       accessibilityLabel,
       accessibilityRole,
       ...rest
@@ -201,13 +201,13 @@ function ModeFieldset(props) {
     Card,
     {
       borderWidth: 1,
-      borderColor: "$borderColor",
-      backgroundColor: "$background",
-      padding: "$3",
-      marginBottom: "$3",
-      gap: "$2",
+      borderColor: "borderColor",
+      backgroundColor: "background",
+      padding: "3",
+      marginBottom: "3",
+      gap: "2",
       children: [
-        /* @__PURE__ */ jsx7(Text, { fontSize: 12, opacity: 0.8, marginBottom: "$1", children: legend }),
+        /* @__PURE__ */ jsx7(Text, { fontSize: 12, opacity: 0.8, marginBottom: "1", children: legend }),
         /* @__PURE__ */ jsx7(
           RadioGroup,
           {
@@ -215,24 +215,23 @@ function ModeFieldset(props) {
             value,
             onValueChange: (v) => onChange(v),
             "aria-label": legend,
-            children: /* @__PURE__ */ jsx7(YStack4, { gap: "$2", children: options.map((o) => {
+            children: /* @__PURE__ */ jsx7(YStack4, { gap: "2", children: options.map((o) => {
               const id = `${name}-${o.value}`;
-              return /* @__PURE__ */ jsxs3(XStack, { gap: "$2", alignItems: "center", children: [
+              return /* @__PURE__ */ jsxs3(XStack, { gap: "2", alignItems: "center", children: [
                 /* @__PURE__ */ jsx7(
                   RadioGroup.Item,
                   {
                     id,
                     value: o.value,
-                    size: "$3",
-                    borderColor: "$borderColor",
+                    size: "md",
+                    borderColor: "border-color",
                     children: /* @__PURE__ */ jsx7(
                       RadioGroup.Indicator,
                       {
-                        unstyled: true,
                         width: 10,
                         height: 10,
                         borderRadius: 9999,
-                        backgroundColor: "$color8"
+                        backgroundColor: "color8"
                       }
                     )
                   }
@@ -261,9 +260,9 @@ function ReadOnlyFieldValue({ children }) {
     YStack5,
     {
       "data-readonly-field-value": true,
-      padding: "$2",
+      padding: "2",
       backgroundColor: isWeb ? "var(--field-readonly-bg)" : FIELD_READONLY_BG,
-      borderRadius: "$2",
+      borderRadius: "2",
       borderWidth: 1,
       borderColor: isWeb ? "var(--field-readonly-border)" : FIELD_READONLY_BORDER,
       userSelect: "none",
@@ -273,13 +272,13 @@ function ReadOnlyFieldValue({ children }) {
   );
 }
 function ReadOnlyField({ label, value, minWidth, flex }) {
-  return /* @__PURE__ */ jsxs4(YStack5, { gap: "$1", minWidth, flex, children: [
+  return /* @__PURE__ */ jsxs4(YStack5, { gap: "1", minWidth, flex, children: [
     /* @__PURE__ */ jsx8(ReadOnlyFieldLabel, { children: label }),
     /* @__PURE__ */ jsx8(ReadOnlyFieldValue, { children: value })
   ] });
 }
 function ReadOnlyFieldRow({ children }) {
-  return /* @__PURE__ */ jsx8(XStack2, { gap: "$3", flexWrap: "wrap", alignItems: "flex-end", children });
+  return /* @__PURE__ */ jsx8(XStack2, { gap: "3", flexWrap: "wrap", alignItems: "flex-end", children });
 }
 
 // src/primitives/Screen.tsx
@@ -293,7 +292,7 @@ function Screen({ flex, style, ...props }) {
     YStack6,
     {
       flex: flex ?? 1,
-      backgroundColor: props.backgroundColor ?? "$background",
+      backgroundColor: props.backgroundColor ?? "background",
       style: [
         {
           paddingTop: 16 + topInset,
@@ -364,10 +363,10 @@ function SelectField({
         Button,
         {
           onPress: () => setOpen(true),
-          size: "$3",
-          background: "$background",
+          size: "md",
+          background: "background",
           borderWidth: 1,
-          borderColor: "$borderColor",
+          borderColor: "borderColor",
           disabled,
           accessibilityLabel: ariaLabel,
           children: /* @__PURE__ */ jsx10(Text, { fontSize: 12, children: (renderValue ? renderValue(value) : selectedLabel) || placeholder || "\u2014" })
@@ -378,7 +377,7 @@ function SelectField({
         {
           style: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "center", padding: 16 },
           onPress: () => setOpen(false),
-          children: /* @__PURE__ */ jsx10(Pressable, { onPress: () => null, children: /* @__PURE__ */ jsxs5(Card, { gap: "$2", background: "$background", borderWidth: 1, borderColor: "$borderColor", padding: "$3", children: [
+          children: /* @__PURE__ */ jsx10(Pressable, { onPress: () => null, children: /* @__PURE__ */ jsxs5(Card, { gap: "2", background: "background", borderWidth: 1, borderColor: "borderColor", padding: "3", children: [
             ariaLabel ? /* @__PURE__ */ jsx10(Text, { fontSize: 16, fontWeight: "700", children: ariaLabel }) : null,
             /* @__PURE__ */ jsx10(ScrollView, { style: { maxHeight: 320 }, children: /* @__PURE__ */ jsx10(View, { style: { gap: 8 }, children: options.map((opt) => /* @__PURE__ */ jsx10(
               Button,
@@ -387,15 +386,15 @@ function SelectField({
                   onValueChange(opt.value);
                   setOpen(false);
                 },
-                size: "$3",
-                background: opt.value === value ? "$color4" : "$background",
+                size: "md",
+                background: opt.value === value ? "color4" : "background",
                 borderWidth: 1,
-                borderColor: "$borderColor",
+                borderColor: "borderColor",
                 children: /* @__PURE__ */ jsx10(Text, { fontSize: 12, children: opt.label })
               },
               opt.value
             )) }) }),
-            closeLabel ? /* @__PURE__ */ jsx10(Button, { onPress: () => setOpen(false), size: "$3", chromeless: true, children: /* @__PURE__ */ jsx10(Text, { children: closeLabel }) }) : null
+            closeLabel ? /* @__PURE__ */ jsx10(Button, { onPress: () => setOpen(false), size: "md", variant: "quiet", children: /* @__PURE__ */ jsx10(Text, { children: closeLabel }) }) : null
           ] }) })
         }
       ) })
@@ -694,28 +693,29 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
   return /* @__PURE__ */ jsxs6(
     YStack7,
     {
-      gap: "$4",
-      ...{ "aria-labelledby": "ai-chat-title", role: "main" },
+      gap: "4",
+      "aria-labelledby": "ai-chat-title",
+      role: "main",
       children: [
-        /* @__PURE__ */ jsxs6(YStack7, { gap: "$2", children: [
+        /* @__PURE__ */ jsxs6(YStack7, { gap: "2", children: [
           /* @__PURE__ */ jsx12(H2, { id: "ai-chat-title", children: t("title") }),
-          /* @__PURE__ */ jsx12(SizableText2, { size: "$2", theme: "alt2", children: t("subtitle") })
+          /* @__PURE__ */ jsx12(SizableText2, { size: "2", theme: "alt2", children: t("subtitle") })
         ] }),
         errorText ? /* @__PURE__ */ jsxs6(
           View2,
           {
-            backgroundColor: "$yellow3",
-            borderColor: "$yellow8",
+            backgroundColor: "yellow3",
+            borderColor: "yellow8",
             borderWidth: 1,
-            padding: "$3",
-            borderRadius: "$3",
-            ...{ role: "alert" },
+            padding: "3",
+            borderRadius: "3",
+            role: "alert",
             children: [
               /* @__PURE__ */ jsx12(SizableText2, { children: errorText }),
-              isSubscriptionError && onOpenUpgrade ? /* @__PURE__ */ jsx12(XStack3, { marginTop: "$2", children: /* @__PURE__ */ jsx12(
+              isSubscriptionError && onOpenUpgrade ? /* @__PURE__ */ jsx12(XStack3, { marginTop: "2", children: /* @__PURE__ */ jsx12(
                 Button,
                 {
-                  size: "$2",
+                  size: "sm",
                   onPress: onOpenUpgrade,
                   accessibilityLabel: t("errors.subscriptionRequiredCta"),
                   children: t("errors.subscriptionRequiredCta")
@@ -727,33 +727,33 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
         /* @__PURE__ */ jsx12(
           YStack7,
           {
-            gap: "$3",
+            gap: "3",
             minHeight: 300,
-            padding: "$3",
-            backgroundColor: "$background",
-            borderRadius: "$3",
+            padding: "3",
+            backgroundColor: "background",
+            borderRadius: "3",
             borderWidth: 1,
-            borderColor: "$borderColor",
-            ...{ "aria-live": "polite" },
-            children: messages.length === 0 ? /* @__PURE__ */ jsx12(SizableText2, { theme: "alt2", children: t("messages.empty") }) : messages.map((m) => /* @__PURE__ */ jsxs6(YStack7, { gap: "$1", children: [
+            borderColor: "border-color",
+            "aria-live": "polite",
+            children: messages.length === 0 ? /* @__PURE__ */ jsx12(SizableText2, { theme: "alt2", children: t("messages.empty") }) : messages.map((m) => /* @__PURE__ */ jsxs6(YStack7, { gap: "1", children: [
               /* @__PURE__ */ jsx12(SizableText2, { fontWeight: "600", children: m.role === "user" ? t("messages.you") : t("messages.assistant") }),
               /* @__PURE__ */ jsx12(SizableText2, { children: m.text || (pending && m.role === "assistant" ? t("composer.thinking") : "") }),
-              m.turn?.toolCalls.map((tc, i) => /* @__PURE__ */ jsx12(SizableText2, { size: "$1", theme: "alt2", children: tc.errored ? t("messages.toolError", { message: tc.name }) : t("messages.toolCall", { tool: tc.name }) }, `${m.id}-tc-${i}`)),
+              m.turn?.toolCalls.map((tc, i) => /* @__PURE__ */ jsx12(SizableText2, { size: "1", theme: "alt2", children: tc.errored ? t("messages.toolError", { message: tc.name }) : t("messages.toolCall", { tool: tc.name }) }, `${m.id}-tc-${i}`)),
               m.turn?.proposals.map((p) => /* @__PURE__ */ jsxs6(
                 YStack7,
                 {
-                  gap: "$2",
-                  padding: "$2",
+                  gap: "2",
+                  padding: "2",
                   borderWidth: 1,
-                  borderColor: "$borderColor",
-                  borderRadius: "$2",
+                  borderColor: "border-color",
+                  borderRadius: "2",
                   children: [
-                    /* @__PURE__ */ jsx12(SizableText2, { size: "$2", children: p.summary }),
-                    p.status === "pending" ? /* @__PURE__ */ jsxs6(XStack3, { gap: "$2", children: [
+                    /* @__PURE__ */ jsx12(SizableText2, { size: "2", children: p.summary }),
+                    p.status === "pending" ? /* @__PURE__ */ jsxs6(XStack3, { gap: "2", children: [
                       /* @__PURE__ */ jsx12(
                         Button,
                         {
-                          size: "$2",
+                          size: "sm",
                           onPress: () => void chat.applyProposal(p.proposalId),
                           accessibilityLabel: t("proposals.apply"),
                           children: t("proposals.apply")
@@ -762,13 +762,13 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
                       /* @__PURE__ */ jsx12(
                         Button,
                         {
-                          size: "$2",
+                          size: "sm",
                           onPress: () => void chat.rejectProposal(p.proposalId),
                           accessibilityLabel: t("proposals.dismiss"),
                           children: t("proposals.dismiss")
                         }
                       )
-                    ] }) : /* @__PURE__ */ jsx12(SizableText2, { size: "$1", theme: "alt2", children: p.status === "applied" ? t("proposals.applied") : t("proposals.dismissed") })
+                    ] }) : /* @__PURE__ */ jsx12(SizableText2, { size: "1", theme: "alt2", children: p.status === "applied" ? t("proposals.applied") : t("proposals.dismissed") })
                   ]
                 },
                 `${m.id}-prop-${p.proposalId}`
@@ -776,7 +776,7 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
             ] }, m.id))
           }
         ),
-        /* @__PURE__ */ jsxs6(XStack3, { gap: "$2", alignItems: "center", children: [
+        /* @__PURE__ */ jsxs6(XStack3, { gap: "2", alignItems: "center", children: [
           /* @__PURE__ */ jsx12(View2, { flex: 1, children: /* @__PURE__ */ jsx12(
             Input,
             {

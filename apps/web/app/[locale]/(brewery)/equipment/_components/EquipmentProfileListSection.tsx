@@ -20,7 +20,7 @@ export function EquipmentProfileListSection(props: { model: Model }) {
   } = props.model;
 
   return (
-    <View mt="$3">
+    <View mt="3">
       <Accordion
         type="single"
         collapsible
@@ -33,7 +33,7 @@ export function EquipmentProfileListSection(props: { model: Model }) {
           title={t("listTitle")}
           open={openSections.includes("list")}
         >
-          <View mt="$3">
+          <View mt="3">
             {profiles.length ? (
               <View className="brew-table-wrap">
                 <table className="brew-table">
@@ -53,24 +53,24 @@ export function EquipmentProfileListSection(props: { model: Model }) {
                         <td>{p.equipment?.mash?.mashEfficiencyPercent == null ? "—" : p.equipment.mash.mashEfficiencyPercent}</td>
                         {canWrite ? (
                           <td>
-                            <XStack gap="$2" display="inline-flex">
+                            <XStack gap="2" display="inline-flex">
                               <Button
-                                size="$3"
-                                onPress={() => beginEdit(p)}
+                                size="md"
                                 bg="var(--surface-2)"
                                 borderWidth={1}
                                 borderColor="var(--border)"
                                 color="var(--text)"
+                                onPress={() => beginEdit(p)}
                               >
                                 {t("edit")}
                               </Button>
                               <Button
-                                size="$3"
-                                onPress={() => void onDelete(p.id)}
+                                size="md"
                                 bg="var(--surface-2)"
                                 borderWidth={1}
                                 borderColor="var(--border)"
                                 color="var(--text)"
+                                onPress={() => void onDelete(p.id)}
                               >
                                 {t("delete")}
                               </Button>
@@ -83,7 +83,7 @@ export function EquipmentProfileListSection(props: { model: Model }) {
                 </table>
               </View>
             ) : (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
                 {t("noProfiles")}
               </SizableText>
             )}

@@ -13,16 +13,16 @@ export function YeastScreenRowPitchManualCount(
 
   return (
     <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderColor: "#2a2f3a" }}>
-      <Text fontSize={12} fontWeight="600" mb="$1">
+      <Text fontSize={12} fontWeight="600" mb="1">
         {t("yeastManualCountSectionTitle")}
       </Text>
-      <Text fontSize={12} color="$gray11" mb="$1">
+      <Text fontSize={12} color="gray11" mb="1">
         {t("yeastManualCountFirstNote")}
       </Text>
-      <Text fontSize={12} color="$gray11" style={{ textDecorationLine: "underline" }} mb="$1">
+      <Text fontSize={12} color="gray11" style={{ textDecorationLine: "underline" }} mb="1">
         {t("yeastManualCountDisclaimer")}
       </Text>
-      <Text fontSize={12} color="$gray11" fontWeight="600" mb="$2">
+      <Text fontSize={12} color="gray11" fontWeight="600" mb="2">
         {t("yeastManualCountDirectlyInfluencesAmount")}
       </Text>
       <View style={{ gap: 8 }}>
@@ -58,7 +58,7 @@ export function YeastScreenRowPitchManualCount(
           />
         </View>
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             {t("yeastManualCountAliveCellsLabel")}
           </Text>
           <Input
@@ -83,14 +83,14 @@ export function YeastScreenRowPitchManualCount(
             }}
             placeholder="—"
             keyboardType="number-pad"
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
           />
         </View>
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             {t("yeastManualCountTotalCellsLabel")}
           </Text>
           <Input
@@ -115,15 +115,15 @@ export function YeastScreenRowPitchManualCount(
             }}
             placeholder="—"
             keyboardType="number-pad"
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
           />
         </View>
         {r.manualCellCount && r.manualCellCount.totalCells > 0 && Number.isFinite(r.manualCellCount.aliveCells) ? (
           <View>
-            <Text fontSize={11} opacity={0.8} mb="$1">
+            <Text fontSize={11} opacity={0.8} mb="1">
               {t("yeastManualCountViabilityLabel")}
             </Text>
             <ReadOnlyField

@@ -28,22 +28,22 @@ export function WaterProfileListSection(props: { model: Model }) {
               <H2 id="profiles-table-heading" mt={0}>
                 {t("viewAllTableTitle")}
               </H2>
-              <SizableText size="$2" opacity={0.7}>
+              <SizableText size="2" opacity={0.7}>
                 {openSections.includes("table") ? "▾" : "▸"}
               </SizableText>
             </XStack>
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" role="status" aria-live="polite">
             {profiles ? `${allProfiles.length} profiles loaded.` : "Not loaded yet."}
           </SizableText>
 
           {error ? (
-            <ErrorBox mt="$3">{error}</ErrorBox>
+            <ErrorBox mt="3">{error}</ErrorBox>
           ) : null}
 
-          <View className="brew-table-wrap" mt="$3">
+          <View className="brew-table-wrap" mt="3">
             <table className="brew-table">
               <thead>
                 <tr>
@@ -65,17 +65,17 @@ export function WaterProfileListSection(props: { model: Model }) {
                   <tr key={p.id} className={idx % 2 === 1 ? "brew-table-row-alt" : undefined}>
                     <td>{p.name}</td>
                     <td>
-                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                         {p.scope}/{p.type}
                       </SizableText>
                     </td>
                     <td>
-                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                         {p.verificationStatus}
                       </SizableText>
                     </td>
                     <td align="right">
-                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                         {p.ph == null ? "—" : p.ph.toFixed(2)}
                       </SizableText>
                     </td>
@@ -87,12 +87,12 @@ export function WaterProfileListSection(props: { model: Model }) {
                     <td align="right">{p.bicarbonate}</td>
                     <td>
                       {admin && p.scope !== "system" ? (
-                        <XStack gap="$2" alignItems="center">
-                          <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onToggleVerify(p)}>
+                        <XStack gap="2" alignItems="center">
+                          <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onToggleVerify(p)}>
                             {p.verificationStatus === "verified" ? "Mark unverified" : "Mark verified"}
                           </Button>
                           <Button
-                            size="$3"
+                            size="md"
                             bg="var(--surface-2)"
                             borderWidth={1}
                             borderColor="var(--border)"
@@ -104,7 +104,7 @@ export function WaterProfileListSection(props: { model: Model }) {
                           </Button>
                         </XStack>
                       ) : (
-                        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                           —
                         </SizableText>
                       )}
@@ -116,7 +116,7 @@ export function WaterProfileListSection(props: { model: Model }) {
           </View>
 
           {!admin ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb={0}>
               Only <code>owner</code> and <code>brewery_admin</code> can add/verify profiles.
             </SizableText>
           ) : null}

@@ -43,8 +43,8 @@ export function LoginScreen() {
       <AdSlot placement="global_top" />
       <Heading fontSize={28}>{t("loginTitle")}</Heading>
 
-      <YStack gap="$3" style={{ width: "100%", maxWidth: 420 }}>
-        <YStack gap="$1.5">
+      <YStack gap="3" style={{ width: "100%", maxWidth: 420 }}>
+        <YStack gap="1-5">
           <Text fontSize={14}>{t("emailLabel")}</Text>
           <Input
             value={email}
@@ -57,7 +57,7 @@ export function LoginScreen() {
           />
         </YStack>
 
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <Text fontSize={14}>{t("passwordLabel")}</Text>
           <Input
             value={password}

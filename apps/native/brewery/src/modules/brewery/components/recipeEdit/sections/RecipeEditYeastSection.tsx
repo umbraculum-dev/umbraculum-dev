@@ -24,7 +24,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
 
   return (
           <Accordion.Item value="yeast">
-            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.yeast")}>
+            <Card gap="2" mt="3" bg={SURFACE_BACKGROUND} aria-label={t("sections.yeast")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -49,7 +49,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                   >
                     {yeastRows.map((r, idx) => (
                       <Accordion.Item key={r.id} value={`yeast-${r.id}`}>
-                        <Card gap="$2" mb="$2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
+                        <Card gap="2" mb="2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="borderColor" p="3">
                           <Accordion.Header>
                             <Accordion.Trigger
                               width="100%"
@@ -72,13 +72,13 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                             <View style={{ gap: 8, marginTop: 12 }}>
                         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                           <View style={{ minWidth: 140, flexGrow: 1 }}>
-                            <Text fontSize={11} opacity={0.8} mb="$1">
+                            <Text fontSize={11} opacity={0.8} mb="1">
                               {t("yeastLabLabel")}
                             </Text>
                             <ReadOnlyField value={r.lab ?? ""} />
                           </View>
                           <View style={{ minWidth: 140, flexGrow: 1 }}>
-                            <Text fontSize={11} opacity={0.8} mb="$1">
+                            <Text fontSize={11} opacity={0.8} mb="1">
                               {t("yeastProductIdLabel")}
                             </Text>
                             <ReadOnlyField value={r.productId ?? ""} />
@@ -86,7 +86,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                         </View>
                         <View style={{ flexDirection: "row", gap: 8 }}>
                           <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
-                            <Text fontSize={11} opacity={0.8} mb="$1" style={{ textAlign: "center" }}>
+                            <Text fontSize={11} opacity={0.8} mb="1" style={{ textAlign: "center" }}>
                               {t("yeastAttenMinLabel")}
                             </Text>
                             <ReadOnlyField
@@ -99,7 +99,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                             />
                           </View>
                           <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
-                            <Text fontSize={11} opacity={0.8} mb="$1" style={{ textAlign: "center" }}>
+                            <Text fontSize={11} opacity={0.8} mb="1" style={{ textAlign: "center" }}>
                               {t("yeastAttenMaxLabel")}
                             </Text>
                             <ReadOnlyField
@@ -113,13 +113,13 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                           </View>
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
+                          <Text fontSize={11} opacity={0.8} mb="1">
                             {tRecipes("analysis.customAttenuationPercentLabel")}
                           </Text>
                           <ReadOnlyField value={yeastAttenuationOverrides[r.id] ?? ""} />
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
+                          <Text fontSize={11} opacity={0.8} mb="1">
                             {t("yeastFormatLabel")}
                           </Text>
                           <ReadOnlyField
@@ -133,7 +133,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                           />
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
+                          <Text fontSize={11} opacity={0.8} mb="1">
                             {t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : tUnits("L") })}
                           </Text>
                           <ReadOnlyField
@@ -145,7 +145,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                           />
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
+                          <Text fontSize={11} opacity={0.8} mb="1">
                             {t("yeastFermentationTempLabel", { unit: tUnits("C") })}
                           </Text>
                           <ReadOnlyField
@@ -157,7 +157,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                           />
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
+                          <Text fontSize={11} opacity={0.8} mb="1">
                             {t("yeastDiacetylRestLabel")}
                           </Text>
                           <ReadOnlyField
@@ -171,7 +171,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                           />
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
+                          <Text fontSize={11} opacity={0.8} mb="1">
                             {t("yeastOxygenationLabel")}
                           </Text>
                           <ReadOnlyField
@@ -192,12 +192,12 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditScreenModel
                   </Accordion>
                   <Button
                     onPress={() => navigation.navigate("RecipeYeast", { recipeId })}
-                    size="$3"
-                    mt="$2"
+                    size="md"
+                    mt="2"
                     width="100%"
-                    background="$background"
+                    background="background"
                     borderWidth={1}
-                    borderColor="$borderColor"
+                    borderColor="borderColor"
                     accessibilityRole="button"
                     accessibilityLabel={t("yeastEditInYeastPage")}
                   >

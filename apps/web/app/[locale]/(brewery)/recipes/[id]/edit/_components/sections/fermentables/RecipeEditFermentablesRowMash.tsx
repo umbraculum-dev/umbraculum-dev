@@ -22,14 +22,14 @@ export function RecipeEditFermentablesRowMash({
     <View flexBasis="100%" w="100%">
       <details>
         <RecipeEditSummary>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             Mash pH model (v1) – Advanced users
           </SizableText>
         </RecipeEditSummary>
-        <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
+        <XStack gap="3" flexWrap="wrap" items="flex-end" mt="2">
           {isRoastedLike(row) ? (
             <>
-              <YStack gap="$1" w={220} maxW="100%">
+              <YStack gap="1" w={220} maxW="100%">
                 <RecipeEditFieldLabel>Dehusked/de-bittered</RecipeEditFieldLabel>
                 <RecipeEditReadOnlyValue>
                   {typeof row.mashRoastDehuskedOverride === "boolean"
@@ -43,7 +43,7 @@ export function RecipeEditFermentablesRowMash({
                       : ""}
                 </RecipeEditReadOnlyValue>
               </YStack>
-              <YStack gap="$1" w={260} maxW="100%">
+              <YStack gap="1" w={260} maxW="100%">
                 <RecipeEditFieldLabel htmlFor={`grist-roast-dehusked-override-${row.id}`}>
                   Override
                 </RecipeEditFieldLabel>
@@ -82,13 +82,13 @@ export function RecipeEditFermentablesRowMash({
                   width="full"
                 />
               </YStack>
-              <YStack gap="$1" w={200} maxW="100%">
+              <YStack gap="1" w={200} maxW="100%">
                 <RecipeEditFieldLabel>Dehusked source</RecipeEditFieldLabel>
                 <RecipeEditReadOnlyValue>{row.mashRoastDehuskedSource ?? "unknown"}</RecipeEditReadOnlyValue>
               </YStack>
             </>
           ) : null}
-          <YStack gap="$1" w={240} maxW="100%">
+          <YStack gap="1" w={240} maxW="100%">
             <RecipeEditFieldLabel htmlFor={`grist-mash-di-ph-${row.id}`}>
               DI mash pH (room temp)
             </RecipeEditFieldLabel>
@@ -96,22 +96,22 @@ export function RecipeEditFermentablesRowMash({
               id={`grist-mash-di-ph-${row.id}`}
               value={row.mashDiPh ?? ""}
               onChangeText={(text) =>
-                updateGristRow(row.id, {
-                  mashDiPh: text === "" ? null : Number(text),
-                  mashPhModelSource: "override",
-                })
-              }
+                            updateGristRow(row.id, {
+                              mashDiPh: text === "" ? null : Number(text),
+                              mashPhModelSource: "override",
+                            })
+                          }
               keyboardType="decimal-pad"
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
-          <YStack gap="$1" w={280} maxW="100%">
+          <YStack gap="1" w={280} maxW="100%">
             <RecipeEditFieldLabel htmlFor={`grist-mash-ta-${row.id}`}>
               Titratable acidity to pH 5.7 (mEq/kg)
             </RecipeEditFieldLabel>
@@ -119,22 +119,22 @@ export function RecipeEditFermentablesRowMash({
               id={`grist-mash-ta-${row.id}`}
               value={row.mashTaToPh57_mEqPerKg ?? ""}
               onChangeText={(text) =>
-                updateGristRow(row.id, {
-                  mashTaToPh57_mEqPerKg: text === "" ? null : Number(text),
-                  mashPhModelSource: "override",
-                })
-              }
+                            updateGristRow(row.id, {
+                              mashTaToPh57_mEqPerKg: text === "" ? null : Number(text),
+                              mashPhModelSource: "override",
+                            })
+                          }
               keyboardType="decimal-pad"
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
-          <YStack gap="$1" w={200} maxW="100%">
+          <YStack gap="1" w={200} maxW="100%">
             <RecipeEditFieldLabel>Source</RecipeEditFieldLabel>
             <RecipeEditReadOnlyValue>{row.mashPhModelSource ?? "unknown"}</RecipeEditReadOnlyValue>
           </YStack>

@@ -30,7 +30,7 @@ function SectionsNavContent({
 }) {
   return (
     <>
-      <YStack gap="$1">
+      <YStack gap="1">
         {sections.map((s) => (
           <a
             key={s.id}
@@ -40,19 +40,17 @@ function SectionsNavContent({
             <XStack
               display="block"
               width="100%"
-              p="$2.5"
-              borderRadius="$2"
+              p="2-5"
+              borderRadius="2"
               color="var(--text)"
               backgroundColor="transparent"
-              textDecoration="none"
+              textDecoration="none hover:none"
               cursor="pointer"
-              hoverStyle={{
-                textDecoration: "none",
-                background: "color-mix(in srgb, var(--info) 10%, var(--surface-2))",
-              }}
-              focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
+              background="hover:color-mix(in srgb, var(--info) 10%, var(--surface-2))"
+              outlineWidth="focus:2px"
+              outlineColor="focus:var(--focus-ring)"
             >
-              <SizableText size="$3" color="var(--text)" fontFamily="$body">
+              <SizableText size="3" color="var(--text)" fontFamily="body">
                 {s.label}
               </SizableText>
             </XStack>
@@ -62,27 +60,24 @@ function SectionsNavContent({
       <XStack
         height={1}
         backgroundColor="var(--border)"
-        my="$3"
+        my="3"
         border={0}
       />
-      <YStack gap="$1">
+      <YStack gap="1">
         <Link href={`/recipes/${recipeId}/water`} className="brew-link-contents">
           <XStack
             display="block"
             width="100%"
-            p="$2.5"
-            borderRadius="$2"
-            color="var(--text-muted)"
+            p="2-5"
+            borderRadius="2"
+            color="var(--text-muted) hover:var(--text)"
             backgroundColor="color-mix(in srgb, var(--surface-2) 35%, transparent)"
-            textDecoration="none"
+            textDecoration="none hover:none"
             cursor="pointer"
-            hoverStyle={{
-              textDecoration: "none",
-              color: "var(--text)",
-            }}
-            focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
+            outlineWidth="focus:2px"
+            outlineColor="focus:var(--focus-ring)"
           >
-            <SizableText size="$3" color="inherit" fontFamily="$body">
+            <SizableText size="3" color="inherit" fontFamily="body">
               {t("nav.openWaterCalculator")}
             </SizableText>
           </XStack>
@@ -91,19 +86,16 @@ function SectionsNavContent({
           <XStack
             display="block"
             width="100%"
-            p="$2.5"
-            borderRadius="$2"
-            color="var(--text-muted)"
+            p="2-5"
+            borderRadius="2"
+            color="var(--text-muted) hover:var(--text)"
             backgroundColor="color-mix(in srgb, var(--surface-2) 35%, transparent)"
-            textDecoration="none"
+            textDecoration="none hover:none"
             cursor="pointer"
-            hoverStyle={{
-              textDecoration: "none",
-              color: "var(--text)",
-            }}
-            focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
+            outlineWidth="focus:2px"
+            outlineColor="focus:var(--focus-ring)"
           >
-            <SizableText size="$3" color="inherit" fontFamily="$body">
+            <SizableText size="3" color="inherit" fontFamily="body">
               {t("nav.editYeast")}
             </SizableText>
           </XStack>
@@ -112,19 +104,16 @@ function SectionsNavContent({
           <XStack
             display="block"
             width="100%"
-            p="$2.5"
-            borderRadius="$2"
-            color="var(--text-muted)"
+            p="2-5"
+            borderRadius="2"
+            color="var(--text-muted) hover:var(--text)"
             backgroundColor="color-mix(in srgb, var(--surface-2) 35%, transparent)"
-            textDecoration="none"
+            textDecoration="none hover:none"
             cursor="pointer"
-            hoverStyle={{
-              textDecoration: "none",
-              color: "var(--text)",
-            }}
-            focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
+            outlineWidth="focus:2px"
+            outlineColor="focus:var(--focus-ring)"
           >
-            <SizableText size="$3" color="inherit" fontFamily="$body">
+            <SizableText size="3" color="inherit" fontFamily="body">
               {t("nav.backToRecipes")}
             </SizableText>
           </XStack>
@@ -158,11 +147,11 @@ export function RecipeEditSectionsNav({
         padding="var(--panel-padding)"
       >
         <SizableText
-          size="$2"
+          size="sm"
           color="var(--text-muted)"
-          fontFamily="$body"
+          fontFamily="body"
           marginTop={0}
-          marginBottom="$2"
+          marginBottom="2"
         >
           {t("nav.sectionsTitle")}
         </SizableText>

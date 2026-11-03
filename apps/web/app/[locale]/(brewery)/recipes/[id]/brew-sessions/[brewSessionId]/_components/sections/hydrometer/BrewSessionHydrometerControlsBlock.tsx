@@ -25,7 +25,7 @@ export function BrewSessionHydrometerControlsBlock({ model }: { model: BrewSessi
   } = model;
 
   return (
-    <YStack gap="$2" mt="$2">
+    <YStack gap="2" mt="2">
       <View minW={200}>
         <RecipeEditFieldLabel htmlFor="hydrometer-kind">
           {t("hydrometerKindLabel")}
@@ -61,37 +61,37 @@ export function BrewSessionHydrometerControlsBlock({ model }: { model: BrewSessi
       </View>
 
       {!hydrometerDevices.length ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("hydrometerNoDevices")}
         </SizableText>
       ) : null}
 
-      <XStack gap="$2" flexWrap="wrap" alignItems="center">
+      <XStack gap="2" flexWrap="wrap" alignItems="center">
         <Button
           onPress={() => void attachHydrometer()}
           disabled={!canCall || hydrometerWorking !== null || !hydrometerSelectedDeviceId}
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
         >
           {hydrometerWorking === "attach" ? t("working") : t("hydrometerAttach")}
         </Button>
         <Button
           onPress={() => void detachHydrometer()}
           disabled={!canCall || hydrometerWorking !== null || !attachedHydrometer}
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
         >
           {hydrometerWorking === "detach" ? t("working") : t("hydrometerDetach")}
         </Button>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {attachedHydrometer
             ? t("hydrometerAttachedTo", {
                 device: attachedHydrometer.device.displayName ?? attachedHydrometer.device.deviceKey,

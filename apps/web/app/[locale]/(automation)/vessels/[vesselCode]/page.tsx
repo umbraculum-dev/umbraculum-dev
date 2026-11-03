@@ -94,13 +94,13 @@ export default function AutomationVesselDetailPage() {
   };
 
   return (
-    <YStack gap="$3">
-      <H1 mb="$2">{vessel ? `${vessel.code} · ${vessel.displayName}` : t("title")}</H1>
+    <YStack gap="3">
+      <H1 mb="2">{vessel ? `${vessel.code} · ${vessel.displayName}` : t("title")}</H1>
 
-      <XStack gap="$3" alignItems="center">
+      <XStack gap="3" alignItems="center">
         <Link href="/vessels">{t("back")}</Link>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -115,13 +115,13 @@ export default function AutomationVesselDetailPage() {
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
       {loading && !vessel ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
       {notFound ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("notFound")}
         </SizableText>
       ) : null}
@@ -130,14 +130,14 @@ export default function AutomationVesselDetailPage() {
         <View role="region" aria-labelledby="vessel-detail-heading">
           <SizableText
             id="vessel-detail-heading"
-            size="$4"
+            size="lg"
             fontWeight="bold"
-            fontFamily="$heading"
-            mb="$2"
+            fontFamily="heading"
+            mb="2"
           >
             {t("listTitle")} · {vessel.code}
           </SizableText>
-          <YStack gap="$2">
+          <YStack gap="2">
             <DetailRow label={tFields("code")} value={vessel.code} />
             <DetailRow label={tFields("displayName")} value={vessel.displayName} />
             <DetailRow label={tFields("vesselKind")} value={vessel.vesselKind} />
@@ -178,11 +178,11 @@ export default function AutomationVesselDetailPage() {
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <XStack gap="$3" alignItems="flex-start" flexWrap="wrap">
-      <SizableText size="$2" fontWeight="bold" fontFamily="$body" minWidth={200}>
+    <XStack gap="3" alignItems="flex-start" flexWrap="wrap">
+      <SizableText size="2" fontWeight="bold" fontFamily="body" minWidth={200}>
         {label}
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {value}
       </SizableText>
     </XStack>

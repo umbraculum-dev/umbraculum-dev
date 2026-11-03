@@ -23,7 +23,7 @@ export function RecipeEditHopsRowEditor({
 
   return (
     <Accordion.Item key={row.id} value={`hop-${row.id}`}>
-      <Card gap="$2" mb="$2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
+      <Card gap="2" mb="2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="borderColor" p="3">
         <Accordion.Header>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
             <Accordion.Trigger
@@ -42,30 +42,30 @@ export function RecipeEditHopsRowEditor({
                 </Text>
               </View>
             </Accordion.Trigger>
-            <Button onPress={() => removeHopRow(row.id)} size="$2" chromeless>
-              <Text color="$red10">{tCommon("remove")}</Text>
+            <Button onPress={() => removeHopRow(row.id)} size="sm" variant="quiet">
+              <Text color="red10">{tCommon("remove")}</Text>
             </Button>
           </View>
         </Accordion.Header>
         <Accordion.Content>
           <View style={{ gap: 8, marginTop: 12 }}>
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 Name
               </Text>
               <Input
                 value={row.name}
                 onChangeText={(text) => updateHopRow(row.id, { name: text, ingredientId: null, country: null })}
                 placeholder="Hop name"
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
             <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
               <View style={{ flex: 1, minWidth: 80 }}>
-                <Text fontSize={11} opacity={0.8} mb="$1">
+                <Text fontSize={11} opacity={0.8} mb="1">
                   Amount (g)
                 </Text>
                 <Input
@@ -76,14 +76,14 @@ export function RecipeEditHopsRowEditor({
                   }}
                   placeholder="0"
                   keyboardType="decimal-pad"
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 />
               </View>
               <View style={{ flex: 1, minWidth: 80 }}>
-                <Text fontSize={11} opacity={0.8} mb="$1">
+                <Text fontSize={11} opacity={0.8} mb="1">
                   α %
                 </Text>
                 <Input
@@ -94,14 +94,14 @@ export function RecipeEditHopsRowEditor({
                   }}
                   placeholder="—"
                   keyboardType="decimal-pad"
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 />
               </View>
               <View style={{ flex: 1, minWidth: 80 }}>
-                <Text fontSize={11} opacity={0.8} mb="$1">
+                <Text fontSize={11} opacity={0.8} mb="1">
                   Time (min)
                 </Text>
                 <Input
@@ -112,10 +112,10 @@ export function RecipeEditHopsRowEditor({
                   }}
                   placeholder="60"
                   keyboardType="number-pad"
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 />
               </View>
             </View>

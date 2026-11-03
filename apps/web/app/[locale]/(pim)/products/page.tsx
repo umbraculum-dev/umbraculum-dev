@@ -24,13 +24,13 @@ export default function PimProductsPage() {
   const model = usePimProductsPage();
 
   return (
-    <YStack gap="$3">
-      <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+    <YStack gap="3">
+      <H1 mb="2">{t("title")}</H1>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("subtitle")}
       </SizableText>
 
-      <XStack gap="$3" flexWrap="wrap" alignItems="center">
+      <XStack gap="3" flexWrap="wrap" alignItems="center">
         <Input
           flex={1}
           minWidth={200}
@@ -40,7 +40,7 @@ export default function PimProductsPage() {
           disabled={!model.canCall || model.loading}
         />
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"

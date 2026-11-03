@@ -27,7 +27,7 @@ export function RecipesListScreenContent({ model }: { model: RecipesListModel })
       <Heading fontSize={28}>{t("title")}</Heading>
 
       {!canCall ? (
-        <Text fontSize={14} color="$red10" mt="$2">
+        <Text fontSize={14} color="red10" mt="2">
           {!baseUrl ? "Missing API base URL." : "Not authenticated."}
         </Text>
       ) : null}
@@ -63,8 +63,8 @@ export function RecipesListScreenContent({ model }: { model: RecipesListModel })
               <Heading fontSize={18}>{t("styleLabel")}</Heading>
               <Button
                 onPress={() => setStylePickerOpen(false)}
-                size="$2"
-                chromeless
+                size="sm"
+                variant="quiet"
                 accessibilityRole="button"
                 accessibilityLabel={tCommon("close")}
               >
@@ -83,11 +83,11 @@ export function RecipesListScreenContent({ model }: { model: RecipesListModel })
                         setNewStyleKey(s.key);
                         setStylePickerOpen(false);
                       }}
-                      background={selected ? "$color4" : "$background"}
+                      background={selected ? "color4" : "background"}
                       borderWidth={1}
-                      borderColor="$borderColor"
+                      borderColor="borderColor"
                       width="100%"
-                      p="$3"
+                      p="3"
                       accessibilityRole="button"
                       accessibilityLabel={label}
                     >

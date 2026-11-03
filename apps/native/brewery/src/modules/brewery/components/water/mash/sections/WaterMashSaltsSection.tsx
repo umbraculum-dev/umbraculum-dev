@@ -19,7 +19,7 @@ export function WaterMashSaltsSection(props: { model: WaterMashScreenModel }) {
 
   return (
     <Accordion.Item value="salts">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -36,8 +36,8 @@ export function WaterMashSaltsSection(props: { model: WaterMashScreenModel }) {
             disabled={!canCall}
           />
           <Button
-            size="$3"
-            mt="$2"
+            size="md"
+            mt="2"
             onPress={() => { void saveSettings({ mashSaltAdditionsJson: saltAdditions }); }}
             disabled={!canCall}
           >

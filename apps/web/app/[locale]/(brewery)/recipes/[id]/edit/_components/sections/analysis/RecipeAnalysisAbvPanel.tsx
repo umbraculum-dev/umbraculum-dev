@@ -11,10 +11,10 @@ export function recipeAnalysisAbvPanelRows(model: RecipeEditPageModel): ReactNod
 
   return [
     (
-      <XStack key="abv" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.abv")}</SizableText>
+      <XStack key="abv" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.abv")}</SizableText>
             {renderMath(
               "analysis.abv",
               renderDerivationMath(
@@ -33,9 +33,9 @@ export function recipeAnalysisAbvPanelRows(model: RecipeEditPageModel): ReactNod
           </XStack>
         </View>
         <View>
-          <XStack gap="$1" ai="baseline" display="inline-flex">
+          <XStack gap="1" display="inline-flex" ai="baseline">
             <CodeInline>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</CodeInline>
-            {typeof a?.abvEstimatedPercent === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText> : null}
+            {typeof a?.abvEstimatedPercent === "number" ? <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">%</SizableText> : null}
           </XStack>
         </View>
       </XStack>

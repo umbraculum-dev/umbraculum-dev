@@ -12,10 +12,10 @@ export function recipeAnalysisIbuPanelRows(model: RecipeEditPageModel): ReactNod
 
   return [
     (
-      <XStack key="ibu-tinseth" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuTinseth")}</SizableText>
+      <XStack key="ibu-tinseth" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.ibuTinseth")}</SizableText>
             {renderMath(
               "analysis.ibuTinseth",
               renderDerivationMath(
@@ -45,10 +45,10 @@ export function recipeAnalysisIbuPanelRows(model: RecipeEditPageModel): ReactNod
       </XStack>
     ),
     (
-      <XStack key="ibu-rager" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuRager")}</SizableText>
+      <XStack key="ibu-rager" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.ibuRager")}</SizableText>
             {renderMath(
               "analysis.ibuRager",
               renderDerivationMath(
@@ -78,10 +78,10 @@ export function recipeAnalysisIbuPanelRows(model: RecipeEditPageModel): ReactNod
       </XStack>
     ),
     (
-      <XStack key="bu-gu" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.buGu")}</SizableText>
+      <XStack key="bu-gu" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.buGu")}</SizableText>
           </XStack>
         </View>
         <View>

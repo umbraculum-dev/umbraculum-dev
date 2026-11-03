@@ -21,7 +21,7 @@ export function WaterMashOverallSection({ model }: { model: WaterMashPageModel }
           open={openMashSections.includes("overall")}
         />
         <Accordion.Content>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </SizableText>
           <WaterMashOverallActionsBlock model={model} />

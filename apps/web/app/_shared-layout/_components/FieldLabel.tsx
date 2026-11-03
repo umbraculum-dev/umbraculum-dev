@@ -14,9 +14,9 @@ export function RecipeEditFieldLabel({ htmlFor, children }: RecipeEditFieldLabel
     return (
       <Label
         htmlFor={htmlFor}
-        size="$2"
+        size="sm"
         color="var(--text-muted)"
-        fontFamily="$body"
+        fontFamily="body"
         display="block"
       >
         {children}
@@ -25,9 +25,9 @@ export function RecipeEditFieldLabel({ htmlFor, children }: RecipeEditFieldLabel
   }
   return (
     <SizableText
-      size="$2"
+      size="sm"
       color="var(--text-muted)"
-      fontFamily="$body"
+      fontFamily="body"
       display="block"
     >
       {children}

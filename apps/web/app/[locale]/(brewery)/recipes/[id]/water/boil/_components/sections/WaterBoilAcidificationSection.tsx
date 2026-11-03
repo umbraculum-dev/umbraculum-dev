@@ -69,7 +69,7 @@ export function WaterBoilAcidificationSection({ model }: { model: WaterBoilPageM
             submitFirst
           />
 
-          {boilError ? <ErrorBox id="boil-error" mt="$3">{boilError}</ErrorBox> : null}
+          {boilError ? <ErrorBox id="boil-error" mt="3">{boilError}</ErrorBox> : null}
         </form>
 
         {acidificationMode === "targetPh" && acidResult ? (

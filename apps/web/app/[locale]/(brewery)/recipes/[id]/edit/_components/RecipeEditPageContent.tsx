@@ -52,15 +52,15 @@ export function RecipeEditPageContent({ model }: { model: RecipeEditPageModel })
 
       <SurfaceMathToggleRow
         left={null}
-        rightHint={<SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{tMath("analysis.common.toggleHint")}</SizableText>}
+        rightHint={<SizableText size="2" color="var(--text-muted)" fontFamily="body">{tMath("analysis.common.toggleHint")}</SizableText>}
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
-        mt="$2"
-        mb="$2"
+        mt="2"
+        mb="2"
       />
 
       {authState.status === "loading" ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
@@ -72,7 +72,7 @@ export function RecipeEditPageContent({ model }: { model: RecipeEditPageModel })
       ) : null}
 
       {loading ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
@@ -98,10 +98,10 @@ export function RecipeEditPageContent({ model }: { model: RecipeEditPageModel })
           right={0}
           zIndex={1000}
           width="100%"
-          px="$4"
+          px="4"
         >
           <View width="100%" maxWidth={600} mx="auto">
-            <YStack gap="$2" width="100%">
+            <YStack gap="2" width="100%">
               {saveStatus ? (
                 <MessageBox
                   variant="success"
@@ -124,15 +124,14 @@ export function RecipeEditPageContent({ model }: { model: RecipeEditPageModel })
       ) : null}
 
       <XStack
-        flexDirection="column"
-        gap="$4"
-        $gtNarrow={{ flexDirection: "row" }}
+        flexDirection="column gtNarrow:row"
+        gap="4"
         flex={1}
         minW={0}
       >
-        <YStack gap="$0" flex={1} minW={0}>
+        <YStack gap="0" flex={1} minW={0}>
           {!useDesktopRail ? (
-            <View mb="$3">
+            <View mb="3">
               <RecipeEditSectionsNav sections={sections} recipeId={recipeId} layoutMode="sheet" />
             </View>
           ) : null}

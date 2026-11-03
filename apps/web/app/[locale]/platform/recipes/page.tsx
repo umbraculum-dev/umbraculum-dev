@@ -102,7 +102,7 @@ export default function PlatformRecipesPage() {
     ? `/api/platform/recipes/export/beerjson?workspaceId=${encodeURIComponent(workspaceId)}`
     : undefined;
 
-  if (auth.status === "loading") return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("loading")}</SizableText>;
+  if (auth.status === "loading") return <SizableText size="2" color="var(--text-muted)" fontFamily="body">{t("loading")}</SizableText>;
   if (auth.status === "error") return <ErrorBox>{auth.error}</ErrorBox>;
 
   if (!isPlatformAdmin) {
@@ -110,7 +110,7 @@ export default function PlatformRecipesPage() {
       <YStack maxWidth={900}>
         <View className="brew-panel">
           <H1 mt={0}>{t("title")}</H1>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb={0}>
             {t("notAuthorized")}
           </SizableText>
         </View>
@@ -119,14 +119,14 @@ export default function PlatformRecipesPage() {
   }
 
   return (
-    <YStack gap="$4" maxWidth={900}>
+    <YStack gap="4" maxWidth={900}>
       <View className="brew-panel">
         <H1 mt={0}>{t("title")}</H1>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
           {t("subtitle")}
         </SizableText>
 
-        <View mt="$3">
+        <View mt="3">
           <RecipeEditFieldLabel htmlFor="platform-workspace">
             {t("workspaceLabel")}
           </RecipeEditFieldLabel>
@@ -142,7 +142,7 @@ export default function PlatformRecipesPage() {
             width="full"
           />
           {workspacesError ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1-5">
               {workspacesError}
             </SizableText>
           ) : null}
@@ -155,7 +155,7 @@ export default function PlatformRecipesPage() {
             <H2 id="platform-export-heading" mt={0}>
               {t("exportSectionTitle")}
             </H2>
-            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+            <XStack gap="3" alignItems="center" flexWrap="wrap">
               <View minWidth={200}>
                 <RecipeEditFieldLabel htmlFor="platform-export-recipe">
                   {t("exportSingleLabel")}
@@ -188,7 +188,7 @@ export default function PlatformRecipesPage() {
                 {t("exportBulkCta")}
               </a>
             </XStack>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2.5" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2-5" mb={0}>
               {t("exportFullNote")}
             </SizableText>
           </View>
@@ -201,7 +201,7 @@ export default function PlatformRecipesPage() {
           />
         </>
       ) : (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("workspaceRequired")}
         </SizableText>
       )}

@@ -49,7 +49,7 @@ export function RecipeEditSection({
           <BrewAccordionHeader
             headingId={headingId}
             title={
-              <SizableText m={0} size="$5" fontFamily="$heading" color="var(--text)">
+              <SizableText m={0} size="5" fontFamily="heading" color="var(--text)">
                 {label}
               </SizableText>
             }
@@ -57,7 +57,7 @@ export function RecipeEditSection({
             rightSlot={rightSlot}
           />
           <Accordion.Content>
-            <View mt="$3">{children}</View>
+            <View mt="3">{children}</View>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>

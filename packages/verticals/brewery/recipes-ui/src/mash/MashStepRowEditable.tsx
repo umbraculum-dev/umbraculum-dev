@@ -25,7 +25,7 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
   const { isSpargeStep, disableName, disableType, disableAmount, typeValue, typeOptions, move } = editState;
 
   return (
-    <Card key={r.id} gap="$2" padding="$3" background="$background" borderWidth={1} borderColor="$borderColor">
+    <Card key={r.id} gap="2" padding="3" background="background" borderWidth={1} borderColor="borderColor">
       <XStack justifyContent="space-between" alignItems="center">
         <Text fontSize={14} fontWeight="700">
           {idx + 1}. {r.name || t("mashingStepName")}
@@ -40,8 +40,8 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
         />
       </XStack>
 
-      <YStack gap="$2">
-        <YStack gap="$1">
+      <YStack gap="2">
+        <YStack gap="1">
           <Text fontSize={11} opacity={0.8}>
             {t("mashingStepName")}
           </Text>
@@ -53,15 +53,15 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
             <Input
               value={r.name}
               onChangeText={(text) => onUpdateStep?.(r.id, { name: text })}
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             />
           )}
         </YStack>
 
-        <YStack gap="$1">
+        <YStack gap="1">
           <Text fontSize={11} opacity={0.8}>
             {t("mashingStepType")}
           </Text>
@@ -80,8 +80,8 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
           )}
         </YStack>
 
-        <XStack gap="$2" flexWrap="wrap">
-          <YStack gap="$1" flex={1} minWidth={120}>
+        <XStack gap="2" flexWrap="wrap">
+          <YStack gap="1" flex={1} minWidth={120}>
             <Text fontSize={11} opacity={0.8}>
               {t("mashingStepTemp", { unit: "°C" })}
             </Text>
@@ -89,14 +89,14 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
               keyboardType="decimal-pad"
               value={String(r.stepTemperatureC)}
               onChangeText={(text) => onUpdateStep?.(r.id, { stepTemperatureC: Number(text) || 0 })}
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             />
           </YStack>
 
-          <YStack gap="$1" flex={1} minWidth={120}>
+          <YStack gap="1" flex={1} minWidth={120}>
             <Text fontSize={11} opacity={0.8}>
               {t("mashingStepTime", { unit: "min" })}
             </Text>
@@ -104,15 +104,15 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
               keyboardType="decimal-pad"
               value={String(r.stepTimeMin)}
               onChangeText={(text) => onUpdateStep?.(r.id, { stepTimeMin: Math.max(0, Number(text) || 0) })}
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             />
           </YStack>
         </XStack>
 
-        <YStack gap="$1">
+        <YStack gap="1">
           <Text fontSize={11} opacity={0.8}>
             {t("mashingStepAmount", { unit: tUnits("L") })}
           </Text>
@@ -132,17 +132,17 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
                 onUpdateStep?.(r.id, { amountL: text.trim() ? Math.max(0, Number(text) || 0) : null })
               }
               placeholder="—"
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
               disabled={disableAmount}
             />
           )}
         </YStack>
 
         {idx > 0 ? (
-          <XStack gap="$2" alignItems="center">
+          <XStack gap="2" alignItems="center">
             <BrewCheckbox
               id={`mash-step-deduce-${r.id}`}
               checked={r.deduceFromMashIn === true}
@@ -151,7 +151,7 @@ export function MashStepRowEditable(props: MashStepRowEditableProps) {
                   deduceFromMashIn: checked === true,
                 })
               }
-              size="$2"
+              size="sm"
               accessibilityLabel={t("mashingDeduceFromMashIn")}
               accessibilityRole="checkbox"
             />

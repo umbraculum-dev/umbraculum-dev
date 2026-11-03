@@ -65,16 +65,16 @@ export function BrewSessionGroupedSection(props: {
       label={getSectionLabel(g.sectionId)}
       rightSlot={
         <View
-          px="$2"
-          py="$1"
+          px="2"
+          py="1"
           bg={sectionPillStyles.bg}
           borderWidth={1}
           borderColor={sectionPillStyles.borderColor}
-          rounded="$2"
+          rounded="2"
           minWidth={110}
           alignItems="center"
         >
-          <SizableText size="$2" fontFamily="$body" color={sectionPillStyles.textColor} mt={0}>
+          <SizableText size="2" fontFamily="body" color={sectionPillStyles.textColor} mt={0}>
             {sectionStatusLabel(t, sectionStatus)}
           </SizableText>
         </View>
@@ -85,7 +85,7 @@ export function BrewSessionGroupedSection(props: {
         setOpenSections((prev) => ({ ...prev, [g.sectionId]: open }));
       }}
     >
-      <YStack gap="$2">
+      <YStack gap="2">
         {mashAnchorStep ? (
           <BrewSessionSectionAnchorTimer
             anchorStep={mashAnchorStep}

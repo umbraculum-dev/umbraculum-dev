@@ -44,10 +44,10 @@ export function WaterSpargeAcidificationProfileBlock(props: { model: WaterSparge
       {selectedProfile ? (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
           <Button
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
             onPress={() => {
               setStartingAlk(bicarbonatePpmToAlkalinityPpmCaCO3(selectedProfile.bicarbonate));
               setStartingPh(selectedProfile.ph == null ? "" : String(selectedProfile.ph));
@@ -109,7 +109,7 @@ export function WaterSpargeAcidificationInputsBlock(props: { model: WaterSpargeS
   return (
     <>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
         </Text>
         <Input
@@ -119,53 +119,53 @@ export function WaterSpargeAcidificationInputsBlock(props: { model: WaterSpargeS
             setStartingAlkTouched(true);
             setStartingAlk(Number(text) || 0);
           }}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {t("waterVolumeLabel", { unit: tUnits("L") })}
         </Text>
         <Input
           keyboardType="decimal-pad"
           value={String(volumeLiters)}
           onChangeText={(text) => setVolumeLiters(Number(text) || 0)}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           Starting pH
         </Text>
         <Input
           keyboardType="decimal-pad"
           value={startingPh}
           onChangeText={setStartingPh}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       {acidificationMode === "targetPh" ? (
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             Target pH
           </Text>
           <Input
             keyboardType="decimal-pad"
             value={String(targetPh)}
             onChangeText={(text) => setTargetPh(Number(text) || 0)}
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
           />
         </View>
       ) : null}
@@ -184,33 +184,33 @@ export function WaterSpargeAcidificationInputsBlock(props: { model: WaterSpargeS
         closeLabel={tCommon("close")}
       />
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           Strength value {strengthKind === "percent" ? "(%)" : ""}
         </Text>
         <Input
           keyboardType="decimal-pad"
           value={String(strengthValue)}
           onChangeText={(text) => setStrengthValue(Number(text) || 0)}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
           disabled={strengthKind === "solid"}
         />
       </View>
       {acidificationMode === "manual" ? (
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
           </Text>
           <Input
             keyboardType="decimal-pad"
             value={String(manualAcidAdded)}
             onChangeText={(text) => setManualAcidAdded(Number(text) || 0)}
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
           />
         </View>
       ) : null}

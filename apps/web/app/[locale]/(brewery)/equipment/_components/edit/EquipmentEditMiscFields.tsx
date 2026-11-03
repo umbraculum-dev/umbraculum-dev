@@ -17,9 +17,9 @@ export function EquipmentEditMiscFields(props: {
   return (
     <fieldset className="brew-fieldset">
       <legend className="brew-fieldset-legend">{t("sectionTitles.misc")}</legend>
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-other-losses">
               {t("otherLossesLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -29,13 +29,13 @@ export function EquipmentEditMiscFields(props: {
               inputMode="decimal"
               value={editDraft["otherLossesLiters"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, otherLossesLiters: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

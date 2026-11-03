@@ -16,7 +16,7 @@ export function WaterProfilesScreenContent(props: { model: NativeWaterProfilesPa
     <Screen>
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={{ gap: 16 }}>
-          <Heading fontSize={28} mb="$2">
+          <Heading fontSize={28} mb="2">
             {t("title")}
           </Heading>
 

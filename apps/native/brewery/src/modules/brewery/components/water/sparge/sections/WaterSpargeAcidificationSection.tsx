@@ -20,7 +20,7 @@ export function WaterSpargeAcidificationSection(props: { model: WaterSpargeScree
 
   return (
     <Accordion.Item value="acidification">
-      <Card gap="$2" mt="$2">
+      <Card gap="2" mt="2">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>

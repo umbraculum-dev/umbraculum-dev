@@ -20,7 +20,7 @@ export function RecipeEditBasicsSection({ model }: { model: RecipeEditScreenMode
 
   return (
           <Accordion.Item value="basics">
-            <Card gap="$2" bg={SURFACE_BACKGROUND} aria-label={t("sections.basics")}>
+            <Card gap="2" bg={SURFACE_BACKGROUND} aria-label={t("sections.basics")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -39,31 +39,31 @@ export function RecipeEditBasicsSection({ model }: { model: RecipeEditScreenMode
               <Accordion.Content>
                 <View style={{ gap: 12, marginTop: 12 }}>
                   <View>
-                    <Text fontSize={12} opacity={0.8} mb="$1">
+                    <Text fontSize={12} opacity={0.8} mb="1">
                       Name
                     </Text>
                     <Input
                       value={name}
                       onChangeText={setName}
                       placeholder="Recipe name"
-                      size="$3"
-                      background="$background"
+                      size="md"
+                      background="background"
                       borderWidth={1}
-                      borderColor="$borderColor"
+                      borderColor="borderColor"
                     />
                   </View>
                   <View>
-                    <Text fontSize={12} opacity={0.8} mb="$1">
+                    <Text fontSize={12} opacity={0.8} mb="1">
                       {t("sections.basics")} — Style
                     </Text>
                     <Button
                       onPress={() => setStylePickerOpen(true)}
                       disabled={stylesLoading || styles.length === 0}
-                      background="$background"
+                      background="background"
                       borderWidth={1}
-                      borderColor="$borderColor"
+                      borderColor="borderColor"
                       width="100%"
-                      p="$3"
+                      p="3"
                       accessibilityRole="button"
                       accessibilityLabel={selectedStyleLabel}
                     >

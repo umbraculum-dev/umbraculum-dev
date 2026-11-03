@@ -21,7 +21,7 @@ export function WaterMashOverallSection(props: { model: WaterMashScreenModel }) 
 
   return (
     <Accordion.Item value="overall">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -32,13 +32,13 @@ export function WaterMashOverallSection(props: { model: WaterMashScreenModel }) 
         </Accordion.Header>
         <Accordion.Content>
           <Button
-            size="$3"
+            size="md"
             onPress={() => { void onComputeAndSave(); }}
             disabled={!canCall || savingOverall}
           >
             <Text>{savingOverall ? "Calculating…" : "Compute & save"}</Text>
           </Button>
-          {overallStatus ? <Text fontSize={12} mt="$2">{overallStatus}</Text> : null}
+          {overallStatus ? <Text fontSize={12} mt="2">{overallStatus}</Text> : null}
           {overallResult ? (
             <View style={{ marginTop: 12, gap: 4 }}>
               <Text fontSize={12}>

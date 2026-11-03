@@ -14,7 +14,7 @@ export function Button(props: ButtonProps) {
   if (Platform.OS === "web") {
     return (
       <TamaguiButton
-        fontFamily={props.fontFamily ?? "$body"}
+        fontFamily={props.fontFamily ?? "body"}
         aria-label={accessibilityLabel}
         {...(rest as ButtonProps)}
       />
@@ -23,7 +23,7 @@ export function Button(props: ButtonProps) {
 
   return (
     <TamaguiButton
-      fontFamily={props.fontFamily ?? "$body"}
+      fontFamily={props.fontFamily ?? "body"}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
       {...(rest as ButtonProps)}

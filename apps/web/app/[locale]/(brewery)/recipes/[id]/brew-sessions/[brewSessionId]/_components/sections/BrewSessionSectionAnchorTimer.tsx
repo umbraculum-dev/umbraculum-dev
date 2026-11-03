@@ -18,27 +18,27 @@ export function BrewSessionSectionAnchorTimer(props: {
 
   return (
     <YStack
-      gap="$1"
-      p="$2"
+      gap="1"
+      p="2"
       bg={running ? "color-mix(in srgb, var(--warning) 18%, var(--surface))" : "var(--surface-2)"}
-      rounded="$2"
+      rounded="2"
       borderWidth={1}
       borderColor={running ? "color-mix(in srgb, var(--warning) 40%, var(--border))" : "var(--border)"}
     >
-      <XStack gap="$2" items="center" flexWrap="wrap">
-        <SizableText size="$3" fontFamily="$body" color="var(--text)">
+      <XStack gap="2" items="center" flexWrap="wrap">
+        <SizableText size="3" fontFamily="body" color="var(--text)">
           {label}
         </SizableText>
         {anchorStep.timerState === "idle" || anchorStep.timerState === "paused" ? (
           <Button
             onPress={() => void onStepTimer(anchorStep.id, "start")}
             disabled={!canCall}
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
           >
             {t("timerStart")}
           </Button>
@@ -47,12 +47,12 @@ export function BrewSessionSectionAnchorTimer(props: {
           <Button
             onPress={() => void onStepTimer(anchorStep.id, "pause")}
             disabled={!canCall}
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
           >
             {t("timerPause")}
           </Button>
@@ -61,25 +61,25 @@ export function BrewSessionSectionAnchorTimer(props: {
           <Button
             onPress={() => void onStepTimer(anchorStep.id, "stop")}
             disabled={!canCall}
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
           >
             {t("timerStop")}
           </Button>
         ) : null}
       </XStack>
       {anchorStep.timerStartedAt ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
           {t("timerLine", {
             elapsed: formatElapsedSeconds(computeElapsedSeconds(anchorStep)),
             planned: minutes == null ? "—" : String(minutes),
           })}
           {minutes != null ? (
-            <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText as="span" size="2" color="var(--text-muted)" fontFamily="body">
               {" "}
               ·{" "}
               {t("countdownLine", {

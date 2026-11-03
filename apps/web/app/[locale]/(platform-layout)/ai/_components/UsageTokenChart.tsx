@@ -46,11 +46,11 @@ export function UsageTokenChart({ data, ariaLabel }: UsageTokenChartProps) {
     <YStack
       role="img"
       aria-label={ariaLabel}
-      backgroundColor="$background"
-      padding="$2"
-      borderRadius="$3"
+      backgroundColor="background"
+      padding="2"
+      borderRadius="3"
       borderWidth={1}
-      borderColor="$borderColor"
+      borderColor="border-color"
     >
       <VictoryChart
         theme={VictoryTheme.material}

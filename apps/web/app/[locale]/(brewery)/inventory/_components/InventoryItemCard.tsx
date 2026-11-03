@@ -33,13 +33,13 @@ export function InventoryItemCard(props: {
 
   return (
     <RecipeEditIngredientCard key={it.id}>
-      <XStack gap="$3" flexWrap="wrap" alignItems="center">
-        <YStack flex={1} minWidth={160} gap="$1">
-          <SizableText size="$2" fontFamily="$body" color="var(--text)">
+      <XStack gap="3" flexWrap="wrap" alignItems="center">
+        <YStack flex={1} minWidth={160} gap="1">
+          <SizableText size="2" fontFamily="body" color="var(--text)">
             {it.name}
           </SizableText>
           {it.category === "fermentable" && (producer || colorLovibond != null || yieldPercent != null || ppg != null) ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {(producer ?? "").trim() ? `${t("producerLabel")}: ${producer}` : null}
               {colorLovibond != null ? ` · ${t("columns.lovibondShort")}: ${colorLovibond.toFixed(1)}` : null}
               {yieldPercent != null ? ` · ${t("yieldPercentLabel")}: ${yieldPercent.toFixed(1)}%` : null}
@@ -47,13 +47,13 @@ export function InventoryItemCard(props: {
             </SizableText>
           ) : null}
           {it.category === "hop" && (alphaMin != null || alphaMax != null) ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {alphaMin != null ? `${t("alphaMinLabel")}: ${alphaMin.toFixed(1)}%` : null}
               {alphaMax != null ? `${alphaMin != null ? " · " : ""}${t("alphaMaxLabel")}: ${alphaMax.toFixed(1)}%` : null}
             </SizableText>
           ) : null}
         </YStack>
-        <YStack minWidth={100} gap="$1">
+        <YStack minWidth={100} gap="1">
           <RecipeEditFieldLabel htmlFor={`inv-qty-${it.id}`}>
             {t("quantityLabel", { unit: unitLabel(it.unit) })}
           </RecipeEditFieldLabel>
@@ -62,29 +62,29 @@ export function InventoryItemCard(props: {
             value={displayQty}
             onChangeText={(v) => setQtyDraft((p) => ({ ...p, [it.id]: v }))}
             onBlur={() => {
-              const v = parseFloat(displayQty);
-              if (Number.isFinite(v) && v >= 0 && Math.abs(v - it.quantity) > 1e-9) {
-                void updateQuantity(it.id, v);
-              } else {
-                setQtyDraft((p) => {
-                  const next = { ...p };
-                  delete next[it.id];
-                  return next;
-                });
-              }
-            }}
+                        const v = parseFloat(displayQty);
+                        if (Number.isFinite(v) && v >= 0 && Math.abs(v - it.quantity) > 1e-9) {
+                          void updateQuantity(it.id, v);
+                        } else {
+                          setQtyDraft((p) => {
+                            const next = { ...p };
+                            delete next[it.id];
+                            return next;
+                          });
+                        }
+                      }}
             keyboardType="decimal-pad"
-            size="$3"
+            size="md"
             w={100}
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"

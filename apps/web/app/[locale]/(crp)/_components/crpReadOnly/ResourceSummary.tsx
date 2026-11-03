@@ -33,17 +33,17 @@ export function ResourceSummary({
   });
 
   return (
-    <YStack gap="$1.5">
-      <SizableText fontFamily="$body">
+    <YStack gap="1-5">
+      <SizableText fontFamily="body">
         <SizableText fontWeight="bold">{resource.code}</SizableText>
         <SizableText color="var(--text-muted)"> · {resource.name}</SizableText>
       </SizableText>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.kind} value={resource.kind} />
         <CrpMeta label={labels.status} value={resource.status} />
         <CrpMeta label={labels.source} value={provenance} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.sourceRefId} value={resource.sourceRefId ?? labels.none} />
         <CrpMeta label={labels.debugId} value={resource.id} />
       </XStack>

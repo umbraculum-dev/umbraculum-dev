@@ -13,7 +13,7 @@ export default function PlatformAdsPage() {
   const t = useTranslations("platformAds");
   const { auth, isPlatformAdmin, error, formProps, tableProps } = usePlatformAdsPage();
 
-  if (auth.status === "loading") return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("loading")}</SizableText>;
+  if (auth.status === "loading") return <SizableText size="2" color="var(--text-muted)" fontFamily="body">{t("loading")}</SizableText>;
   if (auth.status === "error") return <ErrorBox>{auth.error}</ErrorBox>;
 
   if (!isPlatformAdmin) {
@@ -21,7 +21,7 @@ export default function PlatformAdsPage() {
       <YStack maxWidth={900}>
         <View className="brew-panel">
           <H1 mt={0}>{t("title")}</H1>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb={0}>
             {t("notAuthorized")}
           </SizableText>
         </View>
@@ -30,21 +30,21 @@ export default function PlatformAdsPage() {
   }
 
   return (
-    <YStack gap="$4" maxWidth={900}>
+    <YStack gap="4" maxWidth={900}>
       <View className="brew-panel">
         <H1 mt={0}>{t("title")}</H1>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
           {t("subtitle")}
         </SizableText>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
           {t("hint", { locale })}
         </SizableText>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1-5">
           {t("globalBottomNote")}
         </SizableText>
 
         {error ? (
-          <ErrorBox mt="$3">{error}</ErrorBox>
+          <ErrorBox mt="3">{error}</ErrorBox>
         ) : null}
 
         <PlatformAdForm {...formProps} />

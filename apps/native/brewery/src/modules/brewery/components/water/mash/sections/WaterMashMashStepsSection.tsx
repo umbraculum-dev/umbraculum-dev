@@ -31,7 +31,7 @@ export function WaterMashMashStepsSection(props: { model: WaterMashScreenModel }
 
   return (
     <Accordion.Item value="mashSteps">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -58,7 +58,7 @@ export function WaterMashMashStepsSection(props: { model: WaterMashScreenModel }
             formatFixed={formatFixed}
           />
           {mashStepsDirty ? (
-            <Button size="$3" mt="$2" onPress={() => { void saveMashSteps(); }} disabled={mashStepsSaving}>
+            <Button size="md" mt="2" onPress={() => { void saveMashSteps(); }} disabled={mashStepsSaving}>
               <Text>{mashStepsSaving ? "Saving…" : "Save mash steps"}</Text>
             </Button>
           ) : null}

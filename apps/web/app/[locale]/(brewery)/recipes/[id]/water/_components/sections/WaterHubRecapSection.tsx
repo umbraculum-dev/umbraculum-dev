@@ -35,13 +35,13 @@ export function WaterHubRecapSection({ model }: { model: UseWaterHubPageModel })
       open={openSections.includes("recap")}
       spaced
     >
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("recapSubtitle")}
       </SizableText>
 
       <details className="brew-field-block brew-field-block--computed">
         <summary className="brew-field-block-header brew-details-summary">
-          <SizableText size="$2" fontWeight="bold" fontFamily="$body">{t("mergedWaterRecap")}</SizableText>
+          <SizableText size="2" fontWeight="bold" fontFamily="body">{t("mergedWaterRecap")}</SizableText>
           {surfaceMath
             ? (() => {
                 const ex = mathExplain["waterHub.mergedWaterRecap"];
@@ -77,7 +77,7 @@ export function WaterHubRecapSection({ model }: { model: UseWaterHubPageModel })
               })()
             : null}
           <FieldBadge>{t("computed")}</FieldBadge>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("clickToExpand")}</SizableText>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">{t("clickToExpand")}</SizableText>
         </summary>
 
         {summary && displayStreams ? (
@@ -88,7 +88,7 @@ export function WaterHubRecapSection({ model }: { model: UseWaterHubPageModel })
             <WaterHubRecapMergedIonsBlock model={model} />
           </>
         ) : (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2">
             {t("noSettingsLoaded")}
           </SizableText>
         )}

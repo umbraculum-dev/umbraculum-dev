@@ -55,14 +55,14 @@ export function WaterSpargeSaltsCombinedBlock({ model }: { model: WaterSpargeSal
             })()
           : null}
         <FieldBadge>Computed</FieldBadge>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
           Heuristic: Ca/Mg from salts reduce effective alkalinity, so salts can modestly change acid required.
           {surfaceMath
             ? (() => {
                 const ex = mathExplain["sparge.alkalinityHeuristic"];
                 const title = tMath(ex.titleKey);
                 return (
-                  <View as="span" display="inline" ml="$1">
+                  <View as="span" display="inline" ml="1">
                     <MathHelpPopover
                       title={title}
                       body={buildWaterMathBody({

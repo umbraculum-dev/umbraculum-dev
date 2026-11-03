@@ -73,9 +73,9 @@ export function HydrometerChart({
     : { top: 30, bottom: 60, left: 60, right: 60 };
 
   return (
-    <YStack gap="$2" marginTop="$2">
+    <YStack gap="2" marginTop="2">
       {title ? (
-        <Text fontSize={12} color="$gray11">
+        <Text fontSize={12} color="gray11">
           {title}
         </Text>
       ) : null}
@@ -142,11 +142,11 @@ export function HydrometerChart({
             />
           ) : null}
         </VictoryChartWithTitle>
-        <XStack gap="$3" flexWrap="wrap" marginTop="$2" justifyContent="flex-start">
-          <Text fontSize={12} color="$gray11">
+        <XStack gap="3" flexWrap="wrap" marginTop="2" justifyContent="flex-start">
+          <Text fontSize={12} color="gray11">
             {gravityLabel} <Text color={DEFAULT_GRAVITY_COLOR}>●</Text>
           </Text>
-          <Text fontSize={12} color="$gray11">
+          <Text fontSize={12} color="gray11">
             {temperatureLabel} <Text color={DEFAULT_TEMPERATURE_COLOR}>●</Text>
           </Text>
         </XStack>

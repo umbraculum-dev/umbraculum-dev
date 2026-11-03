@@ -16,13 +16,13 @@ export function WaterHubFinalRecapSection({ model }: { model: UseWaterHubPageMod
       open={openSections.includes("finalRecap")}
       spaced
     >
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("finalRecapSubtitle")}
       </SizableText>
 
       <ul className="brew-recipe-edit-list-disc brew-list-mt0">
         <li>
-          <SizableText size="$2" fontFamily="$body">
+          <SizableText size="2" fontFamily="body">
             {t("predictedMashPh")}{" "}
             {summary?.finalRecap.predictedMashPh ? (
               <>
@@ -35,12 +35,12 @@ export function WaterHubFinalRecapSection({ model }: { model: UseWaterHubPageMod
           </SizableText>
         </li>
         <li>
-          <SizableText size="$2" fontFamily="$body">
+          <SizableText size="2" fontFamily="body">
             {t("residualAlkalinity")}
           </SizableText>
           <ul className="brew-recipe-edit-list-disc brew-list-mt1">
             <li>
-              <SizableText size="$2" fontFamily="$body">
+              <SizableText size="2" fontFamily="body">
                 {t("raMashOverall")}:{" "}
                 {summary?.finalRecap.residualAlkalinityMashOverallPpmCaCO3 != null ? (
                   <code>{fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMashOverallPpmCaCO3, 0)}</code>
@@ -51,7 +51,7 @@ export function WaterHubFinalRecapSection({ model }: { model: UseWaterHubPageMod
               </SizableText>
             </li>
             <li>
-              <SizableText size="$2" fontFamily="$body">
+              <SizableText size="2" fontFamily="body">
                 {t("raMerged")}:{" "}
                 {summary?.finalRecap.residualAlkalinityMergedPpmCaCO3 != null ? (
                   <code>{fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMergedPpmCaCO3, 0)}</code>
@@ -64,7 +64,7 @@ export function WaterHubFinalRecapSection({ model }: { model: UseWaterHubPageMod
           </ul>
         </li>
         <li>
-          <SizableText size="$2" fontFamily="$body">
+          <SizableText size="2" fontFamily="body">
             {t("styleExpectedRa")}:{" "}
             {summary?.finalRecap.styleExpectedRa ? (
               <>
@@ -81,7 +81,7 @@ export function WaterHubFinalRecapSection({ model }: { model: UseWaterHubPageMod
         </li>
       </ul>
 
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb={0}>
         {t("finalRecapCaveat")}
       </SizableText>
     </BrewAccordionSection>

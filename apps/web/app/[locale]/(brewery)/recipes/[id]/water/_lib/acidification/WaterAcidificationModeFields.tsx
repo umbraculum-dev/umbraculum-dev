@@ -85,7 +85,7 @@ export function WaterAcidificationModeFields(props: {
         : null}
 
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor={`${idPrefix}-acid-type`}>Acid type</RecipeEditFieldLabel>
           <BrewSelect
             id={`${idPrefix}-acid-type`}
@@ -98,7 +98,7 @@ export function WaterAcidificationModeFields(props: {
       </View>
 
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor={`${idPrefix}-strength-kind`}>Strength kind</RecipeEditFieldLabel>
           <BrewSelect
             id={`${idPrefix}-strength-kind`}
@@ -111,7 +111,7 @@ export function WaterAcidificationModeFields(props: {
       </View>
 
       <View width="100%" flexBasis="100%">
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor={`${idPrefix}-strength-value`}>
             Strength value {strengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
           </RecipeEditFieldLabel>
@@ -121,20 +121,20 @@ export function WaterAcidificationModeFields(props: {
             value={String(strengthValue)}
             onChangeText={(text) => setStrengthValue(Number(text) || 0)}
             disabled={strengthKind === "solid"}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
 
       {acidificationMode === "manual" ? (
         <View width="100%" flexBasis="100%">
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor={`${idPrefix}-manual-acid-added`}>
               Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
             </RecipeEditFieldLabel>
@@ -143,13 +143,13 @@ export function WaterAcidificationModeFields(props: {
               keyboardType="decimal-pad"
               value={String(manualAcidAdded)}
               onChangeText={(text) => setManualAcidAdded(Number(text) || 0)}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

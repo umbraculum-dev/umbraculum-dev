@@ -54,12 +54,12 @@ export default function PimAttributeSetsPage() {
   }, [authState.status]);
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <Link href="/products">{t("products.back")}</Link>
-      <H1 mb="$2">{tSets("title")}</H1>
-      <XStack gap="$3">
+      <H1 mb="2">{tSets("title")}</H1>
+      <XStack gap="3">
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -72,7 +72,7 @@ export default function PimAttributeSetsPage() {
       </XStack>
       {error ? <ErrorBox>{error}</ErrorBox> : null}
       {!loading && sets.length === 0 && !error ? (
-        <SizableText size="$2" color="var(--text-muted)">
+        <SizableText size="2" color="var(--text-muted)">
           {tSets("noSets")}
         </SizableText>
       ) : null}
@@ -81,12 +81,12 @@ export default function PimAttributeSetsPage() {
           <ul className="brew-recipe-list">
             {sets.map((s) => (
               <li key={s.id} className="brew-recipe-list-row">
-                <YStack gap="$1">
-                  <SizableText fontFamily="$body">
+                <YStack gap="1">
+                  <SizableText fontFamily="body">
                     <SizableText fontWeight="bold">{s.code}</SizableText>
                     <SizableText color="var(--text-muted)"> · {s.label}</SizableText>
                   </SizableText>
-                  <SizableText size="$2" color="var(--text-muted)">
+                  <SizableText size="2" color="var(--text-muted)">
                     {tFields("code")}: {s.code} · {s.attributeIds.length} attributes
                   </SizableText>
                   <Link href={`/attribute-sets/${s.id}`}>{tSets("openDetail")}</Link>

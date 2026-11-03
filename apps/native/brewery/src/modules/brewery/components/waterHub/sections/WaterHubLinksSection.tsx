@@ -21,7 +21,7 @@ export function WaterHubLinksSection(props: { model: NativeWaterHubScreenModel }
 
   return (
     <Accordion.Item value="links">
-      <Card gap="$2" mt="$2">
+      <Card gap="2" mt="2">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -33,7 +33,7 @@ export function WaterHubLinksSection(props: { model: NativeWaterHubScreenModel }
         <Accordion.Content>
           <View style={{ gap: 12 }}>
             <View style={{ gap: 4 }}>
-              <Button size="$4" width="100%" onPress={navigateToWaterMash}>
+              <Button size="lg" width="100%" onPress={navigateToWaterMash}>
                 <Text fontSize={14}>{t("mashWater")}</Text>
               </Button>
               <Text fontSize={12} opacity={0.7}>
@@ -42,7 +42,7 @@ export function WaterHubLinksSection(props: { model: NativeWaterHubScreenModel }
             </View>
 
             <View style={{ gap: 4 }}>
-              <Button size="$4" width="100%" onPress={navigateToWaterSparge}>
+              <Button size="lg" width="100%" onPress={navigateToWaterSparge}>
                 <Text fontSize={14}>{t("spargeWater")}</Text>
               </Button>
               <Text fontSize={12} opacity={0.7}>
@@ -51,7 +51,7 @@ export function WaterHubLinksSection(props: { model: NativeWaterHubScreenModel }
             </View>
 
             <View style={{ gap: 4 }}>
-              <Button size="$4" width="100%" onPress={navigateToWaterBoil}>
+              <Button size="lg" width="100%" onPress={navigateToWaterBoil}>
                 <Text fontSize={14}>{t("additionalBoilWater")}</Text>
               </Button>
               <Text fontSize={12} opacity={0.7}>
@@ -61,7 +61,7 @@ export function WaterHubLinksSection(props: { model: NativeWaterHubScreenModel }
 
             <Text fontSize={12} opacity={0.8}>
               {t("manageProfilesOn")}{" "}
-              <Text onPress={navigateToWaterProfiles} color="$blue10">
+              <Text onPress={navigateToWaterProfiles} color="blue10">
                 {t("waterProfilesLink")}
               </Text>
             </Text>

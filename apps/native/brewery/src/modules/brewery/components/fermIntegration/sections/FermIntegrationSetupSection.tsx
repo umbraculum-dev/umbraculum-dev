@@ -43,9 +43,9 @@ export function FermIntegrationSetupSection(props: {
       : t("sections.integration.notConfigured");
 
   return (
-    <Card key={kind} gap="$2">
+    <Card key={kind} gap="2">
       <Heading fontSize={16}>{t(kindTitleKey(kind))}</Heading>
-      <Text fontSize={12} color={kind === "tilt" ? "$green10" : "$yellow10"}>
+      <Text fontSize={12} color={kind === "tilt" ? "green10" : "yellow10"}>
         {t(kindWarnKey(kind))}
       </Text>
       <Text fontSize={12} opacity={0.85}>

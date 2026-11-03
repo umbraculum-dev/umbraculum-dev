@@ -63,7 +63,7 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
   }
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       {mashWaterBudgetLiters != null ? (
         <Text fontSize={12} opacity={0.8}>
           {t("mashStepsWaterBudgetNote")}

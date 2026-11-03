@@ -27,9 +27,9 @@ export function ReadOnlyFieldValue({ children }: ReadOnlyFieldValueProps) {
   return (
     <YStack
       data-readonly-field-value
-      padding="$2"
+      padding="2"
       backgroundColor={isWeb ? "var(--field-readonly-bg)" : FIELD_READONLY_BG}
-      borderRadius="$2"
+      borderRadius="2"
       borderWidth={1}
       borderColor={isWeb ? "var(--field-readonly-border)" : FIELD_READONLY_BORDER}
       userSelect="none"
@@ -51,7 +51,7 @@ export interface ReadOnlyFieldProps {
 
 export function ReadOnlyField({ label, value, minWidth, flex }: ReadOnlyFieldProps) {
   return (
-    <YStack gap="$1" minWidth={minWidth} flex={flex}>
+    <YStack gap="1" minWidth={minWidth} flex={flex}>
       <ReadOnlyFieldLabel>{label}</ReadOnlyFieldLabel>
       <ReadOnlyFieldValue>{value}</ReadOnlyFieldValue>
     </YStack>
@@ -64,7 +64,7 @@ export interface ReadOnlyFieldRowProps {
 
 export function ReadOnlyFieldRow({ children }: ReadOnlyFieldRowProps) {
   return (
-    <XStack gap="$3" flexWrap="wrap" alignItems="flex-end">
+    <XStack gap="3" flexWrap="wrap" alignItems="flex-end">
       {children}
     </XStack>
   );

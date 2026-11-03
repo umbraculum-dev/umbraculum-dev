@@ -21,8 +21,8 @@ export function SectionCard({
         padding: "12px",
       }}
     >
-      <YStack gap="$3">
-        <SizableText id={headingId} size="$4" fontWeight="bold" fontFamily="$heading">
+      <YStack gap="3">
+        <SizableText id={headingId} size="4" fontWeight="bold" fontFamily="heading">
           {title}
         </SizableText>
         {children}
@@ -33,11 +33,11 @@ export function SectionCard({
 
 export function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <XStack gap="$3" alignItems="flex-start" flexWrap="wrap">
-      <SizableText size="$2" fontWeight="bold" fontFamily="$body" minWidth={180}>
+    <XStack gap="3" alignItems="flex-start" flexWrap="wrap">
+      <SizableText size="2" fontWeight="bold" fontFamily="body" minWidth={180}>
         {label}
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {value}
       </SizableText>
     </XStack>

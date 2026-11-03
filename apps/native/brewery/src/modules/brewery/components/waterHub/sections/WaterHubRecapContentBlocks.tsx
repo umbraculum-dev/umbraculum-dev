@@ -37,7 +37,7 @@ export function WaterHubRecapStatsBlock(props: { model: NativeWaterHubScreenMode
       {summary.merged.ionsPpm ? (
         <View style={{ marginTop: 8 }}>
           <Heading fontSize={14}>{t("mergedIonsTitle")}</Heading>
-          <Text fontSize={12} opacity={0.8} mb="$1">{t("mergedIonsDescription")}</Text>
+          <Text fontSize={12} opacity={0.8} mb="1">{t("mergedIonsDescription")}</Text>
           <View style={{ gap: 2 }}>
             {([["Ca", "calcium"], ["Mg", "magnesium"], ["Na", "sodium"], ["SO4", "sulfate"], ["Cl", "chloride"], ["HCO3", "bicarbonate"]] as const).map(([label, k]) => (
               <View key={k} style={{ flexDirection: "row", justifyContent: "space-between" }}>
@@ -61,7 +61,7 @@ export function WaterHubRecapAdditionsBlock(props: { model: NativeWaterHubScreen
 
   return (
     <>
-      <Heading fontSize={14} mt="$2">{t("additionsPerStream")}</Heading>
+      <Heading fontSize={14} mt="2">{t("additionsPerStream")}</Heading>
       {displayStreams.map((s) => (
         <View key={`adds-${s.key}`}>
           <Text fontSize={12} fontWeight="bold">{s.label}</Text>

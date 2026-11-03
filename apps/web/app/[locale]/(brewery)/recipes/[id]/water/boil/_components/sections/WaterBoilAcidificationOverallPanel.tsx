@@ -27,19 +27,19 @@ export function WaterBoilAcidificationOverallPanel({ model }: { model: WaterBoil
 
   return (
     <>
-      <View height={1} bg="var(--border)" my="$4" />
+      <View height={1} bg="var(--border)" my="4" />
 
       <H3 id="overall-boil-water-result" mt={0}>
         {t("overallResultHeading")}
       </H3>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to
         persist a snapshot.
       </SizableText>
-      <YStack mt="$3" gap="$2">
-        <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <YStack mt="3" gap="2">
+        <XStack gap="3" alignItems="center" flexWrap="wrap">
           <Button
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -50,7 +50,7 @@ export function WaterBoilAcidificationOverallPanel({ model }: { model: WaterBoil
             {savingOverall ? "Calculating…" : "Preview overall"}
           </Button>
           <Button
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -61,7 +61,7 @@ export function WaterBoilAcidificationOverallPanel({ model }: { model: WaterBoil
             {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
           </Button>
           {overallStatus ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {overallStatus}
             </SizableText>
           ) : null}
@@ -78,7 +78,7 @@ export function WaterBoilAcidificationOverallPanel({ model }: { model: WaterBoil
           </MessageBox>
         ) : null}
       </YStack>
-      {overallError ? <ErrorBox mt="$3">{overallError}</ErrorBox> : null}
+      {overallError ? <ErrorBox mt="3">{overallError}</ErrorBox> : null}
 
       {overallResult ? (
         <View className="brew-field-block brew-field-block--computed brew-mt3">
@@ -108,7 +108,7 @@ export function WaterBoilAcidificationOverallPanel({ model }: { model: WaterBoil
               );
             })() : null}
             <FieldBadge>Computed</FieldBadge>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
               Uses latest inputs; persist a snapshot to debug
             </SizableText>
           </View>

@@ -41,7 +41,7 @@ export function WaterBoilAdjustmentSection(props: { model: WaterBoilScreenModel 
 
   return (
     <Accordion.Item value="adjustment">
-      <Card gap="$2" mt="$2">
+      <Card gap="2" mt="2">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -51,7 +51,7 @@ export function WaterBoilAdjustmentSection(props: { model: WaterBoilScreenModel 
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <Text fontSize={12} opacity={0.8} mb="$2">
+          <Text fontSize={12} opacity={0.8} mb="2">
             {t("adjustmentHelp")}
           </Text>
           <View style={{ gap: 12 }}>
@@ -77,34 +77,34 @@ export function WaterBoilAdjustmentSection(props: { model: WaterBoilScreenModel 
               closeLabel={tCommon("close")}
             />
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </Text>
               <Input
                 keyboardType="decimal-pad"
                 value={String(tapVolumeLiters)}
                 onChangeText={(text) => setTapVolumeLiters(Number(text) || 0)}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </Text>
               <Input
                 keyboardType="decimal-pad"
                 value={String(dilutionVolumeLiters)}
                 onChangeText={(text) => setDilutionVolumeLiters(Number(text) || 0)}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
-            <Button size="$3" onPress={() => { void onSaveAdjustment(); }} disabled={!canCall || saving}>
+            <Button size="md" onPress={() => { void onSaveAdjustment(); }} disabled={!canCall || saving}>
               <Text>{saving ? "Saving…" : "Save adjustment"}</Text>
             </Button>
           </View>

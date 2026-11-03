@@ -67,16 +67,16 @@ export default function MrpProductionOrdersPage() {
   };
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <H1>{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("subtitle")}
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("alphaNote")}
       </SizableText>
 
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <RefreshButton onClick={() => void refresh()} disabled={!canCall || loading}>
           {loading ? t("refreshing") : t("refresh")}
         </RefreshButton>
@@ -97,13 +97,13 @@ export default function MrpProductionOrdersPage() {
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
       {loading && orders.length === 0 ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
       {!loading && orders.length === 0 && !error ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noProductionOrders")}
         </SizableText>
       ) : null}
@@ -113,9 +113,9 @@ export default function MrpProductionOrdersPage() {
           <ul className="brew-recipe-list">
             {orders.map((order) => (
               <li key={order.id} className="brew-recipe-list-row">
-                <YStack gap="$2">
+                <YStack gap="2">
                   <ProductionOrderSummary order={order} labels={labels} />
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="3" flexWrap="wrap">
                     <Link href={`/production-orders/${encodeURIComponent(order.id)}`}>
                       {tOrders("openDetail")}
                     </Link>

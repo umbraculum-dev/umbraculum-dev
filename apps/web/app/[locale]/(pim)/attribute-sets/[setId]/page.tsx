@@ -65,7 +65,7 @@ export default function PimAttributeSetDetailPage() {
 
   if (notFound) {
     return (
-      <YStack gap="$3">
+      <YStack gap="3">
         <Link href="/attribute-sets">{tSets("back")}</Link>
         <SizableText color="var(--text-muted)">{tProducts("notFound")}</SizableText>
       </YStack>
@@ -73,21 +73,21 @@ export default function PimAttributeSetDetailPage() {
   }
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <Link href="/attribute-sets">{tSets("back")}</Link>
       {attributeSet ? (
         <>
-          <H1 mb="$2">{attributeSet.label}</H1>
+          <H1 mb="2">{attributeSet.label}</H1>
           <SizableText color="var(--text-muted)">
             {tFields("code")}: {attributeSet.code}
           </SizableText>
-          <SizableText fontWeight="bold" mt="$2">
+          <SizableText fontWeight="bold" mt="2">
             Attribute IDs
           </SizableText>
           <ul className="brew-recipe-list">
             {attributeSet.attributeIds.map((id) => (
               <li key={id} className="brew-recipe-list-row">
-                <SizableText fontFamily="$body">{id}</SizableText>
+                <SizableText fontFamily="body">{id}</SizableText>
               </li>
             ))}
           </ul>
@@ -95,7 +95,7 @@ export default function PimAttributeSetDetailPage() {
       ) : null}
       {error ? <ErrorBox>{error}</ErrorBox> : null}
       <Button
-        size="$3"
+        size="md"
         bg="var(--surface-2)"
         borderWidth={1}
         borderColor="var(--border)"

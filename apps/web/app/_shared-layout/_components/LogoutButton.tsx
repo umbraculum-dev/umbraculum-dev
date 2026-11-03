@@ -22,15 +22,15 @@ export function LogoutButton({ disabled, onLogoutStart, onLogout }: LogoutButton
 
   return (
     <Button
-      size="$2"
-      px="$2"
+      size="sm"
+      px="2"
       height={28}
       color="var(--text)"
       backgroundColor="transparent"
       borderWidth={0}
-      fontFamily="$body"
-      hoverStyle={{ textDecoration: "underline" }}
-      pressStyle={{ opacity: 0.8 }}
+      fontFamily="body"
+      textDecoration="hover:underline"
+      opacity="press:0.8"
       disabled={disabled}
       onPress={() => {
         onLogoutStart();

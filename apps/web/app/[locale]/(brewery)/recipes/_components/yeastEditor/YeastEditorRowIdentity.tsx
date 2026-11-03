@@ -23,7 +23,7 @@ export function YeastEditorRowIdentity(props: YeastEditorRowIdentityProps) {
   if (variant === "primary") {
     return (
       <>
-        <YStack gap="$1" flex={1} minW={200}>
+        <YStack gap="1" flex={1} minW={200}>
           <RecipeEditFieldLabel htmlFor={!r.name ? `yeast-name-${r.id}` : undefined}>
             {t("yeastNameLabel")}
           </RecipeEditFieldLabel>
@@ -31,38 +31,38 @@ export function YeastEditorRowIdentity(props: YeastEditorRowIdentityProps) {
             <RecipeEditReadOnlyValue>{r.name}</RecipeEditReadOnlyValue>
           ) : (
             <Input
-              id={`yeast-name-${r.id}`}
-              value={r.name}
-              onChangeText={(text) =>
-                onUpdateRow(r.id, {
-                  name: text,
-                  ingredientId: null,
-                  lab: null,
-                  productId: null,
-                  attenuationMin: null,
-                  attenuationMax: null,
-                })
-              }
-              placeholder={t("yeastCustomNamePlaceholder")}
-              autoComplete="off"
-              size="$3"
-              w="100%"
-              bg="var(--surface)"
-              borderWidth={1}
-              borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
-            />
+                id={`yeast-name-${r.id}`}
+                value={r.name}
+                onChangeText={(text) =>
+                              onUpdateRow(r.id, {
+                                name: text,
+                                ingredientId: null,
+                                lab: null,
+                                productId: null,
+                                attenuationMin: null,
+                                attenuationMax: null,
+                              })
+                            }
+                placeholder={t("yeastCustomNamePlaceholder")}
+                autoComplete="off"
+                size="md"
+                w="100%"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
           )}
         </YStack>
         {(r.lab ?? "") ? (
-          <YStack gap="$1" minW={120}>
+          <YStack gap="1" minW={120}>
             <RecipeEditFieldLabel>{t("yeastLabLabel")}</RecipeEditFieldLabel>
             <RecipeEditReadOnlyValue>{r.lab}</RecipeEditReadOnlyValue>
           </YStack>
         ) : null}
         {(r.productId ?? "") ? (
-          <YStack gap="$1" minW={100}>
+          <YStack gap="1" minW={100}>
             <RecipeEditFieldLabel>{t("yeastProductIdLabel")}</RecipeEditFieldLabel>
             <RecipeEditReadOnlyValue>{r.productId}</RecipeEditReadOnlyValue>
           </YStack>
@@ -73,7 +73,7 @@ export function YeastEditorRowIdentity(props: YeastEditorRowIdentityProps) {
 
   return (
     <>
-      <YStack gap="$1" minW={200}>
+      <YStack gap="1" minW={200}>
         <RecipeEditFieldLabel htmlFor={`yeast-species-${r.id}`}>
           {t("yeastSpeciesLabel")}
         </RecipeEditFieldLabel>
@@ -111,7 +111,7 @@ export function YeastEditorRowIdentity(props: YeastEditorRowIdentityProps) {
           placeholder="—"
         />
       </YStack>
-      <YStack gap="$1" minW={140}>
+      <YStack gap="1" minW={140}>
         <RecipeEditFieldLabel htmlFor={`yeast-needs-propagation-${r.id}`}>
           {t("yeastNeedsPropagationLabel")}
         </RecipeEditFieldLabel>

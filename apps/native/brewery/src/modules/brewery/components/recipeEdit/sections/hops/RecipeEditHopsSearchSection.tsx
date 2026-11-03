@@ -20,7 +20,7 @@ export function RecipeEditHopsSearchSection({ model }: { model: RecipeEditScreen
 
   return (
     <>
-      <Text fontSize={12} opacity={0.8} mb="$2">
+      <Text fontSize={12} opacity={0.8} mb="2">
         {t("hopsHelp")}
       </Text>
       <View style={{ gap: 8, marginBottom: 12 }}>
@@ -28,13 +28,13 @@ export function RecipeEditHopsSearchSection({ model }: { model: RecipeEditScreen
           value={hopQuery}
           onChangeText={setHopQuery}
           placeholder="Search hops"
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <Button onPress={() => void searchHops()} disabled={hopSearching} size="$3">
+          <Button onPress={() => void searchHops()} disabled={hopSearching} size="md">
             <Text>{hopSearching ? "Searching…" : "Search"}</Text>
           </Button>
           <Button
@@ -43,15 +43,15 @@ export function RecipeEditHopsSearchSection({ model }: { model: RecipeEditScreen
               setHopResults([]);
             }}
             disabled={hopSearching}
-            size="$3"
-            chromeless
+            size="md"
+            variant="quiet"
           >
             <Text>{t("buttons.clear")}</Text>
           </Button>
         </View>
       </View>
       {hopSearchError ? (
-        <Text fontSize={12} color="$red10" mb="$2">
+        <Text fontSize={12} color="red10" mb="2">
           {hopSearchError}
         </Text>
       ) : null}
@@ -62,10 +62,10 @@ export function RecipeEditHopsSearchSection({ model }: { model: RecipeEditScreen
               <Button
                 key={it.id}
                 onPress={() => addHopFromDb(it)}
-                size="$2"
-                background="$background"
+                size="sm"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               >
                 <Text fontSize={12}>
                   {it.name} {it.country ? `(${it.country})` : ""} — Add
@@ -75,7 +75,7 @@ export function RecipeEditHopsSearchSection({ model }: { model: RecipeEditScreen
           </View>
         </ScrollView>
       ) : null}
-      <Button onPress={addHopRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
+      <Button onPress={addHopRow} size="md" background="background" borderWidth={1} borderColor="borderColor" mb="2">
         <Text>Add hop</Text>
       </Button>
     </>

@@ -9,8 +9,8 @@ export function WaterHubRecapPerStreamTable({ model }: { model: UseWaterHubPageM
 
   return (
     <>
-      <H3 mt="$3">{t("perStream")}</H3>
-      <View className="brew-table-wrap" mb="$4">
+      <H3 mt="3">{t("perStream")}</H3>
+      <View className="brew-table-wrap" mb="4">
         <table className="brew-table">
           <thead>
             <tr>

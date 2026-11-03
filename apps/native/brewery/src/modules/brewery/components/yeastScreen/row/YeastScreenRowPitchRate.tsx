@@ -29,7 +29,7 @@ export function YeastScreenRowPitchRate(props: YeastScreenRowSectionProps & {
   return (
     <>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : tUnits("L") })}
         </Text>
         {(() => {
@@ -68,10 +68,10 @@ export function YeastScreenRowPitchRate(props: YeastScreenRowSectionProps & {
               }}
               keyboardType="decimal-pad"
               placeholder="—"
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             />
           );
         })()}

@@ -19,15 +19,15 @@ export function BrewSessionStepCardHeader(props: {
 
   return (
     <>
-      <XStack gap="$2" items="center" flexWrap="wrap">
-        <XStack gap="$1" flexShrink={0}>
+      <XStack gap="2" items="center" flexWrap="wrap">
+        <XStack gap="1" flexShrink={0}>
           <Button
-            size="$2"
+            size="sm"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
             onPress={() => moveStep(st.id, -1)}
             disabled={globalIdx <= 0}
             aria-label={t("moveUp")}
@@ -35,12 +35,12 @@ export function BrewSessionStepCardHeader(props: {
             ↑
           </Button>
           <Button
-            size="$2"
+            size="sm"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
             onPress={() => moveStep(st.id, 1)}
             disabled={globalIdx === steps.length - 1}
             aria-label={t("moveDown")}
@@ -55,13 +55,13 @@ export function BrewSessionStepCardHeader(props: {
             id={`step-name-${st.id}`}
             value={st.name}
             onChangeText={(v) => setSteps((prev) => prev.map((s) => (s.id === st.id ? { ...s, name: v } : s)))}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </View>
 
@@ -107,18 +107,10 @@ export function BrewSessionStepCardHeader(props: {
           ) : (
             <RecipeEditReadOnlyValue>
               <SizableText
-                size="$2"
-                fontFamily="$body"
-                color={
-                  st.status === "done"
-                    ? "var(--success)"
-                    : st.status === "in_progress"
-                      ? "var(--warning)"
-                      : st.status === "skipped" || st.status === "not_applicable"
-                        ? "var(--info)"
-                        : "var(--text-muted)"
-                }
-              >
+                  size="sm"
+                  fontFamily="body"
+                  color={ st.status === "done" ? "var(--success)" : st.status === "in_progress" ? "var(--warning)" : st.status === "skipped" || st.status === "not_applicable" ? "var(--info)" : "var(--text-muted)" }
+                >
                 {st.isDisabled
                   ? t("statusSkipped")
                   : st.status === "in_progress"
@@ -162,18 +154,18 @@ export function BrewSessionStepCardHeader(props: {
       {showRelativeCountdown ? (
         showOldestDueWarning ? (
           <View
-            p="$2"
+            p="2"
             bg="color-mix(in srgb, var(--warning) 18%, var(--surface))"
             borderWidth={1}
             borderColor="color-mix(in srgb, var(--warning) 40%, var(--border))"
-            rounded="$2"
+            rounded="2"
           >
-            <SizableText size="$2" color="var(--text)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text)" fontFamily="body" mt={0}>
               {relativeCountdownLine}
             </SizableText>
           </View>
         ) : (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
             {relativeCountdownLine}
           </SizableText>
         )

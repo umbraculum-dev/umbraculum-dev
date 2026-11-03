@@ -11,7 +11,7 @@ export function WaterHubFinalRecapSection(props: { model: NativeWaterHubScreenMo
 
   return (
     <Accordion.Item value="finalRecap">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -21,23 +21,23 @@ export function WaterHubFinalRecapSection(props: { model: NativeWaterHubScreenMo
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <Text fontSize={12} opacity={0.8} mb="$2">
+          <Text fontSize={12} opacity={0.8} mb="2">
             {t("finalRecapSubtitle")}
           </Text>
           <Text fontSize={12}>
             {t("predictedMashPh")} {summary?.finalRecap.predictedMashPh ? fmt("pH", summary.finalRecap.predictedMashPh.value, 2) : "—"}
           </Text>
-          <Text fontSize={12} mt="$2">{t("residualAlkalinity")}</Text>
+          <Text fontSize={12} mt="2">{t("residualAlkalinity")}</Text>
           <Text fontSize={12} opacity={0.8}>
             {t("raMashOverall")}: {summary?.finalRecap.residualAlkalinityMashOverallPpmCaCO3 != null ? fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMashOverallPpmCaCO3, 0) : "—"} {tUnits("ppmAsCaCO3")}
           </Text>
           <Text fontSize={12} opacity={0.8}>
             {t("raMerged")}: {summary?.finalRecap.residualAlkalinityMergedPpmCaCO3 != null ? fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMergedPpmCaCO3, 0) : "—"} {tUnits("ppmAsCaCO3")}
           </Text>
-          <Text fontSize={12} mt="$2">
+          <Text fontSize={12} mt="2">
             {t("styleExpectedRa")}: {summary?.finalRecap.styleExpectedRa ? `${fmt("ppm_as_CaCO3", summary.finalRecap.styleExpectedRa.min, 0)}..${fmt("ppm_as_CaCO3", summary.finalRecap.styleExpectedRa.max, 0)} ${tUnits("ppmAsCaCO3")} · ${t(summary.finalRecap.styleExpectedRa.rationaleKey)}` : t("styleExpectedRaNa")}
           </Text>
-          <Text fontSize={12} opacity={0.8} mt="$2">
+          <Text fontSize={12} opacity={0.8} mt="2">
             {t("finalRecapCaveat")}
           </Text>
         </Accordion.Content>

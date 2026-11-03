@@ -128,63 +128,63 @@ export function BrewSessionLogsSection({ model }: { model: BrewSessionDetailPage
     <>
       {logs.length ? (
               <View
-                bg="var(--surface)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                rounded="$3"
-                p="$3"
-              >
+          bg="var(--surface)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          rounded="3"
+          p="3"
+        >
                 <details>
                   <RecipeEditSummary>
                     <H2 mt={0}>
                       {t("logsTitle")}{" "}
-                      <SizableText as="span" size="$3" fontFamily="$body" color="var(--text-muted)">
+                      <SizableText as="span" size="3" fontFamily="body" color="var(--text-muted)">
                         ({logs.length})
                       </SizableText>
                     </H2>
                   </RecipeEditSummary>
                   {logsTotalPages > 1 ? (
                     <XStack
-                      mt="$2"
-                      gap="$2"
-                      items="center"
-                      flexWrap="wrap"
-                      aria-label={t("logsPagination.ariaLabel")}
-                    >
+                mt="2"
+                gap="2"
+                items="center"
+                flexWrap="wrap"
+                aria-label={t("logsPagination.ariaLabel")}
+              >
                       <Button
-                        onPress={() => setLogsPage((p) => Math.max(1, p - 1))}
-                        disabled={logsPage <= 1}
-                        size="$3"
-                        bg="var(--surface-2)"
-                        borderWidth={1}
-                        borderColor="var(--border)"
-                        color="var(--text)"
-                        fontFamily="$body"
-                      >
+                  onPress={() => setLogsPage((p) => Math.max(1, p - 1))}
+                  disabled={logsPage <= 1}
+                  size="md"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="body"
+                >
                         {t("logsPagination.prev")}
                       </Button>
                       <Button
-                        onPress={() => setLogsPage((p) => Math.min(logsTotalPages, p + 1))}
-                        disabled={logsPage >= logsTotalPages}
-                        size="$3"
-                        bg="var(--surface-2)"
-                        borderWidth={1}
-                        borderColor="var(--border)"
-                        color="var(--text)"
-                        fontFamily="$body"
-                      >
+                  onPress={() => setLogsPage((p) => Math.min(logsTotalPages, p + 1))}
+                  disabled={logsPage >= logsTotalPages}
+                  size="md"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="body"
+                >
                         {t("logsPagination.next")}
                       </Button>
-                      <SizableText size="$2" fontFamily="$body" color="var(--text-muted)" mt={0}>
+                      <SizableText size="2" fontFamily="body" color="var(--text-muted)" mt={0}>
                         {t("logsPagination.status", { page: String(logsPage), pages: String(logsTotalPages) })}
                       </SizableText>
                     </XStack>
                   ) : null}
 
-                  <YStack gap="$1" mt="$2">
+                  <YStack gap="1" mt="2">
                     {visibleLogs.map((l) => (
-                      <SizableText key={l.id} size="$2" fontFamily="$body" color="var(--text)">
-                        <SizableText as="span" size="$2" fontFamily="$body" color="var(--text-muted)">
+                      <SizableText key={l.id} size="2" fontFamily="body" color="var(--text)">
+                        <SizableText as="span" size="2" fontFamily="body" color="var(--text-muted)">
                           <CodeInline>{l.createdAt}</CodeInline>{" "}
                         </SizableText>
                         {l.message}

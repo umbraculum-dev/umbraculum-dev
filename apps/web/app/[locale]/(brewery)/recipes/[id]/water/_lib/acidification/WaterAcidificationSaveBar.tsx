@@ -34,7 +34,7 @@ export function WaterAcidificationSaveBar(props: {
     <Button
       as="button"
       type="submit"
-      size="$3"
+      size="md"
       bg="var(--surface-2)"
       borderWidth={1}
       borderColor="var(--border)"
@@ -51,7 +51,7 @@ export function WaterAcidificationSaveBar(props: {
 
   const saveButton = (
     <Button
-      size="$3"
+      size="md"
       bg="var(--surface-2)"
       borderWidth={1}
       borderColor="var(--border)"
@@ -64,8 +64,8 @@ export function WaterAcidificationSaveBar(props: {
   );
 
   return (
-    <YStack gap="$2" mt="$3" mb="$3">
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+    <YStack gap="2" mt="3" mb="3">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         {submitFirst ? (
           <>
             {submitButton}
@@ -78,7 +78,7 @@ export function WaterAcidificationSaveBar(props: {
           </>
         )}
         {inlineStatus ? (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" role="status" aria-live="polite">
             {inlineStatus}
           </SizableText>
         ) : null}

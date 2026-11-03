@@ -47,7 +47,7 @@ export function AsyncExportButton({
   }, [body, busy, disabled, postUrl]);
 
   return (
-    <XStack gap="$2" alignItems="center" flexWrap="wrap">
+    <XStack gap="2" alignItems="center" flexWrap="wrap">
       <button
         type="button"
         data-testid={testId}
@@ -75,7 +75,7 @@ export function AsyncExportButton({
         </a>
       ) : null}
       {phase === "error" && error ? (
-        <SizableText size="$2" color="var(--danger, #b00020)" fontFamily="$body">
+        <SizableText size="2" color="var(--danger, #b00020)" fontFamily="body">
           {labelError}: {error}
         </SizableText>
       ) : null}

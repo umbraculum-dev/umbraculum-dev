@@ -18,7 +18,7 @@ export function SurfaceMathToggleRow(props: {
 
   return (
     <XStack
-      gap="$3"
+      gap="3"
       alignItems="center"
       flexWrap="wrap"
       mt={mt}
@@ -27,21 +27,21 @@ export function SurfaceMathToggleRow(props: {
       {left}
       <XStack
         marginLeft="auto"
-        gap="$2.5"
+        gap="2-5"
         alignItems="center"
         flexWrap="wrap"
         suppressHydrationWarning
       >
         {rightHint}
         <Button
-          size="$2"
-          chromeless
-          onPress={onToggle}
+          size="sm"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
+          variant="quiet"
+          onPress={onToggle}
           suppressHydrationWarning
         >
           {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}

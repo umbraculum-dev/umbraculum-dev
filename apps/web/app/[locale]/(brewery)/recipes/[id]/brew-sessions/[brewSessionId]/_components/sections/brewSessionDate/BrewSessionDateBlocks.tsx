@@ -42,19 +42,19 @@ export function BrewSessionDateEditForm({ model }: { model: BrewSessionDetailPag
 
   return (
     <>
-      <XStack gap="$2" items="flex-end" flexWrap="wrap">
+      <XStack gap="2" items="flex-end" flexWrap="wrap">
         <View minW={160}>
           <RecipeEditFieldLabel htmlFor="session-date-picker">{t("dateLabel")}</RecipeEditFieldLabel>
           <Input
             asChild
-            size="$3"
+            size="md"
             w="100%"
             minW={140}
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
             color="var(--text)"
           >
             <input
@@ -69,14 +69,14 @@ export function BrewSessionDateEditForm({ model }: { model: BrewSessionDetailPag
           <RecipeEditFieldLabel htmlFor="session-time-picker">{t("timeLabel")}</RecipeEditFieldLabel>
           <Input
             asChild
-            size="$3"
+            size="md"
             w="100%"
             minW={100}
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
             color="var(--text)"
           >
             <input
@@ -87,43 +87,43 @@ export function BrewSessionDateEditForm({ model }: { model: BrewSessionDetailPag
             />
           </Input>
         </View>
-        <XStack gap="$2" items="flex-end" flexWrap="wrap">
+        <XStack gap="2" items="flex-end" flexWrap="wrap">
           <Button
             onPress={() => void onSaveDate()}
             disabled={!canCall || dateSaving}
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
           >
             {dateSaving ? t("working") : t("dateSave")}
           </Button>
           <Button
             onPress={() => void onRemoveDate()}
             disabled={!canCall || dateSaving}
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
           >
             {dateSaving ? t("working") : t("dateRemove")}
           </Button>
           <Button
             onPress={() => {
-              setDateEditing(false);
-              syncDateInputsFromSession(session?.scheduledDate, setDateInputValue, setTimeInputValue);
-            }}
+                        setDateEditing(false);
+                        syncDateInputsFromSession(session?.scheduledDate, setDateInputValue, setTimeInputValue);
+                      }}
             disabled={dateSaving}
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
           >
             {t("dateCancel")}
           </Button>
@@ -145,9 +145,9 @@ export function BrewSessionDateDisplayRow({ model }: { model: BrewSessionDetailP
   } = model;
 
   return (
-    <YStack gap="$2" width="100%">
-      <XStack gap="$2" items="center" flexWrap="wrap">
-        <SizableText size="$3" fontFamily="$body" color="var(--text)" flexShrink={0}>
+    <YStack gap="2" width="100%">
+      <XStack gap="2" items="center" flexWrap="wrap">
+        <SizableText size="3" fontFamily="body" color="var(--text)" flexShrink={0}>
           {session?.scheduledDate
             ? (() => {
                 const d = new Date(session.scheduledDate);
@@ -164,16 +164,16 @@ export function BrewSessionDateDisplayRow({ model }: { model: BrewSessionDetailP
         </SizableText>
         <Button
           onPress={() => {
-            setDateEditing(true);
-            syncDateInputsFromSession(session?.scheduledDate, setDateInputValue, setTimeInputValue);
-          }}
+                    setDateEditing(true);
+                    syncDateInputsFromSession(session?.scheduledDate, setDateInputValue, setTimeInputValue);
+                  }}
           disabled={!canCall}
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
         >
           {session?.scheduledDate ? t("dateEdit") : t("dateAdd")}
         </Button>

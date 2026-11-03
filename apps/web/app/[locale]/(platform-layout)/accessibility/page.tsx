@@ -146,19 +146,19 @@ export default function AccessibilityPage() {
 
   return (
     <View>
-      <View bg="var(--surface)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" maxW={720}>
+      <View bg="var(--surface)" borderWidth={1} borderColor="var(--border)" rounded="2" p="3" maxW={720}>
         <H1 mt={0}>{t("title")}</H1>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
           {t("subtitle")}
         </SizableText>
 
         {!loaded ? (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" aria-live="polite">
             {t("loading")}
           </SizableText>
         ) : (
-          <YStack gap="$3">
-            <YStack gap="$1.5">
+          <YStack gap="3">
+            <YStack gap="1-5">
               <RecipeEditFieldLabel htmlFor="ui-theme">{t("themePreset")}</RecipeEditFieldLabel>
               <BrewSelect
                 id="ui-theme"
@@ -179,7 +179,7 @@ export default function AccessibilityPage() {
               />
             </YStack>
 
-            <YStack gap="$1.5">
+            <YStack gap="1-5">
               <RecipeEditFieldLabel htmlFor="ui-font-scale">{t("fontScale")}</RecipeEditFieldLabel>
               <BrewSelect
                 id="ui-font-scale"
@@ -201,7 +201,7 @@ export default function AccessibilityPage() {
               />
             </YStack>
 
-            <YStack gap="$1.5">
+            <YStack gap="1-5">
               <RecipeEditFieldLabel htmlFor="ui-density">{t("density")}</RecipeEditFieldLabel>
               <BrewSelect
                 id="ui-density"
@@ -221,13 +221,13 @@ export default function AccessibilityPage() {
               />
             </YStack>
 
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {saving ? t("saving") : t("savingHint")}
             </SizableText>
 
             {error ? <ErrorBox>{error}</ErrorBox> : null}
 
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {t("note", { locale })}
             </SizableText>
           </YStack>

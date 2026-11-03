@@ -30,10 +30,10 @@ export function YeastScreenRowPitchAdvanced(props: YeastScreenRowSectionProps & 
 
   return (
     <>
-      <Text fontSize={12} color="$gray11" mb="$1">
+      <Text fontSize={12} color="gray11" mb="1">
         {t("yeastPitchRateAmountNote")}
       </Text>
-      <Text fontSize={12} color="$gray11" mb="$2">
+      <Text fontSize={12} color="gray11" mb="2">
         {t("yeastEstimatedCellsRecalcNote")}
       </Text>
       <PickerField
@@ -67,7 +67,7 @@ export function YeastScreenRowPitchAdvanced(props: YeastScreenRowSectionProps & 
         closeLabel={tCommon("close")}
       />
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {t("yeastEstimatedCellsLabel")}
         </Text>
         <ReadOnlyField
@@ -87,7 +87,7 @@ export function YeastScreenRowPitchAdvanced(props: YeastScreenRowSectionProps & 
       </View>
       {r.format === "liquid" || r.format === "slurry" ? (
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             {t("yeastCellsPerLLabel")}
           </Text>
           {r.format === "slurry" && r.manualCellCount && computeCellsPerLFromManualCount(r.manualCellCount) != null ? (
@@ -109,16 +109,16 @@ export function YeastScreenRowPitchAdvanced(props: YeastScreenRowSectionProps & 
                 });
               }}
               keyboardType="decimal-pad"
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             />
           )}
         </View>
       ) : r.format === "dry" ? (
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             {t("yeastCellsPerKGLabel")}
           </Text>
           <Input
@@ -135,18 +135,18 @@ export function YeastScreenRowPitchAdvanced(props: YeastScreenRowSectionProps & 
               });
             }}
             keyboardType="decimal-pad"
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
           />
         </View>
       ) : null}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-        <Text fontSize={11} color="$gray11">
+        <Text fontSize={11} color="gray11">
           {t("yeastCellsPerDefaultNote")}
         </Text>
-        <Text fontSize={11} color="$gray11">
+        <Text fontSize={11} color="gray11">
           {t("yeastCellsPerOverrideNote")}
         </Text>
       </View>

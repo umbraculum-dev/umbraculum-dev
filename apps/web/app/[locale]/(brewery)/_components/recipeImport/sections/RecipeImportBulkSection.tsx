@@ -45,7 +45,7 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
       spaced
     >
       <RecipeImportLegendBox model={model} subtitle={t("bulkSubtitle")}>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0} mb={0}>
           {t("bulkStyleRule")}
         </SizableText>
       </RecipeImportLegendBox>
@@ -59,11 +59,11 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
         disabled={!canCall}
         aria-describedby="bulk-import-file-help"
       />
-      <SizableText id="bulk-import-file-help" size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5" mb="$3" display="block">
+      <SizableText id="bulk-import-file-help" size="2" color="var(--text-muted)" fontFamily="body" mt="1-5" mb="3" display="block">
         {bulkFileName ? t("filePicked", { name: bulkFileName }) : t("fileNotPicked")}
       </SizableText>
 
-      <YStack gap="$1.5" mt="$3">
+      <YStack gap="1-5" mt="3">
         <RecipeEditFieldLabel htmlFor="bulk-import-format">{t("formatLabel")}</RecipeEditFieldLabel>
         <BrewSelect
           id="bulk-import-format"
@@ -77,20 +77,20 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
           disabled={!canCall}
           width="full"
         />
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1-5">
           {bulkFormat ? t("formatResolved", { format: bulkFormatLabel }) : t("formatNotResolved")}
         </SizableText>
       </YStack>
 
-      <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
-        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onBulkPreview()} disabled={!canBulkPreview}>
+      <XStack gap="3" mt="3" alignItems="center" flexWrap="wrap">
+        <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onBulkPreview()} disabled={!canBulkPreview}>
           {bulkPreviewLoading ? t("previewing") : t("preview")}
         </Button>
-        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onBulkImport()} disabled={!canBulkImport}>
+        <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onBulkImport()} disabled={!canBulkImport}>
           {bulkImporting ? t("importing") : t("import")}
         </Button>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -104,9 +104,9 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
 
       {bulkPreviewError ? (
         <>
-          <ErrorBox mt="$3">{bulkPreviewError}</ErrorBox>
+          <ErrorBox mt="3">{bulkPreviewError}</ErrorBox>
           {isFileTooLargeError(bulkPreviewError) ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
               {t("errors.fileTooLargeHelp")}
             </SizableText>
           ) : null}
@@ -114,9 +114,9 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
       ) : null}
       {bulkImportError ? (
         <>
-          <ErrorBox mt="$3">{bulkImportError}</ErrorBox>
+          <ErrorBox mt="3">{bulkImportError}</ErrorBox>
           {isFileTooLargeError(bulkImportError) ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
               {t("errors.fileTooLargeHelp")}
             </SizableText>
           ) : null}
@@ -124,12 +124,12 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
       ) : null}
 
       {bulkPreviewItems ? (
-        <View mt="$3">
-          <H3 mb="$1.5">{t("bulkPreviewHeading")}</H3>
+        <View mt="3">
+          <H3 mb="1-5">{t("bulkPreviewHeading")}</H3>
           <ul className="brew-recipe-edit-list-disc brew-list-mt0">
             {bulkPreviewItems.map((it) => (
               <li key={String(it?.index ?? Math.random())} className="brew-list-item-mb">
-                <SizableText size="$2" fontFamily="$body">
+                <SizableText size="2" fontFamily="body">
                   <SizableText fontWeight="bold">{String(it?.name ?? dash)}</SizableText>
                   <SizableText color="var(--text-muted)">
                     {" "}({t("resolvedStyleLabel")}:{" "}
@@ -141,7 +141,7 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
                   <ul className="brew-recipe-edit-list-disc brew-list-mt1">
                     {it.warnings.map((w: ImportWarning, idx: number) => (
                       <li key={`${String(w?.code ?? "warn")}-${idx}`}>
-                        <SizableText size="$2" fontFamily="$body">
+                        <SizableText size="2" fontFamily="body">
                           <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
                           <SizableText color="var(--text-muted)">{typeof w?.message === "string" ? w.message : ""}</SizableText>
                         </SizableText>
@@ -156,13 +156,13 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
       ) : null}
 
       {bulkResult ? (
-        <YStack gap="$3" mt="$3">
+        <YStack gap="3" mt="3">
           <View className="brew-field-block brew-field-block--computed">
             <View className="brew-field-block-header">
-              <SizableText size="$2" fontWeight="bold" fontFamily="$body">
+              <SizableText size="2" fontWeight="bold" fontFamily="body">
                 {t("bulkCreatedHeading")}
               </SizableText>
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                 {t("bulkCreatedCount", { count: bulkResult.created.length })}
               </SizableText>
             </View>
@@ -170,7 +170,7 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
               <ul className="brew-recipe-edit-list-disc brew-list-mt0">
                 {bulkResult.created.map((x) => (
                   <li key={String(x?.recipeId ?? Math.random())}>
-                    <SizableText size="$2" fontFamily="$body">
+                    <SizableText size="2" fontFamily="body">
                       <Link href={`/recipes/${String(x.recipeId)}/edit`}>{String(x?.name ?? "") || dash}</Link>
                       <SizableText color="var(--text-muted)"> ({String(x?.style ?? t("customStyleName"))})</SizableText>
                     </SizableText>
@@ -178,7 +178,7 @@ export function RecipeImportBulkSection({ model }: { model: UseRecipeImportFormM
                 ))}
               </ul>
             ) : (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
                 {t("bulkNoneCreated")}
               </SizableText>
             )}

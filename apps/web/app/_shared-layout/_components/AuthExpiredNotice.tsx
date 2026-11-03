@@ -126,22 +126,22 @@ export function AuthExpiredNotice(props: {
       bg="var(--surface)"
       borderWidth={1}
       borderColor="var(--border)"
-      rounded="$2"
-      p="$3"
-      mb="$3"
+      rounded="2"
+      p="3"
+      mb="3"
     >
-      <SizableText size="$3" fontWeight="bold" fontFamily="$body">
+      <SizableText size="3" fontWeight="bold" fontFamily="body">
         {t("title")}
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1">
         {t("body")}
       </SizableText>
 
-      <XStack gap="$3" ai="center" flexWrap="wrap" mt="$2">
-        <Button size="$2" onPress={onLoginNow} bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)">
+      <XStack gap="3" flexWrap="wrap" mt="2" ai="center">
+        <Button size="sm" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" onPress={onLoginNow}>
           {t("cta")}
         </Button>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("countdown", { seconds: secondsLeft })}
         </SizableText>
       </XStack>

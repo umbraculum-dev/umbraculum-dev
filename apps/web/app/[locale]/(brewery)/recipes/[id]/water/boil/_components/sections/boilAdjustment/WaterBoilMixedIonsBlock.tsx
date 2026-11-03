@@ -12,7 +12,7 @@ export function WaterBoilMixedIonsBlock({ model }: { model: WaterBoilMixedIonsMo
         <summary className="brew-field-block-header brew-details-summary">
           <SizableText fontWeight="bold">Mixed water ions</SizableText>
           <FieldBadge>Read-only</FieldBadge>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
             Computed from profiles + volumes
           </SizableText>
         </summary>
@@ -55,7 +55,7 @@ export function WaterBoilMixedIonsBlock({ model }: { model: WaterBoilMixedIonsMo
   }
 
   return (
-    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+    <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3" mb={0}>
       {t("saltAdditionsHelp")}
     </SizableText>
   );

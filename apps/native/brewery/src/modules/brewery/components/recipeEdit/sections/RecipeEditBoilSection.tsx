@@ -16,7 +16,7 @@ export function RecipeEditBoilSection({ model }: { model: RecipeEditScreenModel 
 
   return (
           <Accordion.Item value="boil">
-            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.boil")}>
+            <Card gap="2" mt="3" bg={SURFACE_BACKGROUND} aria-label={t("sections.boil")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -35,7 +35,7 @@ export function RecipeEditBoilSection({ model }: { model: RecipeEditScreenModel 
               <Accordion.Content>
                 <View style={{ marginTop: 12 }}>
                   <View>
-                    <Text fontSize={12} opacity={0.8} mb="$1">
+                    <Text fontSize={12} opacity={0.8} mb="1">
                       Boil time (min)
                     </Text>
                     <Input
@@ -43,10 +43,10 @@ export function RecipeEditBoilSection({ model }: { model: RecipeEditScreenModel 
                       onChangeText={setBoilTimeMinutes}
                       placeholder="60"
                       keyboardType="number-pad"
-                      size="$3"
-                      background="$background"
+                      size="md"
+                      background="background"
                       borderWidth={1}
-                      borderColor="$borderColor"
+                      borderColor="borderColor"
                     />
                   </View>
                 </View>

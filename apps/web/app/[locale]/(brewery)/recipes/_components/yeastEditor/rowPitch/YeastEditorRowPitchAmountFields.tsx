@@ -24,8 +24,8 @@ export function YeastEditorRowPitchAmountFields(props: YeastEditorRowPitchProps)
   const tMath = useTranslations("math");
 
   return (
-    <YStack gap="$1" minW={100}>
-      <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+    <YStack gap="1" minW={100}>
+      <XStack gap="2" alignItems="center" flexWrap="nowrap">
         <RecipeEditFieldLabel htmlFor={`yeast-amount-${r.id}`}>
           {t("yeastAmountLabel", {
             unit: r.format === "dry" ? tUnits("kg") : tUnits("L"),
@@ -91,7 +91,7 @@ export function YeastEditorRowPitchAmountFields(props: YeastEditorRowPitchProps)
         const amountDecimals = r.format === "dry" ? 3 : 2;
         if (isComputed) {
           return (
-            <YStack gap="$1">
+            <YStack gap="1">
               <RecipeEditReadOnlyValue>
                 {rawVal != null ? formatAmount(rawVal, amountDecimals) : "—"}
               </RecipeEditReadOnlyValue>
@@ -103,23 +103,23 @@ export function YeastEditorRowPitchAmountFields(props: YeastEditorRowPitchProps)
             id={`yeast-amount-${r.id}`}
             value={displayVal}
             onChangeText={(text) => {
-              const trimmed = text.trim();
-              const parsed = trimmed === "" ? null : Number(trimmed);
-              const valid = parsed != null && Number.isFinite(parsed) && parsed >= 0;
-              if (r.format === "dry") {
-                onUpdateRow(r.id, { amountKg: valid ? parsed : null });
-              } else {
-                onUpdateRow(r.id, { amountL: valid ? parsed : null });
-              }
-            }}
+                        const trimmed = text.trim();
+                        const parsed = trimmed === "" ? null : Number(trimmed);
+                        const valid = parsed != null && Number.isFinite(parsed) && parsed >= 0;
+                        if (r.format === "dry") {
+                          onUpdateRow(r.id, { amountKg: valid ? parsed : null });
+                        } else {
+                          onUpdateRow(r.id, { amountL: valid ? parsed : null });
+                        }
+                      }}
             keyboardType="decimal-pad"
-            size="$3"
+            size="md"
             w={100}
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         );
       })()}

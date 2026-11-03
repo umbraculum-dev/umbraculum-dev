@@ -40,7 +40,7 @@ export function WaterSpargeAcidificationSection({ model }: { model: WaterSpargeP
 
   const profilePhNote =
     selectedSpargeProfile?.ph == null ? (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1" mb={0}>
         Note: this profile has no pH. The calculation uses only the manually entered <strong>Starting pH</strong>.
       </SizableText>
     ) : null;
@@ -81,7 +81,7 @@ export function WaterSpargeAcidificationSection({ model }: { model: WaterSpargeP
               submitFirst
             />
 
-            {spargeError ? <ErrorBox id="sparge-error" mt="$3">{spargeError}</ErrorBox> : null}
+            {spargeError ? <ErrorBox id="sparge-error" mt="3">{spargeError}</ErrorBox> : null}
           </form>
 
           {spargeAcidificationMode === "targetPh" && spargeResult ? (

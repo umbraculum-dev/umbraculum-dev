@@ -22,14 +22,14 @@ export function BrewdayStepsSettingsScreenContent(props: { model: NativeBrewdayS
         </Text>
 
         {!canCall ? (
-          <Card background="$red3" p="$3">
-            <Text color="$red11">{t("accountRequired")}</Text>
+          <Card background="red3" p="3">
+            <Text color="red11">{t("accountRequired")}</Text>
           </Card>
         ) : null}
 
         {loadError ? (
-          <Card background="$red3" p="$3">
-            <Text color="$red11">{loadError}</Text>
+          <Card background="red3" p="3">
+            <Text color="red11">{loadError}</Text>
           </Card>
         ) : null}
 
@@ -41,7 +41,7 @@ export function BrewdayStepsSettingsScreenContent(props: { model: NativeBrewdayS
         <BrewdayNotesSection model={props.model} />
 
         <View style={{ gap: 8 }}>
-          <Button size="$4" onPress={() => { void onSave(); }} disabled={!canCall || saving}>
+          <Button size="lg" onPress={() => { void onSave(); }} disabled={!canCall || saving}>
             <Text>{saving ? t("saving") : t("save")}</Text>
           </Button>
           {saveStatus ? (
@@ -50,7 +50,7 @@ export function BrewdayStepsSettingsScreenContent(props: { model: NativeBrewdayS
             </Text>
           ) : null}
           {saveError ? (
-            <Text fontSize={12} color="$red10">
+            <Text fontSize={12} color="red10">
               {saveError}
             </Text>
           ) : null}

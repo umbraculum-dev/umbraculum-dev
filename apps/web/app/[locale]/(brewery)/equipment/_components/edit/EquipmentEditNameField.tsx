@@ -14,19 +14,19 @@ export function EquipmentEditNameField(props: {
   const { t, editDraft, setEditDraft } = props;
 
   return (
-    <YStack gap="$1.5">
+    <YStack gap="1-5">
       <RecipeEditFieldLabel htmlFor="equip-edit-name">{t("nameLabel")}</RecipeEditFieldLabel>
       <Input
         id="equip-edit-name"
         value={editDraft["name"] ?? ""}
         onChangeText={(v) => setEditDraft((d) => ({ ...d, name: v }))}
-        size="$3"
+        size="md"
         w="100%"
         bg="var(--surface)"
         borderWidth={1}
         borderColor="var(--border)"
-        rounded="$2"
-        fontFamily="$body"
+        rounded="2"
+        fontFamily="body"
       />
     </YStack>
   );

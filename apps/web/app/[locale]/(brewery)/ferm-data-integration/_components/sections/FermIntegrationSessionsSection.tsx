@@ -29,8 +29,8 @@ export function FermIntegrationSessionsSection(props: {
   const active = device.activeAttachment?.brewSession ?? null;
 
   return (
-    <YStack gap="$1">
-      <SizableText size="$2" fontFamily="$body">
+    <YStack gap="1">
+      <SizableText size="2" fontFamily="body">
         {t("sections.integration.attachedTo")}{" "}
         {active ? (
           <CodeInline>{`${active.code} — ${active.recipe?.name ?? ""}`.trim()}</CodeInline>
@@ -39,8 +39,8 @@ export function FermIntegrationSessionsSection(props: {
         )}
       </SizableText>
 
-      <XStack gap="$2" flexWrap="wrap" alignItems="center">
-        <SizableText id={attachId} size="$2" fontFamily="$body">
+      <XStack gap="2" flexWrap="wrap" alignItems="center">
+        <SizableText id={attachId} size="2" fontFamily="body">
           {t("sections.integration.attachLabel")}
         </SizableText>
         <BrewSelect

@@ -55,8 +55,8 @@ function HydrometerChart({
   }, [temperatureSeries.length, tMin, tMax, gMin, gMax]);
   const height = compact ? 220 : 320;
   const padding = compact ? { top: 24, bottom: 50, left: 52, right: 52 } : { top: 30, bottom: 60, left: 60, right: 60 };
-  return /* @__PURE__ */ jsxs(YStack, { gap: "$2", marginTop: "$2", children: [
-    title ? /* @__PURE__ */ jsx(Text, { fontSize: 12, color: "$gray11", children: title }) : null,
+  return /* @__PURE__ */ jsxs(YStack, { gap: "2", marginTop: "2", children: [
+    title ? /* @__PURE__ */ jsx(Text, { fontSize: 12, color: "gray11", children: title }) : null,
     /* @__PURE__ */ jsxs(Card, { accessibilityRole: "image", accessibilityLabel: title ?? "Hydrometer chart", children: [
       /* @__PURE__ */ jsxs(
         VictoryChart,
@@ -133,13 +133,13 @@ function HydrometerChart({
           ]
         }
       ),
-      /* @__PURE__ */ jsxs(XStack, { gap: "$3", flexWrap: "wrap", marginTop: "$2", children: [
-        /* @__PURE__ */ jsxs(Text, { fontSize: 12, color: "$gray11", children: [
+      /* @__PURE__ */ jsxs(XStack, { gap: "3", flexWrap: "wrap", marginTop: "2", children: [
+        /* @__PURE__ */ jsxs(Text, { fontSize: 12, color: "gray11", children: [
           gravityLabel,
           " ",
           /* @__PURE__ */ jsx(Text, { color: DEFAULT_GRAVITY_COLOR, children: "\u25CF" })
         ] }),
-        /* @__PURE__ */ jsxs(Text, { fontSize: 12, color: "$gray11", children: [
+        /* @__PURE__ */ jsxs(Text, { fontSize: 12, color: "gray11", children: [
           temperatureLabel,
           " ",
           /* @__PURE__ */ jsx(Text, { color: DEFAULT_TEMPERATURE_COLOR, children: "\u25CF" })

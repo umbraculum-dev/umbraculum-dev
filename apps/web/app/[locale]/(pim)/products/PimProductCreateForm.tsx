@@ -36,25 +36,25 @@ export function PimProductCreateForm({ model }: { model: PimProductsPageModel })
         padding: "12px",
       }}
     >
-      <YStack gap="$3">
-        <SizableText id="create-product-heading" size="$4" fontWeight="bold" fontFamily="$heading">
+      <YStack gap="3">
+        <SizableText id="create-product-heading" size="4" fontWeight="bold" fontFamily="heading">
           {tProducts("create")}
         </SizableText>
-        <XStack gap="$3" flexWrap="wrap">
-          <YStack gap="$1.5" flex={1} minWidth={180}>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <XStack gap="3" flexWrap="wrap">
+          <YStack gap="1-5" flex={1} minWidth={180}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {tFields("sku")}
             </SizableText>
             <Input value={createSku} onChangeText={setCreateSku} disabled={!canCall || creating} />
           </YStack>
-          <YStack gap="$1.5" flex={1} minWidth={180}>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <YStack gap="1-5" flex={1} minWidth={180}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {tFields("name")}
             </SizableText>
             <Input value={createName} onChangeText={setCreateName} disabled={!canCall || creating} />
           </YStack>
-          <YStack gap="$1.5" flex={1} minWidth={180}>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <YStack gap="1-5" flex={1} minWidth={180}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {tFields("attributeSet")}
             </SizableText>
             <Input
@@ -65,8 +65,8 @@ export function PimProductCreateForm({ model }: { model: PimProductsPageModel })
             />
           </YStack>
         </XStack>
-        <YStack gap="$1.5">
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <YStack gap="1-5">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {tFields("description")}
           </SizableText>
           <TextArea
@@ -76,12 +76,12 @@ export function PimProductCreateForm({ model }: { model: PimProductsPageModel })
             minHeight={80}
           />
         </YStack>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {tFields("status")}: {tValues("draft")}
         </SizableText>
         {createError ? <ErrorBox>{createError}</ErrorBox> : null}
         {createSuccess ? (
-          <SizableText size="$2" color="var(--success)" fontFamily="$body">
+          <SizableText size="2" color="var(--success)" fontFamily="body">
             {tProducts("createSuccess")}
           </SizableText>
         ) : null}

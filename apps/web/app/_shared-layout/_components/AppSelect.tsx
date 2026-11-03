@@ -66,7 +66,7 @@ export function BrewSelect({
       id={id}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
-      size="$3"
+      size="md"
       width={width === "full" ? "100%" : 160}
       minWidth={width === "full" ? undefined : 160}
       lazyMount
@@ -77,20 +77,20 @@ export function BrewSelect({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         iconAfter={null}
-        size="$3"
+        size="md"
         width={width === "full" ? "100%" : 160}
         minWidth={width === "full" ? undefined : 160}
         flexGrow={0}
         flexShrink={0}
-        jc="flex-start"
-        px="$2"
-        py="$2"
+        px="2"
+        py="2"
         color="var(--text)"
         backgroundColor={triggerStyles.backgroundColor}
         borderWidth={1}
         borderColor={triggerStyles.borderColor}
-        borderRadius="$2"
-        fontFamily="$body"
+        borderRadius="2"
+        fontFamily="body"
+        jc="flex-start"
       >
         <Select.Value placeholder={placeholder} />
       </Select.Trigger>

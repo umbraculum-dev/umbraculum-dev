@@ -22,20 +22,20 @@ export function WaterMashAcidificationActionsBlock(props: { model: WaterMashScre
   return (
     <View style={{ gap: 8, marginTop: 8 }}>
       <Button
-        size="$3"
-        background="$background"
+        size="md"
+        background="background"
         borderWidth={1}
-        borderColor="$borderColor"
+        borderColor="borderColor"
         onPress={() => { void onSaveMashDraft(); }}
         disabled={!canCall || savingMash}
       >
         <Text>{savingMash ? t("saving") : t("saveMashDraft")}</Text>
       </Button>
       <Button
-        size="$3"
-        background="$background"
+        size="md"
+        background="background"
         borderWidth={1}
-        borderColor="$borderColor"
+        borderColor="borderColor"
         onPress={() => { void onEstimateAndSaveSnapshot(); }}
         disabled={!canCall || mashSubmitting}
       >

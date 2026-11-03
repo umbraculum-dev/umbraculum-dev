@@ -43,13 +43,13 @@ export function ProductionOrderDetailContent({ model }: { model: ProductionOrder
   } = model;
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <H1>{order ? order.orderNumber : tOrders("listTitle")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("alphaNote")}
       </SizableText>
 
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <Link href="/production-orders">{tOrders("back")}</Link>
         <RefreshButton onClick={() => void refresh()} disabled={!canCall || loading}>
           {loading ? t("refreshing") : t("refresh")}
@@ -61,20 +61,20 @@ export function ProductionOrderDetailContent({ model }: { model: ProductionOrder
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
       {loading && !order ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
       {notFound ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noProductionOrders")}
         </SizableText>
       ) : null}
 
       {order ? (
         <>
-          <XStack gap="$3" flexWrap="wrap" alignItems="center">
+          <XStack gap="3" flexWrap="wrap" alignItems="center">
             <AsyncExportButton
               postUrl={`/api/mrp/work-orders/${encodeURIComponent(orderId)}/render-jobs`}
               body={{ templateRef: MRP_WORK_ORDER_PDF_TEMPLATE_REF }}
@@ -106,7 +106,7 @@ export function ProductionOrderDetailContent({ model }: { model: ProductionOrder
 
           <SectionCard headingId="mrp-order-detail-heading" title={tOrders("listTitle")}>
             <ProductionOrderSummary order={order} labels={orderLabels} />
-            <YStack gap="$1.5">
+            <YStack gap="1-5">
               <DetailRow label={tFields("source")} value={provenance} />
               <DetailRow
                 label={tFields("outputProductId")}
@@ -122,7 +122,7 @@ export function ProductionOrderDetailContent({ model }: { model: ProductionOrder
 
           <SectionCard headingId="mrp-order-operations-heading" title={tOrders("operations")}>
             {order.operations.length === 0 ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                 {tValues("none")}
               </SizableText>
             ) : (
@@ -141,7 +141,7 @@ export function ProductionOrderDetailContent({ model }: { model: ProductionOrder
             title={tOrders("materialRequirements")}
           >
             {requirements.length === 0 ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                 {t("noMaterialRequirements")}
               </SizableText>
             ) : (

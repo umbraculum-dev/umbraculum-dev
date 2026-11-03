@@ -21,7 +21,7 @@ export function RecipeEditEquipmentSection({ model }: { model: RecipeEditScreenM
 
   return (
           <Accordion.Item value="equipment">
-            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.equipment")}>
+            <Card gap="2" mt="3" bg={SURFACE_BACKGROUND} aria-label={t("sections.equipment")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -39,27 +39,27 @@ export function RecipeEditEquipmentSection({ model }: { model: RecipeEditScreenM
               </Accordion.Header>
               <Accordion.Content>
                 <View style={{ marginTop: 12 }}>
-                  <Text fontSize={12} opacity={0.8} mb="$2">
+                  <Text fontSize={12} opacity={0.8} mb="2">
                     {t("equipmentSection.help")}
                   </Text>
                   {equipmentProfilesError ? (
-                    <Text fontSize={12} color="$red10" mb="$2">
+                    <Text fontSize={12} color="red10" mb="2">
                       {equipmentProfilesError}
                     </Text>
                   ) : null}
                   <View style={{ gap: 8 }}>
                     <View>
-                      <Text fontSize={11} opacity={0.8} mb="$1">
+                      <Text fontSize={11} opacity={0.8} mb="1">
                         {t("equipmentSection.profileLabel")}
                       </Text>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
                           <Button
                             onPress={() => setSelectedEquipmentProfileId("")}
-                            size="$3"
-                            background={!selectedEquipmentProfileId ? "$color4" : "$background"}
+                            size="md"
+                            background={!selectedEquipmentProfileId ? "color4" : "background"}
                             borderWidth={1}
-                            borderColor="$borderColor"
+                            borderColor="borderColor"
                           >
                             <Text fontSize={14}>{t("equipmentSection.noneOption")}</Text>
                           </Button>
@@ -67,10 +67,10 @@ export function RecipeEditEquipmentSection({ model }: { model: RecipeEditScreenM
                             <Button
                               key={p.id}
                               onPress={() => setSelectedEquipmentProfileId(p.id)}
-                              size="$3"
-                              background={selectedEquipmentProfileId === p.id ? "$color4" : "$background"}
+                              size="md"
+                              background={selectedEquipmentProfileId === p.id ? "color4" : "background"}
                               borderWidth={1}
-                              borderColor="$borderColor"
+                              borderColor="borderColor"
                             >
                               <Text fontSize={14}>{p.name}</Text>
                             </Button>
@@ -82,29 +82,29 @@ export function RecipeEditEquipmentSection({ model }: { model: RecipeEditScreenM
                       <Button
                         onPress={() => void applyEquipmentProfileToRecipe("apply")}
                         disabled={!selectedEquipmentProfileId || equipmentApplying}
-                        size="$3"
+                        size="md"
                       >
                         <Text>{equipmentApplying ? t("equipmentSection.working") : t("equipmentSection.apply")}</Text>
                       </Button>
                       <Button
                         onPress={() => void applyEquipmentProfileToRecipe("reload")}
                         disabled={!selectedEquipmentProfileId || equipmentApplying}
-                        size="$3"
-                        chromeless
+                        size="md"
+                        variant="quiet"
                       >
                         <Text>{t("equipmentSection.reload")}</Text>
                       </Button>
                     </View>
                   </View>
                   {equipmentApplyError ? (
-                    <Text fontSize={12} color="$red10" mt="$2">
+                    <Text fontSize={12} color="red10" mt="2">
                       {equipmentApplyError}
                     </Text>
                   ) : null}
                   <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 4, marginTop: 8 }}>
                     <Text fontSize={12} opacity={0.8}>{t("equipmentSection.manageTemplatesText")}</Text>
-                    <Button chromeless size="$3" onPress={() => navigation.navigate("Equipment")}>
-                      <Text fontSize={12} color="$blue10">{t("equipmentSection.manageTemplatesLinkText")}</Text>
+                    <Button variant="quiet" size="md" onPress={() => navigation.navigate("Equipment")}>
+                      <Text fontSize={12} color="blue10">{t("equipmentSection.manageTemplatesLinkText")}</Text>
                     </Button>
                   </View>
                 </View>

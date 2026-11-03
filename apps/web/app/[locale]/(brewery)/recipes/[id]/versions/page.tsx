@@ -58,31 +58,31 @@ export default function RecipeVersionsPage() {
   }, [canCall, recipeId]);
 
   return (
-    <YStack gap="$3">
-      <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+    <YStack gap="3">
+      <H1 mb="2">{t("title")}</H1>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("subtitle")}
       </SizableText>
 
-      <XStack gap="$3" flexWrap="wrap" ai="center">
-        <SizableText size="$2" fontFamily="$body" mb={0}>
+      <XStack gap="3" flexWrap="wrap" ai="center">
+        <SizableText size="2" fontFamily="body" mb={0}>
           <Link href="/recipes">{t("backToRecipes")}</Link>
         </SizableText>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb={0}>
           ·
         </SizableText>
-        <SizableText size="$2" fontFamily="$body" mb={0}>
+        <SizableText size="2" fontFamily="body" mb={0}>
           <Link href={`/recipes/${recipeId}/edit`}>{t("backToEditor")}</Link>
         </SizableText>
       </XStack>
 
-      <View className="brew-panel" aria-labelledby="recipe-versions-heading" mt="$2">
-        <XStack gap="$3" items="center" justifyContent="space-between" flexWrap="wrap">
-          <SizableText id="recipe-versions-heading" fontFamily="$body" fontWeight="bold">
+      <View className="brew-panel" aria-labelledby="recipe-versions-heading" mt="2">
+        <XStack gap="3" items="center" justifyContent="space-between" flexWrap="wrap">
+          <SizableText id="recipe-versions-heading" fontFamily="body" fontWeight="bold">
             {t("listTitle")}
           </SizableText>
           <Button
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -94,10 +94,10 @@ export default function RecipeVersionsPage() {
           </Button>
         </XStack>
 
-        {error ? <ErrorBox mt="$3">{error}</ErrorBox> : null}
+        {error ? <ErrorBox mt="3">{error}</ErrorBox> : null}
 
         {!loading && sorted.length === 0 ? (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3">
             {t("empty")}
           </SizableText>
         ) : null}
@@ -106,18 +106,18 @@ export default function RecipeVersionsPage() {
           <ul className="brew-recipe-list" aria-label={t("listAriaLabel")}>
             {sorted.map((v) => (
               <li key={v.id} className="brew-recipe-list-row">
-                <YStack gap="$1.5">
-                  <SizableText fontFamily="$body">
+                <YStack gap="1-5">
+                  <SizableText fontFamily="body">
                     <SizableText fontWeight="bold">
                       {t("versionLabel")} {String(v.version).padStart(2, "0")}
                     </SizableText>
                     <SizableText color="var(--text-muted)"> · {v.name}</SizableText>
                   </SizableText>
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="3" flexWrap="wrap">
                     <Link href={`/recipes/${v.id}/edit`}>{t("openEditor")}</Link>
                     <Link href={`/recipes/${v.id}/water`}>{t("openWater")}</Link>
                   </XStack>
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
                     {t("updatedAt")}: {v.updatedAt}
                   </SizableText>
                 </YStack>

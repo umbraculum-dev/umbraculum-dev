@@ -26,7 +26,7 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditScreenMod
 
   return (
           <Accordion.Item value="mashing">
-            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.mashing")}>
+            <Card gap="2" mt="3" bg={SURFACE_BACKGROUND} aria-label={t("sections.mashing")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -44,7 +44,7 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditScreenMod
               </Accordion.Header>
               <Accordion.Content>
                 <View style={{ marginTop: 12 }}>
-                  <Text fontSize={12} opacity={0.8} mb="$2">
+                  <Text fontSize={12} opacity={0.8} mb="2">
                     {t("mashingHelp")}
                   </Text>
                   {waterVolumes ? (
@@ -58,10 +58,10 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditScreenMod
                         backgroundColor: FIELD_COMPUTED_BG,
                       }}
                     >
-                      <Text fontSize={12} fontWeight="bold" mb="$1">
+                      <Text fontSize={12} fontWeight="bold" mb="1">
                         {t("mashingWaterVolumesTitle")}
                       </Text>
-                      <Text fontSize={12} opacity={0.8} mb="$1">
+                      <Text fontSize={12} opacity={0.8} mb="1">
                         {t("mashingWaterVolumesSource")}
                       </Text>
                       <Text fontSize={12}>
@@ -72,12 +72,12 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditScreenMod
                       </Text>
                     </View>
                   ) : (
-                    <Text fontSize={12} opacity={0.8} mb="$2">
+                    <Text fontSize={12} opacity={0.8} mb="2">
                       {t("mashingWaterVolumesUnavailable")}
                     </Text>
                   )}
                   <View style={{ marginBottom: 12 }}>
-                    <Text fontSize={12} opacity={0.8} mb="$2">
+                    <Text fontSize={12} opacity={0.8} mb="2">
                       {t("mashStepsFromWaterPage")}
                     </Text>
                     <MashStepsEditor
@@ -95,7 +95,7 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditScreenMod
                   </View>
                   {(spargeRows.length > 0 || (spargeConfigured && waterVolumes)) ? (
                     <View style={{ marginBottom: 12 }}>
-                      <Text fontSize={12} opacity={0.8} mb="$2">
+                      <Text fontSize={12} opacity={0.8} mb="2">
                         {t("spargeStepFromWaterPage")}
                       </Text>
                       <View style={{ gap: 12 }}>
@@ -183,13 +183,13 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditScreenMod
                   ) : null}
                   <Button
                     onPress={() => navigation.navigate("WaterHub", { recipeId })}
-                    size="$3"
+                    size="md"
                   >
                     <Text>{t("nav.openWaterCalculator")}</Text>
                   </Button>
                   <Button
-                    size="$3"
-                    mt="$2"
+                    size="md"
+                    mt="2"
                     onPress={() => navigation.navigate("WaterProfiles")}
                   >
                     <Text>{t("waterProfilesManageText").replace(/\s+(on|su)$/i, "")}</Text>

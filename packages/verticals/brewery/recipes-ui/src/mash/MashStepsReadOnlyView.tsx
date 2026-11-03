@@ -13,7 +13,7 @@ export function MashStepsReadOnlyView(props: MashStepsReadOnlyViewProps) {
     props;
 
   return (
-    <YStack gap="$2">
+    <YStack gap="2">
       {mashProcedure ? (
         <Text fontSize={12} opacity={0.8}>
           {mashProcedure.name} · {t("mashingGrainTemp")}: {mashProcedure.grainTemperatureC} °C

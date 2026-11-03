@@ -19,7 +19,7 @@ export function WaterSpargeSaltsSection({ model }: { model: WaterSpargePageModel
           open={openSpargeSections.includes("salts")}
         />
         <Accordion.Content>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
             {t("saltAdditionsHelp")}
           </SizableText>
 

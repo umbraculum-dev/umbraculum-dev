@@ -24,8 +24,8 @@ export function YeastEditorRowManualCountFields(props: YeastEditorRowManualCount
   const tMath = useTranslations("math");
 
   return (
-    <XStack gap="$3" flexWrap="wrap" items="flex-end">
-      <YStack gap="$1" minW={140}>
+    <XStack gap="3" flexWrap="wrap" items="flex-end">
+      <YStack gap="1" minW={140}>
         <RecipeEditFieldLabel htmlFor={`yeast-manual-df-${r.id}`}>
           {t("yeastManualCountDFLabel")}
         </RecipeEditFieldLabel>
@@ -55,8 +55,8 @@ export function YeastEditorRowManualCountFields(props: YeastEditorRowManualCount
           placeholder="—"
         />
       </YStack>
-      <YStack gap="$1" minW={100}>
-        <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+      <YStack gap="1" minW={100}>
+        <XStack gap="2" alignItems="center" flexWrap="nowrap">
           <RecipeEditFieldLabel htmlFor={`yeast-manual-alive-${r.id}`}>
             {t("yeastManualCountAliveCellsLabel")}
           </RecipeEditFieldLabel>
@@ -73,33 +73,33 @@ export function YeastEditorRowManualCountFields(props: YeastEditorRowManualCount
         <Input
           id={`yeast-manual-alive-${r.id}`}
           value={
-            r.manualCellCount?.aliveCells != null && Number.isFinite(r.manualCellCount.aliveCells)
-              ? String(Math.round(r.manualCellCount.aliveCells))
-              : ""
-          }
+                    r.manualCellCount?.aliveCells != null && Number.isFinite(r.manualCellCount.aliveCells)
+                      ? String(Math.round(r.manualCellCount.aliveCells))
+                      : ""
+                  }
           onChangeText={(text) => {
-            const trimmed = text.trim();
-            const parsed = trimmed === "" ? null : Number(trimmed);
-            const alive = parsed != null && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-            const df = r.manualCellCount?.dilutionFactor;
-            if (!isValidDilutionFactor(df)) return;
-            onUpdateRow(r.id, {
-              manualCellCount: buildManualCellCountWithAlive(df, alive, r.manualCellCount),
-            });
-          }}
+                    const trimmed = text.trim();
+                    const parsed = trimmed === "" ? null : Number(trimmed);
+                    const alive = parsed != null && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+                    const df = r.manualCellCount?.dilutionFactor;
+                    if (!isValidDilutionFactor(df)) return;
+                    onUpdateRow(r.id, {
+                      manualCellCount: buildManualCellCountWithAlive(df, alive, r.manualCellCount),
+                    });
+                  }}
           onBlur={requestAmountRecalc}
           keyboardType="number-pad"
-          size="$3"
+          size="md"
           w={80}
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </YStack>
-      <YStack gap="$1" minW={100}>
-        <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+      <YStack gap="1" minW={100}>
+        <XStack gap="2" alignItems="center" flexWrap="nowrap">
           <RecipeEditFieldLabel htmlFor={`yeast-manual-total-${r.id}`}>
             {t("yeastManualCountTotalCellsLabel")}
           </RecipeEditFieldLabel>
@@ -116,32 +116,32 @@ export function YeastEditorRowManualCountFields(props: YeastEditorRowManualCount
         <Input
           id={`yeast-manual-total-${r.id}`}
           value={
-            r.manualCellCount?.totalCells != null && Number.isFinite(r.manualCellCount.totalCells)
-              ? String(Math.round(r.manualCellCount.totalCells))
-              : ""
-          }
+                    r.manualCellCount?.totalCells != null && Number.isFinite(r.manualCellCount.totalCells)
+                      ? String(Math.round(r.manualCellCount.totalCells))
+                      : ""
+                  }
           onChangeText={(text) => {
-            const trimmed = text.trim();
-            const parsed = trimmed === "" ? null : Number(trimmed);
-            const total = parsed != null && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-            const df = r.manualCellCount?.dilutionFactor;
-            if (!isValidDilutionFactor(df)) return;
-            onUpdateRow(r.id, {
-              manualCellCount: buildManualCellCountWithTotal(df, total, r.manualCellCount),
-            });
-          }}
+                    const trimmed = text.trim();
+                    const parsed = trimmed === "" ? null : Number(trimmed);
+                    const total = parsed != null && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+                    const df = r.manualCellCount?.dilutionFactor;
+                    if (!isValidDilutionFactor(df)) return;
+                    onUpdateRow(r.id, {
+                      manualCellCount: buildManualCellCountWithTotal(df, total, r.manualCellCount),
+                    });
+                  }}
           onBlur={requestAmountRecalc}
           keyboardType="number-pad"
-          size="$3"
+          size="md"
           w={80}
           bg="var(--surface)"
           borderWidth={1}
-          borderColor={isTotalCellsTooLow(r.manualCellCount) ? "$red10" : "var(--border)"}
-          rounded="$2"
-          fontFamily="$body"
+          borderColor={`${isTotalCellsTooLow(r.manualCellCount) ? "red10" : "var(--border)"}`}
+          rounded="2"
+          fontFamily="body"
         />
         {isTotalCellsTooLow(r.manualCellCount) ? (
-          <SizableText size="$1" color="$red10" fontFamily="$body" mt="$1">
+          <SizableText size="1" color="red10" fontFamily="body" mt="1">
             {t("yeastManualCountTotalTooLow")}
           </SizableText>
         ) : null}
@@ -154,9 +154,9 @@ export function YeastEditorRowManualCountFields(props: YeastEditorRowManualCount
           r.manualCellCount!.totalCells,
         );
         return (
-          <YStack gap="$1" minW={100}>
-            <XStack gap="$2" alignItems="center" flexWrap="wrap">
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <YStack gap="1" minW={100}>
+            <XStack gap="2" alignItems="center" flexWrap="wrap">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                 {t("yeastManualCountViabilityLabel")}
               </SizableText>
               {surfaceMath ? (
@@ -170,16 +170,16 @@ export function YeastEditorRowManualCountFields(props: YeastEditorRowManualCount
               ) : null}
             </XStack>
             <View
-              p="$2"
+              p="2"
               bg="var(--surface-2)"
-              rounded="$2"
+              rounded="2"
               borderWidth={1}
-              borderColor={isInvalid ? "$red10" : "var(--border)"}
+              borderColor={`${isInvalid ? "red10" : "var(--border)"}`}
             >
               <SizableText
-                size="$2"
-                fontFamily="$body"
-                color={isInvalid ? "$red10" : "var(--text)"}
+                size="sm"
+                fontFamily="body"
+                color={`${isInvalid ? "red10" : "var(--text)"}`}
               >
                 {roundTo(displayViability, 1)}%
               </SizableText>

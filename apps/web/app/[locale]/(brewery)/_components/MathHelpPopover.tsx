@@ -52,12 +52,12 @@ export function MathHelpPopover(props: {
     >
       <Button
         type="button"
-        size={size === "md" ? "$3" : "$2"}
-        chromeless
-        circular
+        size={size === "md" ? "3" : "2"}
         bg="color-mix(in srgb, var(--info) 14%, var(--surface-2))"
         borderWidth={1}
         borderColor="color-mix(in srgb, var(--info) 25%, var(--border))"
+        variant="quiet"
+        circular
         suppressHydrationWarning
         aria-label={ariaLabel}
         aria-expanded={open}

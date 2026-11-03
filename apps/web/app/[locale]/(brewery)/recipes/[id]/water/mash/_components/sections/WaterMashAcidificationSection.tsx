@@ -84,7 +84,7 @@ export function WaterMashAcidificationSection({ model }: { model: WaterMashPageM
               }}
             />
 
-            {mashError ? <ErrorBox id="mash-error" mt="$3">{mashError}</ErrorBox> : null}
+            {mashError ? <ErrorBox id="mash-error" mt="3">{mashError}</ErrorBox> : null}
           </form>
 
           {mashAcidificationMode === "targetPh" && mashResult ? (

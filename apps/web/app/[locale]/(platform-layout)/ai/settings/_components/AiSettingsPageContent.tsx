@@ -44,10 +44,10 @@ export function AiSettingsPageContent(props: { model: AiSettingsPageModel }) {
   return (
     <>
       <main role="main" aria-labelledby="ai-settings-title">
-        <YStack gap="$4">
-          <YStack gap="$2">
+        <YStack gap="4">
+          <YStack gap="2">
             <H1 id="ai-settings-title">{tSettings("title")}</H1>
-            <SizableText size="$2" color="var(--text-muted)">
+            <SizableText size="2" color="var(--text-muted)">
               {tSettings("subtitle")}
             </SizableText>
           </YStack>

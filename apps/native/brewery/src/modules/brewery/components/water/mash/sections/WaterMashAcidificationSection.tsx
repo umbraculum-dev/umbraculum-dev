@@ -19,7 +19,7 @@ export function WaterMashAcidificationSection(props: { model: WaterMashScreenMod
 
   return (
     <Accordion.Item value="acidification">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>

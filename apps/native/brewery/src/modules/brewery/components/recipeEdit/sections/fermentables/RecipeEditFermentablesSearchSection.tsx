@@ -20,7 +20,7 @@ export function RecipeEditFermentablesSearchSection({ model }: { model: RecipeEd
 
   return (
     <>
-      <Text fontSize={12} opacity={0.8} mb="$2">
+      <Text fontSize={12} opacity={0.8} mb="2">
         Enter your grist here.
       </Text>
       <View style={{ gap: 8, marginBottom: 12 }}>
@@ -28,13 +28,13 @@ export function RecipeEditFermentablesSearchSection({ model }: { model: RecipeEd
           value={fermentableQuery}
           onChangeText={setFermentableQuery}
           placeholder="Search fermentables"
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <Button onPress={() => void searchFermentables()} disabled={fermentableSearching} size="$3">
+          <Button onPress={() => void searchFermentables()} disabled={fermentableSearching} size="md">
             <Text>{fermentableSearching ? "Searching…" : "Search"}</Text>
           </Button>
           <Button
@@ -43,15 +43,15 @@ export function RecipeEditFermentablesSearchSection({ model }: { model: RecipeEd
               setFermentableResults([]);
             }}
             disabled={fermentableSearching}
-            size="$3"
-            chromeless
+            size="md"
+            variant="quiet"
           >
             <Text>{t("buttons.clear")}</Text>
           </Button>
         </View>
       </View>
       {fermentableSearchError ? (
-        <Text fontSize={12} color="$red10" mb="$2">
+        <Text fontSize={12} color="red10" mb="2">
           {fermentableSearchError}
         </Text>
       ) : null}
@@ -62,10 +62,10 @@ export function RecipeEditFermentablesSearchSection({ model }: { model: RecipeEd
               <Button
                 key={it.id}
                 onPress={() => addFermentableFromDb(it)}
-                size="$2"
-                background="$background"
+                size="sm"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               >
                 <Text fontSize={12}>
                   {it.name} {it.producer ? `(${it.producer})` : ""} — Add
@@ -76,7 +76,7 @@ export function RecipeEditFermentablesSearchSection({ model }: { model: RecipeEd
         </ScrollView>
       ) : null}
       <View style={{ marginTop: 8 }}>
-        <Button onPress={addGristRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor">
+        <Button onPress={addGristRow} size="md" background="background" borderWidth={1} borderColor="borderColor">
           <Text>{t("buttons.addCustomFermentable")}</Text>
         </Button>
       </View>

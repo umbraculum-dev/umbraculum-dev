@@ -21,7 +21,7 @@ export function WaterProfileListSection(props: { model: NativeWaterProfilesPageM
 
   return (
     <Accordion.Item value="table">
-      <Card gap="$2" aria-label={t("viewAllTableTitle")}>
+      <Card gap="2" aria-label={t("viewAllTableTitle")}>
         <Accordion.Header>
           <Accordion.Trigger
             width="100%"
@@ -38,12 +38,12 @@ export function WaterProfileListSection(props: { model: NativeWaterProfilesPageM
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <Text fontSize={12} opacity={0.8} mt="$2">
+          <Text fontSize={12} opacity={0.8} mt="2">
             {profiles ? `${allProfiles.length} profiles loaded.` : "Not loaded yet."}
           </Text>
 
           {error ? (
-            <Text fontSize={12} color="$red10" mt="$2">
+            <Text fontSize={12} color="red10" mt="2">
               {error}
             </Text>
           ) : null}
@@ -92,22 +92,22 @@ export function WaterProfileListSection(props: { model: NativeWaterProfilesPageM
                         <>
                           <Button
                             onPress={() => void onToggleVerify(p)}
-                            size="$2"
-                            background="$background"
+                            size="sm"
+                            background="background"
                             borderWidth={1}
-                            borderColor="$borderColor"
+                            borderColor="borderColor"
                           >
                             <Text fontSize={11}>{p.verificationStatus === "verified" ? "Mark unverified" : "Mark verified"}</Text>
                           </Button>
                           <Button
                             onPress={() => void onDeleteProfile(p)}
-                            size="$2"
-                            background="$background"
+                            size="sm"
+                            background="background"
                             borderWidth={1}
-                            borderColor="$borderColor"
+                            borderColor="borderColor"
                             accessibilityLabel={`Delete water profile ${p.name}`}
                           >
-                            <Text fontSize={11} color="$red10">Delete</Text>
+                            <Text fontSize={11} color="red10">Delete</Text>
                           </Button>
                         </>
                       ) : (
@@ -121,7 +121,7 @@ export function WaterProfileListSection(props: { model: NativeWaterProfilesPageM
           )}
 
           {!admin ? (
-            <Text fontSize={12} opacity={0.8} mt="$2">
+            <Text fontSize={12} opacity={0.8} mt="2">
               Only owner and brewery_admin can add/verify profiles.
             </Text>
           ) : null}

@@ -38,26 +38,26 @@ export function RecipesCreateSection({ model }: { model: RecipesPageModel }) {
           void onCreate(...(a as Parameters<typeof onCreate>));
         }}
       >
-        <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+        <XStack gap="3" flexWrap="wrap" ai="flex-end">
           <View flex={1} minWidth={200}>
-            <YStack gap="$1.5">
+            <YStack gap="1-5">
               <RecipeEditFieldLabel htmlFor="recipe-name">{t("nameLabel")}</RecipeEditFieldLabel>
               <Input
                 id="recipe-name"
                 value={newName}
                 onChangeText={setNewName}
                 required
-                size="$3"
+                size="md"
                 w="100%"
                 bg="var(--surface)"
                 borderWidth={1}
                 borderColor="var(--border)"
-                rounded="$2"
-                fontFamily="$body"
+                rounded="2"
+                fontFamily="body"
               />
             </YStack>
           </View>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="recipe-style">{t("styleLabel")}</RecipeEditFieldLabel>
             <BrewSelect
               id="recipe-style"
@@ -74,17 +74,17 @@ export function RecipesCreateSection({ model }: { model: RecipesPageModel }) {
               width="full"
             />
             {stylesError ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1-5">
                 {String(stylesError)}
               </SizableText>
             ) : null}
           </YStack>
         </XStack>
-        <XStack gap="$3" mt="$3" alignItems="center">
+        <XStack gap="3" mt="3" alignItems="center">
           <Button
             as="button"
             type="submit"
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -94,7 +94,7 @@ export function RecipesCreateSection({ model }: { model: RecipesPageModel }) {
             {creating ? t("creating") : t("createButton")}
           </Button>
           <Button
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -106,7 +106,7 @@ export function RecipesCreateSection({ model }: { model: RecipesPageModel }) {
           </Button>
         </XStack>
       </form>
-      {error ? <ErrorBox mt="$3">{error}</ErrorBox> : null}
+      {error ? <ErrorBox mt="3">{error}</ErrorBox> : null}
     </BrewAccordionSection>
   );
 }

@@ -17,9 +17,9 @@ export function EquipmentEditKettleFields(props: {
   return (
     <fieldset className="brew-fieldset">
       <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-kettle-vol">
               {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -29,18 +29,18 @@ export function EquipmentEditKettleFields(props: {
               inputMode="decimal"
               value={editDraft["kettleVolumeLiters"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleVolumeLiters: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-kettle-losses">
               {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -50,18 +50,18 @@ export function EquipmentEditKettleFields(props: {
               inputMode="decimal"
               value={editDraft["kettleLossesLiters"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleLossesLiters: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-evap">
               {t("kettleBoilEvaporationRatePercentPerHourLabel")}
             </RecipeEditFieldLabel>
@@ -71,18 +71,18 @@ export function EquipmentEditKettleFields(props: {
               inputMode="decimal"
               value={editDraft["kettleBoilEvaporationRatePercentPerHour"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleBoilEvaporationRatePercentPerHour: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-shrink">
               {t("kettleCoolingShrinkagePercentLabel")}
             </RecipeEditFieldLabel>
@@ -92,18 +92,18 @@ export function EquipmentEditKettleFields(props: {
               inputMode="decimal"
               value={editDraft["kettleCoolingShrinkagePercent"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleCoolingShrinkagePercent: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-hops-abs">
               {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
             </RecipeEditFieldLabel>
@@ -113,13 +113,13 @@ export function EquipmentEditKettleFields(props: {
               inputMode="decimal"
               value={editDraft["kettleHopsAbsorptionLiters"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

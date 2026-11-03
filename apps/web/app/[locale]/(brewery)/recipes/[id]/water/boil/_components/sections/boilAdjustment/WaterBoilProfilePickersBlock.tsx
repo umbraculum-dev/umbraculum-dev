@@ -28,9 +28,9 @@ export function WaterBoilProfilePickersBlock({ model }: { model: WaterBoilProfil
 
   return (
     <>
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={180}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="boil-source-profile">Source water profile</RecipeEditFieldLabel>
             <BrewSelect
               id="boil-source-profile"
@@ -45,12 +45,12 @@ export function WaterBoilProfilePickersBlock({ model }: { model: WaterBoilProfil
               ]}
               width="full"
             />
-            <View mt="$1.5">{selectedProfileInfo(selectedSource, "Selected")}</View>
+            <View mt="1-5">{selectedProfileInfo(selectedSource, "Selected")}</View>
           </YStack>
         </View>
 
         <View flex={1} minWidth={180}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="boil-target-profile">Target water profile</RecipeEditFieldLabel>
             <BrewSelect
               id="boil-target-profile"
@@ -65,12 +65,12 @@ export function WaterBoilProfilePickersBlock({ model }: { model: WaterBoilProfil
               ]}
               width="full"
             />
-            <View mt="$1.5">{selectedProfileInfo(selectedTarget, "Selected")}</View>
+            <View mt="1-5">{selectedProfileInfo(selectedTarget, "Selected")}</View>
           </YStack>
         </View>
 
         <View flex={1} minWidth={180}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="boil-dilution-profile">Dilution water profile</RecipeEditFieldLabel>
             <BrewSelect
               id="boil-dilution-profile"
@@ -85,14 +85,14 @@ export function WaterBoilProfilePickersBlock({ model }: { model: WaterBoilProfil
               ]}
               width="full"
             />
-            <View mt="$1.5">{selectedProfileInfo(selectedDilution, "Selected")}</View>
+            <View mt="1-5">{selectedProfileInfo(selectedDilution, "Selected")}</View>
           </YStack>
         </View>
       </XStack>
 
-      <XStack gap="$3" flexWrap="wrap" mt="$3" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" mt="3" ai="flex-end">
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="boil-source-volume">
               {t("sourceVolumeLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -101,18 +101,18 @@ export function WaterBoilProfilePickersBlock({ model }: { model: WaterBoilProfil
               keyboardType="decimal-pad"
               value={String(tapVolumeLiters)}
               onChangeText={(text) => setTapVolumeLiters(Number(text) || 0)}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="boil-dilution-volume">
               {t("dilutionVolumeLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -121,13 +121,13 @@ export function WaterBoilProfilePickersBlock({ model }: { model: WaterBoilProfil
               keyboardType="decimal-pad"
               value={String(dilutionVolumeLiters)}
               onChangeText={(text) => setDilutionVolumeLiters(Number(text) || 0)}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

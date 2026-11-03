@@ -26,7 +26,7 @@ export function EquipmentProfileEditForm(props: { model: NativeEquipmentPageMode
   return (
     <View style={{ marginTop: 12 }}>
     <Accordion.Item value="edit">
-      <Card gap="$2" aria-label={t("editTitle")}>
+      <Card gap="2" aria-label={t("editTitle")}>
         <Accordion.Header>
           <Accordion.Trigger
             width="100%"
@@ -116,24 +116,24 @@ export function EquipmentProfileEditForm(props: { model: NativeEquipmentPageMode
               <Button
                 onPress={() => void onSaveEdit()}
                 disabled={editSubmitting}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               >
                 <Text>{editSubmitting ? t("saving") : t("save")}</Text>
               </Button>
               <Button
                 onPress={cancelEdit}
                 disabled={editSubmitting}
-                size="$3"
-                chromeless
+                size="md"
+                variant="quiet"
               >
                 <Text>{t("cancel")}</Text>
               </Button>
             </View>
             {editError ? (
-              <Text fontSize={12} color="$red10">
+              <Text fontSize={12} color="red10">
                 {editError}
               </Text>
             ) : null}

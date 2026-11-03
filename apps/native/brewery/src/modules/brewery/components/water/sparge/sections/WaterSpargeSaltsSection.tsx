@@ -20,7 +20,7 @@ export function WaterSpargeSaltsSection(props: { model: WaterSpargeScreenModel }
 
   return (
     <Accordion.Item value="salts">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
           <Accordion.Trigger unstyled>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -30,7 +30,7 @@ export function WaterSpargeSaltsSection(props: { model: WaterSpargeScreenModel }
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <Text fontSize={12} opacity={0.8} mb="$2">
+          <Text fontSize={12} opacity={0.8} mb="2">
             {t("saltAdditionsHelp")}
           </Text>
           <SaltAdditionsEditor
@@ -39,7 +39,7 @@ export function WaterSpargeSaltsSection(props: { model: WaterSpargeScreenModel }
             idPrefix="sparge"
             disabled={!canCall}
           />
-          <Button size="$3" mt="$2" chromeless onPress={() => { void onSaveSalts(); }} disabled={!canCall || saving}>
+          <Button size="md" mt="2" variant="quiet" onPress={() => { void onSaveSalts(); }} disabled={!canCall || saving}>
             <Text>{saving ? "Saving…" : "Save salts"}</Text>
           </Button>
         </Accordion.Content>

@@ -78,16 +78,16 @@ export default function CrpResourcesPage() {
   };
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <H1>{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("subtitle")}
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("alphaNote")}
       </SizableText>
 
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <RefreshButton onClick={() => void refresh()} disabled={!canCall || loading}>
           {loading ? t("refreshing") : t("refresh")}
         </RefreshButton>
@@ -106,13 +106,13 @@ export default function CrpResourcesPage() {
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
       {loading && resources.length === 0 && workCenters.length === 0 ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
       {!loading && resources.length === 0 && workCenters.length === 0 && !error ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noResources")}
         </SizableText>
       ) : null}
@@ -122,9 +122,9 @@ export default function CrpResourcesPage() {
           <ul className="brew-recipe-list">
             {resources.map((resource) => (
               <li key={resource.id} className="brew-recipe-list-row">
-                <YStack gap="$2">
+                <YStack gap="2">
                   <ResourceSummary resource={resource} labels={labels} />
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="3" flexWrap="wrap">
                     <Link href={`/resources/${encodeURIComponent(resource.id)}`}>
                       {tResources("openDetail")}
                     </Link>
@@ -138,16 +138,16 @@ export default function CrpResourcesPage() {
 
       {workCenters.length > 0 ? (
         <SectionCard headingId="crp-work-centers-heading" title={tResources("workCentersTitle")}>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {tResources("workCentersNote")}
           </SizableText>
           <ul className="brew-recipe-list">
             {workCenters.map((workCenter) => (
               <li key={workCenter.id} className="brew-recipe-list-row">
-                <YStack gap="$2">
+                <YStack gap="2">
                   <WorkCenterSummary workCenter={workCenter} labels={labels} />
                   {workCenter.resourceId ? (
-                    <XStack gap="$3" flexWrap="wrap">
+                    <XStack gap="3" flexWrap="wrap">
                       <Link href={`/resources/${encodeURIComponent(workCenter.resourceId)}`}>
                         {tResources("openRelatedResource")}
                       </Link>

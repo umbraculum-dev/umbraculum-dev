@@ -50,7 +50,7 @@ export function WaterMashSaltsResultBlock({ model }: { model: WaterMashPageModel
           );
         })() : null}
         <FieldBadge>Computed</FieldBadge>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
           Does not consider acid; see &quot;Overall mash water result&quot; for combined output
         </SizableText>
       </summary>

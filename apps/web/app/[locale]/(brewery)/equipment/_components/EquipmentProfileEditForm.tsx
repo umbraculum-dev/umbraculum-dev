@@ -28,19 +28,19 @@ export function EquipmentProfileEditForm(props: { model: Model }) {
 
   return (
     <View
-      mt="$3"
+      mt="3"
       bg="var(--surface)"
       borderWidth={1}
       borderColor="var(--border)"
-      rounded="$2"
-      p="$3"
+      rounded="2"
+      p="3"
       aria-labelledby="equipment-edit"
     >
       <H2 id="equipment-edit" mt={0}>
         {t("editTitle")}
       </H2>
       <form onSubmit={(...a) => { void onSaveEdit(...(a as Parameters<typeof onSaveEdit>)); }} aria-describedby={editError ? "equipment-edit-error" : undefined}>
-        <YStack gap="$3">
+        <YStack gap="3">
           <EquipmentEditNameField
             t={t}
             editDraft={editDraft}
@@ -69,12 +69,12 @@ export function EquipmentProfileEditForm(props: { model: Model }) {
           />
         </YStack>
 
-        <XStack gap="$3" mt="$3">
-          <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={editSubmitting}>
+        <XStack gap="3" mt="3">
+          <Button as="button" type="submit" size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={editSubmitting}>
             {editSubmitting ? t("saving") : t("save")}
           </Button>
           <Button
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -86,7 +86,7 @@ export function EquipmentProfileEditForm(props: { model: Model }) {
           </Button>
         </XStack>
         {editError ? (
-          <ErrorBox id="equipment-edit-error" mt="$3">{editError}</ErrorBox>
+          <ErrorBox id="equipment-edit-error" mt="3">{editError}</ErrorBox>
         ) : null}
       </form>
     </View>

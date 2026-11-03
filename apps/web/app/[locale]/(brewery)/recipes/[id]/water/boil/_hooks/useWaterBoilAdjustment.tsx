@@ -139,13 +139,13 @@ export function useWaterBoilAdjustment(params: {
 
   const selectedProfileInfo = (p: WaterProfile | null, label: string) =>
     p ? (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {label}: <code>{p.name}</code>
       </SizableText>
     ) : (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {label}:{" "}
-        <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+        <SizableText as="span" size="2" color="var(--text-muted)" fontFamily="body" display="inline">
           —
         </SizableText>
       </SizableText>

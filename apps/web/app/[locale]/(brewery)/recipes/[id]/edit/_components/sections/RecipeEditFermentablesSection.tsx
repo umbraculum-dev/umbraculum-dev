@@ -27,15 +27,15 @@ export function RecipeEditFermentablesSection({model}: {model: RecipeEditPageMod
       open={openSections.fermentables}
       onOpenChange={(open) => setSectionOpen("fermentables", open)}
     >
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         Enter your grist here. Water calculator can import a read-only snapshot.
       </SizableText>
 
       <RecipeEditFermentablesToolbar model={model} />
 
-      <View borderTopWidth={1} borderColor="var(--border)" my="$3" />
+      <View borderTopWidth={1} borderColor="var(--border)" my="3" />
 
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" aria-live="polite">
         {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
         {gristTotals.weightedAvgLovibond !== null ? (
           <> · {t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}</>
@@ -44,14 +44,14 @@ export function RecipeEditFermentablesSection({model}: {model: RecipeEditPageMod
 
       <RecipeEditFermentablesList model={model} />
 
-      <XStack mt="$3" justify="flex-end">
+      <XStack mt="3" justify="flex-end">
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={() => { void onSave(); }}
           disabled={!canCallAccountScoped || saving}
         >
@@ -59,7 +59,7 @@ export function RecipeEditFermentablesSection({model}: {model: RecipeEditPageMod
         </Button>
       </XStack>
 
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3" mb={0}>
         {t("rawMaterialsCtaPrefix")}{" "}
         <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
       </SizableText>

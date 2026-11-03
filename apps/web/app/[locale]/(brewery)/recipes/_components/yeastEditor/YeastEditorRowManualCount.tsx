@@ -41,36 +41,36 @@ export function YeastEditorRowManualCount(props: YeastEditorRowManualCountProps)
   const manualCountReady = isManualCountCompleteForSave(manualCellCount);
 
   return (
-    <YStack gap="$2" flexBasis="100%" w="100%" mt="$2" pt="$2" borderTopWidth={1} borderColor="var(--border)">
-      <SizableText size="$2" fontFamily="$body" color="var(--text)" fontWeight="600">
+    <YStack gap="2" flexBasis="100%" w="100%" mt="2" pt="2" borderTopWidth={1} borderColor="var(--border)">
+      <SizableText size="2" fontFamily="body" color="var(--text)" fontWeight="600">
         {t("yeastManualCountSectionTitle")}
       </SizableText>
-      <SizableText size="$2" fontFamily="$body" color="var(--text-muted)" whiteSpace="pre-line">
+      <SizableText size="2" fontFamily="body" color="var(--text-muted)" whiteSpace="pre-line">
         {t("yeastManualCountFirstNote")}
       </SizableText>
       <SizableText
-        size="$2"
-        fontFamily="$body"
+        size="sm"
+        fontFamily="body"
         color="var(--text-muted)"
         whiteSpace="pre-line"
         textDecorationLine="underline"
       >
         {t("yeastManualCountDisclaimer")}
       </SizableText>
-      <SizableText size="$2" fontFamily="$body" color="var(--text-muted)" fontWeight="600">
+      <SizableText size="2" fontFamily="body" color="var(--text-muted)" fontWeight="600">
         {t("yeastManualCountDirectlyInfluencesAmount")}
       </SizableText>
-      <YStack gap="$2">
+      <YStack gap="2">
         <YeastEditorRowManualCountFields {...props} />
         {manualCountReady ? (
           <Button
-            size="$2"
+            size="sm"
             alignSelf="flex-start"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
             color="var(--text)"
-            fontFamily="$body"
+            fontFamily="body"
             onPress={onSave}
             disabled={!canCallAccountScoped || saving}
           >
@@ -78,15 +78,15 @@ export function YeastEditorRowManualCount(props: YeastEditorRowManualCountProps)
           </Button>
         ) : null}
         {lowViabilityWarning != null && idx === firstManualCountRowIdx ? (
-          <WarningBox mt="$2" role="status" aria-live="polite">
+          <WarningBox mt="2" role="status" aria-live="polite">
             {t("yeastLowViabilityWarning", { pct: Math.round(lowViabilityWarning) })}
           </WarningBox>
         ) : null}
         {manualCountReady && manualCellCount ? (
-          <View className="brew-field-block brew-field-block--computed" mt="$2">
-            <YStack gap="$2">
-              <YStack gap="$1">
-                <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+          <View className="brew-field-block brew-field-block--computed" mt="2">
+            <YStack gap="2">
+              <YStack gap="1">
+                <XStack gap="2" alignItems="center" flexWrap="nowrap">
                   <RecipeEditFieldLabel>
                     {t("yeastManualCountCalculatedLiveCellsPerGramLabel")}
                   </RecipeEditFieldLabel>

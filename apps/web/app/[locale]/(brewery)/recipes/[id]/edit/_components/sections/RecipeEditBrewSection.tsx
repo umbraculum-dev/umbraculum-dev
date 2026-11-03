@@ -23,23 +23,23 @@ export function RecipeEditBrewSection({ model }: { model: RecipeEditPageModel })
             open={openSections['brew']}
             onOpenChange={(open) => setSectionOpen("brew", open)}
           >
-            <YStack gap="$2" mt="$2">
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <YStack gap="2" mt="2">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
                 {t("brewNote")}
               </SizableText>
               <Button
-                onPress={() => { void onBrewRecipe(); }}
-                disabled={!canCallAccountScoped || creatingBrewSession}
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
+          onPress={() => { void onBrewRecipe(); }}
+          disabled={!canCallAccountScoped || creatingBrewSession}
+          size="md"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="body"
+        >
                 {t("brewButton")}
               </Button>
-              {brewSessionError ? <ErrorBox mt="$1.5">{brewSessionError}</ErrorBox> : null}
+              {brewSessionError ? <ErrorBox mt="1.5">{brewSessionError}</ErrorBox> : null}
             </YStack>
           </RecipeEditSection>
   );

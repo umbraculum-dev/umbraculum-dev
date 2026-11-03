@@ -14,17 +14,17 @@ export function FermIntegrationDevicesSection(props: { model: Model }) {
   const { t, tiltDevices, deviceWorkingId } = model;
 
   return (
-    <YStack gap="$2" mt="$3">
-      <SizableText size="$3" fontFamily="$body">
+    <YStack gap="2" mt="3">
+      <SizableText size="3" fontFamily="body">
         {t("sections.integration.devicesTitle")}
       </SizableText>
 
       {!tiltDevices.length ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("sections.integration.noDevices")}
         </SizableText>
       ) : (
-        <YStack gap="$2">
+        <YStack gap="2">
           {tiltDevices.map((d) => {
             const working = deviceWorkingId === d.id;
             const last = d.lastReading ?? null;
@@ -33,24 +33,24 @@ export function FermIntegrationDevicesSection(props: { model: Model }) {
             return (
               <YStack
                 key={d.id}
-                gap="$2"
-                p="$3"
+                gap="2"
+                p="3"
                 borderWidth={1}
                 borderColor="var(--border)"
-                borderRadius="$3"
+                borderRadius="3"
                 backgroundColor="var(--surface)"
               >
-                <YStack gap="$1">
-                  <SizableText size="$3" fontFamily="$body">
+                <YStack gap="1">
+                  <SizableText size="3" fontFamily="body">
                     {d.displayName ? `${t("sections.integration.device")} ${d.displayName}` : t("sections.integration.device")}
                   </SizableText>
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                     {t("sections.integration.deviceKey")}: <CodeInline>{d.deviceKey}</CodeInline>
                   </SizableText>
                 </YStack>
 
                 {last ? (
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                     {t("sections.integration.lastReading")}:{" "}
                     <CodeInline>
                       {typeof last.temperatureC === "number" ? `${last.temperatureC.toFixed(2)} °C` : "—"},{" "}
@@ -58,7 +58,7 @@ export function FermIntegrationDevicesSection(props: { model: Model }) {
                     </CodeInline>
                   </SizableText>
                 ) : (
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                     {t("sections.integration.noReadingsYet")}
                   </SizableText>
                 )}

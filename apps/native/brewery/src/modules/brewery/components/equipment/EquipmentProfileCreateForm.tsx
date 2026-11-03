@@ -46,7 +46,7 @@ export function EquipmentProfileCreateForm(props: { model: NativeEquipmentPageMo
   return (
     <View style={{ marginTop: 12 }}>
     <Accordion.Item value="create">
-      <Card gap="$2" aria-label={t("createTitle")}>
+      <Card gap="2" aria-label={t("createTitle")}>
         <Accordion.Header>
           <Accordion.Trigger
             width="100%"
@@ -131,15 +131,15 @@ export function EquipmentProfileCreateForm(props: { model: NativeEquipmentPageMo
             <Button
               onPress={() => void onCreate()}
               disabled={!createName.trim() || createSubmitting}
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             >
               <Text>{createSubmitting ? t("saving") : t("create")}</Text>
             </Button>
             {createError ? (
-              <Text fontSize={12} color="$red10">
+              <Text fontSize={12} color="red10">
                 {createError}
               </Text>
             ) : null}

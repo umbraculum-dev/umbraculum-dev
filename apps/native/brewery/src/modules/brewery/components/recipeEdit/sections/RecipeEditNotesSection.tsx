@@ -16,7 +16,7 @@ export function RecipeEditNotesSection({ model }: { model: RecipeEditScreenModel
 
   return (
           <Accordion.Item value="notes">
-            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.notes")}>
+            <Card gap="2" mt="3" bg={SURFACE_BACKGROUND} aria-label={t("sections.notes")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -35,18 +35,18 @@ export function RecipeEditNotesSection({ model }: { model: RecipeEditScreenModel
               <Accordion.Content>
                 <View style={{ marginTop: 12 }}>
                   <TextArea
-                    value={notes}
-                    onChangeText={setNotes}
-                    onFocus={() => {
-                      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
-                    }}
-                    placeholder="Notes"
-                    size="$3"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                    height={80}
-                  />
+              value={notes}
+              onChangeText={setNotes}
+              onFocus={() => {
+                                  setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+                                }}
+              placeholder="Notes"
+              size="md"
+              background="background"
+              borderWidth={1}
+              borderColor="border-color"
+              height={80}
+            />
                 </View>
               </Accordion.Content>
             </Card>

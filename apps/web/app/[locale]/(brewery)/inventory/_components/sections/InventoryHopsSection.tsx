@@ -27,69 +27,69 @@ export function InventoryHopsSection(props: InventorySectionProps) {
       open={openSections['hops']}
       onOpenChange={(o) => setSectionOpen("hops", o)}
     >
-<YStack gap="$2">
-              <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
+<YStack gap="2">
+              <XStack gap="2" flexWrap="wrap" alignItems="flex-end">
                 <form onSubmit={(...a) => { void onSearchHops(...(a as Parameters<typeof onSearchHops>)); }}>
-                  <XStack gap="$2" alignItems="center">
+                  <XStack gap="2" alignItems="center">
                     <Input
-                      value={hopQuery}
-                      onChangeText={setHopQuery}
-                      placeholder={t("searchPlaceholder")}
-                      size="$3"
-                      minWidth={180}
-                      bg="var(--surface)"
-                      borderWidth={1}
-                      borderColor="var(--border)"
-                      rounded="$2"
-                      fontFamily="$body"
-                    />
-                    <Button type="submit" size="$3" disabled={hopSearching}>
+                value={hopQuery}
+                onChangeText={setHopQuery}
+                placeholder={t("searchPlaceholder")}
+                size="md"
+                minWidth={180}
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
+                    <Button type="submit" size="md" disabled={hopSearching}>
                       {hopSearching ? "…" : t("search")}
                     </Button>
                     <Button
-                      size="$3"
-                      bg="var(--surface-2)"
-                      borderWidth={1}
-                      borderColor="var(--border)"
-                      color="var(--text)"
-                      onPress={clearHopsSearch}
-                      disabled={hopSearching || (!hopQuery && !hopResults.length && !hopSearched)}
-                    >
+                size="md"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                onPress={clearHopsSearch}
+                disabled={hopSearching || (!hopQuery && !hopResults.length && !hopSearched)}
+              >
                       {t("clearSearch")}
                     </Button>
                   </XStack>
                 </form>
               </XStack>
               {hopResults.length ? (
-                <View overflowX="auto" mt="$2">
-                  <YStack gap="$1">
+                <View overflowX="auto" mt="2">
+                  <YStack gap="1">
                     <StripedRow odd={false}>
-                      <XStack gap="$2" ai="center" minW="max-content">
-                        <View minW={235}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.name")}</SizableText></View>
-                        <View minW={120}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.type")}</SizableText></View>
-                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.alphaMin")}</SizableText></View>
-                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.alphaMax")}</SizableText></View>
+                      <XStack gap="2" minW="max-content" ai="center">
+                        <View minW={235}><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">{t("columns.name")}</SizableText></View>
+                        <View minW={120}><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">{t("columns.type")}</SizableText></View>
+                      <View minW={60}><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">{t("columns.alphaMin")}</SizableText></View>
+                      <View minW={60}><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">{t("columns.alphaMax")}</SizableText></View>
                       <View minW={60} />
                       </XStack>
                     </StripedRow>
                     {hopResults.map((it, idx) => (
                       <StripedRow key={it.id} odd={idx % 2 === 1}>
-                        <XStack gap="$2" ai="center" minW="max-content">
-                          <View minW={235}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
-                          <View minW={120}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.type ?? ""}</SizableText></View>
-                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.alphaMin === "number" ? it.alphaMin.toFixed(1) : ""}</SizableText></View>
-                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.alphaMax === "number" ? it.alphaMax.toFixed(1) : ""}</SizableText></View>
+                        <XStack gap="2" minW="max-content" ai="center">
+                          <View minW={235}><SizableText size="2" fontFamily="body" color="var(--text)">{it.name}</SizableText></View>
+                          <View minW={120}><SizableText size="2" fontFamily="body" color="var(--text)">{it.type ?? ""}</SizableText></View>
+                        <View minW={60}><SizableText size="2" fontFamily="body" color="var(--text)" textAlign="right">{typeof it.alphaMin === "number" ? it.alphaMin.toFixed(1) : ""}</SizableText></View>
+                        <View minW={60}><SizableText size="2" fontFamily="body" color="var(--text)" textAlign="right">{typeof it.alphaMax === "number" ? it.alphaMax.toFixed(1) : ""}</SizableText></View>
                         <View minW={60}>
                           <Button
-                            size="$2"
-                            bg="var(--surface-2)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            color="var(--text)"
-                            fontFamily="$body"
-                            onPress={() => void addFromHop(it)}
-                            disabled={!canCall}
-                          >
+                              size="sm"
+                              bg="var(--surface-2)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              color="var(--text)"
+                              fontFamily="body"
+                              onPress={() => void addFromHop(it)}
+                              disabled={!canCall}
+                            >
                             {t("addFromListAdd")}
                           </Button>
                         </View>
@@ -100,128 +100,128 @@ export function InventoryHopsSection(props: InventorySectionProps) {
                 </View>
               ) : null}
               {hopSearched && !hopSearching && hopResults.length === 0 ? (
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2">
                   {t("noResultsTryAnotherKey")}
                 </SizableText>
               ) : null}
               {hopResults.length && (hopTotal ?? hopResults.length) > PUBLIC_DB_PAGE_SIZE ? (
                 <XStack
-                  mt="$2"
-                  gap="$2"
-                  ai="center"
-                  jc="flex-end"
-                  aria-label={t("pagination.ariaLabel")}
-                >
+            mt="2"
+            gap="2"
+            ai="center"
+            jc="flex-end"
+            aria-label={t("pagination.ariaLabel")}
+          >
                   <Button
-                    size="$2"
-                    disabled={hopPage <= 0 || hopSearching}
-                    onPress={() => void fetchHopsPage(hopPage - 1, hopActiveQuery)}
-                  >
+              size="sm"
+              disabled={hopPage <= 0 || hopSearching}
+              onPress={() => void fetchHopsPage(hopPage - 1, hopActiveQuery)}
+            >
                     {t("pagination.prev")}
                   </Button>
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                     {t("pagination.status", {
                       page: hopPage + 1,
                       pages: Math.max(1, Math.ceil((hopTotal ?? hopResults.length) / PUBLIC_DB_PAGE_SIZE)),
                     })}
                   </SizableText>
                   <Button
-                    size="$2"
-                    disabled={
-                      hopSearching ||
-                      (hopTotal != null
-                        ? (hopPage + 1) * PUBLIC_DB_PAGE_SIZE >= hopTotal
-                        : hopResults.length < PUBLIC_DB_PAGE_SIZE)
-                    }
-                    onPress={() => void fetchHopsPage(hopPage + 1, hopActiveQuery)}
-                  >
+              size="sm"
+              disabled={
+                                  hopSearching ||
+                                  (hopTotal != null
+                                    ? (hopPage + 1) * PUBLIC_DB_PAGE_SIZE >= hopTotal
+                                    : hopResults.length < PUBLIC_DB_PAGE_SIZE)
+                                }
+              onPress={() => void fetchHopsPage(hopPage + 1, hopActiveQuery)}
+            >
                     {t("pagination.next")}
                   </Button>
                 </XStack>
               ) : null}
               <View
-                borderWidth={1}
-                borderColor="var(--border)"
-                bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
-                rounded="$2"
-                p="$3"
-              >
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb="$2">
+          borderWidth={1}
+          borderColor="var(--border)"
+          bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
+          rounded="2"
+          p="3"
+        >
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0} mb="2">
                   {t("addCustomGuidance")}
                 </SizableText>
-                <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
-                  <YStack minWidth={120} gap="$1">
+                <XStack gap="2" flexWrap="wrap" alignItems="flex-end">
+                  <YStack minWidth={120} gap="1">
                     <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
                     <Input
-                      value={customName['hop'] ?? ""}
-                      onChangeText={(v) => setCustomName((p) => ({ ...p, hop: v }))}
-                      placeholder={t("nameLabel")}
-                      size="$3"
-                      bg="var(--surface)"
-                      borderWidth={1}
-                      borderColor="var(--border)"
-                      rounded="$2"
-                      fontFamily="$body"
-                    />
+                value={customName['hop'] ?? ""}
+                onChangeText={(v) => setCustomName((p) => ({ ...p, hop: v }))}
+                placeholder={t("nameLabel")}
+                size="md"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
                   </YStack>
-                  <YStack minWidth={90} gap="$1">
+                  <YStack minWidth={90} gap="1">
                     <RecipeEditFieldLabel>{t("alphaMinLabel")}</RecipeEditFieldLabel>
                     <Input
-                      value={customHopAlphaMin}
-                      onChangeText={setCustomHopAlphaMin}
-                      keyboardType="decimal-pad"
-                      size="$3"
-                      bg="var(--surface)"
-                      borderWidth={1}
-                      borderColor="var(--border)"
-                      rounded="$2"
-                      fontFamily="$body"
-                    />
+                value={customHopAlphaMin}
+                onChangeText={setCustomHopAlphaMin}
+                keyboardType="decimal-pad"
+                size="md"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
                   </YStack>
-                  <YStack minWidth={90} gap="$1">
+                  <YStack minWidth={90} gap="1">
                     <RecipeEditFieldLabel>{t("alphaMaxLabel")}</RecipeEditFieldLabel>
                     <Input
-                      value={customHopAlphaMax}
-                      onChangeText={setCustomHopAlphaMax}
-                      keyboardType="decimal-pad"
-                      size="$3"
-                      bg="var(--surface)"
-                      borderWidth={1}
-                      borderColor="var(--border)"
-                      rounded="$2"
-                      fontFamily="$body"
-                    />
+                value={customHopAlphaMax}
+                onChangeText={setCustomHopAlphaMax}
+                keyboardType="decimal-pad"
+                size="md"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
                   </YStack>
-                  <YStack minWidth={80} gap="$1">
+                  <YStack minWidth={80} gap="1">
                     <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
                     <Input
-                      value={customQty['hop'] ?? ""}
-                      onChangeText={(v) => setCustomQty((p) => ({ ...p, hop: v }))}
-                      keyboardType="decimal-pad"
-                      size="$3"
-                      bg="var(--surface)"
-                      borderWidth={1}
-                      borderColor="var(--border)"
-                      rounded="$2"
-                      fontFamily="$body"
-                    />
+                value={customQty['hop'] ?? ""}
+                onChangeText={(v) => setCustomQty((p) => ({ ...p, hop: v }))}
+                keyboardType="decimal-pad"
+                size="md"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
                   </YStack>
                   <Button
-                    size="$3"
-                    onPress={() => void addCustom("hop")}
-                    bg="var(--surface-2)"
-                    borderWidth={1}
-                    borderColor="var(--border)"
-                    color="var(--text)"
-                  >
+              size="md"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              onPress={() => void addCustom("hop")}
+            >
                     {t("addCustom")}
                   </Button>
                 </XStack>
               </View>
               {itemsByCategory("hop").length === 0 ? (
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("noItems")}</SizableText>
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body">{t("noItems")}</SizableText>
               ) : (
-                <YStack gap="$2">{itemsByCategory("hop").map((it) => renderInventoryItemRow(m, it))}</YStack>
+                <YStack gap="2">{itemsByCategory("hop").map((it) => renderInventoryItemRow(m, it))}</YStack>
               )}
             </YStack>
               </RecipeEditSection>

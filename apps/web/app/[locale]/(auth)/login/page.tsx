@@ -36,11 +36,11 @@ export default function LoginPage() {
         bg="var(--surface)"
         borderWidth={1}
         borderColor="var(--border)"
-        rounded="$2"
-        p="$3"
+        rounded="2"
+        p="3"
       >
         <H1 mt={0}>{t("loginTitle")}</H1>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
           {t("submitting")}
         </SizableText>
       </View>
@@ -69,7 +69,8 @@ export default function LoginPage() {
       router.replace(next && next.startsWith("/") ? next : `/${locale}`);
     } catch (err) {
       if (err instanceof ApiClientError) {
-        setError(typeof err.body === "string" ? err.body : JSON.stringify(err.body));
+        // Prefer sanitized message (strips nginx HTML padding); body may be raw HTML.
+        setError(err.message);
       } else {
         setError(String(err));
       }
@@ -84,14 +85,14 @@ export default function LoginPage() {
       bg="var(--surface)"
       borderWidth={1}
       borderColor="var(--border)"
-      rounded="$2"
-      p="$3"
+      rounded="2"
+      p="3"
     >
       <H1 mt={0}>{t("loginTitle")}</H1>
 
       <form onSubmit={(...a) => { void onSubmit(...(a as Parameters<typeof onSubmit>)); }} aria-describedby={error ? "login-error" : undefined}>
-        <YStack gap="$3">
-          <YStack gap="$1.5">
+        <YStack gap="3">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="login-email">{t("emailLabel")}</RecipeEditFieldLabel>
             <Input
               id="login-email"
@@ -103,17 +104,17 @@ export default function LoginPage() {
               data-1p-ignore="true"
               data-bwignore="true"
               required
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
 
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="login-password">{t("passwordLabel")}</RecipeEditFieldLabel>
             <Input
               id="login-password"
@@ -125,37 +126,37 @@ export default function LoginPage() {
               data-1p-ignore="true"
               data-bwignore="true"
               required
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
 
           <LocaleSelect id="login-locale" />
 
-          <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={submitting}>
+          <Button as="button" type="submit" size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={submitting}>
             {submitting ? t("submitting") : t("submitLogin")}
           </Button>
         </YStack>
       </form>
 
       {error ? (
-        <ErrorBox id="login-error" mt="$3">{error}</ErrorBox>
+        <ErrorBox id="login-error" mt="3">{error}</ErrorBox>
       ) : null}
 
-      <View mt="$3">
-        <YStack gap="$1.5">
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" fontWeight="bold">
+      <View mt="3">
+        <YStack gap="1-5">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" fontWeight="bold">
             {t("noteTitle")}
           </SizableText>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {t("noteBody")}
           </SizableText>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             <Link href="/contributing?topic=i18n">{t("helpTranslate")}</Link>
           </SizableText>
         </YStack>

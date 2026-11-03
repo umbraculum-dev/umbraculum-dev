@@ -22,14 +22,14 @@ export function YeastEditorEditableSaveFooter({
   onDismissSaveStatus,
 }: YeastEditorEditableSaveFooterProps) {
   return (
-    <YStack mt="$3" mb="$4" gap="$2" alignItems="flex-end">
+    <YStack mt="3" mb="4" gap="2" alignItems="flex-end">
       <Button
-        size="$3"
+        size="md"
         bg="var(--surface-2)"
         borderWidth={1}
         borderColor="var(--border)"
         color="var(--text)"
-        fontFamily="$body"
+        fontFamily="body"
         onPress={onSave}
         disabled={!canCallAccountScoped || saving}
       >

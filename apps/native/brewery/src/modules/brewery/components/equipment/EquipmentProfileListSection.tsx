@@ -20,7 +20,7 @@ export function EquipmentProfileListSection(props: { model: NativeEquipmentPageM
 
   return (
     <Accordion.Item value="list">
-      <Card gap="$2" aria-label={t("listTitle")}>
+      <Card gap="2" aria-label={t("listTitle")}>
         <Accordion.Header>
           <Accordion.Trigger
             width="100%"
@@ -90,21 +90,21 @@ export function EquipmentProfileListSection(props: { model: NativeEquipmentPageM
                       <View style={{ width: 120, paddingHorizontal: 8, flexDirection: "row", gap: 8 }}>
                         <Button
                           onPress={() => beginEdit(p)}
-                          size="$2"
-                          background="$background"
+                          size="sm"
+                          background="background"
                           borderWidth={1}
-                          borderColor="$borderColor"
+                          borderColor="borderColor"
                         >
                           <Text fontSize={11}>{t("edit")}</Text>
                         </Button>
                         <Button
                           onPress={() => onDelete(p)}
-                          size="$2"
-                          background="$background"
+                          size="sm"
+                          background="background"
                           borderWidth={1}
-                          borderColor="$borderColor"
+                          borderColor="borderColor"
                         >
-                          <Text fontSize={11} color="$red10">{t("delete")}</Text>
+                          <Text fontSize={11} color="red10">{t("delete")}</Text>
                         </Button>
                       </View>
                     ) : null}

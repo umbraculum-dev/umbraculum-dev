@@ -35,9 +35,9 @@ export function WaterSpargeAcidificationInputs({ model }: { model: WaterSpargePa
   } = model;
 
   return (
-    <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+    <XStack gap="3" flexWrap="wrap" ai="flex-end">
       <View width="100%" flexBasis="100%">
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="sparge-profile">{t("spargeSourceWaterProfileLabel")}</RecipeEditFieldLabel>
           <BrewSelect
             id="sparge-profile"
@@ -78,7 +78,7 @@ export function WaterSpargeAcidificationInputs({ model }: { model: WaterSpargePa
       />
 
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="starting-alk">
             {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
           </RecipeEditFieldLabel>
@@ -87,72 +87,72 @@ export function WaterSpargeAcidificationInputs({ model }: { model: WaterSpargePa
             keyboardType="decimal-pad"
             value={String(startingAlk)}
             onChangeText={(text) => {
-              setStartingAlkTouched(true);
-              const n = Number(text);
-              setStartingAlk(Number.isFinite(n) ? n : 0);
-            }}
-            size="$3"
+                        setStartingAlkTouched(true);
+                        const n = Number(text);
+                        setStartingAlk(Number.isFinite(n) ? n : 0);
+                      }}
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="volume-l">{t("waterVolumeLabel", { unit: tUnits("L") })}</RecipeEditFieldLabel>
           <Input
             id="volume-l"
             keyboardType="decimal-pad"
             value={String(volumeLiters)}
             onChangeText={(text) => setVolumeLiters(Number(text) || 0)}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="starting-ph">Starting pH</RecipeEditFieldLabel>
           <Input
             id="starting-ph"
             keyboardType="decimal-pad"
             value={startingPh}
             onChangeText={setStartingPh}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       {spargeAcidificationMode === "targetPh" ? (
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="target-ph">Target pH</RecipeEditFieldLabel>
             <Input
               id="target-ph"
               keyboardType="decimal-pad"
               value={String(targetPh)}
               onChangeText={(text) => setTargetPh(Number(text) || 0)}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

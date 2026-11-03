@@ -12,7 +12,7 @@ export function RecipeEditHopsSection({ model }: { model: RecipeEditScreenModel 
 
   return (
     <Accordion.Item value="hops">
-      <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.hops")}>
+      <Card gap="2" mt="3" bg={SURFACE_BACKGROUND} aria-label={t("sections.hops")}>
         <Accordion.Header>
           <Accordion.Trigger
             width="100%"

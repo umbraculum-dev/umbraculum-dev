@@ -27,26 +27,26 @@ export function InventoryFermentablesSearchBlock(props: InventorySectionProps) {
 
   return (
     <>
-      <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
+      <XStack gap="2" flexWrap="wrap" alignItems="flex-end">
         <form onSubmit={(...a) => { void onSearchFermentables(...(a as Parameters<typeof onSearchFermentables>)); }}>
-          <XStack gap="$2" alignItems="center">
+          <XStack gap="2" alignItems="center">
             <Input
               value={fermentableQuery}
               onChangeText={setFermentableQuery}
               placeholder={t("searchPlaceholder")}
-              size="$3"
+              size="md"
               minWidth={180}
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
-            <Button type="submit" size="$3" disabled={fermentableSearching}>
+            <Button type="submit" size="md" disabled={fermentableSearching}>
               {fermentableSearching ? "…" : t("search")}
             </Button>
             <Button
-              size="$3"
+              size="md"
               bg="var(--surface-2)"
               borderWidth={1}
               borderColor="var(--border)"
@@ -60,34 +60,34 @@ export function InventoryFermentablesSearchBlock(props: InventorySectionProps) {
         </form>
       </XStack>
       {fermentableResults.length ? (
-        <View overflowX="auto" mt="$2">
-          <YStack gap="$1">
+        <View overflowX="auto" mt="2">
+          <YStack gap="1">
             <StripedRow odd={false}>
-              <XStack gap="$2" ai="center" minW="max-content">
-                <View minW={185}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.name")}</SizableText></View>
-                <View minW={110}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.producer")}</SizableText></View>
-                <View minW={50} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">{t("columns.lovibondShort")}</SizableText></View>
-                <View minW={70} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">{t("columns.yieldPercentShort")}</SizableText></View>
-                <View minW={60} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">{t("columns.ppg")}</SizableText></View>
+              <XStack gap="2" minW="max-content" ai="center">
+                <View minW={185}><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">{t("columns.name")}</SizableText></View>
+                <View minW={110}><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">{t("columns.producer")}</SizableText></View>
+                <View minW={50} jc="flex-end"><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)" textAlign="right" width="100%">{t("columns.lovibondShort")}</SizableText></View>
+                <View minW={70} jc="flex-end"><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)" textAlign="right" width="100%">{t("columns.yieldPercentShort")}</SizableText></View>
+                <View minW={60} jc="flex-end"><SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)" textAlign="right" width="100%">{t("columns.ppg")}</SizableText></View>
                 <View minW={60} />
               </XStack>
             </StripedRow>
             {fermentableResults.map((it, idx) => (
               <StripedRow key={it.id} odd={idx % 2 === 1}>
-                <XStack gap="$2" ai="center" minW="max-content">
-                  <View minW={185}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
-                  <View minW={110}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.producer ?? ""}</SizableText></View>
-                  <View minW={50}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.colorLovibond === "number" ? it.colorLovibond.toFixed(1) : ""}</SizableText></View>
-                  <View minW={70}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.yieldPercent === "number" ? it.yieldPercent.toFixed(3) : ""}</SizableText></View>
-                  <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.ppg === "number" ? it.ppg.toFixed(3) : ""}</SizableText></View>
+                <XStack gap="2" minW="max-content" ai="center">
+                  <View minW={185}><SizableText size="2" fontFamily="body" color="var(--text)">{it.name}</SizableText></View>
+                  <View minW={110}><SizableText size="2" fontFamily="body" color="var(--text)">{it.producer ?? ""}</SizableText></View>
+                  <View minW={50}><SizableText size="2" fontFamily="body" color="var(--text)" textAlign="right">{typeof it.colorLovibond === "number" ? it.colorLovibond.toFixed(1) : ""}</SizableText></View>
+                  <View minW={70}><SizableText size="2" fontFamily="body" color="var(--text)" textAlign="right">{typeof it.yieldPercent === "number" ? it.yieldPercent.toFixed(3) : ""}</SizableText></View>
+                  <View minW={60}><SizableText size="2" fontFamily="body" color="var(--text)" textAlign="right">{typeof it.ppg === "number" ? it.ppg.toFixed(3) : ""}</SizableText></View>
                   <View minW={60}>
                     <Button
-                      size="$2"
+                      size="sm"
                       bg="var(--surface-2)"
                       borderWidth={1}
                       borderColor="var(--border)"
                       color="var(--text)"
-                      fontFamily="$body"
+                      fontFamily="body"
                       onPress={() => void addFromFermentable(it)}
                       disabled={!canCall}
                     >
@@ -101,26 +101,26 @@ export function InventoryFermentablesSearchBlock(props: InventorySectionProps) {
         </View>
       ) : null}
       {fermentableSearched && !fermentableSearching && fermentableResults.length === 0 ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2">
           {t("noResultsTryAnotherKey")}
         </SizableText>
       ) : null}
       {fermentableResults.length && (fermentableTotal ?? fermentableResults.length) > PUBLIC_DB_PAGE_SIZE ? (
         <XStack
-          mt="$2"
-          gap="$2"
+          mt="2"
+          gap="2"
           ai="center"
           jc="flex-end"
           aria-label={t("pagination.ariaLabel")}
         >
           <Button
-            size="$2"
+            size="sm"
             disabled={fermentablePage <= 0 || fermentableSearching}
             onPress={() => void fetchFermentablesPage(fermentablePage - 1, fermentableActiveQuery)}
           >
             {t("pagination.prev")}
           </Button>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {t("pagination.status", {
               page: fermentablePage + 1,
               pages: Math.max(
@@ -130,13 +130,13 @@ export function InventoryFermentablesSearchBlock(props: InventorySectionProps) {
             })}
           </SizableText>
           <Button
-            size="$2"
+            size="sm"
             disabled={
-              fermentableSearching ||
-              (fermentableTotal != null
-                ? (fermentablePage + 1) * PUBLIC_DB_PAGE_SIZE >= fermentableTotal
-                : fermentableResults.length < PUBLIC_DB_PAGE_SIZE)
-            }
+                        fermentableSearching ||
+                        (fermentableTotal != null
+                          ? (fermentablePage + 1) * PUBLIC_DB_PAGE_SIZE >= fermentableTotal
+                          : fermentableResults.length < PUBLIC_DB_PAGE_SIZE)
+                      }
             onPress={() => void fetchFermentablesPage(fermentablePage + 1, fermentableActiveQuery)}
           >
             {t("pagination.next")}

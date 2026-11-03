@@ -36,27 +36,27 @@ function IntegrationKindSetup(props: {
   const isTilt = variant === "tilt";
 
   return (
-    <YStack gap="$2" mt={isTilt ? undefined : "$3"}>
-      <SizableText size="$3" fontFamily="$body">
+    <YStack gap="2" mt={`${isTilt ? undefined : "3"}`}>
+      <SizableText size="3" fontFamily="body">
         {t(`sections.integration.${kind}Title`)}
       </SizableText>
       {isTilt ? (
         <>
           <MessageBox variant="success">{t("sections.integration.tiltSupportedNotice")}</MessageBox>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {t("sections.integration.tiltSubtitle")}
           </SizableText>
-          <YStack gap="$1">
-            <SizableText size="$2" fontFamily="$body">
+          <YStack gap="1">
+            <SizableText size="2" fontFamily="body">
               {t("sections.integration.stepsLabel")}
             </SizableText>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {t("sections.integration.step1")}
             </SizableText>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {t("sections.integration.step2")}
             </SizableText>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {t("sections.integration.step3")}
             </SizableText>
           </YStack>
@@ -64,13 +64,13 @@ function IntegrationKindSetup(props: {
       ) : (
         <>
           <MessageBox variant="warning">{t(`sections.integration.${kind}Warning`)}</MessageBox>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {t(`sections.integration.${kind}Subtitle`)}
           </SizableText>
         </>
       )}
 
-      <XStack gap="$2" flexWrap="wrap" alignItems="center">
+      <XStack gap="2" flexWrap="wrap" alignItems="center">
         <Button
           onPress={() => void createOrRotate(kind)}
           disabled={!canCall || loading || isAnyWorking}
@@ -108,7 +108,7 @@ function IntegrationKindSetup(props: {
           {t("sections.integration.actions.revoke")}
         </Button>
 
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {loading || isAnyWorking
             ? t("sections.integration.working")
             : integration
@@ -118,8 +118,8 @@ function IntegrationKindSetup(props: {
       </XStack>
 
       {newPublicPaths[kind] ? (
-        <YStack gap="$2" mt="$2">
-          <SizableText size="$2" fontFamily="$body">
+        <YStack gap="2" mt="2">
+          <SizableText size="2" fontFamily="body">
             {t("sections.integration.cloudUrlLabel")}
           </SizableText>
           <Input
@@ -131,7 +131,7 @@ function IntegrationKindSetup(props: {
                 : t("sections.integration.cloudUrlAriaGeneric")
             }
           />
-          <XStack gap="$2" flexWrap="wrap" alignItems="center">
+          <XStack gap="2" flexWrap="wrap" alignItems="center">
             <Button
               onPress={() => {
                 void copyToClipboard(kind, "url", getFullPublicUrl(kind) ?? newPublicPaths[kind] ?? "");
@@ -143,7 +143,7 @@ function IntegrationKindSetup(props: {
                 ? t("sections.integration.copied")
                 : t("sections.integration.copy")}
             </Button>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {isTilt ? t("sections.integration.cloudUrlHelpTilt") : t("sections.integration.cloudUrlHelpGeneric")}
             </SizableText>
           </XStack>
@@ -151,12 +151,12 @@ function IntegrationKindSetup(props: {
       ) : null}
 
       {newTokens[kind] ? (
-        <YStack gap="$2" mt="$2">
-          <SizableText size="$2" fontFamily="$body">
+        <YStack gap="2" mt="2">
+          <SizableText size="2" fontFamily="body">
             {t("sections.integration.tokenLabel")}
           </SizableText>
           <Input value={newTokens[kind]} readOnly aria-label={t("sections.integration.tokenAria")} />
-          <XStack gap="$2" flexWrap="wrap" alignItems="center">
+          <XStack gap="2" flexWrap="wrap" alignItems="center">
             <Button
               onPress={() => {
                 void copyToClipboard(kind, "token", newTokens[kind] ?? "");
@@ -167,7 +167,7 @@ function IntegrationKindSetup(props: {
                 ? t("sections.integration.copied")
                 : t("sections.integration.copy")}
             </Button>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {t("sections.integration.tokenHelp")}
             </SizableText>
           </XStack>
@@ -184,13 +184,13 @@ export function FermIntegrationSetupSection(props: { model: Model }) {
   return (
     <>
       {error ? (
-        <SizableText size="$2" color="var(--danger)" fontFamily="$body" mt="$3">
+        <SizableText size="2" color="var(--danger)" fontFamily="body" mt="3">
           {t("sections.integration.error")} <CodeInline>{error}</CodeInline>
         </SizableText>
       ) : null}
 
-      <YStack gap="$2" mt="$3">
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <YStack gap="2" mt="3">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("sections.integration.intro")}
         </SizableText>
 
@@ -198,11 +198,11 @@ export function FermIntegrationSetupSection(props: { model: Model }) {
 
         <FermIntegrationDevicesSection model={model} />
 
-        <YStack borderBottomWidth={1} borderColor="var(--border)" my="$3" />
+        <YStack borderBottomWidth={1} borderColor="var(--border)" my="3" />
 
         <IntegrationKindSetup model={model} kind="ispindel" integration={ispindelIntegration} variant="generic" />
 
-        <YStack borderBottomWidth={1} borderColor="var(--border)" my="$3" />
+        <YStack borderBottomWidth={1} borderColor="var(--border)" my="3" />
 
         <IntegrationKindSetup model={model} kind="rapt" integration={raptIntegration} variant="generic" />
       </YStack>

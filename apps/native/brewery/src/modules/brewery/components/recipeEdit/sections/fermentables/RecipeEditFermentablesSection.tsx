@@ -13,7 +13,7 @@ export function RecipeEditFermentablesSection({ model }: { model: RecipeEditScre
 
   return (
     <Accordion.Item value="fermentables">
-      <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.fermentables")}>
+      <Card gap="2" mt="3" bg={SURFACE_BACKGROUND} aria-label={t("sections.fermentables")}>
         <Accordion.Header>
           <Accordion.Trigger
             width="100%"

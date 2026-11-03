@@ -28,9 +28,9 @@ export function AiSettingsAdminForm(props: {
         </View>
       ) : null}
 
-      <YStack gap="$1">
+      <YStack gap="1">
         <label htmlFor="ai-enable" aria-label={tSettings("enableLabel")}>
-          <XStack ai="center" gap="$2">
+          <XStack ai="center" gap="2">
             <input
               id="ai-enable"
               type="checkbox"
@@ -42,24 +42,24 @@ export function AiSettingsAdminForm(props: {
             <SizableText>{tSettings("enableLabel")}</SizableText>
           </XStack>
         </label>
-        <SizableText id="enable-hint" size="$1" color="var(--text-muted)">
+        <SizableText id="enable-hint" size="1" color="var(--text-muted)">
           {tSettings("enableHint")}
         </SizableText>
       </YStack>
 
-      <YStack gap="$1">
+      <YStack gap="1">
         <SizableText fontWeight="600">{tSettings("providerLabel")}</SizableText>
         <SizableText>Anthropic Claude</SizableText>
-        <SizableText size="$1" color="var(--text-muted)">
+        <SizableText size="1" color="var(--text-muted)">
           {tSettings("providerHint")}
         </SizableText>
       </YStack>
 
-      <YStack gap="$1">
+      <YStack gap="1">
         <label htmlFor="ai-api-key">
           <SizableText fontWeight="600">{tSettings("apiKeyLabel")}</SizableText>
         </label>
-        <SizableText size="$1" color="var(--text-muted)">
+        <SizableText size="1" color="var(--text-muted)">
           {settings.hasKey ? tSettings("apiKeyConfigured") : tSettings("apiKeyMissing")}
         </SizableText>
         <Input
@@ -73,12 +73,12 @@ export function AiSettingsAdminForm(props: {
           autoCapitalize="off"
           autoCorrect="off"
         />
-        <SizableText id="ai-api-key-hint" size="$1" color="var(--text-muted)">
+        <SizableText id="ai-api-key-hint" size="1" color="var(--text-muted)">
           {tSettings("apiKeyHint")}
         </SizableText>
         {settings.hasKey ? (
           <label htmlFor="ai-clear-key" aria-label={tSettings("apiKeyClearLabel")}>
-            <XStack ai="center" gap="$2">
+            <XStack ai="center" gap="2">
               <input
                 id="ai-clear-key"
                 type="checkbox"
@@ -88,15 +88,15 @@ export function AiSettingsAdminForm(props: {
                   setForm((f) => (f ? { ...f, clearKey: e.target.checked, apiKey: "" } : f))
                 }
               />
-              <SizableText size="$1">{tSettings("apiKeyClearLabel")}</SizableText>
+              <SizableText size="1">{tSettings("apiKeyClearLabel")}</SizableText>
             </XStack>
           </label>
         ) : null}
       </YStack>
 
-      <YStack gap="$1">
+      <YStack gap="1">
         <label htmlFor="ai-data-egress" aria-label={tSettings("dataEgressLabel")}>
-          <XStack ai="center" gap="$2">
+          <XStack ai="center" gap="2">
             <input
               id="ai-data-egress"
               type="checkbox"
@@ -110,11 +110,11 @@ export function AiSettingsAdminForm(props: {
             <SizableText>{tSettings("dataEgressLabel")}</SizableText>
           </XStack>
         </label>
-        <SizableText id="data-egress-hint" size="$1" color="var(--text-muted)">
+        <SizableText id="data-egress-hint" size="1" color="var(--text-muted)">
           {tSettings("dataEgressHint")}
         </SizableText>
         {settings.dataEgressAcceptedAt ? (
-          <SizableText size="$1" color="var(--text-muted)">
+          <SizableText size="1" color="var(--text-muted)">
             {tSettings("dataEgressAcceptedAt", {
               date: new Date(settings.dataEgressAcceptedAt).toLocaleDateString(),
             })}
@@ -122,14 +122,14 @@ export function AiSettingsAdminForm(props: {
         ) : null}
       </YStack>
 
-      <YStack gap="$2">
+      <YStack gap="2">
         <H2>{tSettings("roleLimitsTitle")}</H2>
-        <SizableText size="$1" color="var(--text-muted)">
+        <SizableText size="1" color="var(--text-muted)">
           {tSettings("roleLimitsHint")}
         </SizableText>
-        <YStack gap="$2">
+        <YStack gap="2">
           {ROLE_KEYS.map((role) => (
-            <XStack key={role} ai="center" gap="$3">
+            <XStack key={role} ai="center" gap="3">
               <View width={150}>
                 <SizableText>{tRoles(role)}</SizableText>
               </View>
@@ -154,7 +154,7 @@ export function AiSettingsAdminForm(props: {
         </YStack>
       </YStack>
 
-      <YStack gap="$1">
+      <YStack gap="1">
         <label htmlFor="ai-per-user-cap">
           <SizableText fontWeight="600">{tSettings("perUserDailyCapLabel")}</SizableText>
         </label>
@@ -171,7 +171,7 @@ export function AiSettingsAdminForm(props: {
           disabled={!isAdmin || saving}
           aria-describedby="ai-per-user-cap-hint"
         />
-        <SizableText id="ai-per-user-cap-hint" size="$1" color="var(--text-muted)">
+        <SizableText id="ai-per-user-cap-hint" size="1" color="var(--text-muted)">
           {tSettings("perUserDailyCapHint")}
         </SizableText>
       </YStack>
@@ -184,10 +184,10 @@ export function AiSettingsAdminForm(props: {
             backgroundColor: "var(--surface-subtle, #fafafa)",
           }}
         >
-          <YStack gap="$1">
+          <YStack gap="1">
             <H2>{tSettings("concierge.title")}</H2>
             <SizableText>{tSettings("concierge.body")}</SizableText>
-            <XStack mt="$1">
+            <XStack mt="1">
               <a href={CONCIERGE_URL} target="_blank" rel="noopener noreferrer">
                 <SizableText color="var(--accent, #06c)">{tSettings("concierge.cta")}</SizableText>
               </a>
@@ -197,7 +197,7 @@ export function AiSettingsAdminForm(props: {
       ) : null}
 
       {isAdmin ? (
-        <XStack mt="$2">
+        <XStack mt="2">
           <Button disabled={saving} onPress={() => void onSave()}>
             {saving ? tSettings("savingButton") : tSettings("saveButton")}
           </Button>

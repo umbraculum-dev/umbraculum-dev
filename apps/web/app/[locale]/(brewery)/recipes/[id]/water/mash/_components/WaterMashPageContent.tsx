@@ -42,7 +42,7 @@ export function WaterMashPageContent({ model }: { model: WaterMashPageModel }) {
       />
       <SurfaceMathToggleRow
         left={
-          <SizableText size="$2" fontFamily="$body" mt={0}>
+          <SizableText size="2" fontFamily="body" mt={0}>
             <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link> {" · "}
             <Link href={`/recipes/${recipeId}/water/sparge`}>{tWater("goToSparge")}</Link> {" · "}
             <Link href={`/recipes/${recipeId}/edit#fermentables`}>{tWater("viewEditGrist")}</Link>
@@ -50,14 +50,14 @@ export function WaterMashPageContent({ model }: { model: WaterMashPageModel }) {
         }
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
-        mb="$2"
+        mb="2"
       />
 
       {authState.status === "error" ? (
         <ErrorBox>{authState.error}</ErrorBox>
       ) : null}
 
-      <YStack gap="$4">
+      <YStack gap="4">
         <Accordion
           type="multiple"
           value={openMashSections}
@@ -74,14 +74,14 @@ export function WaterMashPageContent({ model }: { model: WaterMashPageModel }) {
         </Accordion>
 
         {savingError ? (
-          <ErrorBox mt="$3">{savingError}</ErrorBox>
+          <ErrorBox mt="3">{savingError}</ErrorBox>
         ) : null}
         {settingsError ? (
-          <ErrorBox mt="$3">{settingsError}</ErrorBox>
+          <ErrorBox mt="3">{settingsError}</ErrorBox>
         ) : null}
 
         {!admin ? (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
             Only <code>owner</code> and <code>brewery_admin</code> can manage water profiles. Current role:{" "}
             <code>{me?.role ?? "—"}</code>
           </SizableText>

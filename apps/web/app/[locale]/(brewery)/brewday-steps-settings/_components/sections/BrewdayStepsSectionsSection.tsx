@@ -40,32 +40,32 @@ export function BrewdayStepsSectionsSection(props: { model: Model }) {
       onOpenChange={(open) => setSectionOpen("brewdayStepsSections", open)}
     >
       {loading ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : (
         <>
-          <YStack gap="$2" mt="$2">
+          <YStack gap="2" mt="2">
             {PRESET_KEYS.map((k) => (
               <RecipeEditIngredientCard key={k}>
-                <XStack gap="$2" items="center" flexWrap="wrap">
+                <XStack gap="2" items="center" flexWrap="wrap">
                   <SizableText
-                    size="$3"
-                    fontFamily="$body"
+                    size="md"
+                    fontFamily="body"
                     color="var(--text)"
                     flex={1}
                     minW={0}
                   >
                     {t(`presetSections.${k}`)}
                   </SizableText>
-                  <XStack gap="$2" items="center">
+                  <XStack gap="2" items="center">
                     <Checkbox
                       id={`section-exclude-preset-${k}`}
                       checked={presetExcludes[k] ?? false}
                       onCheckedChange={(c) =>
-                        setPresetExclude(k, c === true)
-                      }
-                      size="$2"
+                                            setPresetExclude(k, c === true)
+                                          }
+                      size="sm"
                       aria-label={`${t("exclude")} ${t(`presetSections.${k}`)}`}
                     >
                       <Checkbox.Indicator />
@@ -73,9 +73,9 @@ export function BrewdayStepsSectionsSection(props: { model: Model }) {
                     <SizableText
                       as="label"
                       htmlFor={`section-exclude-preset-${k}`}
-                      size="$2"
+                      size="sm"
                       color="var(--text-muted)"
-                      fontFamily="$body"
+                      fontFamily="body"
                     >
                       {t("exclude")}
                     </SizableText>
@@ -85,24 +85,24 @@ export function BrewdayStepsSectionsSection(props: { model: Model }) {
             ))}
             {sections.customSections.map((c) => (
               <RecipeEditIngredientCard key={c.id}>
-                <XStack gap="$2" items="center" flexWrap="wrap">
+                <XStack gap="2" items="center" flexWrap="wrap">
                   <SizableText
-                    size="$3"
-                    fontFamily="$body"
+                    size="md"
+                    fontFamily="body"
                     color="var(--text)"
                     flex={1}
                     minW={0}
                   >
                     {c.name}
                   </SizableText>
-                  <XStack gap="$2" items="center">
+                  <XStack gap="2" items="center">
                     <Checkbox
                       id={`section-exclude-custom-${c.id}`}
                       checked={c.exclude}
                       onCheckedChange={(ch) =>
-                        setCustomSectionExclude(c.id, ch === true)
-                      }
-                      size="$2"
+                                            setCustomSectionExclude(c.id, ch === true)
+                                          }
+                      size="sm"
                       aria-label={`${t("exclude")} ${c.name}`}
                     >
                       <Checkbox.Indicator />
@@ -110,20 +110,20 @@ export function BrewdayStepsSectionsSection(props: { model: Model }) {
                     <SizableText
                       as="label"
                       htmlFor={`section-exclude-custom-${c.id}`}
-                      size="$2"
+                      size="sm"
                       color="var(--text-muted)"
-                      fontFamily="$body"
+                      fontFamily="body"
                     >
                       {t("exclude")}
                     </SizableText>
                   </XStack>
                   <Button
-                    size="$2"
+                    size="sm"
                     bg="var(--surface-2)"
                     borderWidth={1}
                     borderColor="var(--border)"
                     color="var(--text)"
-                    fontFamily="$body"
+                    fontFamily="body"
                     onPress={() => removeCustomSection(c.id)}
                     aria-label={`${t("remove")} ${c.name}`}
                   >
@@ -133,49 +133,49 @@ export function BrewdayStepsSectionsSection(props: { model: Model }) {
               </RecipeEditIngredientCard>
             ))}
           </YStack>
-          <XStack gap="$2" items="flex-end" flexWrap="wrap" mt="$3">
+          <XStack gap="2" items="flex-end" flexWrap="wrap" mt="3">
             <View flex={1} minW={180}>
               <RecipeEditFieldLabel htmlFor="add-custom-section">
                 {t("addCustomSection")}
               </RecipeEditFieldLabel>
               <Input
-                id="add-custom-section"
-                value={customSectionName}
-                onChangeText={setCustomSectionName}
-                placeholder={t("name")}
-                size="$3"
-                w="100%"
-                bg="var(--surface)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                rounded="$2"
-                fontFamily="$body"
-              />
+                  id="add-custom-section"
+                  value={customSectionName}
+                  onChangeText={setCustomSectionName}
+                  placeholder={t("name")}
+                  size="md"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="2"
+                  fontFamily="body"
+                />
             </View>
             <Button
-              size="$3"
-              bg="var(--surface-2)"
-              borderWidth={1}
-              borderColor="var(--border)"
-              color="var(--text)"
-              fontFamily="$body"
-              onPress={addCustomSection}
-              disabled={!canCallAccountScoped || !customSectionName.trim()}
-            >
+                size="md"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="body"
+                onPress={addCustomSection}
+                disabled={!canCallAccountScoped || !customSectionName.trim()}
+              >
               {t("add")}
             </Button>
           </XStack>
-          <XStack gap="$3" items="center" mt="$3">
+          <XStack gap="3" items="center" mt="3">
             <Button
-              size="$3"
-              bg="var(--surface-2)"
-              borderWidth={1}
-              borderColor="var(--border)"
-              color="var(--text)"
-              fontFamily="$body"
-              onPress={() => { void onSave(); }}
-              disabled={!canCallAccountScoped || saving}
-            >
+                size="md"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="body"
+                onPress={() => { void onSave(); }}
+                disabled={!canCallAccountScoped || saving}
+              >
               {saving
                 ? t("saving")
                 : t("save")}

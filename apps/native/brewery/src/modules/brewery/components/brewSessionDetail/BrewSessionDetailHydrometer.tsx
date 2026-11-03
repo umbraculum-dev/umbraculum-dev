@@ -28,7 +28,7 @@ export function BrewSessionDetailHydrometer(props: { model: BrewSessionDetailScr
   } = model;
 
   return (
-    <Card gap="$2" mb="$3">
+    <Card gap="2" mb="3">
       <Heading fontSize={16}>{t("hydrometerSectionTitle")}</Heading>
       <Text fontSize={12} opacity={0.8}>
         {t("hydrometerSectionSubtitle")}
@@ -46,8 +46,8 @@ export function BrewSessionDetailHydrometer(props: { model: BrewSessionDetailScr
       </View>
 
       {hydrometerKind !== "tilt" ? (
-        <Card borderWidth={1} borderColor="$yellow10" bg="rgba(234,179,8,0.18)">
-          <Text fontSize={12} color="$yellow10">
+        <Card borderWidth={1} borderColor="yellow10" bg="rgba(234,179,8,0.18)">
+          <Text fontSize={12} color="yellow10">
             {t("hydrometerNotSupportedYet")}
           </Text>
         </Card>
@@ -74,7 +74,7 @@ export function BrewSessionDetailHydrometer(props: { model: BrewSessionDetailScr
         <Button onPress={() => { void attachHydrometer(); }} disabled={!selectedDeviceId || working !== null}>
           <Text>{t("hydrometerAttach")}</Text>
         </Button>
-        <Button onPress={() => { void detachHydrometer(); }} disabled={!attached || working !== null} background="$background" borderWidth={1}>
+        <Button onPress={() => { void detachHydrometer(); }} disabled={!attached || working !== null} background="background" borderWidth={1}>
           <Text>{t("hydrometerDetach")}</Text>
         </Button>
       </View>
@@ -110,7 +110,7 @@ export function BrewSessionDetailHydrometer(props: { model: BrewSessionDetailScr
       ) : null}
 
       {hydrometerError ? (
-        <Text fontSize={12} color="$red10">
+        <Text fontSize={12} color="red10">
           {hydrometerError}
         </Text>
       ) : null}

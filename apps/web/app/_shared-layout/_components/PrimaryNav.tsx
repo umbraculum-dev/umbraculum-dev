@@ -169,14 +169,14 @@ export function PrimaryNav({ sharedLayoutNavItems }: { sharedLayoutNavItems: rea
         bottom={
           <>
             {authKnown && me ? (
-              <XStack alignItems="center" gap="$3" flexWrap="wrap" minWidth={0}>
+              <XStack alignItems="center" gap="3" flexWrap="wrap" minWidth={0}>
                 <AuthStatus me={me} activeWorkspace={active} />
                 <SwitchAccountLink />
               </XStack>
             ) : null}
             {process.env.NODE_ENV !== "production" && authError ? (
               <XStack alignItems="center" minHeight={28}>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                   (auth: {authError})
                 </SizableText>
               </XStack>

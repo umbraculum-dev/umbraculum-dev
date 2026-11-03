@@ -23,9 +23,9 @@ export function PageWideActionBar({ children }: PageWideActionBarProps) {
       bg="var(--background)"
       borderTopWidth={1}
       borderColor="var(--border)"
-      p="$3"
+      p="3"
     >
-      <XStack gap="$2" items="center" flexWrap="wrap">
+      <XStack gap="2" items="center" flexWrap="wrap">
         {children}
       </XStack>
     </View>

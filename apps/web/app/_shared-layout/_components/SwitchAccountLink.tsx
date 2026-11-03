@@ -14,10 +14,10 @@ export function SwitchWorkspaceLink() {
     >
       <XStack ai="center" height={28}>
         <SizableText
-          size="$2"
+          size="sm"
           color="var(--text-muted)"
-          fontFamily="$body"
-          hoverStyle={{ textDecoration: "underline" }}
+          fontFamily="body"
+          textDecoration="hover:underline"
         >
           {t("switchWorkspace")}
         </SizableText>

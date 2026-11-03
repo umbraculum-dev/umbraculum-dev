@@ -55,7 +55,7 @@ export function DashboardScreenSections(props: {
 
   return (
     <>
-      <Card gap="$2" aria-label={t("importExport.title")}>
+      <Card gap="2" aria-label={t("importExport.title")}>
         <Heading fontSize={18}>{t("importExport.title")}</Heading>
         <Text fontSize={12} opacity={0.85}>
           {t("importExport.supportedNote")}
@@ -71,13 +71,13 @@ export function DashboardScreenSections(props: {
           <Text>{t("importExport.actionsCta")}</Text>
         </Button>
         {openWebState.error ? (
-          <Text color="$red10" fontSize={12}>
+          <Text color="red10" fontSize={12}>
             {openWebState.error}
           </Text>
         ) : null}
       </Card>
 
-      <Card gap="$2" aria-label={t("links.title")}>
+      <Card gap="2" aria-label={t("links.title")}>
         <Heading fontSize={18}>{t("links.title")}</Heading>
         <View style={{ gap: 8, marginTop: 4 }}>
           {links.map((l) => (
@@ -110,7 +110,7 @@ export function DashboardScreenSections(props: {
         </View>
       </Card>
 
-      <Card gap="$2" aria-label={t("links.brewery")}>
+      <Card gap="2" aria-label={t("links.brewery")}>
         <Heading fontSize={18}>{t("links.brewery")}</Heading>
         <View style={{ gap: 8, marginTop: 4 }}>
           {breweryLinks.map((l) => (
@@ -130,7 +130,7 @@ export function DashboardScreenSections(props: {
         </View>
       </Card>
 
-      <Card gap="$2" aria-label={tNav("language")}>
+      <Card gap="2" aria-label={tNav("language")}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <Text fontSize={14}>
             {tCommon("localeLabel")}: {tLocales(locale)}
@@ -192,9 +192,9 @@ export function DashboardScreenSections(props: {
                     }}
                     accessibilityRole="button"
                     accessibilityLabel={tLocales(l)}
-                    background={selected ? "$color4" : "$background"}
+                    background={selected ? "color4" : "background"}
                     borderWidth={1}
-                    borderColor="$borderColor"
+                    borderColor="borderColor"
                   >
                     <Text fontWeight={selected ? "700" : "400"}>
                       {tLocales(l)}

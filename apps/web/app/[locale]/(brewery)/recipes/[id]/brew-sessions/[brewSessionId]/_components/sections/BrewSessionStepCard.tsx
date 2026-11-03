@@ -75,7 +75,7 @@ export function BrewSessionStepCard(props: { step: BrewSessionStep; ctx: BrewSes
   return (
     <View id={`step-${st.id}`}>
       <RecipeEditIngredientCard>
-        <YStack gap="$2">
+        <YStack gap="2">
           <BrewSessionStepCardHeader step={st} ctx={ctx} derived={derived} />
           <BrewSessionStepCardActions step={st} ctx={ctx} />
           {hasPresetStepTimer(st) ? (

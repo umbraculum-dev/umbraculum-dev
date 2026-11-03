@@ -30,9 +30,9 @@ export function WaterMashAcidificationInputs({ model }: { model: WaterMashPageMo
   } = model;
 
   return (
-    <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+    <XStack gap="3" flexWrap="wrap" ai="flex-end">
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="mash-starting-alk">
             {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
           </RecipeEditFieldLabel>
@@ -41,26 +41,26 @@ export function WaterMashAcidificationInputs({ model }: { model: WaterMashPageMo
             keyboardType="decimal-pad"
             value={String(mashStartingAlk)}
             onChangeText={(text) => {
-              setMashStartingAlkTouched(true);
-              const n = Number(text);
-              setMashStartingAlk(Number.isFinite(n) ? n : 0);
-            }}
-            size="$3"
+                        setMashStartingAlkTouched(true);
+                        const n = Number(text);
+                        setMashStartingAlk(Number.isFinite(n) ? n : 0);
+                      }}
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="mash-volume-l">
             {t("mashWaterVolumeLabel", { unit: tUnits("L") })}
           </RecipeEditFieldLabel>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1" mb={0}>
             Derived from Water adjustment volumes above (Source + Dilution).
           </SizableText>
           <Input
@@ -70,36 +70,36 @@ export function WaterMashAcidificationInputs({ model }: { model: WaterMashPageMo
             readOnly
             tabIndex={-1}
             disabled
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="mash-starting-ph">Starting pH</RecipeEditFieldLabel>
           <Input
             id="mash-starting-ph"
             keyboardType="decimal-pad"
             value={String(mashStartingPh)}
             onChangeText={(text) => setMashStartingPh(Number(text) || 0)}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="mash-target-ph">Target pH</RecipeEditFieldLabel>
           <Input
             id="mash-target-ph"
@@ -107,13 +107,13 @@ export function WaterMashAcidificationInputs({ model }: { model: WaterMashPageMo
             value={String(mashTargetPh)}
             onChangeText={(text) => setMashTargetPh(Number(text) || 0)}
             disabled={mashAcidificationMode === "manual"}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>

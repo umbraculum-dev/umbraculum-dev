@@ -1,7 +1,7 @@
 # Tamagui: type-system situation + our adaptation strategy
 
 **Tier:** Public
-**Status:** v1.4 — descriptive (not prescriptive). Living document. Updated 2026-06-10 — Tamagui CLI check gate (`scripts/check-tamagui-cli.sh`, agent rule 79). v1.3 — monorepo-wide Tamagui **2.2.0** stable adoption (exact pins + root overrides); tsc baselines re-measured. v1.2 (2026-05-21) refreshed shorthand-prop counts post-web-route-shape audit. v1.1 (2026-05-16) revised the "Tamagui wall" framing post-HIGH-full landing (see triage block #3 below).
+**Status:** v1.5 — descriptive (not prescriptive). Living document. Updated 2026-11-03 — monorepo Tamagui **3.2.0** (flat values + Config v5 kept). v1.4 — Tamagui CLI check gate (`scripts/check-tamagui-cli.sh`, agent rule 79). v1.3 — Tamagui **2.2.0** stable. v1.2 (2026-05-21) shorthand-prop counts. v1.1 (2026-05-16) "Tamagui wall" framing post-HIGH-full.
 **Audience:** maintainers, contributors authoring web/native UI code, anyone debugging Tamagui-related lint/TS noise.
 **Owners:** maintainers
 **Related:** `docs/LINTING.md` (the lint phase log, including the post-mortem revision of the Tamagui-wall framing), `packages/platform/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
@@ -20,7 +20,7 @@ This document:
 2. Describes how we work around each one,
 3. Tells future maintainers when *not* to spend time fixing what is upstream.
 
-**Pinned version (2026-06-10):** `tamagui` and every declared `@tamagui/*` dependency use exact **`2.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (devDep). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps.
+**Pinned version (2026-11-03):** `tamagui` and every declared `@tamagui/*` dependency use exact **`3.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (`tamagui` peer `>=3`). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. Keep `@tamagui/config/v5` for this wave (Config v6 is a separate design remap). Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps. See [`design/tamagui-3-upgrade-analysis.md`](design/tamagui-3-upgrade-analysis.md).
 
 ### Tamagui CLI check (duplicate instances)
 
@@ -39,14 +39,14 @@ The script: removes stale `packages/platform/ui/node_modules` and `packages/vert
 
 **Common cause:** root `npm install --legacy-peer-deps` or `apps/web` `npm install` nesting Tamagui under `file:` workspace links. Web compose startup removes package-mount nested trees; post-install dedupe in [`docker-compose.yml`](../docker-compose.yml) targets the `web_node_modules` volume mirror paths.
 
-Concrete numbers (refreshed 2026-06-10, post-2.2.0):
+Concrete numbers (refreshed 2026-11-03 pre-bump baselines in [`design/tamagui-3-upgrade-analysis.md`](design/tamagui-3-upgrade-analysis.md); historical 2.2.0 row kept for trend):
 
 | Where | TS errors (`tsc --noEmit`) | Notes |
 |---|---|---|
-| `packages/platform/ui` | 27 | Mostly `TS2322` (shorthand prop incompatibility) + `TS2590` (union too complex) — up from 25 at rc.17 |
-| `apps/web` | 1125 | Up from 1086 at rc.17 (2026-05-21). Still dominated by `TS2322` shorthand/token gaps. **>1000 trigger still active**; wrapper-layer work deferred — measure again on the next Tamagui minor. |
-| `apps/native` | 0 | Native side typically doesn't hit the web-DOM-shorthand collision — held at 0 through 2.2.0 (two `Accordion.Item` `mt` sites fixed via `YStack marginTop`) |
-| `packages/verticals/brewery/recipes-ui` | 0 | Uses a curated subset of Tamagui surface — held at 0 through 2.2.0 |
+| `packages/platform/ui` | 23 (pre-3.2.0) / was 27 at 2.2.0 | Mostly `TS2322` + `TS2590` — re-measure after 3.2.0 land |
+| `apps/web` | 723 (pre-3.2.0) / was 1125 at 2.2.0 doc row | Dominated by token/prop gaps; **>1000 trigger** from 2026-06 is no longer the live count — still defer wrapper-layer until a minor clearly shrinks residual `TS2322` |
+| `apps/native` | 0 (historical through 2.2.0) | Re-check with Expo 58 + Tamagui 3 after pin bump |
+| `packages/verticals/brewery/recipes-ui` | 0 (build DTS green on 3.2.0) | Curated subset; Button `disabled` / Checkbox Indicator adjusted for v3 |
 
 ---
 
@@ -203,7 +203,7 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 
 - A new Tamagui major version is released and changes the type ecosystem materially.
 - A new bug class appears that needs another wrapper primitive.
-- The `no-explicit-any` count concentrated in Tamagui-adjacent code crosses a threshold where the cost/benefit of a more aggressive wrapper layer changes. Original framing (2026-05-16): "~590 in apps/web alone; if it grows to >1000 in a single app, reconsider." **Update 2026-06-10:** v2 stable **2.2.0** landed repo-wide; `apps/web` `tsc` is **1125** (up from 1086 at rc.17) — the >1000 trigger remains active but wrapper-layer work stays deferred until a Tamagui minor measurably reduces shorthand `TS2322` count or a feature PR needs typed shorthands urgently. Next hygiene step: re-measure on Tamagui **2.3.x** (or next minor) before scoping a project-local shorthand wrapper.
+- The `no-explicit-any` count concentrated in Tamagui-adjacent code crosses a threshold where the cost/benefit of a more aggressive wrapper layer changes. Original framing (2026-05-16): "~590 in apps/web alone; if it grows to >1000 in a single app, reconsider." **Update 2026-11-03:** monorepo on Tamagui **3.2.0**; pre-bump `apps/web` `tsc` was **723** (below the old >1000 trigger). Wrapper-layer work stays deferred until residual `TS2322` after flat-values migration is re-measured and a feature PR needs typed tokens urgently.
 - HIGH-full lint upgrade landed 2026-05-16 — see [`docs/LINTING.md`](LINTING.md) for the full phase log. Tamagui-adjacent type leakage turned out to be ~6 warnings, not the 266 originally predicted (95% of the apps/web `no-unsafe-*` surface was a stale `account → workspace` rename, not Tamagui — see triage block #3 above). The trigger to re-open the "should we build a Tamagui adapter wrapper layer?" question: a *new* surge of Tamagui-attributed `no-unsafe-*` errors in CI specifically (>50 in a single PR cycle, or >100 cumulative across two cycles) — that would suggest Tamagui upstream's typings have regressed and the cost/benefit of a project-local adapter has shifted. Until then, per-line `eslint-disable-next-line ... -- Tamagui ... ; see docs/TAMAGUI.md` is the right granularity.
 
 ---

@@ -30,7 +30,7 @@ export function RecipeEditEquipmentSection({ model }: { model: RecipeEditPageMod
             open={openSections['equipment']}
             onOpenChange={(open) => setSectionOpen("equipment", open)}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {tEquip("help")}
             </SizableText>
 
@@ -38,7 +38,7 @@ export function RecipeEditEquipmentSection({ model }: { model: RecipeEditPageMod
               <ErrorBox>{equipmentProfilesError}</ErrorBox>
             ) : null}
 
-            <XStack gap="$3" mt="$3" flexWrap="wrap" items="flex-end">
+            <XStack gap="3" mt="3" flexWrap="wrap" items="flex-end">
               <View flex={1} minW={200}>
                 <RecipeEditField id="equipment-profile" label={tEquip("profileLabel")}>
                   <BrewSelect
@@ -55,36 +55,36 @@ export function RecipeEditEquipmentSection({ model }: { model: RecipeEditPageMod
                 </RecipeEditField>
               </View>
               <Button
-                onPress={() => void applyEquipmentProfileToRecipe("apply")}
-                disabled={!selectedEquipmentProfileId || equipmentApplying}
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
+          onPress={() => void applyEquipmentProfileToRecipe("apply")}
+          disabled={!selectedEquipmentProfileId || equipmentApplying}
+          size="md"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="body"
+        >
                 {equipmentApplying ? tEquip("working") : tEquip("apply")}
               </Button>
               <Button
-                onPress={() => void applyEquipmentProfileToRecipe("reload")}
-                disabled={!selectedEquipmentProfileId || equipmentApplying}
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
+          onPress={() => void applyEquipmentProfileToRecipe("reload")}
+          disabled={!selectedEquipmentProfileId || equipmentApplying}
+          size="md"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="body"
+        >
                 {equipmentApplying ? tEquip("working") : tEquip("reload")}
               </Button>
             </XStack>
 
             {equipmentApplyError ? (
-              <ErrorBox mt="$3">{equipmentApplyError}</ErrorBox>
+              <ErrorBox mt="3">{equipmentApplyError}</ErrorBox>
             ) : null}
 
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb={0}>
               {tEquip("manageTemplatesText")} <Link href="/equipment">{tEquip("manageTemplatesLinkText")}</Link>.
             </SizableText>
           </RecipeEditSection>

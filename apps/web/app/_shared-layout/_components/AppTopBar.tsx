@@ -17,9 +17,9 @@ export function AppTopBar({ left, right, bottom, ariaLabel }: AppTopBarProps) {
   return (
     <YStack
       aria-label={ariaLabel}
-      py="$2"
-      pb="$2.5"
-      mb="$2.5"
+      paddingTop="2"
+      pb="2-5"
+      mb="2-5"
       borderBottomWidth={1}
       borderColor="var(--border)"
       minWidth={0}
@@ -27,13 +27,13 @@ export function AppTopBar({ left, right, bottom, ariaLabel }: AppTopBarProps) {
       <XStack
         ai="center"
         jc="space-between"
-        gap={narrow ? "$2" : "$3"}
+        gap={`${narrow ? "2" : "3"}`}
         flexWrap="wrap"
         minWidth={0}
       >
         <XStack
           ai="center"
-          gap="$3"
+          gap="3"
           flexWrap={narrow ? "wrap" : "nowrap"}
           minWidth={0}
           flex={1}
@@ -43,7 +43,7 @@ export function AppTopBar({ left, right, bottom, ariaLabel }: AppTopBarProps) {
         <XStack
           ai="center"
           jc="flex-end"
-          gap="$3"
+          gap="3"
           flexWrap={narrow ? "wrap" : "nowrap"}
           minWidth={0}
         >
@@ -52,7 +52,7 @@ export function AppTopBar({ left, right, bottom, ariaLabel }: AppTopBarProps) {
       </XStack>
 
       {bottom ? (
-        <YStack mt="$2" minWidth={0}>
+        <YStack mt="2" minWidth={0}>
           {bottom}
         </YStack>
       ) : null}

@@ -43,7 +43,7 @@ export function YeastPageContent(props: { model: UseYeastPageModel }) {
 
   return (
     <>
-      <H1 mb="$2">{t("yeastPageTitle")}</H1>
+      <H1 mb="2">{t("yeastPageTitle")}</H1>
       <RecipeMetaLine
         recipeId={recipeId}
         enabled={authState.status === "ready"}
@@ -51,13 +51,13 @@ export function YeastPageContent(props: { model: UseYeastPageModel }) {
       />
       <SurfaceMathToggleRow
         left={
-          <SizableText size="$2" fontFamily="$body" mt={0}>
+          <SizableText size="2" fontFamily="body" mt={0}>
             <Link href={`/recipes/${recipeId}/edit#yeast`}>{t("yeastBackToRecipe")}</Link>
           </SizableText>
         }
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
-        mb="$2"
+        mb="2"
       />
 
       {authState.status === "error" ? (
@@ -68,7 +68,7 @@ export function YeastPageContent(props: { model: UseYeastPageModel }) {
       ) : null}
 
       {loading ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
@@ -77,11 +77,11 @@ export function YeastPageContent(props: { model: UseYeastPageModel }) {
       ) : null}
 
       {!loading && !loadError && recipe ? (
-          <View className="brew-panel" mt="$3" aria-labelledby="yeast-section-heading">
-            <H2 id="yeast-section-heading" mt={0} size="$5" fontFamily="$heading" color="var(--text)">
+          <View className="brew-panel" mt="3" aria-labelledby="yeast-section-heading">
+            <H2 id="yeast-section-heading" mt={0} size="5" fontFamily="heading" color="var(--text)">
               {t("yeastSectionHeading")}
             </H2>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb="$3">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb="3">
             {t("yeastHelp")}
           </SizableText>
           <YeastEditor
@@ -120,9 +120,9 @@ export function YeastPageContent(props: { model: UseYeastPageModel }) {
             )}
           />
           {saveError ? (
-            <ErrorBox mt="$3">{saveError}</ErrorBox>
+            <ErrorBox mt="3">{saveError}</ErrorBox>
           ) : null}
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3" mb={0}>
             {t("rawMaterialsCtaPrefix")}{" "}
             <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
           </SizableText>

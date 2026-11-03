@@ -6,7 +6,7 @@ import { Checkbox as TamaguiCheckbox } from "tamagui";
 import { Text } from "@umbraculum/ui";
 
 export interface BrewCheckboxProps
-  extends Omit<ComponentProps<typeof TamaguiCheckbox>, "children" | "native" | "unstyled"> {}
+  extends Omit<ComponentProps<typeof TamaguiCheckbox>, "children" | "native"> {}
 
 export function BrewCheckbox(props: BrewCheckboxProps) {
   const { accessibilityLabel, accessibilityRole, checked, disabled, size, ...rest } = props as unknown as {
@@ -22,16 +22,15 @@ export function BrewCheckbox(props: BrewCheckboxProps) {
   const sharedProps: ComponentProps<typeof TamaguiCheckbox> = {
     // Keep this custom-rendered so we control contrast/indicator on web.
     native: Platform.OS === "web" ? false : undefined,
-    size: size ?? "$2",
+    size: size ?? "2",
     ...(disabled !== undefined ? { disabled } : {}),
     checked,
-    unstyled: true,
     width: 18,
     height: 18,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: isChecked ? "$color8" : "$borderColor",
-    backgroundColor: isChecked ? "$color8" : "transparent",
+    borderColor: isChecked ? "color8" : "borderColor",
+    backgroundColor: isChecked ? "color8" : "transparent",
     alignItems: "center",
     justifyContent: "center",
     ...(rest as ComponentProps<typeof TamaguiCheckbox>),
@@ -40,8 +39,8 @@ export function BrewCheckbox(props: BrewCheckboxProps) {
   if (Platform.OS === "web") {
     return (
       <TamaguiCheckbox aria-label={accessibilityLabel} {...sharedProps}>
-        <TamaguiCheckbox.Indicator unstyled>
-          <Text fontSize={12} lineHeight={12} fontWeight="700" color="$color1">
+        <TamaguiCheckbox.Indicator>
+          <Text fontSize={12} lineHeight={12} fontWeight="700" color="color1">
             ✓
           </Text>
         </TamaguiCheckbox.Indicator>
@@ -51,8 +50,8 @@ export function BrewCheckbox(props: BrewCheckboxProps) {
 
   return (
     <TamaguiCheckbox accessibilityLabel={accessibilityLabel} accessibilityRole={accessibilityRole} {...sharedProps}>
-      <TamaguiCheckbox.Indicator unstyled>
-        <Text fontSize={12} lineHeight={12} fontWeight="700" color="$color1">
+      <TamaguiCheckbox.Indicator>
+        <Text fontSize={12} lineHeight={12} fontWeight="700" color="color1">
           ✓
         </Text>
       </TamaguiCheckbox.Indicator>

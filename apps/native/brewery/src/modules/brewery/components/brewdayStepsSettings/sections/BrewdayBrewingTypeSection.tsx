@@ -23,8 +23,8 @@ export function BrewdayBrewingTypeSection(props: { model: NativeBrewdayStepsSett
   } = props.model;
 
   return (
-    <Card gap="$2">
-      <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("brewingType")} width="100%" justifyContent="space-between">
+    <Card gap="2">
+      <SectionToggleButton variant="quiet" size="md" onPress={() => toggleOpen("brewingType")} width="100%" justifyContent="space-between">
         <Heading fontSize={18}>{t("sections.brewingType.title")}</Heading>
         <Text opacity={0.7}>{openSections.includes("brewingType") ? "▾" : "▸"}</Text>
       </SectionToggleButton>
@@ -42,19 +42,19 @@ export function BrewdayBrewingTypeSection(props: { model: NativeBrewdayStepsSett
             closeLabel={tCommon("close")}
           />
           <View>
-            <Text fontSize={11} opacity={0.8} mb="$1">
+            <Text fontSize={11} opacity={0.8} mb="1">
               {t("addCustomBrewingMethod")}
             </Text>
             <Input
               value={customBrewingMethodName}
               onChangeText={setCustomBrewingMethodName}
               placeholder={t("name")}
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             />
-            <Button size="$3" mt="$2" onPress={addCustomBrewingMethod} disabled={!customBrewingMethodName.trim()}>
+            <Button size="md" mt="2" onPress={addCustomBrewingMethod} disabled={!customBrewingMethodName.trim()}>
               <Text>{t("add")}</Text>
             </Button>
           </View>

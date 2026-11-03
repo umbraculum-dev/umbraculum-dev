@@ -75,7 +75,7 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
           <Spinner />
         </View>
       ) : state.status === "error" ? (
-        <Text color="$red10" fontSize={12}>
+        <Text color="red10" fontSize={12}>
           {state.error}
         </Text>
       ) : state.workspaces.length === 0 ? (
@@ -83,7 +83,7 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
           {t("selectWorkspace.noWorkspacesFound")}
         </Text>
       ) : (
-        <Card gap="$2">
+        <Card gap="2">
           {state.workspaces.map((w) => {
             const isActive = state.activeWorkspaceId === w.id;
             const isSubmitting = submittingId === w.id;
@@ -95,16 +95,16 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
                 accessibilityRole="button"
                 accessibilityLabel={w.name}
                 width="100%"
-                p="$3"
-                background={isActive ? "$color4" : "$background"}
+                p="3"
+                background={isActive ? "color4" : "background"}
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               >
                 <View style={{ width: "100%" }}>
                   <Text fontWeight="700" fontSize={16} lineHeight={20}>
                     {w.name}
                   </Text>
-                  <Text mt="$1" opacity={0.8} fontSize={12} lineHeight={16}>
+                  <Text mt="1" opacity={0.8} fontSize={12} lineHeight={16}>
                     {w.role}
                     {isSubmitting ? ` · ${t("submitting")}` : ""}
                   </Text>

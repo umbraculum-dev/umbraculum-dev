@@ -77,15 +77,15 @@ export function MessageBox({
       bg={styles.bg}
       borderWidth={1}
       borderColor={styles.borderColor}
-      rounded="$2"
-      p="$3"
+      rounded="2"
+      p="3"
       maxW="100%"
       role={role}
       aria-live={ariaLive}
     >
       <SizableText
-        size="$2"
-        fontFamily="$body"
+        size="sm"
+        fontFamily="body"
         color="var(--text)"
         whiteSpace="pre-wrap"
         style={{ wordBreak: "break-word" }}

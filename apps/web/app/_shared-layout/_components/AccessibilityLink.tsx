@@ -15,19 +15,16 @@ export function AccessibilityLink() {
       <XStack
         ai="center"
         jc="center"
-        px="$2"
-        borderRadius="$2"
+        px="2"
+        borderRadius="2"
         borderWidth={1}
-        borderColor="color-mix(in srgb, var(--focus-ring) 25%, var(--border))"
-        backgroundColor="color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))"
+        borderColor="color-mix(in srgb, var(--focus-ring) 25%, var(--border)) hover:color-mix(in srgb, var(--focus-ring) 25%, var(--border))"
+        backgroundColor="color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2)) hover:color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))"
         height={28}
-        hoverStyle={{
-          borderColor: "color-mix(in srgb, var(--focus-ring) 25%, var(--border))",
-          backgroundColor: "color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))",
-        }}
-        focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
+        outlineWidth="focus:2px"
+        outlineColor="focus:var(--focus-ring)"
       >
-        <SizableText size="$2" color="var(--text)" fontFamily="$body">
+        <SizableText size="2" color="var(--text)" fontFamily="body">
           {t("accessibility")}
         </SizableText>
       </XStack>

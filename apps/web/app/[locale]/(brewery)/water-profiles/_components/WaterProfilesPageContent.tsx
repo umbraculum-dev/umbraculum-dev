@@ -15,9 +15,9 @@ export function WaterProfilesPageContent(props: { model: Model }) {
 
   return (
     <>
-      <YStack width="100%" gap="$1" mb="$2">
+      <YStack width="100%" gap="1" mb="2">
         <H1 mt={0} mb={0}>{t("title")}</H1>
-        <SizableText size="$2" fontFamily="$body" mt={0} mb={0} display="block">
+        <SizableText size="2" fontFamily="body" mt={0} mb={0} display="block">
           <Link href="/recipes">{tEquipment("backToRecipes")}</Link>
         </SizableText>
       </YStack>
@@ -34,10 +34,10 @@ export function WaterProfilesPageContent(props: { model: Model }) {
         ) : null}
       </Accordion>
 
-      <View className="brew-panel" mt="$3">
+      <View className="brew-panel" mt="3">
         <ul className="brew-recipe-edit-list-disc brew-list-mb0">
           <li>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {t("rawMaterialsCtaPrefix")} <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
             </SizableText>
           </li>

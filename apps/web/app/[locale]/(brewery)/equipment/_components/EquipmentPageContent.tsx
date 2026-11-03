@@ -16,14 +16,14 @@ export function EquipmentPageContent(props: { model: Model }) {
   const { t, tNav, error, canWrite, editingId } = model;
 
   return (
-    <YStack gap="$3">
-      <H1 mb="$2">{tNav("equipment")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+    <YStack gap="3">
+      <H1 mb="2">{tNav("equipment")}</H1>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("subtitle")}
       </SizableText>
 
       <Link href="/recipes">
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">
           {t("backToRecipes")}
         </SizableText>
       </Link>

@@ -18,13 +18,13 @@ export function ModeFieldset<T extends string>(props: {
   return (
     <Card
       borderWidth={1}
-      borderColor="$borderColor"
-      backgroundColor="$background"
-      padding="$3"
-      marginBottom="$3"
-      gap="$2"
+      borderColor="borderColor"
+      backgroundColor="background"
+      padding="3"
+      marginBottom="3"
+      gap="2"
     >
-      <Text fontSize={12} opacity={0.8} marginBottom="$1">
+      <Text fontSize={12} opacity={0.8} marginBottom="1">
         {legend}
       </Text>
 
@@ -34,23 +34,22 @@ export function ModeFieldset<T extends string>(props: {
         onValueChange={(v) => onChange(v as T)}
         aria-label={legend}
       >
-        <YStack gap="$2">
+        <YStack gap="2">
           {options.map((o) => {
             const id = `${name}-${o.value}`;
             return (
-              <XStack key={o.value} gap="$2" alignItems="center">
+              <XStack key={o.value} gap="2" alignItems="center">
                 <RadioGroup.Item
                   id={id}
                   value={o.value}
-                  size="$3"
-                  borderColor="$borderColor"
+                  size="md"
+                  borderColor="border-color"
                 >
                   <RadioGroup.Indicator
-                    unstyled
                     width={10}
                     height={10}
                     borderRadius={9999}
-                    backgroundColor="$color8"
+                    backgroundColor="color8"
                   />
                 </RadioGroup.Item>
                 <Label htmlFor={id}>

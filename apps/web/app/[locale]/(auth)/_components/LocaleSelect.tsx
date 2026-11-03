@@ -23,7 +23,7 @@ export function LocaleSelect({ id = "auth-locale" }: { id?: string }) {
   };
 
   return (
-    <YStack gap="$1.5">
+    <YStack gap="1-5">
       <RecipeEditFieldLabel htmlFor={id}>{t("languageLabel")}</RecipeEditFieldLabel>
       <BrewSelect
         id={id}

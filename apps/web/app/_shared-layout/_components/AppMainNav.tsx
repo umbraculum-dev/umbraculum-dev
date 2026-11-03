@@ -22,11 +22,11 @@ export function AppMainNav({ items, ariaLabel }: AppMainNavProps) {
     <nav aria-label={ariaLabel}>
       <XStack
         flexWrap="wrap"
-        gap={media.mobile ? "$1.5" : "$2"}
+        gap={`${media.mobile ? "1-5" : "2"}`}
         width="100%"
-        p="$2"
-        mt="$2"
-        mb="$2"
+        p="2"
+        mt="2"
+        mb="2"
         borderWidth={1}
         borderColor="var(--border)"
         borderRadius="var(--radius)"
@@ -42,28 +42,25 @@ export function AppMainNav({ items, ariaLabel }: AppMainNavProps) {
             <XStack
               flex={1}
               minWidth={minWidth}
-              ai="center"
-              jc="center"
-              p="$2.5"
-              borderRadius="$2"
+              p="2-5"
+              borderRadius="2"
               borderWidth={1}
-              borderColor={item.isActive ? "color-mix(in srgb, var(--info) 35%, var(--border))" : "color-mix(in srgb, var(--border) 85%, var(--info))"}
+              borderColor={`${item.isActive ? "color-mix(in srgb, var(--info) 35%, var(--border))" : "color-mix(in srgb, var(--border) 85%, var(--info))"} hover:color-mix(in srgb, var(--info) 28%, var(--border))`}
               backgroundColor={item.isActive ? "color-mix(in srgb, var(--info) 18%, var(--surface-2))" : "color-mix(in srgb, var(--surface-2) 60%, var(--surface))"}
               color="var(--text)"
-              textDecoration="none"
+              textDecoration="none hover:none"
               cursor="pointer"
-              hoverStyle={{
-                textDecoration: "none",
-                background: "color-mix(in srgb, var(--info) 12%, var(--surface-2))",
-                borderColor: "color-mix(in srgb, var(--info) 28%, var(--border))",
-              }}
-              focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
+              background="hover:color-mix(in srgb, var(--info) 12%, var(--surface-2))"
+              outlineWidth="focus:2px"
+              outlineColor="focus:var(--focus-ring)"
+              ai="center"
+              jc="center"
             >
               <SizableText
-                size="$3"
+                size="md"
                 color="var(--text)"
                 fontWeight={item.isActive ? "600" : "400"}
-                fontFamily="$body"
+                fontFamily="body"
               >
                 {item.label}
               </SizableText>

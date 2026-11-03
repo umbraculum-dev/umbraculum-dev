@@ -72,7 +72,7 @@ export default function PimProductDetailPage() {
 
   if (notFound) {
     return (
-      <YStack gap="$3">
+      <YStack gap="3">
         <Link href="/products">{tProducts("back")}</Link>
         <SizableText color="var(--text-muted)">{tProducts("notFound")}</SizableText>
       </YStack>
@@ -80,11 +80,11 @@ export default function PimProductDetailPage() {
   }
 
   return (
-    <YStack gap="$3">
-      <XStack gap="$3" alignItems="center">
+    <YStack gap="3">
+      <XStack gap="3" alignItems="center">
         <Link href="/products">{tProducts("back")}</Link>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -98,12 +98,12 @@ export default function PimProductDetailPage() {
 
       {product ? (
         <>
-          <H1 mb="$2">{product.name}</H1>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <H1 mb="2">{product.name}</H1>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {tFields("sku")}: {product.sku} · {tFields("status")}: {tValues(product.status)}
           </SizableText>
           {product.description ? (
-            <SizableText fontFamily="$body">{product.description}</SizableText>
+            <SizableText fontFamily="body">{product.description}</SizableText>
           ) : null}
         </>
       ) : null}
@@ -113,15 +113,15 @@ export default function PimProductDetailPage() {
       <View role="region" aria-labelledby="variants-heading">
         <SizableText
           id="variants-heading"
-          size="$4"
+          size="lg"
           fontWeight="bold"
-          fontFamily="$heading"
-          mb="$2"
+          fontFamily="heading"
+          mb="2"
         >
           {tVariants("title")}
         </SizableText>
         {!loading && variants.length === 0 ? (
-          <SizableText size="$2" color="var(--text-muted)">
+          <SizableText size="2" color="var(--text-muted)">
             {tVariants("noVariants")}
           </SizableText>
         ) : null}
@@ -129,7 +129,7 @@ export default function PimProductDetailPage() {
           <ul className="brew-recipe-list">
             {variants.map((v) => (
               <li key={v.id} className="brew-recipe-list-row">
-                <SizableText fontFamily="$body">
+                <SizableText fontFamily="body">
                   <SizableText fontWeight="bold">{v.sku}</SizableText>
                   <SizableText color="var(--text-muted)"> · {v.name}</SizableText>
                 </SizableText>

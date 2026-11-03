@@ -32,16 +32,16 @@ export function SpargeStepReadOnlyRow(props: SpargeStepReadOnlyRowProps) {
     <Card
       data-mash-step-card
       {...((cardBackgroundColor ?? cardBorderColor) ? {} : { theme: "surface2" as const })}
-      backgroundColor={cardBackgroundColor ?? "$background"}
+      backgroundColor={cardBackgroundColor ?? "background"}
       borderWidth={1}
-      borderColor={cardBorderColor ?? "$borderColor"}
-      padding="$3"
-      gap="$2"
+      borderColor={cardBorderColor ?? "borderColor"}
+      padding="3"
+      gap="2"
     >
       <Text fontSize={12} fontWeight="700">
         {rest.stepNumber}. {rest.title}
       </Text>
-      <YStack gap="$2">
+      <YStack gap="2">
         <ReadOnlyFieldRow>
           <ReadOnlyField label={labels.name} value={rest.name} minWidth={90} />
           <ReadOnlyField label={labels.type} value={rest.typeLabel} minWidth={110} />

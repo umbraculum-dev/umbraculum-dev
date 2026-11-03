@@ -12,7 +12,7 @@ export function FermIntegrationSection(props: { model: NativeFermDataIntegration
   const { t, state } = model;
 
   return (
-    <Card gap="$2" aria-label={t("sections.integration.title")}>
+    <Card gap="2" aria-label={t("sections.integration.title")}>
       <Heading fontSize={18}>{t("sections.integration.title")}</Heading>
       <Text fontSize={12} opacity={0.85}>
         {t("sections.integration.intro")}
@@ -20,7 +20,7 @@ export function FermIntegrationSection(props: { model: NativeFermDataIntegration
 
       {state.status === "loading" ? <Spinner /> : null}
       {state.status === "error" ? (
-        <Text fontSize={12} color="$red10">
+        <Text fontSize={12} color="red10">
           {state.error}
         </Text>
       ) : null}

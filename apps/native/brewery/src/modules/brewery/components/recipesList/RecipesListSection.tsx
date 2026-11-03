@@ -22,14 +22,14 @@ export function RecipesListSection({ model }: { model: RecipesListModel }) {
   } = model;
 
   return (
-    <Card gap="$2" mt="$3" aria-label={t("listTitle")}>
+    <Card gap="2" mt="3" aria-label={t("listTitle")}>
       <Heading fontSize={18}>{t("listTitle")}</Heading>
       {loading && recipes.length === 0 ? (
         <View style={{ paddingVertical: 24, alignItems: "center" }}>
           <Spinner />
         </View>
       ) : error ? (
-        <Text fontSize={14} color="$red10">
+        <Text fontSize={14} color="red10">
           {error}
         </Text>
       ) : recipes.length === 0 ? (
@@ -68,12 +68,12 @@ export function RecipesListSection({ model }: { model: RecipesListModel }) {
                 <Button
                   onPress={() => onAskDelete(r.id)}
                   disabled={Boolean(deletingId)}
-                  chromeless
-                  size="$2"
+                  variant="quiet"
+                  size="sm"
                   accessibilityRole="button"
                   accessibilityLabel={t("delete.cta")}
                 >
-                  <Text color="$red10">{t("delete.cta")}</Text>
+                  <Text color="red10">{t("delete.cta")}</Text>
                 </Button>
               </View>
               {deleteConfirmId === r.id ? (
@@ -86,7 +86,7 @@ export function RecipesListSection({ model }: { model: RecipesListModel }) {
                     <Button
                       onPress={() => onDeleteConfirm(r.id)}
                       disabled={deletingId === r.id}
-                      background="$red10"
+                      background="red10"
                       accessibilityRole="button"
                       accessibilityLabel={t("delete.confirmCta")}
                     >
@@ -106,11 +106,11 @@ export function RecipesListSection({ model }: { model: RecipesListModel }) {
               <View style={{ flexDirection: "row", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
                 <Button
                   onPress={() => openEditor(r.id)}
-                  size="$4"
+                  size="lg"
                   width="100%"
-                  background="$background"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                   accessibilityRole="button"
                   accessibilityLabel={t("openEditor")}
                 >

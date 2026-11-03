@@ -21,8 +21,8 @@ export function BrewdayStepsSectionsSection(props: { model: NativeBrewdayStepsSe
   } = props.model;
 
   return (
-    <Card gap="$2">
-      <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("sections")} width="100%" justifyContent="space-between">
+    <Card gap="2">
+      <SectionToggleButton variant="quiet" size="md" onPress={() => toggleOpen("sections")} width="100%" justifyContent="space-between">
         <Heading fontSize={18}>{t("sections.brewdayStepsSections.title")}</Heading>
         <Text opacity={0.7}>{openSections.includes("sections") ? "▾" : "▸"}</Text>
       </SectionToggleButton>
@@ -53,18 +53,18 @@ export function BrewdayStepsSectionsSection(props: { model: NativeBrewdayStepsSe
               value={customSectionName}
               onChangeText={setCustomSectionName}
               placeholder={t("name")}
-              size="$3"
-              background="$background"
+              size="md"
+              background="background"
               borderWidth={1}
-              borderColor="$borderColor"
+              borderColor="borderColor"
             />
-            <Button size="$3" onPress={addCustomSection} disabled={!customSectionName.trim()}>
+            <Button size="md" onPress={addCustomSection} disabled={!customSectionName.trim()}>
               <Text>{t("addCustomSection")}</Text>
             </Button>
             {sections.customSections?.length ? (
               <View style={{ gap: 10 }}>
                 {sections.customSections.map((s) => (
-                  <Card key={s.id} gap="$2" p="$3" background="$background" borderWidth={1} borderColor="$borderColor">
+                  <Card key={s.id} gap="2" p="3" background="background" borderWidth={1} borderColor="borderColor">
                     <Text fontSize={12} fontWeight="600">
                       {s.name}
                     </Text>
@@ -79,13 +79,13 @@ export function BrewdayStepsSectionsSection(props: { model: NativeBrewdayStepsSe
                       }
                     />
                     <Button
-                      size="$2"
-                      chromeless
+                      size="sm"
+                      variant="quiet"
                       onPress={() =>
                         setSections((prev) => ({ ...prev, customSections: (prev.customSections ?? []).filter((x) => x.id !== s.id) }))
                       }
                     >
-                      <Text color="$red10">{t("remove")}</Text>
+                      <Text color="red10">{t("remove")}</Text>
                     </Button>
                   </Card>
                 ))}

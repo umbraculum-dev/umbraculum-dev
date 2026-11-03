@@ -61,7 +61,7 @@ export function AiUsageTable({
                 <td style={cellStyle}>
                   {formatNumber(today)}
                   {perUserDailyCap > 0 ? (
-                    <SizableText size="$1" theme="alt2">
+                    <SizableText size="1" theme="alt2">
                       {" "}
                       ({formatPercent(todayPercent)})
                     </SizableText>

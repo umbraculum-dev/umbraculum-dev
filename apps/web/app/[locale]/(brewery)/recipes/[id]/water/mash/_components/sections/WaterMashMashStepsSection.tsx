@@ -148,7 +148,7 @@ export function WaterMashMashStepsSection({ model }: { model: WaterMashPageModel
                 open={openMashSections.includes("mashSteps")}
               />
               <Accordion.Content>
-                {mashStepsSaveError ? <ErrorBox mb="$3">{mashStepsSaveError}</ErrorBox> : null}
+                {mashStepsSaveError ? <ErrorBox mb="3">{mashStepsSaveError}</ErrorBox> : null}
                 <MashStepsEditor
                   mashRows={mashRows}
                   mashProcedure={mashProcedure}
@@ -183,7 +183,7 @@ export function WaterMashMashStepsSection({ model }: { model: WaterMashPageModel
                     aria-live="polite"
                     dismissAfter={5000}
                     onDismiss={() => setMashStepsSaveStatus(null)}
-                    mt="$3"
+                    mt="3"
                   >
                     {mashStepsSaveStatus}
                   </MessageBox>

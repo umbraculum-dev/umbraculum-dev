@@ -23,7 +23,7 @@ export function BrewdayStepsCustomAddForm(props: { model: Model }) {
   } = props.model;
 
   return (
-    <XStack gap="$2" items="flex-end" flexWrap="wrap" mt="$3">
+    <XStack gap="2" items="flex-end" flexWrap="wrap" mt="3">
       <View flex={1} minW={120}>
         <RecipeEditFieldLabel htmlFor="custom-step-name">
           {t("name")}
@@ -33,13 +33,13 @@ export function BrewdayStepsCustomAddForm(props: { model: Model }) {
           value={customStepName}
           onChangeText={setCustomStepName}
           placeholder={t("name")}
-          size="$3"
+          size="md"
           w="100%"
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </View>
       <View minW={80}>
@@ -52,13 +52,13 @@ export function BrewdayStepsCustomAddForm(props: { model: Model }) {
           onChangeText={setCustomStepMinutes}
           placeholder="—"
           keyboardType="numeric"
-          size="$3"
+          size="md"
           w="100%"
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </View>
       <View flex={1} minW={140}>
@@ -77,12 +77,12 @@ export function BrewdayStepsCustomAddForm(props: { model: Model }) {
         />
       </View>
       <Button
-        size="$3"
+        size="md"
         bg="var(--surface-2)"
         borderWidth={1}
         borderColor="var(--border)"
         color="var(--text)"
-        fontFamily="$body"
+        fontFamily="body"
         onPress={addCustomStep}
         disabled={!canCallAccountScoped || !customStepName.trim()}
       >

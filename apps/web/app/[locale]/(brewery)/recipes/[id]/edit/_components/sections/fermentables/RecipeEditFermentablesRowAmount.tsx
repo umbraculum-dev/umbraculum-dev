@@ -15,8 +15,8 @@ export function RecipeEditFermentablesRowAmount({
   const {t, tUnits, roundTo, updateGristRow} = model;
 
   return (
-    <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
-      <YStack gap="$1" minW={100}>
+    <XStack gap="3" flexWrap="wrap" items="flex-end" mt="2">
+      <YStack gap="1" minW={100}>
         <RecipeEditFieldLabel htmlFor={`grist-kg-${row.id}`}>
           {t("amountLabel", { unit: tUnits("kg") })}
         </RecipeEditFieldLabel>
@@ -24,20 +24,20 @@ export function RecipeEditFermentablesRowAmount({
           id={`grist-kg-${row.id}`}
           value={String(row.amountKg)}
           onChangeText={(text) =>
-            updateGristRow(row.id, { amountKg: text === "" ? 0 : Number(text) })
-          }
+                    updateGristRow(row.id, { amountKg: text === "" ? 0 : Number(text) })
+                  }
           keyboardType="decimal-pad"
-          size="$3"
+          size="md"
           w={140}
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </YStack>
 
-      <YStack gap="$1" minW={80}>
+      <YStack gap="1" minW={80}>
         <RecipeEditFieldLabel htmlFor={`grist-lov-${row.id}`}>
           {t("colorLabel", { unit: tUnits("lovibond") })}
         </RecipeEditFieldLabel>
@@ -45,22 +45,22 @@ export function RecipeEditFermentablesRowAmount({
           id={`grist-lov-${row.id}`}
           value={row.colorLovibond ?? ""}
           onChangeText={(text) =>
-            updateGristRow(row.id, {
-              colorLovibond: text === "" ? null : Number(text),
-            })
-          }
+                    updateGristRow(row.id, {
+                      colorLovibond: text === "" ? null : Number(text),
+                    })
+                  }
           keyboardType="decimal-pad"
-          size="$3"
+          size="md"
           w={100}
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </YStack>
 
-      <YStack gap="$1" minW={140}>
+      <YStack gap="1" minW={140}>
         <RecipeEditFieldLabel htmlFor={`grist-class-${row.id}`}>
           Mash pH class (legacy)
         </RecipeEditFieldLabel>
@@ -77,7 +77,7 @@ export function RecipeEditFermentablesRowAmount({
         />
       </YStack>
 
-      <YStack gap="$1" minW={140}>
+      <YStack gap="1" minW={140}>
         <RecipeEditFieldLabel htmlFor={`grist-timing-${row.id}`}>
           {t("fermentableTimingLabel")}
         </RecipeEditFieldLabel>
@@ -96,7 +96,7 @@ export function RecipeEditFermentablesRowAmount({
         />
       </YStack>
 
-      <YStack gap="$1" minW={140}>
+      <YStack gap="1" minW={140}>
         <RecipeEditFieldLabel htmlFor={`grist-late-${row.id}`}>
           {t("fermentableLateAdditionLabel")}
         </RecipeEditFieldLabel>
@@ -113,7 +113,7 @@ export function RecipeEditFermentablesRowAmount({
         />
       </YStack>
 
-      <YStack gap="$1" minW={140}>
+      <YStack gap="1" minW={140}>
         <RecipeEditFieldLabel htmlFor={`grist-pot-kind-${row.id}`}>
           Potential kind
         </RecipeEditFieldLabel>
@@ -137,7 +137,7 @@ export function RecipeEditFermentablesRowAmount({
         />
       </YStack>
 
-      <YStack gap="$1" minW={100}>
+      <YStack gap="1" minW={100}>
         <RecipeEditFieldLabel htmlFor={`grist-pot-val-${row.id}`}>
           Potential value
         </RecipeEditFieldLabel>
@@ -145,20 +145,20 @@ export function RecipeEditFermentablesRowAmount({
           id={`grist-pot-val-${row.id}`}
           value={row.potential ? String(roundTo(row.potential.value, 3)) : ""}
           onChangeText={(text) => {
-            const v = text === "" ? null : Number(text);
-            if (!row.potential) return;
-            if (v === null) return updateGristRow(row.id, { potential: null });
-            updateGristRow(row.id, { potential: { ...row.potential, value: roundTo(v, 3) } });
-          }}
+                    const v = text === "" ? null : Number(text);
+                    if (!row.potential) return;
+                    if (v === null) return updateGristRow(row.id, { potential: null });
+                    updateGristRow(row.id, { potential: { ...row.potential, value: roundTo(v, 3) } });
+                  }}
           disabled={!row.potential}
           keyboardType="decimal-pad"
-          size="$3"
+          size="md"
           w={140}
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </YStack>
     </XStack>

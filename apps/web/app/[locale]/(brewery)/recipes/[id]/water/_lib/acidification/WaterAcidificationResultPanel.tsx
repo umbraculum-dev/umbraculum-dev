@@ -126,7 +126,7 @@ export function WaterAcidificationTargetPhResultPanel(props: {
         <View className="brew-field-block-header">
           <SizableText fontWeight="bold">Result</SizableText>
           <FieldBadge>Computed</FieldBadge>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
             From current inputs
           </SizableText>
         </View>
@@ -140,7 +140,7 @@ export function WaterAcidificationTargetPhResultPanel(props: {
       <View className="brew-field-block-header">
         <strong>Result</strong>
         <FieldBadge>Computed</FieldBadge>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
           From current inputs
         </SizableText>
       </View>
@@ -175,7 +175,7 @@ export function WaterAcidificationManualResultPanel(props: {
       <summary className="brew-field-block-header brew-details-summary">
         <strong>Result (manual acid amount mode)</strong>
         <FieldBadge>Computed</FieldBadge>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
           Estimated from manual acid amount
         </SizableText>
       </summary>

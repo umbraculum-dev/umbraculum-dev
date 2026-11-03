@@ -20,10 +20,10 @@ export function recipeAnalysisColorPanelRows(model: RecipeEditPageModel): ReactN
 
   return [
     (
-      <XStack key="srm-morey" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmMorey")}</SizableText>
+      <XStack key="srm-morey" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.srmMorey")}</SizableText>
             {renderMath(
               "analysis.srmMorey",
               renderDerivationMath(
@@ -47,10 +47,10 @@ export function recipeAnalysisColorPanelRows(model: RecipeEditPageModel): ReactN
       </XStack>
     ),
     (
-      <XStack key="srm-daniels" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmDaniels")}</SizableText>
+      <XStack key="srm-daniels" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.srmDaniels")}</SizableText>
             {renderMath(
               "analysis.srmDaniels",
               renderDerivationMath(

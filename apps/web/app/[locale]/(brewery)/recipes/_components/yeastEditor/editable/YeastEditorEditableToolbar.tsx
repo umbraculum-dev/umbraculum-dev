@@ -14,14 +14,14 @@ export function YeastEditorEditableToolbar({
   onAddRow,
 }: YeastEditorEditableToolbarProps) {
   return (
-    <XStack gap="$3" items="center" flexWrap="wrap">
+    <XStack gap="3" items="center" flexWrap="wrap">
       <Button
-        size="$3"
+        size="md"
         bg="var(--surface-2)"
         borderWidth={1}
         borderColor="var(--border)"
         color="var(--text)"
-        fontFamily="$body"
+        fontFamily="body"
         onPress={onAddRow}
         disabled={!canCallAccountScoped}
       >

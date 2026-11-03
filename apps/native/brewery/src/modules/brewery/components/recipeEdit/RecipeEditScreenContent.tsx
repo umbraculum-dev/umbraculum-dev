@@ -44,7 +44,7 @@ export function RecipeEditScreenContent(props: { model: RecipeEditScreenModel })
   if (!canCall) {
     return (
       <Screen>
-        <Text fontSize={14} color="$red10">
+        <Text fontSize={14} color="red10">
           Not authenticated or missing API base URL.
         </Text>
       </Screen>
@@ -56,7 +56,7 @@ export function RecipeEditScreenContent(props: { model: RecipeEditScreenModel })
       <Screen>
         <View style={{ paddingVertical: 48, alignItems: "center" }}>
           <Spinner />
-          <Text fontSize={14} opacity={0.8} mt="$2">
+          <Text fontSize={14} opacity={0.8} mt="2">
             {t("loading")}
           </Text>
         </View>
@@ -68,7 +68,7 @@ export function RecipeEditScreenContent(props: { model: RecipeEditScreenModel })
     return (
       <Screen>
         <Heading fontSize={22}>Error</Heading>
-        <Text fontSize={14} color="$red10">
+        <Text fontSize={14} color="red10">
           {loadError ?? "Recipe not found"}
         </Text>
       </Screen>
@@ -89,13 +89,13 @@ export function RecipeEditScreenContent(props: { model: RecipeEditScreenModel })
           keyboardDismissMode="on-drag"
         >
         {(saveStatus || saveError) ? (
-          <Card gap="$2" mb="$3" bg={saveError ? "rgba(255,80,80,0.15)" : "rgba(80,200,80,0.15)"}>
+          <Card gap="2" mb="3" bg={saveError ? "rgba(255,80,80,0.15)" : "rgba(80,200,80,0.15)"}>
             {saveStatus ? <Text fontSize={14}>{saveStatus}</Text> : null}
-            {saveError ? <Text fontSize={14} color="$red10">{saveError}</Text> : null}
+            {saveError ? <Text fontSize={14} color="red10">{saveError}</Text> : null}
           </Card>
         ) : null}
 
-        <Card gap="$2" mb="$3">
+        <Card gap="2" mb="3">
           <Heading fontSize={16}>{tBrewSessions("listTitle")}</Heading>
           <Button
             onPress={() => navigation.navigate("BrewSessionsList", { recipeId })}
@@ -123,7 +123,7 @@ export function RecipeEditScreenContent(props: { model: RecipeEditScreenModel })
         <Button
           onPress={() => void save()}
           disabled={saving}
-          mt="$4"
+          mt="4"
           accessibilityRole="button"
           accessibilityLabel={tEquip("save")}
         >
@@ -157,8 +157,8 @@ export function RecipeEditScreenContent(props: { model: RecipeEditScreenModel })
                 <Heading fontSize={18}>Style</Heading>
                 <Button
                   onPress={() => setStylePickerOpen(false)}
-                  size="$2"
-                  chromeless
+                  size="sm"
+                  variant="quiet"
                   accessibilityRole="button"
                   accessibilityLabel={tCommon("close")}
                 >
@@ -177,11 +177,11 @@ export function RecipeEditScreenContent(props: { model: RecipeEditScreenModel })
                           setStyleKey(s.key);
                           setStylePickerOpen(false);
                         }}
-                        background={selected ? "$color4" : "$background"}
+                        background={selected ? "color4" : "background"}
                         borderWidth={1}
-                        borderColor="$borderColor"
+                        borderColor="borderColor"
                         width="100%"
-                        p="$3"
+                        p="3"
                         accessibilityRole="button"
                         accessibilityLabel={label}
                       >

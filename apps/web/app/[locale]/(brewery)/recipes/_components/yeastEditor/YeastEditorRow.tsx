@@ -21,16 +21,16 @@ export function YeastEditorRow(props: { row: EditorYeastRow; idx: number; ctx: Y
 
   return (
     <RecipeEditIngredientCard>
-      <XStack gap="$3" flexWrap="wrap" items="flex-end" flexDirection="row">
+      <XStack gap="3" flexWrap="wrap" items="flex-end" flexDirection="row">
         <View alignSelf="center">
-          <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+          <SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">
             {idx + 1}
           </SizableText>
         </View>
         <YeastEditorRowIdentity row={r} ctx={ctx} variant="primary" />
         <YeastEditorRowAttenuation row={r} ctx={ctx} />
         <YeastEditorRowPitch row={r} ctx={ctx} variant="amount" />
-        <YStack gap="$1" minW={100}>
+        <YStack gap="1" minW={100}>
           <RecipeEditFieldLabel htmlFor={`yeast-oxygenation-${r.id}`}>
             {t("yeastOxygenationLabel")}
           </RecipeEditFieldLabel>
@@ -50,12 +50,12 @@ export function YeastEditorRow(props: { row: EditorYeastRow; idx: number; ctx: Y
           />
         </YStack>
         <Button
-          size="$2"
+          size="sm"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={() => onRemoveRow(r.id)}
           aria-label={`Remove yeast row ${idx + 1}`}
         >
@@ -63,24 +63,24 @@ export function YeastEditorRow(props: { row: EditorYeastRow; idx: number; ctx: Y
         </Button>
       </XStack>
 
-      <View flexBasis="100%" w="100%" mt="$2">
+      <View flexBasis="100%" w="100%" mt="2">
         <details>
           <RecipeEditSummary>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {t("yeastAdvancedSubsectionHeading")}
             </SizableText>
           </RecipeEditSummary>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb="$1">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb="1">
             {t("yeastPitchRateAmountNote")}
           </SizableText>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb="$2">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb="2">
             {t("yeastEstimatedCellsRecalcNote")}
           </SizableText>
-          <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
+          <XStack gap="3" flexWrap="wrap" items="flex-end" mt="2">
             <YeastEditorRowPitch row={r} ctx={ctx} variant="advanced" />
             <YeastEditorRowManualCount row={r} idx={idx} ctx={ctx} />
           </XStack>
-          <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
+          <XStack gap="3" flexWrap="wrap" items="flex-end" mt="2">
             <YeastEditorRowIdentity row={r} ctx={ctx} variant="advanced" />
           </XStack>
         </details>

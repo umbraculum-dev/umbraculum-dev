@@ -15,7 +15,7 @@ import { BrewSessionActionBarSection } from "./sections/BrewSessionActionBarSect
 
 export function BrewSessionDetailPageContent({ model }: { model: BrewSessionDetailPageModel }) {
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <BrewSessionDetailHeaderSection model={model} />
       <BrewSessionSummarySection model={model} />
       <BrewSessionDateSection model={model} />

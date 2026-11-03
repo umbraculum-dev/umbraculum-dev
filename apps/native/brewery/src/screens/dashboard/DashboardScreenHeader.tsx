@@ -33,7 +33,7 @@ export function DashboardScreenHeader(props: {
         </Text>
       </View>
 
-      <Card gap="$2" aria-label={tHealth("title")}>
+      <Card gap="2" aria-label={tHealth("title")}>
         <Heading fontSize={18}>{tHealth("title")}</Heading>
         <Text fontSize={12} opacity={0.8}>
           {tHealth("subtitle", { url: baseUrl ?? "(missing)" })}
@@ -44,7 +44,7 @@ export function DashboardScreenHeader(props: {
             <Spinner />
           </View>
         ) : healthState.status === "error" ? (
-          <Text color="$red10" fontSize={12}>
+          <Text color="red10" fontSize={12}>
             {healthState.errorKey ? tNav(healthState.errorKey) : healthState.error}
           </Text>
         ) : healthState.status === "ok" ? (
@@ -56,7 +56,7 @@ export function DashboardScreenHeader(props: {
         ) : null}
       </Card>
 
-      <Card gap="$2" aria-label={tHealth("appPermissions.title")}>
+      <Card gap="2" aria-label={tHealth("appPermissions.title")}>
         <Heading fontSize={18}>{tHealth("appPermissions.title")}</Heading>
         <Text fontSize={12} opacity={0.8}>
           {tHealth("appPermissions.subtitle")}
@@ -67,7 +67,7 @@ export function DashboardScreenHeader(props: {
             <Spinner />
           </View>
         ) : healthState.status === "error" ? (
-          <Text color="$red10" fontSize={12}>
+          <Text color="red10" fontSize={12}>
             {healthState.errorKey ? tNav(healthState.errorKey) : healthState.error}
           </Text>
         ) : healthState.status === "ok" ? (

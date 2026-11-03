@@ -29,18 +29,18 @@ export function AiUsagePageContent(props: { model: AiUsagePageModel }) {
   }
 
   return (
-    <YStack gap="$4">
+    <YStack gap="4">
       <H1 id="ai-usage-title">{tUsage("title")}</H1>
         <SizableText theme="alt2">{tUsage("description")}</SizableText>
 
         {error ? (
-          <View role="alert" backgroundColor="$red3" padding="$3" borderRadius="$3">
-            <SizableText color="$red11">{error}</SizableText>
+          <View role="alert" backgroundColor="red3" padding="3" borderRadius="3">
+            <SizableText color="red11">{error}</SizableText>
           </View>
         ) : null}
 
         {loading && !data ? (
-          <XStack gap="$2" alignItems="center">
+          <XStack gap="2" alignItems="center">
             <Spinner />
             <SizableText>{tCommon("loading")}</SizableText>
           </XStack>
@@ -51,14 +51,14 @@ export function AiUsagePageContent(props: { model: AiUsagePageModel }) {
             {/* Alerts */}
             {data.alerts.roleAlerts.length > 0 || data.alerts.userAlerts.length > 0 ? (
               <YStack
-                gap="$2"
-                backgroundColor="$yellow3"
-                padding="$3"
-                borderRadius="$3"
-                role="alert"
-                aria-live="polite"
-              >
-                <H2 size="$5">{tUsage("alerts.heading")}</H2>
+              gap="2"
+              backgroundColor="yellow3"
+              padding="3"
+              borderRadius="3"
+              role="alert"
+              aria-live="polite"
+            >
+                <H2 size="5">{tUsage("alerts.heading")}</H2>
                 {data.alerts.roleAlerts.map((a) => (
                   <SizableText key={`role-${a.role}`}>
                     {tUsage("alerts.roleApproachingLimit", {
@@ -87,7 +87,7 @@ export function AiUsagePageContent(props: { model: AiUsagePageModel }) {
             ) : null}
 
             {/* Monthly summary cards */}
-            <XStack gap="$3" flexWrap="wrap">
+            <XStack gap="3" flexWrap="wrap">
               <AiUsageSummaryCard
                 label={tUsage("monthly.callCount")}
                 value={formatNumber(data.monthly.callCount)}
@@ -107,14 +107,14 @@ export function AiUsagePageContent(props: { model: AiUsagePageModel }) {
             </XStack>
 
             {/* Chart */}
-            <YStack gap="$2">
-              <H2 size="$6">{tUsage("chart.title")}</H2>
+            <YStack gap="2">
+              <H2 size="6">{tUsage("chart.title")}</H2>
               <UsageTokenChart data={chartData} ariaLabel={tUsage("chart.ariaLabel")} />
             </YStack>
 
             {/* Per-user table */}
-            <YStack gap="$2">
-              <H2 size="$6">{tUsage("table.title")}</H2>
+            <YStack gap="2">
+              <H2 size="6">{tUsage("table.title")}</H2>
               {data.byUser.length === 0 ? (
                 <SizableText theme="alt2">{tUsage("table.empty")}</SizableText>
               ) : (
