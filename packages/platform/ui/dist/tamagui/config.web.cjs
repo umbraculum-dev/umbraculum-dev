@@ -24,12 +24,12 @@ __export(config_web_exports, {
   default: () => config_web_default
 });
 module.exports = __toCommonJS(config_web_exports);
-var import_animations_css = require("@tamagui/animations-css");
+var import_extras = require("@tamagui/animations-css/extras");
 var import_v5 = require("@tamagui/config/v5");
 var import_tamagui = require("tamagui");
 var config = (0, import_tamagui.createTamagui)({
   ...import_v5.defaultConfig,
-  animations: (0, import_animations_css.createAnimations)({
+  animations: (0, import_extras.createAnimations)({
     quick: "ease-out 150ms",
     medium: "ease-in 300ms",
     slow: "ease-in 450ms"
