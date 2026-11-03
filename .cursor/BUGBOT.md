@@ -34,6 +34,11 @@ Feature work merges via PRs to **`master`**. Suggested flow: optional local `/re
 - Flag shared logic duplicated into `apps/web` and `apps/native` when it belongs in `packages/**`.
 - Flag `@umbraculum/ui` importing domain packages against layering rules in `docs/CROSS-PLATFORM-BOUNDARIES.md`.
 
+## Native / Metro / Edge runtimes
+
+- Flag `apps/native/**`, Expo Metro entrypoints, Next.js `middleware.ts`, or other Edge/client bundles that import the **main** `@umbraculum/module-sdk` barrel (or any package entry that statically pulls Node builtins such as `fs` / `path` / `child_process`) when a dedicated `./native` or `./edge` (or equivalent) export exists for the symbols used.
+- Flag new install-profile / filesystem gates added to packages consumed by native or Edge without a Node-free entrypoint and matching consumer imports.
+
 ## TypeScript / ESLint
 
 - Flag new `any` in production paths without justification.

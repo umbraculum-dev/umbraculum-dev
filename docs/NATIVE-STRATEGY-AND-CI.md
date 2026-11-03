@@ -101,6 +101,7 @@ These are the **minimum** professional bar for the current stack:
 | Mitigation | Purpose |
 | --- | --- |
 | Baseline version table + [`check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh) (18/18) | Prevents hoist duplicates and Expo Go ABI crashes before they hit the device |
+| Cold Android bundle smoke ([`check-native-metro-cold.sh`](../scripts/check-native-metro-cold.sh); see [`DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) § Pre-release) | Prevents warm Metro/`node_modules` false greens; catches Node `fs` (and similar) in the native JS graph before juniors / restores |
 | `react` + `react-dom` same exact version in `apps/native` | Prevents blank Metro web preview at `:8081/` |
 | LAN IP pre-flight (`ip`, curl smoke tests) | Prevents `Failed to download remote update` |
 | API `/api/health` triage + esbuild recovery doc | Prevents false “native bugs” when API is 502 |

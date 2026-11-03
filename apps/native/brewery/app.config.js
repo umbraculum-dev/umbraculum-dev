@@ -9,6 +9,7 @@
 module.exports = ({ config }) => {
   const api = process.env.EXPO_PUBLIC_API_BASE_URL;
   const media = process.env.EXPO_PUBLIC_MEDIA_BASE_URL;
+  const moduleProfile = process.env.EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE;
 
   return {
     ...config,
@@ -20,6 +21,9 @@ module.exports = ({ config }) => {
       ...config.extra,
       ...(api ? { EXPO_PUBLIC_API_BASE_URL: api } : {}),
       ...(media ? { EXPO_PUBLIC_MEDIA_BASE_URL: media } : {}),
+      ...(moduleProfile
+        ? { EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE: moduleProfile }
+        : {}),
     },
   };
 };

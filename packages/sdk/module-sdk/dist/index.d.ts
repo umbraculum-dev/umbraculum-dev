@@ -1,6 +1,8 @@
 import { AiToolRegistry } from '@umbraculum/ai-tool-sdk';
 import { ModuleNavLabelKey } from '@umbraculum/i18n-keys';
 export { ModuleNavLabelKey } from '@umbraculum/i18n-keys';
+export { NativeRouteId, RegisterNativeModuleOptions, RegisteredNativeModuleSnapshot, aggregateNativeAvailableRouteIds, clearNativeModuleRegistryForTests, listRegisteredNativeModules, registerNativeModule } from './native.js';
+export { BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP, resolveEnabledModuleCodesEdge } from './edge.js';
 
 /**
  * Reserved canonical module codes per RFC-0001 Decision B.
@@ -434,47 +436,6 @@ declare class InvalidTierLimitValueError extends Error {
 declare function listRegisteredTierLimitKeys(moduleCode: string): readonly string[];
 
 /**
- * Route IDs a module exposes on native. Must be valid `@umbraculum/navigation` RouteIds.
- * Declared as strings here to avoid a hard dependency from module-sdk on navigation.
- */
-type NativeRouteId = string;
-interface RegisterNativeModuleOptions {
-    /** Module or vertical code (matches API `registerModule` code). */
-    code: string;
-    /**
-     * RouteIds with real native screens for this module.
-     * Aggregated into the native shell via `configureNativeRoutePolicy`.
-     */
-    availableRouteIds: readonly NativeRouteId[];
-    /**
-     * Optional tab label key (`nav.*` in locale bundles) when this module
-     * contributes a primary tab. See `@umbraculum/i18n-keys`.
-     */
-    tabEntry?: {
-        labelKey: ModuleNavLabelKey;
-        order?: number;
-    };
-}
-interface RegisteredNativeModuleSnapshot {
-    code: string;
-    availableRouteIds: readonly NativeRouteId[];
-    tabEntry?: {
-        labelKey: ModuleNavLabelKey;
-        order?: number;
-    };
-}
-/**
- * Parallel native-side registry (RFC-0002 §5). Records which RouteIds each
- * installed module promotes to `available` on native.
- */
-declare function registerNativeModule(options: RegisterNativeModuleOptions): RegisteredNativeModuleSnapshot;
-declare function listRegisteredNativeModules(): RegisteredNativeModuleSnapshot[];
-/** Union of all `availableRouteIds` from registered native modules. */
-declare function aggregateNativeAvailableRouteIds(): readonly NativeRouteId[];
-/** Test-only reset. */
-declare function clearNativeModuleRegistryForTests(): void;
-
-/**
  * Installation profile manifest — which modules and native apps are enabled for this deployment.
  * @see docs/design/installation-profile.md
  */
@@ -533,28 +494,6 @@ declare function registerBuiltinWebModulesIfAbsent(options?: {
     enabledCodes?: ReadonlySet<string>;
 }): void;
 
-/**
- * Edge-runtime-safe module enablement for Next.js middleware.
- * Does not read the filesystem or call `process.cwd()`.
- */
-declare const BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP: readonly [{
-    readonly code: "automation";
-    readonly segments: readonly ["vessels"];
-}, {
-    readonly code: "brewery";
-    readonly segments: readonly ["recipes", "inventory", "equipment", "water-profiles", "brewday-steps-settings", "ferm-data-integration"];
-}, {
-    readonly code: "crp";
-    readonly segments: readonly ["capacity", "schedule", "resources"];
-}, {
-    readonly code: "mrp";
-    readonly segments: readonly ["production-orders", "work-orders", "material-requirements"];
-}, {
-    readonly code: "pim";
-    readonly segments: readonly ["products", "categories", "attribute-sets", "channels"];
-}];
-declare function resolveEnabledModuleCodesEdge(env?: Record<string, string | undefined>): ReadonlySet<string>;
-
 interface WebSharedLayoutNavItem {
     href: string;
     labelKey: ModuleNavLabelKey;
@@ -588,4 +527,4 @@ interface WebSharedLayoutNoticeConfig {
  */
 declare function resolveWebSharedLayoutNotice(env?: NodeJS.ProcessEnv): WebSharedLayoutNoticeConfig | null;
 
-export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_MODULE_CODES, BUILTIN_WEB_MODULE_REGISTRATIONS, BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP, type BillingTierSlug, type BuiltinModuleCode, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, type InstallationProfileId, type InstallationProfileManifest, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidModuleProfileError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleProfile, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, WEB_SHARED_LAYOUT_NOTICE_IDS, type WebSharedLayoutNavItem, type WebSharedLayoutNoticeConfig, type WebSharedLayoutNoticeId, type WebSharedLayoutNoticeVariant, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebSharedLayoutNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, isModuleEnabled, isVerticalInstalled, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredTierLimitKeys, listRegisteredWebModules, loadInstallationProfileManifest, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveEnabledModuleCodes, resolveEnabledModuleCodesEdge, resolveInstallManifestPath, resolveModuleProfile, resolveNativeAppCodes, resolvePrimaryNativeAppCode, resolveRepoRoot, resolveRoutePromptOverlay, resolveWebSharedLayoutNotice, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };
+export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_MODULE_CODES, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type BuiltinModuleCode, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, type InstallationProfileId, type InstallationProfileManifest, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidModuleProfileError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleProfile, type ModuleRouteRegistrar, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHARED_LAYOUT_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, WEB_SHARED_LAYOUT_NOTICE_IDS, type WebSharedLayoutNavItem, type WebSharedLayoutNoticeConfig, type WebSharedLayoutNoticeId, type WebSharedLayoutNoticeVariant, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebSharedLayoutNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, isModuleEnabled, isVerticalInstalled, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredTierLimitKeys, listRegisteredWebModules, loadInstallationProfileManifest, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerRegisteredModuleAiTools, registerWebModule, resolveEnabledModuleCodes, resolveInstallManifestPath, resolveModuleProfile, resolveNativeAppCodes, resolvePrimaryNativeAppCode, resolveRepoRoot, resolveRoutePromptOverlay, resolveWebSharedLayoutNotice, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };

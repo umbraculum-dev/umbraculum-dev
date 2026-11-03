@@ -6,13 +6,17 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE": "reference"
+      }
     },
     "preview": {
       "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_API_BASE_URL": "https://demo.umbraculum.dev",
-        "EXPO_PUBLIC_MEDIA_BASE_URL": "https://demo.umbraculum.dev"
+        "EXPO_PUBLIC_MEDIA_BASE_URL": "https://demo.umbraculum.dev",
+        "EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE": "reference"
       },
       "android": {
         "buildType": "apk"
@@ -22,7 +26,10 @@
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE": "reference"
+      }
     }
   },
   "submit": {

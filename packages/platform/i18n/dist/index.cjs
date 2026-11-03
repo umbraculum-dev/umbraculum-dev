@@ -29,7 +29,7 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 var import_brewery_i18n = require("@umbraculum/brewery-i18n");
-var import_module_sdk = require("@umbraculum/module-sdk");
+var import_edge = require("@umbraculum/module-sdk/edge");
 
 // src/en.json
 var en_default = {
@@ -1692,6 +1692,13 @@ function isLocale(value) {
 // src/index.ts
 var en = en_default;
 var it = it_default;
+function isBreweryVerticalInstalled(env = process.env) {
+  const profile = env["UMBRACULUM_MODULE_PROFILE"]?.trim() || env["EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE"]?.trim() || void 0;
+  return (0, import_edge.resolveEnabledModuleCodesEdge)({
+    ...env,
+    ...profile ? { UMBRACULUM_MODULE_PROFILE: profile } : {}
+  }).has("brewery");
+}
 function deepMerge(target, source) {
   const result = { ...target };
   for (const key of Object.keys(source)) {
@@ -1709,7 +1716,7 @@ function deepMerge(target, source) {
   return result;
 }
 function loadBreweryMessages(locale) {
-  if (!(0, import_module_sdk.isVerticalInstalled)("brewery")) {
+  if (!isBreweryVerticalInstalled()) {
     return {};
   }
   return locale === "it" ? import_brewery_i18n.it : import_brewery_i18n.en;
