@@ -98,7 +98,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Set up Node 20
+      - name: Set up Node 22
         uses: actions/setup-node@v5
         with:
           node-version: "22"

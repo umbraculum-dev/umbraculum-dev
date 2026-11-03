@@ -95,7 +95,10 @@ run_native_step() {
     api-integration)
       echo "==> [api-integration] docker compose up + vitest"
       docker compose -f "${REPO_ROOT}/docker-compose.yml" up -d postgres redis gotenberg
-      docker compose -f "${REPO_ROOT}/docker-compose.yml" exec -T api sh -c 'cd /app && npm install --no-audit --no-fund && npm test'
+      # Match .github/workflows/api.yml — reference profile registers brewery (core omits it).
+      docker compose -f "${REPO_ROOT}/docker-compose.yml" exec -T \
+        -e UMBRACULUM_MODULE_PROFILE=reference \
+        api sh -c 'cd /app && npm install --no-audit --no-fund && npm test'
       ;;
     packages-dist-check)
       echo "==> [packages-dist-check] check-packages-dist-up-to-date.sh"
