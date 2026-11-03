@@ -80,6 +80,8 @@ const excludedDocs = new Set(
     'design/pr3-routes-migration-handoff.md',
     'design/architectural-audit-template.md',
     'design/validation-library-adoption-audit.md',
+    // Codemod machine dump — keep in repo for agents; not a human docs page.
+    'design/tamagui-3-flat-values-report.md',
   ].map((relativePath) => path.resolve(docsRoot, relativePath)),
 );
 
