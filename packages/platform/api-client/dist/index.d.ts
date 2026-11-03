@@ -1,10 +1,10 @@
-import { A as ApiResponse, a as ApiClient } from './client-Dia82S7S.js';
-export { b as ApiClientCredentials, c as ApiRequestInit, d as AuthStrategy, F as FetchLike, e as FetchResponseLike, f as bearerTokenAuth, g as cookieAuth, h as createApiClient } from './client-Dia82S7S.js';
+import { a as ApiResponse, A as ApiClient } from './client-zbAgg_TE.js';
+export { b as ApiClientCredentials, c as ApiRequestInit, d as AuthStrategy, F as FetchLike, e as FetchResponseLike, f as bearerTokenAuth, g as cookieAuth, h as createApiClient } from './client-zbAgg_TE.js';
 import { p as paths } from './platform.openapi-DFK6FUu2.js';
 export { c as PlatformOpenApiComponents, o as PlatformOpenApiOperations } from './platform.openapi-DFK6FUu2.js';
 import { AuthWebviewExchangeResponseSchema, AuthMeResponse, AuthLoginRequest, AuthLoginResponseSchema, AuthLoginNativeResponseSchema, AuthLogoutResponseSchema, AuthPreferencesPatchResponseSchema, AuthActiveWorkspaceResponseSchema, AuthSignupRequest, AuthSignupResponseSchema, WorkspaceCreateRequest, WorkspaceCreateResponseSchema, HealthResponseSchema, WorkspacesListResponseSchema, IntegrationKind, WorkspaceBillingResponseSchema, BillingIntentRequest, BillingIntentResponseSchema, WorkspaceAiSettingsResponseSchema, WorkspaceAiUsageResponseSchema, AdSlotResponse } from '@umbraculum/contracts';
 export { AdSlotResponse } from '@umbraculum/contracts';
-export { R as RenderJobPhase, a as RenderJobResultGet, b as RenderJobStatusGet, f as fetchRenderJobDownloadUrl, p as pollRenderJobUntilSucceeded, r as resolveArtifactDownloadUrl, c as runAsyncRenderJobExport, s as submitRenderJob, t as toWebArtifactUrl } from './rendering-Dsx1_oqk.js';
+export { R as RenderJobPhase, a as RenderJobResultGet, b as RenderJobStatusGet, f as fetchRenderJobDownloadUrl, p as pollRenderJobUntilSucceeded, r as resolveArtifactDownloadUrl, c as runAsyncRenderJobExport, s as submitRenderJob, t as toWebArtifactUrl } from './rendering-dNXtf-4L.js';
 
 /** Non-2xx API response from a typed facade call. */
 declare class ApiClientError extends Error {

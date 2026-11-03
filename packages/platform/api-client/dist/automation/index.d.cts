@@ -1,5 +1,5 @@
 import { VesselStateResponse, VesselListResponse } from '@umbraculum/automation-contracts';
-import { a as ApiClient } from '../client-Dia82S7S.cjs';
+import { A as ApiClient } from '../client-zbAgg_TE.cjs';
 import { p as paths } from '../platform.openapi-DFK6FUu2.cjs';
 
 type AutomationVesselsListPath = "/automation/vessels";

@@ -1,4 +1,4 @@
-import { A as ApiResponse, a as ApiClient } from '../client-Dia82S7S.cjs';
+import { a as ApiResponse, A as ApiClient } from '../client-zbAgg_TE.cjs';
 
 /** Map OpenAPI path keys (leading slash) to first-party client paths via nginx `/api` proxy. */
 declare function toClientPath(openApiPath: `/${string}`): string;

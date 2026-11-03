@@ -55,4 +55,4 @@ declare function createApiClient(baseUrl: string, auth: AuthStrategy, options?: 
     fetch?: FetchLike;
 }): ApiClient;
 
-export { type ApiResponse as A, type FetchLike as F, type ApiClient as a, type ApiClientCredentials as b, type ApiRequestInit as c, type AuthStrategy as d, type FetchResponseLike as e, bearerTokenAuth as f, cookieAuth as g, createApiClient as h };
+export { type ApiClient as A, type FetchLike as F, type ApiResponse as a, type ApiClientCredentials as b, type ApiRequestInit as c, type AuthStrategy as d, type FetchResponseLike as e, bearerTokenAuth as f, cookieAuth as g, createApiClient as h };

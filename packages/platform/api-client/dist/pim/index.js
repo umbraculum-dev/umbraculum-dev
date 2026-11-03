@@ -4,7 +4,7 @@ import {
   patchParsed,
   postParsed,
   toClientPath
-} from "../chunk-EHQ6NO7O.js";
+} from "../chunk-AS7NE72B.js";
 
 // src/pim/products.ts
 import {
