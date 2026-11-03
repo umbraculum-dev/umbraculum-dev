@@ -636,7 +636,10 @@
                     "type": "string",
                     "minLength": 1
                   }
-                }
+                },
+                "required": [
+                  "next"
+                ]
               }
             }
           }
@@ -749,7 +752,7 @@
             },
             "in": "query",
             "name": "next",
-            "required": false
+            "required": true
           }
         ],
         "responses": {
@@ -7492,7 +7495,7 @@
                             "items": {
                               "type": "string",
                               "format": "email",
-                              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                              "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                             }
                           },
                           "subject": {

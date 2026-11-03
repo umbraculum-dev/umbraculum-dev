@@ -76,6 +76,7 @@
     "typescript-eslint": "^8.59.3"
   },
   "overrides": {
+    "ajv": "^8.18.0",
     "postcss": "8.5.4",
     "expo": "58.0.23",
     "expo-font": "58.0.11",
