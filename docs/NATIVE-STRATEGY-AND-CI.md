@@ -52,7 +52,7 @@ That is **controlled alignment**, not gambling. Risk returns if agents **re-spli
 - **Implicit coupling to Expo’s schedule:** A future Expo SDK upgrade might force a coordinated bump across native **and** possibly web. Mitigation: upgrade in a dedicated branch; run `expo install --check` + manual smoke on device before merge.
 - **Operational fragility:** Anything that restarts the API watcher after `packages/platform/contracts` rebuilds can expose missing `node_modules` (the `esbuild` incident). Mitigation: documented recovery (`docker compose exec api npm install`, restart); optionally a tiny smoke script or CI job hitting `/api/health`.
 
-So: you are **not** condemned to disaster by staying on Expo Go short-term. You **are** vulnerable if mitigations exist only in chat history instead of **repo docs + habits (+ optional lean CI)**.
+So: you are **not** condemned to disaster by staying on Expo Go short-term. You **are** vulnerable if mitigations exist only in chat history instead of **repo docs + CI**. The maintainer checklist for Expo/React/lock edits lives in [`DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) § When you change native dependencies (juniors on first install do not need that section).
 
 ---
 

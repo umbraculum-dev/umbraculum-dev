@@ -443,7 +443,9 @@ docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
 
 **Do not regress Path B (2026-11):** monorepo `react@19.3.0` overrides; Expo SDK **58**; tight `native-shell`
 `expo` peer (`~58.0.23`, never `>=58`); no `expo-*` in `native-shell` `devDependencies`;
-`app.config.js` `({ config }) =>` spread; Metro pins brewery `react`; Node **22** (`node:22-slim`).
+root Expo **`dependencies`** keep hoist at `node_modules/expo`; root [`.npmrc`](.npmrc) `legacy-peer-deps=true`;
+`app.config.js` `({ config }) =>` spread; Metro pins brewery `react`; Node **22** (`node:22-slim`);
+doctor **20/20** (not 18/18). Human/agent procedure: [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](docs/DEVELOPMENT-NATIVE-LOCAL.md) § When you change native dependencies.
 
 CI: [`.github/workflows/native-deps.yml`](.github/workflows/native-deps.yml). Assessment +
 agent anti-patterns: [`docs/design/expo-doctor-monorepo-assessment.md`](docs/design/expo-doctor-monorepo-assessment.md) §8.

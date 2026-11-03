@@ -65,7 +65,7 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 | `apps/native/brewery/package.json` | `19.1.0` exact | Expo Go ABI |
 | [`metro.config.js`](../../apps/native/brewery/metro.config.js) | Brewery `node_modules/react` | Must not pin root hoisted copy |
 
-**Do not** bump `apps/web` or root `overrides` to `19.2.x` without Path B ([DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md) § Long-term). Historical pre-remediation drift (`19.2.4` web vs `19.1.0` native) is what doctor duplicate checks caught.
+**Historical note (Path A era):** do not bump web ahead of the then-current Expo Go ABI without a deliberate exit. Path B (2026-11) moved the monorepo to `19.3.0` / SDK 58 — see §5 and [`DEVELOPMENT-NATIVE-LOCAL.md`](../DEVELOPMENT-NATIVE-LOCAL.md) § When you change native dependencies. Pre-remediation drift (`19.2.4` web vs `19.1.0` native) is what doctor duplicate checks caught.
 
 ### `react-native@0.84.0` at root
 
@@ -119,7 +119,7 @@ Update [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) § Expo Do
 
 ## 8. Agent guardrails (do not regress)
 
-Future agents must treat this doc + the toolset gate as binding — not optional tribal knowledge.
+Future agents must treat this doc + the toolset gate as binding — not optional tribal knowledge. **Human checklist (same content, prose form):** [`DEVELOPMENT-NATIVE-LOCAL.md`](../DEVELOPMENT-NATIVE-LOCAL.md) § When you change native dependencies.
 
 | Surface | Guard |
 |---------|--------|
@@ -127,5 +127,8 @@ Future agents must treat this doc + the toolset gate as binding — not optional
 | Cursor skill | **`native-expo-doctor-pre-push`** — reproduces GHA `native-deps.yml` before push |
 | Repo interceptor | [`AGENTS.md`](../../AGENTS.md) § Native dependency / expo-doctor gate |
 | T2 verify | `npm run verify:pre-push` runs `expo-doctor` native step when `.umbraculum/gha-trigger-map.json` matches `native-deps` paths |
+| Lock / peers | Root [`.npmrc`](../../.npmrc) `legacy-peer-deps=true`; root `package.json` **`dependencies`** include `expo` / `expo-constants` / … so the lock **hoists** to `node_modules/expo` (nested `apps/native/*/node_modules/expo` breaks `native-shell` DTS and can split React for Expo Go) |
 
-**Hard do-nots:** loosen `native-shell` `expo` peer to `>=58`; add `expo-*` to `native-shell` `devDependencies`; drift web React off root `overrides` / Expo Go ABI; skip `check-native-expo-doctor.sh` after override/lockfile edits; revert `app.config.js` away from `({ config }) =>` spread; delete root `node_modules/expo-font` (real transitive on SDK 58).
+**Hard do-nots:** loosen `native-shell` `expo` peer to `>=58`; add `expo-*` to `native-shell` **devDependencies** (peers + root deps own the hoist); drift web React off root `overrides` / Expo Go ABI; skip `check-native-expo-doctor.sh` after override/lockfile edits; revert `app.config.js` away from `({ config }) =>` spread; delete root `node_modules/expo-font` (real transitive on SDK 58 — Path A only removed a phantom); treat doctor **18/18** as success (SDK 58 bar is **20/20**); push without committing lock + matching manifests then `npm run verify:pre-push`.
+
+**Lessons encoded (Path B 2026-11):** same SemVer in manifests ≠ one physical install; legacy peers required for a CI-installable lock; doctor check count rose with SDK 58; do not delete real Expo transitives; archive T2 proves **HEAD** only.

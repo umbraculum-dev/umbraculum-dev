@@ -4,12 +4,25 @@
 
 For **strategy** (risk posture, Expo Go vs long-term dev client, Mac-free constraints, optional CI philosophy): see `docs/NATIVE-STRATEGY-AND-CI.md`. **Ubuntu Touch** is not covered here — it uses the web app in a Lomiri Click Morph webapp wrapper ([`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md)). The same dependency check runs in CI: `.github/workflows/native-deps.yml`.
 
+## Who should read what
+
+| Audience | Goal | Read / do |
+|----------|------|-----------|
+| **Junior / first install** | Open the app in Expo Go | Prerequisites → baseline table (for awareness) → [`./scripts/start-metro-dev.sh`](../scripts/start-metro-dev.sh) → [Device testing (Expo Go)](#device-testing-expo-go). You do **not** need Path B theory or lockfile regen. |
+| **Daily native UI work** | Screens, Metro, LAN | Device testing + troubleshooting for network / blank screens |
+| **Changing Expo / React / native lockfiles** (weeks later, or agents) | Keep Expo Go + CI green | [When you change native dependencies](#when-you-change-native-dependencies-path-b-procedure) — this is the repo checklist (not chat memory). CI + `expo-doctor` enforce it if you skip steps. |
+
+Deep hoist / doctor rationale: [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md).
+
 ## Prerequisites
 
 - Docker / Docker Compose
 - iOS simulator or Android emulator (or a physical device)
+- **Expo Go Client 58.x** on the phone (Play Store / App Store / [expo.dev/go](https://expo.dev/go?device=true&platform=android&sdkVersion=58)) — must match this repo’s SDK **58** pin
 
-This repo prefers running Node/npm in containers. If you do run Expo tooling on the host, keep Node aligned with repo `engines` and expect drift.
+This repo prefers running Node/npm in containers. If you do run Expo tooling on the host, keep Node aligned with repo `engines` (**≥22.13**) and expect drift.
+
+**First-install shape:** `docker compose up` (core profile → native app **blank**) or reference compose / `UMBRACULUM_MODULE_PROFILE=reference` for **brewery**. Then start Metro with the helper and connect Expo Go. See [`apps/native/README.md`](../apps/native/README.md).
 
 ## Native baseline (Expo SDK 58 + Expo Go)
 
@@ -429,20 +442,37 @@ Walk through these in this exact order before deep-diving:
 6. **Bundle cache?** Restart Metro with `-c` and rescan the QR (or re-enter `exp://<LAN_IP>:8081`).
 7. **Read the device error log.** On the blue "Something went wrong" screen, tap **View error log** — `java.io.IOException: Failed to download remote update` means step 2/3; `Incompatible React versions` means step 4.
 
-## Path B status (executed 2026-11) + future exits
+## When you change native dependencies (Path B procedure)
 
-**Current state (Path B):** `apps/web`, `apps/native/{brewery,blank}`, and the repo root all resolve **`react@19.3.0`** / **`react-dom@19.3.0`** / **`expo@58.x`** via root `overrides`. Expo Go remains the primary Linux device loop. See [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md).
+Use this section when you (or an agent) edit **any** of: `apps/native/**/package.json`, `packages/platform/native-shell/package.json`, root `package.json` `overrides` / Expo-related `dependencies`, or the root `package-lock.json`. Juniors doing first install can skip it.
 
-**Do not** drift web React off the Expo Go ABI without a deliberate next exit:
+**Current Path B pins (2026-11):** monorepo **`react@19.3.0`** / **`react-dom@19.3.0`** / **Expo SDK 58** (`expo@~58.0.23`) / **RN `0.88.1`** / **Node ≥22.13**. Root `package.json` also lists Expo packages under **`dependencies`** so npm **hoists** them to `node_modules/expo` (needed for `@umbraculum/native-shell` builds). Root [`.npmrc`](../.npmrc) sets **`legacy-peer-deps=true`** so lock regen and `npm ci` (GHA / ci-parity) agree. Doctor target: **20/20** (SDK 54 was 18/18 — do not treat 18 as the bar).
 
-1. **Custom dev client** (EAS Build or `expo prebuild` + dev client) — exits Expo Go ABI constraint.
-2. **Further Expo SDK upgrade** when store Expo Go moves again.
+### Procedure (do in order)
 
-Standing hygiene:
+1. **Align pins everywhere that matters** — brewery, blank, `native-shell` peers, root `overrides`, and root Expo `dependencies`. Do not bump only one app.
+2. **Regenerate the root lock in container:** `npm run lock:update:root` (uses legacy peers; same policy as [`DEVELOPMENT.md`](../DEVELOPMENT.md) § npm lockfiles).
+3. **Prove one physical tree:** after install, `node_modules/expo` and `node_modules/react` should exist at **repo root**. Nested `apps/native/*/node_modules/react` or `…/expo` usually means Expo Go “Incompatible React versions” or `native-shell` DTS build failures — same version string in `package.json` is **not** enough.
+4. **Run doctor:** `./scripts/check-native-expo-doctor.sh` → **20/20** (and the profile’s primary app typecheck). CI: [`native-deps.yml`](../.github/workflows/native-deps.yml).
+5. **Optional cold Metro:** `./scripts/check-native-metro-cold.sh` if Metro/shared packages changed.
+6. **Commit `package.json` + `package-lock.json` together**, working tree clean, then **`npm run verify:pre-push`**. Archive mode tests **committed HEAD** only — uncommitted fixes do not count.
 
-- Keep root `overrides` and `native-shell` peer pins aligned with the assessment doc.
-- Run **`./scripts/check-native-expo-doctor.sh`** after any native hoist / lockfile edit (CI: [`native-deps.yml`](../.github/workflows/native-deps.yml)).
-- Pin both `react` and `react-dom` in native apps to the exact Expo Go version (currently `19.3.0`).
+### Do not
+
+| Anti-pattern | Why |
+|--------------|-----|
+| Delete root `node_modules/expo-font` (or teach scripts to) | On SDK 58 it is a **real** transitive of `expo`. Path A cleanup removed a *phantom* copy only. |
+| Bump web React ahead of Expo Go ABI | Device blank/black screen; doctor duplicate-deps |
+| Add `expo-*` to `native-shell` **devDependencies** | Historically spawned a second Expo tree at root and broke doctor — keep them as **peers**; root `dependencies` + overrides own the hoist |
+| Host `npm install` for lock commits | Non-reproducible; use `node:22-slim` / `lock:update:*` |
+| Expect API vitest brewery routes on **core/platform** profile | GHA and `verify-slice` api-integration set `UMBRACULUM_MODULE_PROFILE=reference`. Local `docker compose exec api npm test` without that env looks like “everything broke” |
+
+### Future exits (only when deliberate)
+
+1. **Custom dev client** (EAS / `expo prebuild`) — leaves Expo Go ABI.
+2. **Next Expo SDK** when store Expo Go moves again (treat as a new Path C assessment).
+
+SoT detail: [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md) §8.
 
 ## Appendix: operator quick reference
 

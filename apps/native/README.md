@@ -35,6 +35,8 @@ Per-app detail: [`blank/`](blank/) (blank app) and [`brewery/README.md`](brewery
 
 ## Build / test / lint (local)
 
+**First install / daily loop:** use Docker Metro helper from repo root ([`scripts/start-metro-dev.sh`](../../scripts/start-metro-dev.sh)) and store **Expo Go 58** — full device steps in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../docs/DEVELOPMENT-NATIVE-LOCAL.md). You do not need to regenerate lockfiles for a normal boot.
+
 **Core profile (default — blank):**
 
 ```bash
@@ -48,12 +50,14 @@ UMBRACULUM_MODULE_PROFILE=reference docker compose -f docker-compose.yml -f dock
 cd apps/native/brewery && npx expo start
 ```
 
-- **CI**: `native-deps` runs `expo-doctor` against the manifest's primary native app (`blank` on core, `brewery` on reference). See [`.github/workflows/native-deps.yml`](../../.github/workflows/native-deps.yml).
+- **CI**: `native-deps` runs `expo-doctor` (**20/20**) against the manifest's primary native app (`blank` on core, `brewery` on reference). See [`.github/workflows/native-deps.yml`](../../.github/workflows/native-deps.yml).
 - **Typecheck**: `npm run typecheck -w @umbraculum/native-blank` or `-w @umbraculum/native-brewery` (container-only npm per [`DEVELOPMENT.md`](../../DEVELOPMENT.md)).
 - **Lint**: root `npm run lint` includes native app sources; brewery workspace lint policy in [`brewery/README.md`](brewery/README.md).
+- **Changing Expo / React / lockfiles:** follow [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../docs/DEVELOPMENT-NATIVE-LOCAL.md) § When you change native dependencies (Path B procedure) — not tribal chat notes.
 
 ## Further reading
 
 - [`docs/design/installation-profile.md`](../../docs/design/installation-profile.md) — core vs reference profiles
 - [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md) — native strategy and CI gates
-- [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../docs/DEVELOPMENT-NATIVE-LOCAL.md) — local Expo setup
+- [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../docs/DEVELOPMENT-NATIVE-LOCAL.md) — local Expo setup + dependency-change checklist
+- [`docs/design/expo-doctor-monorepo-assessment.md`](../../docs/design/expo-doctor-monorepo-assessment.md) — hoist / doctor SoT
