@@ -71,17 +71,37 @@ var import_tamagui2 = require("tamagui");
 // src/primitives/Card.tsx
 var import_react2 = require("react");
 var import_tamagui = require("tamagui");
+
+// src/primitives/legacyStyleAliases.ts
+function splitLegacyStyleAliases(props) {
+  const { background, backgroundColor, width, style, ...rest } = props;
+  const resolvedBackgroundColor = backgroundColor ?? background;
+  const mergedStyle = width !== void 0 ? { ...style, width } : style;
+  return {
+    rest,
+    backgroundColor: resolvedBackgroundColor,
+    style: mergedStyle
+  };
+}
+
+// src/primitives/Card.tsx
 var import_jsx_runtime = require("react/jsx-runtime");
 function Card(props) {
+  const { children, borderWidth, borderColor, borderRadius, padding, ...raw } = props;
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
     import_tamagui.YStack,
     {
-      borderWidth: props.borderWidth ?? 1,
-      borderColor: props.borderColor ?? "borderColor",
-      borderRadius: props.borderRadius ?? "4",
-      backgroundColor: props.backgroundColor ?? "background",
-      padding: props.padding ?? "3",
-      ...props
+      borderWidth: borderWidth ?? 1,
+      borderColor: borderColor ?? "borderColor",
+      borderRadius: borderRadius ?? "4",
+      backgroundColor: backgroundColor ?? "background",
+      padding: padding ?? "3",
+      ...style !== void 0 ? { style } : {},
+      ...rest,
+      children
     }
   );
 }
@@ -128,24 +148,25 @@ var import_react_native2 = require("react-native");
 var import_tamagui3 = require("tamagui");
 var import_jsx_runtime3 = require("react/jsx-runtime");
 function Button(props) {
-  const { accessibilityLabel, accessibilityRole, ...rest } = props;
+  const { accessibilityLabel, accessibilityRole, fontFamily, ...raw } = props;
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw
+  );
+  const shared = {
+    fontFamily: fontFamily ?? "body",
+    ...backgroundColor !== void 0 ? { backgroundColor } : {},
+    ...style !== void 0 ? { style } : {},
+    ...rest
+  };
   if (import_react_native2.Platform.OS === "web") {
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-      import_tamagui3.Button,
-      {
-        fontFamily: props.fontFamily ?? "body",
-        "aria-label": accessibilityLabel,
-        ...rest
-      }
-    );
+    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_tamagui3.Button, { "aria-label": accessibilityLabel, ...shared });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
     import_tamagui3.Button,
     {
-      fontFamily: props.fontFamily ?? "body",
       accessibilityLabel,
       accessibilityRole,
-      ...rest
+      ...shared
     }
   );
 }
@@ -215,24 +236,25 @@ var import_react_native4 = require("react-native");
 var import_tamagui6 = require("tamagui");
 var import_jsx_runtime6 = require("react/jsx-runtime");
 function Input(props) {
-  const { accessibilityLabel, accessibilityRole, ...rest } = props;
+  const { accessibilityLabel, accessibilityRole, fontFamily, ...raw } = props;
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw
+  );
+  const shared = {
+    fontFamily: fontFamily ?? "body",
+    ...backgroundColor !== void 0 ? { backgroundColor } : {},
+    ...style !== void 0 ? { style } : {},
+    ...rest
+  };
   if (import_react_native4.Platform.OS === "web") {
-    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-      import_tamagui6.Input,
-      {
-        fontFamily: props.fontFamily ?? "body",
-        "aria-label": accessibilityLabel,
-        ...rest
-      }
-    );
+    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_tamagui6.Input, { "aria-label": accessibilityLabel, ...shared });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
     import_tamagui6.Input,
     {
-      fontFamily: props.fontFamily ?? "body",
       accessibilityLabel,
       accessibilityRole,
-      ...rest
+      ...shared
     }
   );
 }

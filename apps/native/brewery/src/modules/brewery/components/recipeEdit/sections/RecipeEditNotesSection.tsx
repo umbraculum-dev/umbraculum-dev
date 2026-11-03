@@ -42,9 +42,9 @@ export function RecipeEditNotesSection({ model }: { model: RecipeEditScreenModel
                                 }}
               placeholder="Notes"
               size="md"
-              background="background"
+              backgroundColor="background"
               borderWidth={1}
-              borderColor="border-color"
+              borderColor="borderColor"
               height={80}
             />
                 </View>

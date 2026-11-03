@@ -25,17 +25,37 @@ import { YStack as YStack2 } from "tamagui";
 // src/primitives/Card.tsx
 import "react";
 import { YStack } from "tamagui";
+
+// src/primitives/legacyStyleAliases.ts
+function splitLegacyStyleAliases(props) {
+  const { background, backgroundColor, width, style, ...rest } = props;
+  const resolvedBackgroundColor = backgroundColor ?? background;
+  const mergedStyle = width !== void 0 ? { ...style, width } : style;
+  return {
+    rest,
+    backgroundColor: resolvedBackgroundColor,
+    style: mergedStyle
+  };
+}
+
+// src/primitives/Card.tsx
 import { jsx } from "react/jsx-runtime";
 function Card(props) {
+  const { children, borderWidth, borderColor, borderRadius, padding, ...raw } = props;
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw
+  );
   return /* @__PURE__ */ jsx(
     YStack,
     {
-      borderWidth: props.borderWidth ?? 1,
-      borderColor: props.borderColor ?? "borderColor",
-      borderRadius: props.borderRadius ?? "4",
-      backgroundColor: props.backgroundColor ?? "background",
-      padding: props.padding ?? "3",
-      ...props
+      borderWidth: borderWidth ?? 1,
+      borderColor: borderColor ?? "borderColor",
+      borderRadius: borderRadius ?? "4",
+      backgroundColor: backgroundColor ?? "background",
+      padding: padding ?? "3",
+      ...style !== void 0 ? { style } : {},
+      ...rest,
+      children
     }
   );
 }
@@ -82,24 +102,25 @@ import { Platform as Platform2 } from "react-native";
 import { Button as TamaguiButton } from "tamagui";
 import { jsx as jsx3 } from "react/jsx-runtime";
 function Button(props) {
-  const { accessibilityLabel, accessibilityRole, ...rest } = props;
+  const { accessibilityLabel, accessibilityRole, fontFamily, ...raw } = props;
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw
+  );
+  const shared = {
+    fontFamily: fontFamily ?? "body",
+    ...backgroundColor !== void 0 ? { backgroundColor } : {},
+    ...style !== void 0 ? { style } : {},
+    ...rest
+  };
   if (Platform2.OS === "web") {
-    return /* @__PURE__ */ jsx3(
-      TamaguiButton,
-      {
-        fontFamily: props.fontFamily ?? "body",
-        "aria-label": accessibilityLabel,
-        ...rest
-      }
-    );
+    return /* @__PURE__ */ jsx3(TamaguiButton, { "aria-label": accessibilityLabel, ...shared });
   }
   return /* @__PURE__ */ jsx3(
     TamaguiButton,
     {
-      fontFamily: props.fontFamily ?? "body",
       accessibilityLabel,
       accessibilityRole,
-      ...rest
+      ...shared
     }
   );
 }
@@ -169,24 +190,25 @@ import { Platform as Platform4 } from "react-native";
 import { Input as TamaguiInput } from "tamagui";
 import { jsx as jsx6 } from "react/jsx-runtime";
 function Input(props) {
-  const { accessibilityLabel, accessibilityRole, ...rest } = props;
+  const { accessibilityLabel, accessibilityRole, fontFamily, ...raw } = props;
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw
+  );
+  const shared = {
+    fontFamily: fontFamily ?? "body",
+    ...backgroundColor !== void 0 ? { backgroundColor } : {},
+    ...style !== void 0 ? { style } : {},
+    ...rest
+  };
   if (Platform4.OS === "web") {
-    return /* @__PURE__ */ jsx6(
-      TamaguiInput,
-      {
-        fontFamily: props.fontFamily ?? "body",
-        "aria-label": accessibilityLabel,
-        ...rest
-      }
-    );
+    return /* @__PURE__ */ jsx6(TamaguiInput, { "aria-label": accessibilityLabel, ...shared });
   }
   return /* @__PURE__ */ jsx6(
     TamaguiInput,
     {
-      fontFamily: props.fontFamily ?? "body",
       accessibilityLabel,
       accessibilityRole,
-      ...rest
+      ...shared
     }
   );
 }

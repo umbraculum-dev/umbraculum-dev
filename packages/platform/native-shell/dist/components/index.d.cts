@@ -1,11 +1,15 @@
 import React from 'react';
-import { InputProps } from 'tamagui';
+import { InputProps as InputProps$1 } from '@umbraculum/ui';
 
 type AdPlacementV1 = "global_top" | "global_bottom" | "recipe_edit_after_fermentables" | "recipe_edit_after_hops" | "recipe_edit_after_yeast";
 declare function AdSlot({ placement }: {
     placement: AdPlacementV1;
 }): React.JSX.Element | null;
 
+type IncludeFontPaddingProp = {
+    includeFontPadding?: boolean;
+};
+type InputProps = InputProps$1 & IncludeFontPaddingProp;
 declare function Input(props: InputProps): React.JSX.Element;
 
 interface ReadOnlyFieldProps {

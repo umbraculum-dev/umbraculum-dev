@@ -277,7 +277,8 @@ var RecipeCreateRequestSchema = import_zod4.z.object({
 var RecipePatchRequestSchema = import_zod4.z.object({
   name: import_zod4.z.string().optional(),
   styleKey: import_zod4.z.string().optional(),
-  notes: import_zod4.z.string().optional(),
+  // Clients send null for empty notes (native + web editors); service stores null.
+  notes: import_zod4.z.string().nullable().optional(),
   beerJsonRecipeJson: import_zod4.z.unknown().optional(),
   recipeExtJson: import_zod4.z.unknown().optional()
 });

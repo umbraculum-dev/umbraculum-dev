@@ -3,31 +3,38 @@ import React from "react";
 import { Platform } from "react-native";
 import { Button as TamaguiButton } from "tamagui";
 
-export type ButtonProps = ComponentProps<typeof TamaguiButton>;
+import { splitLegacyStyleAliases, type WithLegacyStyleAliases } from "./legacyStyleAliases";
+
+export type ButtonProps = WithLegacyStyleAliases<ComponentProps<typeof TamaguiButton>>;
 
 export function Button(props: ButtonProps) {
-  const { accessibilityLabel, accessibilityRole, ...rest } = props as unknown as {
+  const { accessibilityLabel, accessibilityRole, fontFamily, ...raw } = props as ButtonProps & {
     accessibilityLabel?: string;
     accessibilityRole?: string;
-  } & ButtonProps;
+  };
+
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw as Record<string, unknown>,
+  );
+
+  const shared = {
+    fontFamily: fontFamily ?? "body",
+    ...(backgroundColor !== undefined
+      ? { backgroundColor: backgroundColor as ComponentProps<typeof TamaguiButton>["backgroundColor"] }
+      : {}),
+    ...(style !== undefined ? { style: style as ComponentProps<typeof TamaguiButton>["style"] } : {}),
+    ...(rest as ComponentProps<typeof TamaguiButton>),
+  };
 
   if (Platform.OS === "web") {
-    return (
-      <TamaguiButton
-        fontFamily={props.fontFamily ?? "body"}
-        aria-label={accessibilityLabel}
-        {...(rest as ButtonProps)}
-      />
-    );
+    return <TamaguiButton aria-label={accessibilityLabel} {...shared} />;
   }
 
   return (
     <TamaguiButton
-      fontFamily={props.fontFamily ?? "body"}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
-      {...(rest as ButtonProps)}
+      {...shared}
     />
   );
 }
-

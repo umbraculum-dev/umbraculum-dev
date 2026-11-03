@@ -143,7 +143,8 @@ var RecipeCreateRequestSchema = z4.object({
 var RecipePatchRequestSchema = z4.object({
   name: z4.string().optional(),
   styleKey: z4.string().optional(),
-  notes: z4.string().optional(),
+  // Clients send null for empty notes (native + web editors); service stores null.
+  notes: z4.string().nullable().optional(),
   beerJsonRecipeJson: z4.unknown().optional(),
   recipeExtJson: z4.unknown().optional()
 });

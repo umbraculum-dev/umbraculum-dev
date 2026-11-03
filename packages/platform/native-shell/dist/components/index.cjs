@@ -194,9 +194,9 @@ function AdSlot({ placement }) {
 }
 
 // src/components/AppInput.tsx
+var import_ui2 = require("@umbraculum/ui");
 var import_react3 = require("react");
 var import_react_native3 = require("react-native");
-var import_tamagui = require("tamagui");
 var import_jsx_runtime3 = require("react/jsx-runtime");
 function Input(props) {
   const isAndroid = import_react_native3.Platform.OS === "android";
@@ -205,14 +205,14 @@ function Input(props) {
     paddingTop: 2,
     paddingBottom: 0
   } : null;
-  const passthrough = props;
-  const includeFontPadding = passthrough.includeFontPadding ?? (isAndroid ? false : void 0);
+  const { includeFontPadding: includeFontPaddingProp, style, ...rest } = props;
+  const includeFontPadding = includeFontPaddingProp ?? (isAndroid ? false : void 0);
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-    import_tamagui.Input,
+    import_ui2.Input,
     {
-      ...props,
+      ...rest,
       ...{ includeFontPadding },
-      style: androidSingleLineFixStyle ? [androidSingleLineFixStyle, props.style] : props.style
+      style: androidSingleLineFixStyle ? [androidSingleLineFixStyle, style] : style
     }
   );
 }
@@ -220,12 +220,12 @@ function Input(props) {
 // src/components/ReadOnlyField.tsx
 var import_react4 = require("react");
 var import_react_native4 = require("react-native");
-var import_ui3 = require("@umbraculum/ui");
+var import_ui4 = require("@umbraculum/ui");
 
 // src/theme/colors.ts
-var import_ui2 = require("@umbraculum/ui");
-var FIELD_READONLY_BG = import_ui2.FIELD_READONLY_BG;
-var FIELD_READONLY_BORDER = import_ui2.FIELD_READONLY_BORDER;
+var import_ui3 = require("@umbraculum/ui");
+var FIELD_READONLY_BG = import_ui3.FIELD_READONLY_BG;
+var FIELD_READONLY_BORDER = import_ui3.FIELD_READONLY_BORDER;
 
 // src/components/ReadOnlyField.tsx
 var import_jsx_runtime4 = require("react/jsx-runtime");
@@ -242,11 +242,11 @@ function ReadOnlyField({ value, placeholder = "\u2014", textAlign }) {
         borderColor: FIELD_READONLY_BORDER
       },
       children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-        import_ui3.Text,
+        import_ui4.Text,
         {
           fontSize: 14,
-          color: "$gray11",
-          fontFamily: "$body",
+          color: "gray11",
+          fontFamily: "body",
           style: textAlign ? { textAlign } : void 0,
           children: display
         }

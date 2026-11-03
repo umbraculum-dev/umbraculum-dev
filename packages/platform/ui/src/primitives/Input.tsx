@@ -3,31 +3,38 @@ import React from "react";
 import { Platform } from "react-native";
 import { Input as TamaguiInput } from "tamagui";
 
-export type InputProps = ComponentProps<typeof TamaguiInput>;
+import { splitLegacyStyleAliases, type WithLegacyStyleAliases } from "./legacyStyleAliases";
+
+export type InputProps = WithLegacyStyleAliases<ComponentProps<typeof TamaguiInput>>;
 
 export function Input(props: InputProps) {
-  const { accessibilityLabel, accessibilityRole, ...rest } = props as unknown as {
+  const { accessibilityLabel, accessibilityRole, fontFamily, ...raw } = props as InputProps & {
     accessibilityLabel?: string;
     accessibilityRole?: string;
-  } & InputProps;
+  };
+
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw as Record<string, unknown>,
+  );
+
+  const shared = {
+    fontFamily: fontFamily ?? "body",
+    ...(backgroundColor !== undefined
+      ? { backgroundColor: backgroundColor as ComponentProps<typeof TamaguiInput>["backgroundColor"] }
+      : {}),
+    ...(style !== undefined ? { style: style as ComponentProps<typeof TamaguiInput>["style"] } : {}),
+    ...(rest as ComponentProps<typeof TamaguiInput>),
+  };
 
   if (Platform.OS === "web") {
-    return (
-      <TamaguiInput
-        fontFamily={props.fontFamily ?? "body"}
-        aria-label={accessibilityLabel}
-        {...(rest as InputProps)}
-      />
-    );
+    return <TamaguiInput aria-label={accessibilityLabel} {...shared} />;
   }
 
   return (
     <TamaguiInput
-      fontFamily={props.fontFamily ?? "body"}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
-      {...(rest as InputProps)}
+      {...shared}
     />
   );
 }
-
