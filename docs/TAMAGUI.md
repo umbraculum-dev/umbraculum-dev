@@ -20,7 +20,7 @@ This document:
 2. Describes how we work around each one,
 3. Tells future maintainers when *not* to spend time fixing what is upstream.
 
-**Pinned version (2026-11-03):** `tamagui` and every declared `@tamagui/*` dependency use exact **`3.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (`tamagui` peer `>=3`). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. Keep `@tamagui/config/v5` for this wave (Config v6 is a separate design remap). Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps. See [`design/tamagui-3-upgrade-analysis.md`](design/tamagui-3-upgrade-analysis.md).
+**Pinned version (2026-11-03):** `tamagui` and every declared `@tamagui/*` dependency use exact **`3.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (`tamagui` peer `>=3`). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. Keep `@tamagui/config/v5` for this wave (Config v6 is a separate design remap). Web config must import `createAnimations` from **`@tamagui/animations-css/extras`** (not bare `@tamagui/animations-css`) so Sheet/animated-number hooks work. Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps. See [`design/tamagui-3-upgrade-analysis.md`](design/tamagui-3-upgrade-analysis.md).
 
 ### Tamagui CLI check (duplicate instances)
 
