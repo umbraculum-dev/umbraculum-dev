@@ -111,7 +111,7 @@ run_native_step() {
       ;;
     expo-doctor)
       echo "==> [expo-doctor] check-native-expo-doctor.sh (manifest primary native app + typecheck)"
-      docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:20-slim \
+      docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:22-slim \
         bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh"
       ;;
     *)

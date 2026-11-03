@@ -47,7 +47,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Run check-web-url-segments inside node:20-slim
+      - name: Run check-web-url-segments inside node:22-slim
         # Same one-off-container method as docs-readmes.yml and typecheck.yml
         # (canonical per docs/TYPING.md §Methodology). The script is pure
         # Node stdlib + tsx; install + run is ~5 s wall.
@@ -55,7 +55,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}:/repo" \
             -w /repo \
-            node:20-slim \
+            node:22-slim \
             bash -lc '
               set -eu
               npm install --no-audit --no-fund --workspaces --include-workspace-root

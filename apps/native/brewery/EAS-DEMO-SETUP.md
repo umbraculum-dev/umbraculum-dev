@@ -72,7 +72,7 @@ Priority queue / paid Expo plans are optional operator upgrades, not required fo
 
 ---
 
-## Metro config (SDK 54 monorepo)
+## Metro config (SDK 58 monorepo)
 
 [`metro.config.js`](metro.config.js) extends Expo via `getDefaultConfig` + `mergeConfig` (see [Work with monorepos](https://docs.expo.dev/guides/monorepos/)). EAS may still warn about monorepo `extraNodeModules`; answer **`n`** to continue unless the bundle fails.
 
@@ -97,7 +97,7 @@ After root `npm ci`, run from repo root:
 ./scripts/check-native-expo-doctor.sh
 ```
 
-The script removes stale `apps/native/node_modules` (pre–Wave 4A), nested `packages/platform/ui/node_modules`, and phantom root peer copies before `expo-doctor`. Target: **18/18**. See [`docs/design/expo-doctor-monorepo-assessment.md`](../../docs/design/expo-doctor-monorepo-assessment.md).
+The script removes stale `apps/native/node_modules` (pre–Wave 4A), nested `packages/platform/ui/node_modules`, and phantom root peer copies before `expo-doctor`. Target: **20/20**. See [`docs/design/expo-doctor-monorepo-assessment.md`](../../docs/design/expo-doctor-monorepo-assessment.md).
 
 **Agents:** run this (or rely on green `native-deps` GHA) after native lockfile / override edits — see [`AGENTS.md`](../../AGENTS.md) § Native dependency / expo-doctor gate.
 

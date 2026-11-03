@@ -338,14 +338,14 @@ Toolset witnesses (when installed): `48-rfc-companion-documentation-gate.mdc`,
 
 ## Node/npm: container-only — host is not the project
 
-The **Docker stack** (compose services, `node:20-slim` ci-parity image) is the
+The **Docker stack** (compose services, `node:22-slim` ci-parity image) is the
 canonical execution surface — same bar as GHA. The **host** laptop (Node/npm
 versions, PATH, global npm) is **not** part of the project and differs per
 contributor.
 
 **Agents:** do not run `node` / `npm` / `npx` on the host for verification,
 registry checks, or repo scripts that invoke npm — use compose exec,
-`docker run … node:20-slim`, or `./scripts/ci-parity-check.sh`. Host npm is
+`docker run … node:22-slim`, or `./scripts/ci-parity-check.sh`. Host npm is
 allowed only after the operator explicitly approves and you state the cons
 (non-reproducible, not CI parity, must re-verify in container before done).
 
@@ -437,13 +437,13 @@ Use skill **`native-expo-doctor-pre-push`** (toolset rule **`78-native-expo-doct
 [`.umbraculum/gha-trigger-map.json`](.umbraculum/gha-trigger-map.json) `native-deps` paths.
 
 ```bash
-docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
   bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
 ```
 
-**Do not regress Path A (2026-06-07):** monorepo `react@19.1.0` overrides; tight `native-shell`
-`expo` peer (`~54.0.35`, never `>=54`); no `expo-*` in `native-shell` `devDependencies`;
-`app.config.js` `({ config }) =>` spread; Metro pins brewery `react`.
+**Do not regress Path B (2026-11):** monorepo `react@19.3.0` overrides; Expo SDK **58**; tight `native-shell`
+`expo` peer (`~58.0.22`, never `>=58`); no `expo-*` in `native-shell` `devDependencies`;
+`app.config.js` `({ config }) =>` spread; Metro pins brewery `react`; Node **22** (`node:22-slim`).
 
 CI: [`.github/workflows/native-deps.yml`](.github/workflows/native-deps.yml). Assessment +
 agent anti-patterns: [`docs/design/expo-doctor-monorepo-assessment.md`](docs/design/expo-doctor-monorepo-assessment.md) §8.
@@ -458,7 +458,7 @@ configuration`, duplicate-instance warnings), run skill **`tamagui-cli-check`**
 as the binding copy for agents.
 
 ```bash
-docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
   bash -lc "./scripts/check-tamagui-cli.sh"
 ```
 
@@ -475,7 +475,7 @@ workspace **`package.json`** deps change, or **`services/api/package-lock.json`*
 on disk. Binding copy:
 [`.cursor/rules/80-monorepo-lockfile-agent-gate.mdc`](.cursor/rules/80-monorepo-lockfile-agent-gate.mdc).
 **`verify:pre-push`** runs **`npm run check:lockfiles`** (forbidden api lockfile + root
-+ web sync in `node:20-slim`).
++ web sync in `node:22-slim`).
 
 Agent sequence when the change set includes any **`package-lock.json`**:
 
@@ -673,7 +673,7 @@ EAS, etc.) — not for discovering failures ci-parity can catch locally.
 
 Host prerequisites for ci-parity: **git**, **Docker**, and **Node** (to launch
 the CLI via `./scripts/ci-parity-check.sh` or `npm run verify:pre-push`). Job
-commands execute inside the manifest's container image (`node:20-slim`), not
+commands execute inside the manifest's container image (`node:22-slim`), not
 on the host shell/OS.
 
 Witness rule: `72-ci-parity-local-vs-ci-divergence.mdc` (agent anti-patterns

@@ -70,8 +70,8 @@ services:
     environment:
       - NEXT_PUBLIC_API_BASE_URL=/api
       - UMBRACULUM_MODULE_PROFILE=${UMBRACULUM_MODULE_PROFILE:-platform}
-      # NOTE: Required to bypass npm peer-dependency conflicts when React is pinned to 19.1.0
-      # (Expo Go ABI via root overrides) while Tamagui pulls react-native@0.85.x peers.
+      # NOTE: Required to bypass npm peer-dependency conflicts when React is pinned to 19.3.0
+      # (Expo Go SDK 58 ABI via root overrides) while Tamagui may pull divergent react-native peers.
       - npm_config_legacy_peer_deps=true
     ports:
       - "3000:3000"
@@ -120,7 +120,7 @@ services:
       - ./packages/canonical/crp/contracts:/packages/canonical/crp/contracts:ro
 
   docs-site:
-    image: node:20-slim
+    image: node:22-slim
     working_dir: /repo
     environment:
       - NODE_OPTIONS=--max-old-space-size=8192

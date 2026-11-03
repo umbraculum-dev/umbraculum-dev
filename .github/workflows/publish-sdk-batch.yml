@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           package-manager-cache: false
 
       # npm ci must run on npm 10 (Node 20 default) — npm 11 rejects the root lockfile

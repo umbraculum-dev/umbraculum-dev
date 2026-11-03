@@ -64,22 +64,22 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
     2. **End-to-end reproduction (for understanding the symptom):**
        ```bash
        # Wipe beerjson dist to simulate "field added, dist forgot to be rebuilt"
-       docker run --rm -v "$PWD:/repo" node:20-slim bash -lc 'rm -rf /repo/packages/verticals/brewery/beerjson/dist'
+       docker run --rm -v "$PWD:/repo" node:22-slim bash -lc 'rm -rf /repo/packages/verticals/brewery/beerjson/dist'
        ./scripts/build-packages-in-docker.sh
        grep -c lateAddition packages/verticals/brewery/beerjson/dist/index.d.ts   # expect >=1 once that field exists
-       docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+       docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
          bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
-       # exit 0 means the chain is healthy end-to-end (expo-doctor 18/18 + typecheck)
+       # exit 0 means the chain is healthy end-to-end (expo-doctor 20/20 + typecheck)
        ```
   - **Container ownership (now self-resolving from the script).** Historically, `scripts/build-packages-in-docker.sh` ran Docker as root inside the `/repo` bind-mount, which left any file it (re)wrote — anything under `packages/*/dist/*`, sometimes `package-lock.json`, sometimes files inside `apps/*` and `services/*` — owned by `root:root` on the host. Git tracks content not ownership, so this was invisible until you asked git to *replace* one of those files (stash pop, branch switch, restore, rebase): non-root users can't unlink root-owned files, and git aborts with `error: unable to unlink old '...': Permission denied`. The build script now appends a `chown -R $HOST_UID:$HOST_GID /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json` step (uid/gid are resolved on the host and passed in via env vars; the chown runs unconditionally so a failed build never leaves a partial root-owned tree; `/repo/node_modules` is excluded on purpose because it's a docker named volume, not a host bind-mount). If you ever do hit `Permission denied` from git on those paths — e.g. because an older runner image or an out-of-band `docker run` wrote them as root — the manual recovery command is still:
     ```bash
-    docker run --rm -v "$PWD:/repo" node:20-slim \
+    docker run --rm -v "$PWD:/repo" node:22-slim \
       chown -R "$(id -u):$(id -g)" /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json
     ```
-  - **CI guard.** `.github/workflows/native-deps.yml` runs **`./scripts/check-native-expo-doctor.sh`** (18/18) + brewery typecheck on every PR touching `apps/native/**`, `packages/**`, or the lockfiles. Stale `packages/verticals/brewery/beerjson/dist/*` relative to `src/` will also fail brewery typecheck — desired signal. Stricter dist audit: `./scripts/check-packages-dist-up-to-date.sh`.
-  - Native baseline: Expo SDK 54 + **`react@19.1.0` monorepo-wide** (root `overrides` — web and native aligned as of 2026-06-07). Assessment: `docs/design/expo-doctor-monorepo-assessment.md`.
+  - **CI guard.** `.github/workflows/native-deps.yml` runs **`./scripts/check-native-expo-doctor.sh`** (20/20) + brewery typecheck on every PR touching `apps/native/**`, `packages/**`, or the lockfiles. Stale `packages/verticals/brewery/beerjson/dist/*` relative to `src/` will also fail brewery typecheck — desired signal. Stricter dist audit: `./scripts/check-packages-dist-up-to-date.sh`.
+  - Native baseline: Expo SDK **58** + **`react@19.3.0` monorepo-wide** (root `overrides` — Path B 2026-11). Node **22**. Assessment: `docs/design/expo-doctor-monorepo-assessment.md`.
   - **Native strategy + CI (prose)**: read `docs/NATIVE-STRATEGY-AND-CI.md`.
-  - **Expo Go ABI (important)**: `apps/native/brewery` MUST match Expo Go's React / `react-dom` / `react-native-svg` / `expo` versions. **Do not** bump `apps/web` React past root `overrides` without Path B. Symptoms of misalignment: device `Incompatible React versions`, blank Metro web preview at `:8081/`, or `expo-doctor` duplicate-deps failures. Recovery: `docs/DEVELOPMENT-NATIVE-LOCAL.md` troubleshooting + `./scripts/check-native-expo-doctor.sh`. Agent gate: Cursor rule **`78-native-expo-doctor-monorepo-gate`**, skill **`native-expo-doctor-pre-push`**, `AGENTS.md` § Native dependency / expo-doctor gate.
+  - **Expo Go ABI (important)**: `apps/native/brewery` MUST match Expo Go's React / `react-dom` / `react-native-svg` / `expo` versions (Path B: SDK 58 / `react@19.3.0`). **Do not** bump `apps/web` React past root `overrides` without a new assessment. Symptoms of misalignment: device `Incompatible React versions`, blank Metro web preview at `:8081/`, or `expo-doctor` duplicate-deps failures. Recovery: `docs/DEVELOPMENT-NATIVE-LOCAL.md` troubleshooting + `./scripts/check-native-expo-doctor.sh`. Agent gate: Cursor rule **`78-native-expo-doctor-monorepo-gate`**, skill **`native-expo-doctor-pre-push`**, `AGENTS.md` § Native dependency / expo-doctor gate.
 - **Monorepo workspace deps in Docker (important)**:
   - Workspace packages are mounted under `/packages/*` in the `web` container.
   - To ensure workspace package dependencies resolve correctly, `/packages/node_modules` is symlinked to `/app/node_modules` at container startup.
@@ -100,7 +100,7 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
          docker run --rm \
            -v "$PWD/packages:/packages" \
            -w /packages/platform/rendering \
-           node:20-slim \
+           node:22-slim \
            sh -c "npm install --omit=dev --no-save --no-package-lock --ignore-scripts --legacy-peer-deps"
          docker compose restart api
          ```

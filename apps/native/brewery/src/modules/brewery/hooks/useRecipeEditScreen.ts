@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { ScrollView } from "react-native";
+import type { ScrollViewInstance } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -47,7 +47,7 @@ export function useRecipeEditScreen() {
     return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
 
   const sections = useNativeRecipeEditSections();
   const catalogs = useNativeRecipeEditCatalogs({ api });

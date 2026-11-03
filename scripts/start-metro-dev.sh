@@ -76,7 +76,7 @@ docker run -d --rm \
   -e EXPO_OFFLINE=1 \
   -v "${REPO_ROOT}:/repo" \
   -w /repo/apps/native/brewery \
-  node:20-slim \
+  node:22-slim \
   bash -lc 'cd /repo && npm install --no-audit --no-fund -w @umbraculum/native-brewery && EXPO_BIN=/repo/node_modules/.bin/expo; if [ ! -x "$EXPO_BIN" ]; then EXPO_BIN=/repo/apps/native/brewery/node_modules/.bin/expo; fi; if [ ! -x "$EXPO_BIN" ]; then echo "ERROR: expo CLI not found under /repo/node_modules or brewery workspace" >&2; exit 1; fi; cd /repo/apps/native/brewery && exec "$EXPO_BIN" start --lan -c'
 
 echo

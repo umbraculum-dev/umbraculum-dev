@@ -100,7 +100,7 @@ For each slice: what it locks down, what bug class it owns, what artifacts ship 
   - `isolatedModules` — universal; 0-cost (no `const enum`, no value-vs-type re-export ambiguities).
 - 13 of 15 workspaces pass `tsc --noEmit` cleanly. 2 workspaces excluded by explicit Phase 4 decision: `apps/web` (585 errors) + `packages/platform/ui` (25 errors), all in the Tamagui-accepted-cost class per [`docs/TAMAGUI.md`](TAMAGUI.md).
 - `apps/web/typecheck` npm script wired (Phase 4) for local reproduction even though it's outside the gate.
-- Methodology pinned: canonical baselines measured via one-off `node:20-slim` + monorepo-root hoisted `/repo/node_modules`, matching CI conditions and reproducible across machines.
+- Methodology pinned: canonical baselines measured via one-off `node:22-slim` + monorepo-root hoisted `/repo/node_modules`, matching CI conditions and reproducible across machines.
 
 **CI gate**: `.github/workflows/typecheck.yml` (sequential per-workspace `tsc --noEmit` under `set +e` with explicit pass/fail aggregation; ~33s wall + ~30s `npm install` = ~63s CI total).
 

@@ -37,7 +37,7 @@ None of that is “moving fast”; it is **undefined behavior** that wastes days
 
 ### 2.2 What is professionally acceptable for your situation
 
-Using **Expo Go** on a physical device with **documented** version pins and **monorepo-wide React alignment** (`react@19.1.0` via root `overrides` as of 2026-06-07) is **acceptable** when:
+Using **Expo Go** on a physical device with **documented** version pins and **monorepo-wide React alignment** (`react@19.3.0` via root `overrides` as of Path B 2026-11) is **acceptable** when:
 
 1. Pins and overrides are **explicit** (baseline table in `DEVELOPMENT-NATIVE-LOCAL.md`, assessment in [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md)).
 2. Everyone touching native deps runs **[`scripts/check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh)** (or CI `native-deps.yml`) before merging — the script targets the **primary native app** from the [installation profile manifest](../.umbraculum/install.core.json) (`blank` on core profile, `brewery` when opted in).
@@ -73,9 +73,9 @@ So “Mac-free” pushes the long-term path toward **EAS (or similar remote iOS 
 
 **Today (aligned with your answers):**
 
-- Keep **Expo Go + SDK 54** as the primary dev loop on Linux.
+- Keep **Expo Go + SDK 58** as the primary dev loop on Linux (Node **22**).
 - Keep **`apps/native/brewery` pinned** to what Expo Go expects (see baseline table in `docs/DEVELOPMENT-NATIVE-LOCAL.md`), including **`react-dom` matching `react`** for Metro web preview.
-- Keep **`apps/web` on the same React minor** as native via root `overrides` (Path A, 2026-06-07). Do **not** bump web ahead until Path B (SDK upgrade or dev client) — see [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md) §5.
+- Keep **`apps/web` on the same React minor** as native via root `overrides` (Path B, 2026-11: `19.3.0`). Do **not** bump web ahead of Expo Go ABI without a deliberate next exit — see [`docs/design/expo-doctor-monorepo-assessment.md`](design/expo-doctor-monorepo-assessment.md) §5.
 - Maintain **`docs/DEVELOPMENT-NATIVE-LOCAL.md`** as the single operational source of truth (LAN IP, Metro detached vs interactive, troubleshooting).
 
 **Revisit Option C-2 when:** you decide you will distribute native binaries (Play Store / TestFlight / sideload) **or** when Expo Go blocks a feature you need (custom native module, specific native dependency version).
@@ -100,7 +100,7 @@ These are the **minimum** professional bar for the current stack:
 
 | Mitigation | Purpose |
 | --- | --- |
-| Baseline version table + [`check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh) (18/18) | Prevents hoist duplicates and Expo Go ABI crashes before they hit the device |
+| Baseline version table + [`check-native-expo-doctor.sh`](../scripts/check-native-expo-doctor.sh) (20/20) | Prevents hoist duplicates and Expo Go ABI crashes before they hit the device |
 | Cold Android bundle smoke ([`check-native-metro-cold.sh`](../scripts/check-native-metro-cold.sh); see [`DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) § Pre-release) | Prevents warm Metro/`node_modules` false greens; catches Node `fs` (and similar) in the native JS graph before juniors / restores |
 | `react` + `react-dom` same exact version in `apps/native` | Prevents blank Metro web preview at `:8081/` |
 | LAN IP pre-flight (`ip`, curl smoke tests) | Prevents `Failed to download remote update` |
@@ -123,7 +123,7 @@ Agent gate (required when editing native hoist surface): Cursor rule **`78-nativ
 | Option | What it does | Why not as primary |
 |---|---|---|
 | **A. Auto-derive from Metro `hostUri`** *(chosen)* | `apps/native/brewery/src/auth/apiBaseUrl.ts` reads `Constants.expoConfig.hostUri` at runtime and derives `http://<host>:18080` when no explicit URL is set. A `scripts/start-metro-dev.sh` helper detects the laptop's outbound LAN IP and passes it as `REACT_NATIVE_PACKAGER_HOSTNAME`. | — |
-| **Metro (SDK 54+)** | [`apps/native/brewery/metro.config.js`](../apps/native/brewery/metro.config.js) uses `getDefaultConfig` + `mergeConfig` (Expo monorepo defaults for `watchFolders` / `nodeModulesPaths`); only `resolver.extraNodeModules` is merged for React pinning and `brewery-recipes-ui`. `experiments.autolinkingModuleResolution` in [`app.config.js`](../apps/native/brewery/app.config.js). | Revisit if `expo doctor` / EAS still warn after dropping manual `disableHierarchicalLookup`. |
+| **Metro (SDK 58)** | [`apps/native/brewery/metro.config.js`](../apps/native/brewery/metro.config.js) uses `getDefaultConfig` + `mergeConfig` (Expo monorepo defaults for `watchFolders` / `nodeModulesPaths`); only `resolver.extraNodeModules` is merged for React pinning and `brewery-recipes-ui`. `experiments.autolinkingModuleResolution` in [`app.config.js`](../apps/native/brewery/app.config.js). | Revisit if `expo doctor` / EAS still warn after dropping manual `disableHierarchicalLookup`. |
 | B. DHCP reservation on the router | Bind a fixed IP to the laptop's MAC in router admin; `app.json` stays pinned forever. | Only works on the home LAN. Useless on café/coworking WiFi or mobile hotspot. Assumes router admin access, which we cannot assume for all future contributors or future homes. |
 | C. Tailscale | Laptop + phone on a Tailscale tailnet; use a stable `100.x.x.x` or `<hostname>.tailnet.ts.net`. | Solves a bigger problem (works across any network, even when laptop & phone are not on the same LAN) at the cost of an always-on daemon and ~30–80ms latency per request. Sensible **secondary** option if we ever dev away from the home LAN regularly. |
 | D. Static IP on the laptop interface | Configure `wlo1`/`enp3s0` with a fixed IP outside the DHCP pool. | Fragile (collides with the router's DHCP pool when networks change) and same network-bound limitation as B. |
@@ -167,7 +167,7 @@ Goals:
    - `packages/**`
    - root `package.json` / `package-lock.json`
    - the workflow file itself (`.github/workflows/native-deps.yml`)
-3. **Job:** `actions/checkout@v5` → single Docker step in `node:20-slim` (`-v` repo at `/repo`, `-w /repo`): root **`npm ci`**, then **`./scripts/check-native-expo-doctor.sh`** (`expo install --check` + `expo-doctor` 18/18 + stale-tree cleanup), then **`npm run typecheck -w @umbraculum/native-brewery`**. (After RFC-0011 Wave 4A, doctor must run after **root** `npm ci` — brewery-only install misses hoist duplicates.)
+3. **Job:** `actions/checkout@v5` → single Docker step in `node:22-slim` (`-v` repo at `/repo`, `-w /repo`): root **`npm ci`**, then **`./scripts/check-native-expo-doctor.sh`** (`expo install --check` + `expo-doctor` 20/20 + stale-tree cleanup), then **`npm run typecheck -w @umbraculum/native-brewery`**. (After RFC-0011 Wave 4A, doctor must run after **root** `npm ci` — brewery-only install misses hoist duplicates.)
 4. **Concurrency:** new runs on the same ref cancel in-flight runs (`concurrency.cancel-in-progress: true`) — keeps minutes lean on rapid pushes.
 5. **Timeout:** `timeout-minutes: 10`.
 
@@ -195,7 +195,7 @@ Run the same checks **locally before push**:
 docker run --rm \
   -v "$REPO_ROOT:/repo" \
   -w /repo \
-  node:20-slim \
+  node:22-slim \
   bash -lc "npm ci --no-audit --no-fund && ./scripts/check-native-expo-doctor.sh && npm run typecheck -w @umbraculum/native-brewery"
 ```
 

@@ -24,7 +24,7 @@ A developer-tooling HTTP server (and matching CLI) that wraps a fixed set of tes
 
 | Tool | Args | What it does |
 |---|---|---|
-| `smokeStack` | `{ baseUrl? }` | In-process port of `scripts/smoke.sh` (5 checks via `fetch()`). No `curl`/`jq` dependency, so it runs in any Node >=18 container (including `node:20-slim` and the api container). Writes the same `verdict.txt`/`log.jsonl` plus a per-check `summary.json`. The shell `scripts/smoke.sh` is retained for CI/ops; both implementations must stay semantically equivalent — if you add/remove a check in one, mirror it in the other. |
+| `smokeStack` | `{ baseUrl? }` | In-process port of `scripts/smoke.sh` (5 checks via `fetch()`). No `curl`/`jq` dependency, so it runs in any Node >=18 container (including `node:22-slim` and the api container). Writes the same `verdict.txt`/`log.jsonl` plus a per-check `summary.json`. The shell `scripts/smoke.sh` is retained for CI/ops; both implementations must stay semantically equivalent — if you add/remove a check in one, mirror it in the other. |
 | `seedE2eFixture` | `{ clean? }` | Runs `docker compose exec api npm run seed:e2e [-- --clean]` |
 | `runApiTests` | `{ filter? }` | Runs `docker compose exec api npm test` (vitest filter via `-t`) |
 | `runContractsCheck` | `{ update? }` | Runs `npm run contracts:check` (or `contracts:update`) in the api container |
@@ -61,7 +61,7 @@ POST responses from any subprocess/fetch-based tool are enriched server-side wit
 # Start the server
 docker compose exec api npx tsx /repo/packages/platform/test-mcp/src/server.ts
 # (or run from host:)
-docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:20-slim \
+docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:22-slim \
   bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts"
 
 # Smoke
@@ -84,10 +84,10 @@ curl -fsS "http://localhost:8932/lastRunArtifacts?tool=smoke"
 ## CLI usage
 
 ```bash
-docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:20-slim \
+docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:22-slim \
   bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli smokeStack"
 
-docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:20-slim \
+docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:22-slim \
   bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli runPlaywrightSpec --json '{\"spec\":\"platform/b2b-registered-auth.spec.ts\"}'"
 ```
 
@@ -108,7 +108,7 @@ Add this entry to your Cursor MCP user config (typically `~/.cursor/mcp.json` or
 }
 ```
 
-(Adjust the absolute path to your local checkout. Per the no-host-npm rule, run via `docker run ... node:20-slim` if you don't have tsx available on the host.)
+(Adjust the absolute path to your local checkout. Per the no-host-npm rule, run via `docker run ... node:22-slim` if you don't have tsx available on the host.)
 
 ## Output contract
 
@@ -135,8 +135,8 @@ This matches the run-dir layout documented in the `agentic-browser-web-app` skil
 
 This package is invoked at runtime via `tsx` (no separate build step needed for the dev / agentic loop) and runs container-friendly per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`.
 
-- **Run (HTTP server, in-stack)**: `docker compose exec api npx tsx /repo/packages/platform/test-mcp/src/server.ts` — see HTTP usage above for the `node:20-slim` host alternative.
-- **Run (single CLI tool, host)**: `docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:20-slim bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli <tool>"` — see CLI usage above for full examples.
+- **Run (HTTP server, in-stack)**: `docker compose exec api npx tsx /repo/packages/platform/test-mcp/src/server.ts` — see HTTP usage above for the `node:22-slim` host alternative.
+- **Run (single CLI tool, host)**: `docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/platform/test-mcp node:22-slim bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli <tool>"` — see CLI usage above for full examples.
 - **Test**: vitest is not configured in this workspace; the tools are exercised directly by the CI / agentic flows that consume them. See [`docs/TESTING.md`](../../../docs/TESTING.md) §"Layer map".
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace landed `noUncheckedIndexedAccess` in Phase 6b — fixing 4 latent index-out-of-bounds sites — and carries all 6 candidate strict flags after Phase 6h).
 
@@ -144,7 +144,7 @@ This package is invoked at runtime via `tsx` (no separate build step needed for 
 
 - **Consumed by**: developer machines running agentic / scripted browser tests (the agent driving the integrated Chrome calls these endpoints to set up state); CI surfaces that need deterministic primitives without reproducing the smoke-script logic in YAML; ad-hoc shell users via `--cli`.
 - **Depends on**: a running dev stack (`docker compose up -d`) for tools that exercise the API container (`runApiTests`, `runContractsCheck`, `seedE2eFixture`, `loginAs`); the Playwright Docker image at `mcr.microsoft.com/playwright:v1.60.0-noble` for `runPlaywrightSmoke` / `runPlaywrightSpec`.
-- **Container-only**: per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`, all subprocess invocations target containers (`docker compose exec api …`, `docker run … node:20-slim`, Playwright image), never host Node.
+- **Container-only**: per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`, all subprocess invocations target containers (`docker compose exec api …`, `docker run … node:22-slim`, Playwright image), never host Node.
 
 ## Status
 

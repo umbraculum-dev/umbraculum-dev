@@ -26,7 +26,7 @@ docker run --rm \
   -v "${WEB_DIR}:/app" \
   -w /app \
   -e npm_config_legacy_peer_deps=true \
-  node:20-slim bash -lc '
+  node:22-slim bash -lc '
     set -euo pipefail
     before="$(mktemp)"
     cp package-lock.json "$before"

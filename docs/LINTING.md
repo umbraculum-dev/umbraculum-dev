@@ -788,13 +788,13 @@ None of slices 1-3 are blocking. Pick based on the bottleneck you're feeling mos
 
 ## How to run locally
 
-ESLint runs inside a `node:20-slim` container (per the no-npm-on-host policy):
+ESLint runs inside a `node:22-slim` container (per the no-npm-on-host policy):
 
 ```bash
 # From repo root — full repo lint
 docker run --rm \
   -v "$PWD:/repo" -w /repo \
-  node:20-slim \
+  node:22-slim \
   bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && npm run lint"
 ```
 
@@ -805,7 +805,7 @@ For a focused path (much faster iteration):
 ```bash
 docker run --rm \
   -v "$PWD:/repo" -w /repo \
-  node:20-slim \
+  node:22-slim \
   bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && \
             npx eslint packages/platform/ui/src/ai/"
 ```
@@ -815,7 +815,7 @@ Auto-fix safe issues (mostly unused `eslint-disable` directives):
 ```bash
 docker run --rm \
   -v "$PWD:/repo" -w /repo \
-  node:20-slim \
+  node:22-slim \
   bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && npm run lint -- --fix"
 ```
 
@@ -869,11 +869,11 @@ The `.github/workflows/web-lint.yml` workflow runs a single ESLint invocation on
 
 - **`npm run lint`** — full repo. Errors block CI. Since HIGH-full Phase 5c (2026-05-16) all 12 type-aware rules + `no-explicit-any` + `no-unused-vars` are at `error`, so any new violation fails the build. The lone `no-empty-object-type` straggler was promoted to `error` in 5f housekeeping the same day (with the Tamagui-friendly `with-single-extends` allowance preserved); no warning-level rules remain.
 
-Runs inside a `node:20-slim` container to mirror the CI environment exactly. The historical `npm run lint:packages-strict` second step was dropped in Phase 5d (now redundant since the main `lint` is the strict gate).
+Runs inside a `node:22-slim` container to mirror the CI environment exactly. The historical `npm run lint:packages-strict` second step was dropped in Phase 5d (now redundant since the main `lint` is the strict gate).
 
 ### CI heap budget
 
-The workflow passes `NODE_OPTIONS=--max-old-space-size=6144` to the node:20-slim container. Surfaced 2026-05-19 after the sub-plan #9 slot-4 push (commit `bd7d147`) produced the first CI run to OOM the type-aware ESLint parser with the default v8 heap (~4 GB):
+The workflow passes `NODE_OPTIONS=--max-old-space-size=6144` to the node:22-slim container. Surfaced 2026-05-19 after the sub-plan #9 slot-4 push (commit `bd7d147`) produced the first CI run to OOM the type-aware ESLint parser with the default v8 heap (~4 GB):
 
 ```
 FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
@@ -883,7 +883,7 @@ Error: Process completed with exit code 134.
 
 **Root cause is monotonic monorepo growth, not a code defect.** `eslint.config.mjs` runs the type-aware parser repo-wide (`parserOptions.projectService` with `tsconfigRootDir` set to the repo root), which loads the entire TypeScript project graph (`services/api/**` + `apps/web/**` + `apps/native/**` + every `packages/*/`) into a single node process — plus rule contexts for all 12 type-aware rules (`no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`, and the five `no-unsafe-*` for the api + web + native scopes). Default v8 old-generation cap (~4 GB) was sufficient at HIGH-full Phase 5 (May 16) but exceeded by sub-plan #9 slot 4 (May 19).
 
-**Why local doesn't hit it:** local editors use `eslint.config.editor.mjs`, which strips the type-aware rules from IDE-level lint (per Phase 5a). When running `npm run lint` locally outside the container, the host machine isn't constrained by node:20-slim's container memory envelope.
+**Why local doesn't hit it:** local editors use `eslint.config.editor.mjs`, which strips the type-aware rules from IDE-level lint (per Phase 5a). When running `npm run lint` locally outside the container, the host machine isn't constrained by node:22-slim's container memory envelope.
 
 **Why 6 GB:** GitHub-hosted `ubuntu-latest` runners ship with 7 GB RAM, so a 6 GB v8 old-generation cap leaves enough headroom for the node runtime + npm + ESLint scaffolding. Re-evaluate the cap if the type-checked file count per package crosses ~100 on average.
 

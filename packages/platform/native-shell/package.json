@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "description": "Shared Expo bootstrap for Umbraculum native apps — auth, i18n, theme, platform UI primitives. RFC-0011 Wave 4B.",
+  "description": "Shared Expo bootstrap for Umbraculum native apps \u2014 auth, i18n, theme, platform UI primitives. RFC-0011 Wave 4B.",
   "scripts": {
     "build": "tsup --config tsup.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
@@ -59,13 +59,13 @@
     "tamagui": "2.2.0"
   },
   "peerDependencies": {
-    "expo": "~54.0.37",
-    "expo-constants": "~18.0.14",
-    "expo-image": "^3.0.11",
-    "expo-localization": "~17.0.9",
-    "expo-secure-store": "~15.0.8",
+    "expo": "~58.0.22",
+    "expo-constants": "~58.0.14",
+    "expo-image": "~58.0.18",
+    "expo-localization": "~58.0.5",
+    "expo-secure-store": "~58.0.2",
     "react": ">=19",
-    "react-native": "0.81.5",
+    "react-native": "0.88.1",
     "tamagui": ">=2"
   }
 }

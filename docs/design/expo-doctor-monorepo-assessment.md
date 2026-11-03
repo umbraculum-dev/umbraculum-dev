@@ -1,15 +1,15 @@
 # Expo Doctor — monorepo assessment
 
 **Tier:** Internal  
-**Status:** Active — Path A chosen (2026-06-07)  
+**Status:** Active — **Path B executed** (Expo SDK 58 + React 19.3.0; Node 22). Path A (2026-06-07) remains historical.  
 **Audience:** native maintainers, CI authors  
-**Related:** Cursor plan `expo_doctor_fixes` (2026-06-07), [DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md), [native-eas-demo-build-log.md](native-eas-demo-build-log.md)
+**Related:** Cursor plan `expo_doctor_fixes` (2026-06-07), Path B upgrade (2026-11), [DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md), [native-eas-demo-build-log.md](native-eas-demo-build-log.md)
 
 ---
 
 ## 1. Summary
 
-`npx expo-doctor` (18 checks) must pass from the **primary native app** in the active [installation profile](installation-profile.md) after **root `npm ci`** — core profile: [`apps/native/blank/`](../../apps/native/blank/); reference profile: [`apps/native/brewery/`](../../apps/native/brewery/). [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) resolves the app from `.umbraculum/install*.json`. Same context as EAS ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)) and [`native-deps.yml`](../../.github/workflows/native-deps.yml).
+`npx expo-doctor` (20 checks on SDK 58) must pass from the **primary native app** in the active [installation profile](installation-profile.md) after **root `npm ci`** — core profile: [`apps/native/blank/`](../../apps/native/blank/); reference profile: [`apps/native/brewery/`](../../apps/native/brewery/). [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh) resolves the app from `.umbraculum/install*.json`. Same context as EAS ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)) and [`native-deps.yml`](../../.github/workflows/native-deps.yml).
 
 **Baseline (2026-06-07, pre-remediation):** **16/18** — two failures:
 
@@ -18,7 +18,9 @@
 | Expo config | `app.config.js` not using `app.json` values (doctor heuristic) |
 | Duplicate dependencies | `expo@54` (brewery) vs `expo@56` (root peer), `react@19.1` vs `react@19.2.4`, stale `apps/native/node_modules/` tree |
 
-**Decision:** **Path A** (shipped 2026-06-07) — keep Expo Go + `react@19.1.0`; align `apps/web` to `19.1.0` (monorepo-wide override); root `expo@54.0.35` override; tighten `@umbraculum/native-shell` peer ranges; post-`npm ci` cleanup via [`check-native-expo-doctor.sh`](../../scripts/check-native-expo-doctor.sh). **Path B** deferred.
+**Decision (historical):** **Path A** (shipped 2026-06-07) — keep Expo Go + `react@19.1.0`; align `apps/web` to `19.1.0`; root `expo@54` override. **Path B** was deferred until store Expo Go shipped SDK 58-only (junior install friction).
+
+**Decision (current):** **Path B executed (2026-11)** — Expo Go remains the primary loop; monorepo on **Expo SDK 58** / **React 19.3.0** / **RN 0.88.1** / **Node ≥22.13** via root `overrides`; `native-shell` peers `~58.0.22`; doctor **20/20**.
 
 ---
 
@@ -26,7 +28,7 @@
 
 ```bash
 cd $REPO_ROOT
-docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
   bash -lc "npm ci --no-audit --no-fund && cd apps/native/brewery && npx expo-doctor@latest"
 ```
 
@@ -39,10 +41,10 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 | Path | Role |
 |------|------|
 | `apps/native/blank/` | `@umbraculum/native-blank` — blank Expo app (core installation profile; CI expo-doctor default) |
-| `apps/native/brewery/` | `@umbraculum/native-brewery` — Expo SDK 54 app (reference profile; EAS, Metro, screens) |
+| `apps/native/brewery/` | `@umbraculum/native-brewery` — Expo SDK **58** app (reference profile; EAS, Metro, screens) |
 | `apps/native/` | Umbrella index only — **must not** retain `node_modules/` after Wave 4A |
-| `packages/platform/native-shell/` | `@umbraculum/native-shell` — shared auth/i18n/bootstrap (`file:` dep) |
-| Repo root `node_modules/` | Hoisted monorepo stack (`react@19.1.0` via `overrides`; phantom `expo@56` / `react@19.2.x` **before** Path A remediation) |
+| `packages/platform/native-shell/` | `@umbraculum/native-shell` — shared auth/i18n/bootstrap (`file:` dep); peers `expo ~58` |
+| Repo root `node_modules/` | Hoisted monorepo stack (`react@19.3.0` / `expo@58.0.22` via `overrides`) |
 
 ---
 
@@ -79,13 +81,15 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 
 ## 5. Path A vs Path B
 
-| | Path A (chosen) | Path B (deferred) |
+| | Path A (2026-06-07) | Path B (executed 2026-11) |
 |---|----------------|-------------------|
-| Expo Go | Keep as primary dev loop | Custom dev client or SDK upgrade |
-| React native | Stay `19.1.0` in brewery | Align to `19.2.4` monorepo-wide |
-| SDK | Stay Expo 54 | Expo 55+ spike |
-| Doctor | Config fix + overrides + stale tree cleanup | Full alignment milestone |
-| Risk | Low — documented monorepo hoist for web `react` if residual | Breaks Expo Go until dev-client workflow lands |
+| Expo Go | Primary loop on SDK 54 | Still primary loop — now **SDK 58** (store Expo Go) |
+| React | `19.1.0` monorepo-wide | `19.3.0` monorepo-wide |
+| SDK | Expo 54 | Expo **58** (`expo@58.0.22`, RN `0.88.1`) |
+| Node | 20 | **22.13+** (`node:22-slim`) |
+| Doctor | 18/18 | **20/20** |
+
+Further exits (custom dev client, web React ahead of Expo Go) remain available if Expo Go ABI blocks a feature again.
 
 ---
 
@@ -106,7 +110,8 @@ EAS prep ([`native-eas-build.yml`](../../.github/workflows/native-eas-build.yml)
 | Date | Score | Notes |
 |------|-------|-------|
 | 2026-06-07 pre | 16/18 | Config + duplicates |
-| 2026-06-07 post | **18/18** | After remediation + cleanup script |
+| 2026-06-07 post | **18/18** | After Path A remediation + cleanup script |
+| 2026-11 Path B | **20/20** | Expo SDK 58 + React 19.3; regen root lock so overrides hoist (avoid nested brewery `react` vs root `19.1`) |
 
 Update [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) § Expo Doctor when green.
 
@@ -123,4 +128,4 @@ Future agents must treat this doc + the toolset gate as binding — not optional
 | Repo interceptor | [`AGENTS.md`](../../AGENTS.md) § Native dependency / expo-doctor gate |
 | T2 verify | `npm run verify:pre-push` runs `expo-doctor` native step when `.umbraculum/gha-trigger-map.json` matches `native-deps` paths |
 
-**Hard do-nots:** loosen `native-shell` `expo` peer to `>=54`; add `expo-*` to `native-shell` `devDependencies`; bump web React without Path B; skip `check-native-expo-doctor.sh` after override/lockfile edits; revert `app.config.js` away from `({ config }) =>` spread.
+**Hard do-nots:** loosen `native-shell` `expo` peer to `>=58`; add `expo-*` to `native-shell` `devDependencies`; drift web React off root `overrides` / Expo Go ABI; skip `check-native-expo-doctor.sh` after override/lockfile edits; revert `app.config.js` away from `({ config }) =>` spread; delete root `node_modules/expo-font` (real transitive on SDK 58).

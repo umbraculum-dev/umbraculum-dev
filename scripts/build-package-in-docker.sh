@@ -159,7 +159,7 @@ EOF
 
 echo "Building workspace(s): ${BUILD_LIST[*]}"
 
-"${DOCKER_ARGS[@]}" node:20-slim \
+"${DOCKER_ARGS[@]}" node:22-slim \
   bash -lc "${INNER}; rc=\$?; chown -R \"\$HOST_UID:\$HOST_GID\" /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json; exit \$rc"
 
 echo "OK: built ${#BUILD_LIST[@]} workspace(s): ${BUILD_LIST[*]}"

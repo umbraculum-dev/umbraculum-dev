@@ -29,8 +29,8 @@ echo "[native-expo-doctor] profile native app=${NATIVE_APP} workspace=${NATIVE_W
 
 # Stale nested installs confuse expo-doctor duplicate detection (pre–Wave 4A layout + ui workspace).
 rm -rf apps/native/node_modules packages/platform/ui/node_modules
-# Phantom override peer at root (expo-font@56) — not a direct dep; safe to drop before doctor.
-rm -rf node_modules/expo-font
+# Historical Path A cleanup removed a phantom root `expo-font` that was not a real dep.
+# On Expo SDK 58+, `expo-font` is a real transitive of `expo` — do not delete it.
 
 cd "apps/native/${NATIVE_APP}"
 npx expo install --check

@@ -43,9 +43,9 @@ When you change `packages/platform/native-shell/src/**`, rebuild before native a
 
 | Peer | Pin | Do not |
 |------|-----|--------|
-| `expo` | `~54.0.35` | `>=54` or open range |
+| `expo` | `~58.0.22` | `>=58` or open range |
 | `react-native` | `0.81.5` | Floating minor |
-| `react` | `>=19` (resolved to `19.1.0` via root overrides) | — |
+| `react` | `>=19` (resolved to `19.3.0` via root overrides) | — |
 | `expo-constants`, `expo-image`, `expo-localization`, `expo-secure-store` | SDK-aligned ranges in `package.json` | Move to `devDependencies` |
 
 **No `expo-*` in `devDependencies`** — they install at repo root and break `expo-doctor` duplicate detection. After editing peers or root `overrides`, run [`scripts/check-native-expo-doctor.sh`](../../../scripts/check-native-expo-doctor.sh).
