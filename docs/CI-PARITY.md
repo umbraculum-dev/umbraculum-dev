@@ -96,11 +96,32 @@ Unbounded `--parallel` + `--max-old-space-size=6144` × N containers has OOMed d
 |-----|---------|----------|
 | Docker `--memory` / `--memory-swap` | `2560m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
 | Docker `--cpus` | `2` | `CI_PARITY_DOCKER_CPUS` or `docker.resources.cpus` |
-| Concurrent job containers | `2` | `CI_PARITY_MAX_PARALLEL` or `docker.resources.maxParallel` |
+| Concurrent job containers | `2` | `--max-parallel <n>`, `CI_PARITY_MAX_PARALLEL`, or manifest `docker.resources.maxParallel` |
 | `NODE_OPTIONS` heap | clamped to ≤ memory−512 MiB (laptop base 2048) | manifest `runtime.nodeOptions` (still clamped) |
 | Escape hatch | — | `CI_PARITY_NO_RESOURCE_LIMITS=1` (not for juniors) |
 
 Requires `@umbraculum/ci-parity` **≥ 1.0.13** (sibling toolset `dist/cli.js` or published pin). GHA runners use a higher profile automatically.
+
+**maxParallel precedence:** CLI `--max-parallel` → env `CI_PARITY_MAX_PARALLEL` → manifest `docker.resources.maxParallel` → laptop default `2` (or CI default `8` under `GITHUB_ACTIONS`/`CI`).
+
+### Stronger laptop (opt-in more parallelism)
+
+Default **2** concurrent job containers is the safe floor for juniors and typical 16 GiB laptops. If you know the machine has headroom (e.g. 32 GiB+ RAM, you are not also overlapping heavy native companions), raise concurrency for that one run — do **not** change the repo manifest default for everyone.
+
+```bash
+# One-shot via CLI (forwarded through ci-parity-check.sh)
+./scripts/ci-parity-check.sh --archive run --parallel --isolated-install \
+  --jobs lint,typecheck,docs-readmes --max-parallel 4
+
+# Or via env (works for npm run verify:pre-push, which does not take --max-parallel itself)
+CI_PARITY_MAX_PARALLEL=4 npm run verify:pre-push
+
+# Optional: also give each container more RAM/CPU when raising concurrency
+CI_PARITY_MAX_PARALLEL=4 CI_PARITY_DOCKER_MEMORY=3g CI_PARITY_DOCKER_CPUS=3 \
+  npm run verify:pre-push
+```
+
+**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (e.g. 4 × 2560 m ≈ 10 GiB Docker pressure before host headroom). Prefer raising memory/cpus per container *or* concurrency — not both blindly. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
 
 ## Pre-push commands reference (contributors and agents)
 
@@ -114,6 +135,7 @@ Requires `@umbraculum/ci-parity` **≥ 1.0.13** (sibling toolset `dist/cli.js` o
 | Validate trigger map vs GHA workflow `paths:` | `npm run validate:gha-triggers` |
 | WIP iteration only (not push proof) | `./scripts/ci-parity-check.sh run` |
 | Low-level parallel ci-parity subset | `./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,docs-readmes` |
+| Same with more concurrent containers (strong laptop) | `… --max-parallel 4` or `CI_PARITY_MAX_PARALLEL=4 npm run verify:pre-push` |
 
 **Agents:** run T2-PR yourself before push — do not tell the contributor to run it. Skill: `path-aware-pre-push` (toolset). **T2 validate** always runs **`npm run check:lockfiles`** (forbidden `services/api/package-lock.json` + root lockfile sync in `node:20-slim`) before ci-parity jobs — see rule **`80-monorepo-lockfile-agent-gate`**. Human contributors use the same commands from repo root (host needs `git`, Docker, Node for the wrapper — jobs run in `node:20-slim`).
 
