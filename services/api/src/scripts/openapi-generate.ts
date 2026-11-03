@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import "../openapi/preferWorkspaceAjv.js";
 import { validate as validateOpenApi } from "@readme/openapi-parser";
 import type { OpenAPI } from "openapi-types";
 
