@@ -1,5 +1,4 @@
-import * as react_jsx_runtime from 'react/jsx-runtime';
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { SupportedLocale } from '@umbraculum/i18n';
 
 type TranslationValues = Record<string, string | number | Date>;
@@ -17,7 +16,7 @@ declare function LocaleProvider({ locale, messages, children, }: {
     locale: SupportedLocale;
     messages: Record<string, unknown>;
     children: ReactNode;
-}): react_jsx_runtime.JSX.Element;
+}): React.JSX.Element;
 declare function useT(namespace: string): Translator;
 
 export { type I18nRuntime, LocaleProvider, type RichTranslationValue, type RichTranslationValues, type TranslationValues, type Translator, useT };

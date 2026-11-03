@@ -10,10 +10,14 @@ export { defaultLocale, isLocale, locales } from './locales.cjs';
 declare const en: Record<string, unknown>;
 declare const it: Record<string, unknown>;
 
+type SharedMessagesOptions = {
+    /** Override `process.env` (native: include expo.extra module profile). */
+    env?: Record<string, string | undefined>;
+};
 /**
  * Get shared messages for the given locale.
  * Returns the full message tree for next-intl (web) or i18next (native).
  */
-declare function getSharedMessages(locale: SupportedLocale): Record<string, unknown>;
+declare function getSharedMessages(locale: SupportedLocale, options?: SharedMessagesOptions): Record<string, unknown>;
 
-export { SupportedLocale, en, getSharedMessages, it };
+export { type SharedMessagesOptions, SupportedLocale, en, getSharedMessages, it };

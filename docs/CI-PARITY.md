@@ -84,9 +84,44 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 | Aspect | T2-PR (`verify:pre-push`) | T2-release (`verify:pre-push:release`) |
 |--------|---------------------------|----------------------------------------|
 | Job selection | Only jobs whose GHA workflow would trigger on the diff | All manifest jobs (`docs-readmes`, `lint`, `typecheck`, `sdk-publish-prep`, `dogfood-npm-smoke`) |
-| Execution | Parallel containers (`--parallel --isolated-install`); native companions overlap ci-parity | Sequential in one container (warm shared volumes) |
-| API vitest | Auto-runs **in parallel with** ci-parity when `api.yml` paths match | Not auto-run — use `api-integration-tests-pre-push` when needed |
-| Typical wall clock | ~max(ci-parity job times, native companion times) + archive overhead (~3–5 min) | ~sum(job times) (~8–15 min) |
+| Execution | Parallel containers (`--parallel --isolated-install`), **capped** (see Resource safety); native companions run **after** ci-parity on laptops (overlap on GHA / `VERIFY_SLICE_OVERLAP_NATIVE=1`) | Sequential in one container (warm shared volumes) |
+| API vitest | Auto-runs when `api.yml` paths match (after ci-parity on laptops; overlapped on GHA) | Not auto-run — use `api-integration-tests-pre-push` when needed |
+| Typical wall clock | Path-aware jobs with max-1 local concurrency by default (~sum of heavy jobs; use `--max-parallel 2` on 32 GiB+) | ~sum(job times) (~8–15 min) |
+
+## Resource safety (laptops / juniors)
+
+Unbounded `--parallel` + `--max-old-space-size=6144` × N containers has OOMed developer machines. **Defaults (local host, no `CI`/`GITHUB_ACTIONS`):**
+
+| Cap | Default | Override |
+|-----|---------|----------|
+| Docker `--memory` / `--memory-swap` | `7168m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
+| Docker `--cpus` | `2` | `CI_PARITY_DOCKER_CPUS` or `docker.resources.cpus` |
+| Concurrent job containers | `1` | `--max-parallel <n>`, `CI_PARITY_MAX_PARALLEL`, or manifest `docker.resources.maxParallel` |
+| `NODE_OPTIONS` heap | ≤ memory−512 MiB (manifest may request more; never raised above cgroup) | manifest `runtime.nodeOptions` |
+| Escape hatch | — | `CI_PARITY_NO_RESOURCE_LIMITS=1` (not for juniors) |
+
+Requires `@umbraculum/ci-parity` **≥ 1.0.14** (sibling toolset `dist/cli.js` or published pin). GHA runners use a higher profile automatically.
+
+**maxParallel precedence:** CLI `--max-parallel` → env `CI_PARITY_MAX_PARALLEL` → manifest `docker.resources.maxParallel` → laptop default `1` (or CI default `8` under `GITHUB_ACTIONS`/`CI`).
+
+### Why default concurrency is 1 (not 2)
+
+Measured on this monorepo: a single `lint` job (`npm ci` + `build:packages` + eslint) needs about **7 GiB** inside the cgroup. Two of those at once ≈ 14 GiB Docker pressure — fine on 32 GiB hosts, hostile to 16 GiB junior laptops once the IDE/browser are counted. So the **safe default is `maxParallel: 1` + `7168m`**; parallelism is an explicit opt-in.
+
+### Stronger laptop (opt-in more parallelism)
+
+If you know the machine has headroom (32 GiB+ RAM, not overlapping heavy native companions), raise concurrency for that one run — do **not** change the repo manifest default for everyone.
+
+```bash
+# One-shot via CLI (forwarded through ci-parity-check.sh)
+./scripts/ci-parity-check.sh --archive run --parallel --isolated-install \
+  --jobs lint,typecheck,docs-readmes --max-parallel 2
+
+# Or via env (works for npm run verify:pre-push, which does not take --max-parallel itself)
+CI_PARITY_MAX_PARALLEL=2 npm run verify:pre-push
+```
+
+**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (default 1 × 7168 m ≈ 7 GiB; opt-in 2 × 7168 m ≈ 14 GiB). Do **not** lower `runtime.nodeOptions` below what eslint/`npm ci` need — the cgroup clamp is the safety valve; a 2048 MiB heap aborts lint here. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
 
 ## Pre-push commands reference (contributors and agents)
 
@@ -100,6 +135,7 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 | Validate trigger map vs GHA workflow `paths:` | `npm run validate:gha-triggers` |
 | WIP iteration only (not push proof) | `./scripts/ci-parity-check.sh run` |
 | Low-level parallel ci-parity subset | `./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,docs-readmes` |
+| Same with more concurrent containers (32 GiB+ laptop) | `… --max-parallel 2` or `CI_PARITY_MAX_PARALLEL=2 npm run verify:pre-push` |
 
 **Agents:** run T2-PR yourself before push — do not tell the contributor to run it. Skill: `path-aware-pre-push` (toolset). **T2 validate** always runs **`npm run check:lockfiles`** (forbidden `services/api/package-lock.json` + root lockfile sync in `node:20-slim`) before ci-parity jobs — see rule **`80-monorepo-lockfile-agent-gate`**. Human contributors use the same commands from repo root (host needs `git`, Docker, Node for the wrapper — jobs run in `node:20-slim`).
 
@@ -243,7 +279,7 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 **Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** follow **[`AGENTS.md`](../AGENTS.md) § ci-parity manifest / version changes** (agent-owned checklist — not optional). Summary: toolset tag publish first → bump **every** `ci_parity_version` + `CI_PARITY_PKG_VERSION` in one commit → `./scripts/ci-parity-check.sh --archive run --jobs lint,typecheck` before push.
 
-**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.11`) — do not use bare `@^1` or a built toolset `dist/cli.js` as pre-push proof unless `CI_PARITY_CLI` is set during local toolset development before npm publish. When you publish a new `@umbraculum/ci-parity`, bump **every** pin in the AGENTS.md table **and** `CI_PARITY_PKG_VERSION` in the **same commit** as manifest job-id changes.
+**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.14`) — do not use bare `@^1` or a built toolset `dist/cli.js` as pre-push proof unless `CI_PARITY_CLI` is set during local toolset development before npm publish. When you publish a new `@umbraculum/ci-parity`, bump **every** pin in the AGENTS.md table **and** `CI_PARITY_PKG_VERSION` in the **same commit** as manifest job-id changes.
 
 **Before `sdk-batch-v*` or `sdk-contracts-v*` tag push:** `./scripts/ci-parity-check.sh run --jobs docs-readmes,sdk-publish-prep,dogfood-npm-smoke` (or full ci-parity).
 

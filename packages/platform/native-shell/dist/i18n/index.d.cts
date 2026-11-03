@@ -1,5 +1,4 @@
-import * as react_jsx_runtime from 'react/jsx-runtime';
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { SupportedLocale } from '@umbraculum/i18n';
 
 interface LocaleController {
@@ -9,7 +8,7 @@ interface LocaleController {
 declare function useLocaleController(): LocaleController;
 declare function I18nProvider({ children }: {
     children: ReactNode;
-}): react_jsx_runtime.JSX.Element;
+}): React.JSX.Element;
 
 declare const LOCALE_STORAGE_KEY = "brewery.locale";
 declare function getDeviceLocale(): SupportedLocale;

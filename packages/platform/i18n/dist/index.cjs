@@ -1715,15 +1715,15 @@ function deepMerge(target, source) {
   }
   return result;
 }
-function loadBreweryMessages(locale) {
-  if (!isBreweryVerticalInstalled()) {
+function loadBreweryMessages(locale, env) {
+  if (!isBreweryVerticalInstalled(env)) {
     return {};
   }
   return locale === "it" ? import_brewery_i18n.it : import_brewery_i18n.en;
 }
-function getSharedMessages(locale) {
+function getSharedMessages(locale, options) {
   const platform = locale === "it" ? it : en;
-  const brewery = loadBreweryMessages(locale);
+  const brewery = loadBreweryMessages(locale, options?.env);
   return deepMerge(platform, brewery);
 }
 // Annotate the CommonJS export names for ESM import in node:

@@ -25,6 +25,8 @@ export { defaultLocale, isLocale, locales, type SupportedLocale };
  * Edge/RN-safe brewery gate (no Node `fs`).
  * Native Expo may only see `EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE`; server/web
  * uses `UMBRACULUM_MODULE_PROFILE`. Prefer the public mirror when set.
+ * Callers (e.g. native-shell I18nProvider) MAY pass an `env` that already
+ * merges `expo.extra` so EAS release binaries match eas.json / app.config.js.
  */
 function isBreweryVerticalInstalled(
   env: Record<string, string | undefined> = process.env as Record<
@@ -41,6 +43,11 @@ function isBreweryVerticalInstalled(
     ...(profile ? { UMBRACULUM_MODULE_PROFILE: profile } : {}),
   }).has("brewery");
 }
+
+export type SharedMessagesOptions = {
+  /** Override `process.env` (native: include expo.extra module profile). */
+  env?: Record<string, string | undefined>;
+};
 
 function deepMerge(
   target: Record<string, unknown>,
@@ -69,8 +76,11 @@ function deepMerge(
   return result;
 }
 
-function loadBreweryMessages(locale: SupportedLocale): Record<string, unknown> {
-  if (!isBreweryVerticalInstalled()) {
+function loadBreweryMessages(
+  locale: SupportedLocale,
+  env?: Record<string, string | undefined>,
+): Record<string, unknown> {
+  if (!isBreweryVerticalInstalled(env)) {
     return {};
   }
   return locale === "it" ? breweryIt : breweryEn;
@@ -80,9 +90,12 @@ function loadBreweryMessages(locale: SupportedLocale): Record<string, unknown> {
  * Get shared messages for the given locale.
  * Returns the full message tree for next-intl (web) or i18next (native).
  */
-export function getSharedMessages(locale: SupportedLocale): Record<string, unknown> {
+export function getSharedMessages(
+  locale: SupportedLocale,
+  options?: SharedMessagesOptions,
+): Record<string, unknown> {
   const platform = locale === "it" ? it : en;
-  const brewery = loadBreweryMessages(locale);
+  const brewery = loadBreweryMessages(locale, options?.env);
   return deepMerge(platform, brewery);
 }
 

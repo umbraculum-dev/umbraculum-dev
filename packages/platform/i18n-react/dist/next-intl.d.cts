@@ -1,5 +1,4 @@
 import { Translator } from './index.cjs';
-import 'react/jsx-runtime';
 import 'react';
 import '@umbraculum/i18n';
 

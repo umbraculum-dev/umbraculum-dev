@@ -55,5 +55,5 @@ jobs:
     uses: ./.github/workflows/ci-parity-reusable.yml
     with:
       jobs: dogfood-npm-smoke
-      ci_parity_version: "1.0.12"
+      ci_parity_version: "1.0.14"
       manifest_path: .umbraculum/ci-parity.json

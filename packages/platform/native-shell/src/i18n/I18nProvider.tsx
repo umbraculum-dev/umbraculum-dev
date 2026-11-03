@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ActivityIndicator, View } from "react-native";
 
@@ -6,6 +7,32 @@ import { LocaleProvider } from "@umbraculum/i18n-react";
 
 import { getDeviceLocale, LOCALE_STORAGE_KEY } from "./locale";
 import { readString, writeString } from "./storage";
+
+/**
+ * Merge `expo.extra` module profile (EAS → app.config.js) ahead of process.env
+ * so brewery locale bundles load in release APKs the same way API base URL does.
+ */
+function envWithExpoModuleProfile(): Record<string, string | undefined> {
+  const base = process.env as Record<string, string | undefined>;
+  const expoExtra = (
+    Constants.expoConfig as
+      | { extra?: { EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE?: unknown } }
+      | null
+      | undefined
+  )?.extra;
+  const fromExtra = expoExtra?.EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE;
+  const profile =
+    (typeof fromExtra === "string" && fromExtra.trim()) ||
+    base["EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE"]?.trim() ||
+    base["UMBRACULUM_MODULE_PROFILE"]?.trim() ||
+    undefined;
+  if (!profile) return base;
+  return {
+    ...base,
+    EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE: profile,
+    UMBRACULUM_MODULE_PROFILE: profile,
+  };
+}
 
 export interface LocaleController {
   locale: SupportedLocale;
@@ -57,7 +84,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  const messages = getSharedMessages(locale);
+  const messages = getSharedMessages(locale, { env: envWithExpoModuleProfile() });
 
   return (
     <LocaleControllerContext.Provider value={controller}>
