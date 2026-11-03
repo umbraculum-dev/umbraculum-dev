@@ -76,7 +76,6 @@ export function BrewSelect({
         id={id}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
-        iconAfter={null}
         size="md"
         width={width === "full" ? "100%" : 160}
         minWidth={width === "full" ? undefined : 160}

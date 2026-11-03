@@ -40,7 +40,6 @@ export function LanguageSwitcher() {
       >
         <Select.Trigger
           aria-label={t("language")}
-          iconAfter={null}
           size="sm"
           width="auto"
           minWidth={52}
