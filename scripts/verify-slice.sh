@@ -121,6 +121,19 @@ run_native_step() {
   esac
 }
 
+# Overlap native companions with ci-parity only on GHA (or explicit opt-in).
+# Local laptops already run multi-job ci-parity; overlapping expo-doctor/docs-site
+# on top has OOM'd developer machines. Juniors get sequential companions by default.
+should_overlap_native_with_ci_parity() {
+  if [[ "${VERIFY_SLICE_OVERLAP_NATIVE:-}" == "1" ]]; then
+    return 0
+  fi
+  if [[ "${GITHUB_ACTIONS:-}" == "true" || "${CI:-}" == "true" ]]; then
+    return 0
+  fi
+  return 1
+}
+
 # Start path-matched native companions in background (GHA runs these workflows in parallel).
 start_native_steps_parallel() {
   native_pids=()
@@ -137,6 +150,31 @@ start_native_steps_parallel() {
     ) &
     native_pids+=("$!")
     native_step_names+=("$step")
+  done
+}
+
+run_native_steps_sequential() {
+  if [[ -z "${native_steps:-}" ]]; then
+    return 0
+  fi
+  echo "verify-slice: running native companions after ci-parity (set VERIFY_SLICE_OVERLAP_NATIVE=1 to overlap on laptops)" >&2
+  IFS=',' read -r -a native_array <<< "$native_steps"
+  for step in "${native_array[@]}"; do
+    [[ -z "$step" ]] && continue
+    if run_native_step "$step"; then
+      if [[ "$step" == "api-integration" ]]; then
+        api_status="OK"
+      elif [[ "$step" == "expo-doctor" ]]; then
+        expo_doctor_status="OK"
+      fi
+    else
+      rc=1
+      if [[ "$step" == "api-integration" ]]; then
+        api_status="FAIL"
+      elif [[ "$step" == "expo-doctor" ]]; then
+        expo_doctor_status="FAIL"
+      fi
+    fi
   done
 }
 
@@ -222,8 +260,10 @@ run_t2() {
     echo "verify-slice T2-PR: ci-parity jobs=${ci_jobs} parallel=${parallel_count} native=${native_steps:-none} (native∥ci-parity)" >&2
   fi
 
-  # T2-PR: overlap native companions with ci-parity (mirrors separate GHA workflows on one push).
-  if [[ -z "$T2_FULL" && -n "${native_steps:-}" ]]; then
+  # T2-PR: overlap companions only on CI / opt-in; laptops run them after ci-parity.
+  local overlap_native=0
+  if [[ -z "$T2_FULL" && -n "${native_steps:-}" ]] && should_overlap_native_with_ci_parity; then
+    overlap_native=1
     start_native_steps_parallel
   fi
 
@@ -235,28 +275,13 @@ run_t2() {
     rc=1
   fi
 
-  if [[ -z "$T2_FULL" && ${#native_pids[@]} -gt 0 ]]; then
+  if [[ "$overlap_native" -eq 1 && ${#native_pids[@]} -gt 0 ]]; then
     wait_native_steps_parallel
+  elif [[ -z "$T2_FULL" && -n "${native_steps:-}" ]]; then
+    run_native_steps_sequential
   elif [[ -n "$T2_FULL" && -n "${native_steps:-}" ]]; then
     # T2-release: native companions after full sequential manifest (no overlap).
-    IFS=',' read -r -a native_array <<< "$native_steps"
-    for step in "${native_array[@]}"; do
-      [[ -z "$step" ]] && continue
-      if run_native_step "$step"; then
-        if [[ "$step" == "api-integration" ]]; then
-          api_status="OK"
-        elif [[ "$step" == "expo-doctor" ]]; then
-          expo_doctor_status="OK"
-        fi
-      else
-        rc=1
-        if [[ "$step" == "api-integration" ]]; then
-          api_status="FAIL"
-        elif [[ "$step" == "expo-doctor" ]]; then
-          expo_doctor_status="FAIL"
-        fi
-      fi
-    done
+    run_native_steps_sequential
   fi
 
   if [[ "$tier_label" == "T2-release" ]]; then

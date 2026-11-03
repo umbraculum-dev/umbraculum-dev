@@ -84,9 +84,23 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 | Aspect | T2-PR (`verify:pre-push`) | T2-release (`verify:pre-push:release`) |
 |--------|---------------------------|----------------------------------------|
 | Job selection | Only jobs whose GHA workflow would trigger on the diff | All manifest jobs (`docs-readmes`, `lint`, `typecheck`, `sdk-publish-prep`, `dogfood-npm-smoke`) |
-| Execution | Parallel containers (`--parallel --isolated-install`); native companions overlap ci-parity | Sequential in one container (warm shared volumes) |
-| API vitest | Auto-runs **in parallel with** ci-parity when `api.yml` paths match | Not auto-run — use `api-integration-tests-pre-push` when needed |
-| Typical wall clock | ~max(ci-parity job times, native companion times) + archive overhead (~3–5 min) | ~sum(job times) (~8–15 min) |
+| Execution | Parallel containers (`--parallel --isolated-install`), **capped** (see Resource safety); native companions run **after** ci-parity on laptops (overlap on GHA / `VERIFY_SLICE_OVERLAP_NATIVE=1`) | Sequential in one container (warm shared volumes) |
+| API vitest | Auto-runs when `api.yml` paths match (after ci-parity on laptops; overlapped on GHA) | Not auto-run — use `api-integration-tests-pre-push` when needed |
+| Typical wall clock | Path-aware jobs with max-2 local concurrency (~3–8 min) | ~sum(job times) (~8–15 min) |
+
+## Resource safety (laptops / juniors)
+
+Unbounded `--parallel` + `--max-old-space-size=6144` × N containers has OOMed developer machines. **Defaults (local host, no `CI`/`GITHUB_ACTIONS`):**
+
+| Cap | Default | Override |
+|-----|---------|----------|
+| Docker `--memory` / `--memory-swap` | `2560m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
+| Docker `--cpus` | `2` | `CI_PARITY_DOCKER_CPUS` or `docker.resources.cpus` |
+| Concurrent job containers | `2` | `CI_PARITY_MAX_PARALLEL` or `docker.resources.maxParallel` |
+| `NODE_OPTIONS` heap | clamped to ≤ memory−512 MiB (laptop base 2048) | manifest `runtime.nodeOptions` (still clamped) |
+| Escape hatch | — | `CI_PARITY_NO_RESOURCE_LIMITS=1` (not for juniors) |
+
+Requires `@umbraculum/ci-parity` **≥ 1.0.13** (sibling toolset `dist/cli.js` or published pin). GHA runners use a higher profile automatically.
 
 ## Pre-push commands reference (contributors and agents)
 
