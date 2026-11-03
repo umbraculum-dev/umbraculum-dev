@@ -13,7 +13,7 @@ TARGET="${1:-all}"
 
 install_root() {
   echo "[npm-lock-install] root — npm ci (from package-lock.json)"
-  docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:20-slim \
+  docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:22-slim \
     bash -lc "npm ci --no-audit --no-fund"
 }
 
@@ -24,7 +24,7 @@ install_web() {
     -v "${REPO_ROOT}/apps/web:/app"
     -w /app
     -e npm_config_legacy_peer_deps=true
-    node:20-slim
+    node:22-slim
     bash -lc "npm ci --no-audit --no-fund"
   )
   if docker compose -f "${REPO_ROOT}/docker-compose.yml" ps web --status running -q 2>/dev/null | grep -q .; then

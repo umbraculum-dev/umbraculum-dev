@@ -7,7 +7,7 @@ const workspaceRoot = path.resolve(projectRoot, "../../..");
 const appNodeModules = path.join(projectRoot, "node_modules");
 
 /**
- * Expo SDK 54+ configures monorepo watchFolders and nodeModulesPaths automatically
+ * Expo SDK 58 configures monorepo watchFolders and nodeModulesPaths automatically
  * (see https://docs.expo.dev/guides/monorepos/). Start from getDefaultConfig, then
  * merge only the resolver overrides we still need for a single React copy and
  * workspace package paths — see docs/NATIVE-STRATEGY-AND-CI.md §6.1.
@@ -19,7 +19,7 @@ const expoConfig = getDefaultConfig(projectRoot);
 const monorepoResolverOverrides = {
   resolver: {
     extraNodeModules: {
-      // Pin Expo Go ABI react@19.1.0 from the brewery workspace (not root hoisted copy).
+      // Pin Expo Go ABI react@19.3.0 from the brewery workspace (not a divergent copy).
       react: path.join(appNodeModules, "react"),
       "react/jsx-runtime": path.join(appNodeModules, "react", "jsx-runtime.js"),
       "react/jsx-dev-runtime": path.join(appNodeModules, "react", "jsx-dev-runtime.js"),

@@ -1,6 +1,6 @@
 import { ProductCreateRequest, ProductGetResponse, VariantListResponse, ProductListResponse, AttributeCreateRequest, AttributeGetResponse, PimDeleteResponse, AttributeListResponse, AttributeUpdateRequest, AttributeSetGetResponse, AttributeSetListResponse, CategoryListResponse, MediaAssetRefCreateRequest, MediaAssetRefGetResponse, MediaAssetRefListResponse, MediaAssetRefUpdateRequest } from '@umbraculum/pim-contracts';
 export { AttributeCreateRequest, AttributeGetResponse, AttributeListResponse, AttributeUpdateRequest, MediaAssetRefCreateRequest, MediaAssetRefGetResponse, MediaAssetRefListResponse, MediaAssetRefUpdateRequest, PimDeleteResponse } from '@umbraculum/pim-contracts';
-import { a as ApiClient } from '../client-Dia82S7S.js';
+import { A as ApiClient } from '../client-zbAgg_TE.js';
 import { p as paths } from '../platform.openapi-DFK6FUu2.js';
 
 type PimProductsListPath = "/pim/products";

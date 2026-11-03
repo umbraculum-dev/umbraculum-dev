@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { getRecipe, getRecipeWaterSettings } from "@umbraculum/brewery-api-client";
@@ -23,9 +23,16 @@ export function useNativeRecipeEditLoad(params: {
 }) {
   const { api, recipeId, canCall, hydrators } = params;
 
+  // Parent passes a fresh hydrators object each render; keep loadRecipe identity
+  // stable so the mount/focus effects cannot loop on setState → new deps → reload.
+  const hydratorsRef = useRef(hydrators);
+  hydratorsRef.current = hydrators;
+
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [recipeState, setRecipe] = useState<Recipe | null>(null);
+  const recipeStateRef = useRef(recipeState);
+  recipeStateRef.current = recipeState;
 
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("");
@@ -56,7 +63,7 @@ export function useNativeRecipeEditLoad(params: {
 
       hydrateNativeRecipeEditFromBeerJson({
         r,
-        hydrators,
+        hydrators: hydratorsRef.current,
         setBoilTimeMinutes,
         setMashProcedure,
         setMashRows,
@@ -67,7 +74,7 @@ export function useNativeRecipeEditLoad(params: {
     } finally {
       setLoading(false);
     }
-  }, [api, recipeId, hydrators]);
+  }, [api, recipeId]);
 
   useEffect(() => {
     if (canCall && recipeId) {
@@ -93,12 +100,15 @@ export function useNativeRecipeEditLoad(params: {
     };
   }, [canCall, recipeId, api]);
 
+  // Reload on re-focus only when a recipe is already in memory. Read via ref so
+  // setRecipe after the initial load does not recreate this callback and re-fire
+  // while the screen stays focused (Maximum update depth / Z loop on RN).
   useFocusEffect(
     useCallback(() => {
-      if (canCall && recipeId && recipeState) {
+      if (canCall && recipeId && recipeStateRef.current) {
         void loadRecipe();
       }
-    }, [canCall, recipeId, recipeState, loadRecipe]),
+    }, [canCall, recipeId, loadRecipe]),
   );
 
   return {

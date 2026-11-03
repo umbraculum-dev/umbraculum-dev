@@ -192,7 +192,7 @@ docker compose up -d api
 ### Reset npm cache only
 
 ```bash
-docker run --rm -v umbraculum_npm_cache:/root/.npm node:20-slim npm cache clean --force
+docker run --rm -v umbraculum_npm_cache:/root/.npm node:22-slim npm cache clean --force
 ```
 
 ### Clear legacy root volume name

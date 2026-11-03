@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run a shell command in node:20-slim with warm npm cache + optional root node_modules volume.
+# Run a shell command in node:22-slim with warm npm cache + optional root node_modules volume.
 #
 # Cross-platform: named Docker volumes only (no $HOME bind mounts).
 #
@@ -22,7 +22,7 @@ usage() {
   cat <<'EOF'
 Usage: docker-npm-run.sh [-w REL_WORKDIR] [-r] 'shell command…'
 
-Run a command in node:20-slim with:
+Run a command in node:22-slim with:
   - umbraculum_npm_cache     -> /root/.npm
   - optional umbraculum_root_node_modules -> /repo/node_modules (-r)
 
@@ -74,7 +74,7 @@ fi
 DOCKER_ARGS+=(
   -v "${REPO_ROOT}:/repo"
   -w "$WORKDIR"
-  node:20-slim
+  node:22-slim
   bash -lc "$CMD"
 )
 

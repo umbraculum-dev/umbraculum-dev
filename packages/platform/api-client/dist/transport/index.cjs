@@ -37,12 +37,40 @@ function toClientPath(openApiPath) {
 }
 
 // src/errors.ts
+function messageFromApiResponse(res) {
+  const data = res.data;
+  if (typeof data === "string") {
+    const trimmed = data.trim();
+    if (/^<!DOCTYPE html/i.test(trimmed) || /^<html[\s>]/i.test(trimmed)) {
+      const title = trimmed.match(/<title>([^<]*)<\/title>/i)?.[1]?.trim();
+      const h1 = trimmed.match(/<h1>([^<]*)<\/h1>/i)?.[1]?.trim();
+      const label = title || h1 || "upstream error";
+      return `API unavailable (${res.status}): ${label}`;
+    }
+    if (trimmed.length > 500) {
+      return `API request failed (${res.status})`;
+    }
+    return trimmed || `API request failed (${res.status})`;
+  }
+  if (data && typeof data === "object") {
+    const rec = data;
+    const message = rec["message"];
+    if (typeof message === "string" && message.trim()) return message.trim();
+    const error = rec["error"];
+    if (typeof error === "string" && error.trim()) return error.trim();
+  }
+  try {
+    const json = JSON.stringify(data);
+    if (json && json !== "null" && json !== "{}") return json;
+  } catch {
+  }
+  return `API request failed (${res.status})`;
+}
 var ApiClientError = class extends Error {
   status;
   body;
   constructor(res) {
-    const detail = typeof res.data === "string" ? res.data : JSON.stringify(res.data);
-    super(detail || `API request failed (${res.status})`);
+    super(messageFromApiResponse(res));
     this.name = "ApiClientError";
     this.status = res.status;
     this.body = res.data;

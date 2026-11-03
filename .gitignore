@@ -15,7 +15,9 @@ backups/
 
 # npm auth / registry config (often contains tokens)
 .npmrc
-# Committed policy file only — no secrets (package-lock=false); see DEVELOPMENT.md
+# Committed policy files only — no secrets. Root: legacy-peer-deps for Expo 58 lock.
+# api: package-lock=false; see DEVELOPMENT.md
+!/.npmrc
 !services/api/.npmrc
 
 # ci-parity --ci mode writes ephemeral logs/scripts into the repo root

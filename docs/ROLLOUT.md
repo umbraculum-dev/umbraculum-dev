@@ -32,7 +32,7 @@ Natural stopping point: **after S4**. That's the "deterministic CI gate is in pl
 Before considering a slice done, verify it works **locally** (no merge required — `40-workflow-and-navigation.mdc` says don't commit by default).
 
 - **S1**: docs render OK; rule appears in editor preview.
-- **S2**: `docker run --rm -v "$PWD:/repo" -w /repo node:20-slim bash -lc "npm install --workspaces --include-workspace-root --no-audit --no-fund && npm run test:packages"` → green.
+- **S2**: `docker run --rm -v "$PWD:/repo" -w /repo node:22-slim bash -lc "npm install --workspaces --include-workspace-root --no-audit --no-fund && npm run test:packages"` → green.
 - **S3**: stack up → `docker compose exec api npm run seed:e2e` → `./scripts/smoke.sh` exit 0. Then `npm run seed:e2e` again (idempotency check — second run reports "already present").
 - **S4**: open a no-op PR touching `services/api/src/**` (e.g. comment) on a throwaway branch → workflow runs → both jobs green. Revert.
 - **S5**: `docker run --rm --network host -v "$PWD/apps/web/e2e:/e2e" -w /e2e mcr.microsoft.com/playwright:v1.60.0-noble bash -lc "npm install --no-audit --no-fund && npx playwright test --project=smoke"` → green.
@@ -100,7 +100,7 @@ When the stack is up, this is the sequence — each step gates the next.
 4. **L1 unit** (node container, no host npm)
 
    ```bash
-   docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+   docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
      bash -lc "npm install --workspaces --include-workspace-root --no-audit --no-fund && npm run test:packages"
    ```
 

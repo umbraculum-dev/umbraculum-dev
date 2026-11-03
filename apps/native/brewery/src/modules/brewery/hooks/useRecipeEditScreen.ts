@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { ScrollView } from "react-native";
+import type { ScrollViewInstance } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -47,7 +47,7 @@ export function useRecipeEditScreen() {
     return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
 
   const sections = useNativeRecipeEditSections();
   const catalogs = useNativeRecipeEditCatalogs({ api });
@@ -55,19 +55,31 @@ export function useRecipeEditScreen() {
   const fermentables = useRecipeEditScreenFermentables({ api });
   const hops = useRecipeEditScreenHops({ api });
 
-  const load = useNativeRecipeEditLoad({
-    api,
-    recipeId,
-    canCall,
-    locale,
-    hydrators: {
+  const hydrators = useMemo(
+    () => ({
       setGristRows: fermentables.setGristRows,
       setHopsRows: hops.setHopsRows,
       setYeastRows: yeast.setYeastRows,
       setYeastAttenuationOverrides: yeast.setYeastAttenuationOverrides,
       hydrateYeastAmountText: yeast.hydrateYeastAmountText,
       setSelectedEquipmentProfileId: catalogs.setSelectedEquipmentProfileId,
-    },
+    }),
+    [
+      fermentables.setGristRows,
+      hops.setHopsRows,
+      yeast.setYeastRows,
+      yeast.setYeastAttenuationOverrides,
+      yeast.hydrateYeastAmountText,
+      catalogs.setSelectedEquipmentProfileId,
+    ],
+  );
+
+  const load = useNativeRecipeEditLoad({
+    api,
+    recipeId,
+    canCall,
+    locale,
+    hydrators,
   });
 
   const actions = useNativeRecipeEditActions({

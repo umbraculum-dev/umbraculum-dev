@@ -73,5 +73,5 @@ if [[ "${bytes}" -lt 100000 ]]; then
 fi
 
 echo "[native-metro-cold] OK Android bundle HTTP 200 (${bytes} bytes)"
-echo "[native-metro-cold] note: Expo Go on device must still match SDK 54 (see DEVELOPMENT-NATIVE-LOCAL.md)"
+echo "[native-metro-cold] note: Expo Go on device must match SDK 58 (see DEVELOPMENT-NATIVE-LOCAL.md)"
 exit 0

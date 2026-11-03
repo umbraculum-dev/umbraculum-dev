@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tamagui duplicate-instance gate — run from repo root inside node:20-slim (or web container).
+# Tamagui duplicate-instance gate — run from repo root inside node:22-slim (or web container).
 # Detects version skew and nested tamagui copies under file: workspace links.
 # See docs/TAMAGUI.md § "Tamagui CLI check".
 set -euo pipefail

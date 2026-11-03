@@ -13,10 +13,14 @@ TARGET="${1:-root}"
 
 update_root() {
   echo "[npm-lock-update] root — npm install (rewrites package-lock.json)"
-  docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:20-slim \
+  docker run --rm -v "${REPO_ROOT}:/repo" -w /repo \
+    -e npm_config_legacy_peer_deps=true \
+    node:22-slim \
     bash -lc "npm install --no-audit --no-fund"
   echo "[npm-lock-update] root — npm ci proof"
-  docker run --rm -v "${REPO_ROOT}:/repo" -w /repo node:20-slim \
+  docker run --rm -v "${REPO_ROOT}:/repo" -w /repo \
+    -e npm_config_legacy_peer_deps=true \
+    node:22-slim \
     bash -lc "npm ci --no-audit --no-fund"
 }
 
@@ -30,7 +34,7 @@ update_web() {
   else
     docker run --rm -v "${REPO_ROOT}/apps/web:/app" -w /app \
       -e npm_config_legacy_peer_deps=true \
-      node:20-slim bash -lc "npm install --include=dev --no-audit --no-fund && npm ci --no-audit --no-fund"
+      node:22-slim bash -lc "npm install --include=dev --no-audit --no-fund && npm ci --no-audit --no-fund"
   fi
 }
 

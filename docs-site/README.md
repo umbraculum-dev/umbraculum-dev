@@ -28,13 +28,13 @@ Contributors: doc PRs go live on the site after Cloudflare build, but **producti
 
 ## Build / test / lint (local)
 
-Per the `node-npm-container-only` project rule, run Node/npm **inside** a `node:20-slim` container with the repo bind-mounted (same pattern as CI — see [`docs/LINTING.md`](../docs/LINTING.md)):
+Per the `node-npm-container-only` project rule, run Node/npm **inside** a `node:22-slim` container with the repo bind-mounted (same pattern as CI — see [`docs/LINTING.md`](../docs/LINTING.md)):
 
 ```bash
 docker run --rm \
   -v "$(pwd):/repo" \
   -w /repo/docs-site \
-  node:20-slim \
+  node:22-slim \
   bash -lc 'npm install --no-audit --no-fund && npm run build'
 ```
 

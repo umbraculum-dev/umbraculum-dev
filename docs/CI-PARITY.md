@@ -137,7 +137,7 @@ CI_PARITY_MAX_PARALLEL=2 npm run verify:pre-push
 | Low-level parallel ci-parity subset | `./scripts/ci-parity-check.sh --archive run --parallel --isolated-install --jobs lint,typecheck,docs-readmes` |
 | Same with more concurrent containers (32 GiB+ laptop) | `… --max-parallel 2` or `CI_PARITY_MAX_PARALLEL=2 npm run verify:pre-push` |
 
-**Agents:** run T2-PR yourself before push — do not tell the contributor to run it. Skill: `path-aware-pre-push` (toolset). **T2 validate** always runs **`npm run check:lockfiles`** (forbidden `services/api/package-lock.json` + root lockfile sync in `node:20-slim`) before ci-parity jobs — see rule **`80-monorepo-lockfile-agent-gate`**. Human contributors use the same commands from repo root (host needs `git`, Docker, Node for the wrapper — jobs run in `node:20-slim`).
+**Agents:** run T2-PR yourself before push — do not tell the contributor to run it. Skill: `path-aware-pre-push` (toolset). **T2 validate** always runs **`npm run check:lockfiles`** (forbidden `services/api/package-lock.json` + root lockfile sync in `node:22-slim`) before ci-parity jobs — see rule **`80-monorepo-lockfile-agent-gate`**. Human contributors use the same commands from repo root (host needs `git`, Docker, Node for the wrapper — jobs run in `node:22-slim`).
 
 **SOLID / dependency direction:** The 2026 mechanical SOLID program is **closed** (S hygiene + WS5/WS6 D enforcement). The **`lint` job** in T2-PR enforces `eslint-plugin-boundaries` (B5 API modules, WS5 apps) and WS6 client-safe imports at **`error`** when the diff touches eslint surface. No separate SOLID pre-push tier — see [solid-post-wave17-closure.md](design/solid-post-wave17-closure.md) and [AGENTS.md](../AGENTS.md) § SOLID and dependency direction (D).
 
@@ -158,7 +158,7 @@ Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 ## Cross-platform contract (agents and contributors)
 
-`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI runs manifest jobs inside the manifest `runtime.image` (default: `public.ecr.aws/docker/library/node:20-slim`). **Agent pre-push uses `--archive`** (committed tree, cold install); **`--ci`** is for WIP iteration only — see [Snapshot modes](#snapshot-modes-read-this-before-pre-push) below.
+`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI runs manifest jobs inside the manifest `runtime.image` (default: `public.ecr.aws/docker/library/node:22-slim`). **Agent pre-push uses `--archive`** (committed tree, cold install); **`--ci`** is for WIP iteration only — see [Snapshot modes](#snapshot-modes-read-this-before-pre-push) below.
 
 | Layer | Role |
 |-------|------|
@@ -193,13 +193,13 @@ Agent rule (toolset): `72-ci-parity-local-vs-ci-divergence.mdc` § Agent anti-pa
 
 If Actions shows **only** Docker Hub / `registry-1.docker.io` timeout errors at **“Pull CI parity runtime image”**, local archive typecheck being green is **expected** — you are not missing TS errors; CI never reached `tsc`.
 
-**Primary registry (2026-06):** manifest `runtime.image` is `public.ecr.aws/docker/library/node:20-slim` (AWS public mirror of Docker Official Images). GHA pre-pull tries manifest image first, then ECR, then Docker Hub, tagging the winner as the manifest name so `@umbraculum/ci-parity` uses the cached layer.
+**Primary registry (2026-06):** manifest `runtime.image` is `public.ecr.aws/docker/library/node:22-slim` (AWS public mirror of Docker Official Images). GHA pre-pull tries manifest image first, then ECR, then Docker Hub, tagging the winner as the manifest name so `@umbraculum/ci-parity` uses the cached layer.
 
 **Reproduce the GHA pull gate locally (optional):**
 
 ```bash
-docker rmi public.ecr.aws/docker/library/node:20-slim node:20-slim 2>/dev/null || true
-docker pull public.ecr.aws/docker/library/node:20-slim
+docker rmi public.ecr.aws/docker/library/node:22-slim node:22-slim 2>/dev/null || true
+docker pull public.ecr.aws/docker/library/node:22-slim
 ./scripts/ci-parity-check.sh --archive run --jobs typecheck
 ```
 

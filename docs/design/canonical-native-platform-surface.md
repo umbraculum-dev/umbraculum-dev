@@ -134,7 +134,7 @@ iOS/Android obligations in §3–§4 apply to **`apps/native` (Expo)** only. **U
 - Native UI for MRP, CRP, PIM, automation.
 - Native inventory list (web fallback only).
 - `registerNativeModule` required for all modules (brewery registered; others deferred).
-- React minor ahead of Expo Go ABI (monorepo aligned on 19.1.0 as of expo-doctor remediation 2026-06-07).
+- React minor ahead of Expo Go ABI (monorepo aligned on **19.3.0** / Expo SDK **58** as of Path B 2026-11; historical Path A was 19.1.0 / SDK 54).
 - Store-wide public release; **`cloud.umbraculum.dev`** hosted product.
 
 ### 5.1 Device smoke checklist (EAS `preview` → demo host)

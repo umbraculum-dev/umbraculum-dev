@@ -31,7 +31,7 @@ Tamagui ships `npx @tamagui/cli check` to detect **multiple physical installatio
 **Canonical script** (container — not host npm):
 
 ```bash
-docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
+docker run --rm -v "$PWD:/repo" -w /repo node:22-slim \
   bash -lc "./scripts/check-tamagui-cli.sh"
 ```
 

@@ -2,7 +2,7 @@
   "name": "@umbraculum/ui",
   "private": true,
   "version": "0.0.1",
-  "description": "Cross-platform UI primitive layer built on Tamagui: design tokens, platform-forking primitives (Button/Input), AI chat panel. Industry-agnostic by construction — consumed by both apps/web (Next.js) and apps/native (React Native + Expo). Brewery-specific widgets live in @umbraculum/brewery-recipes-ui.",
+  "description": "Cross-platform UI primitive layer built on Tamagui: design tokens, platform-forking primitives (Button/Input), AI chat panel. Industry-agnostic by construction \u2014 consumed by both apps/web (Next.js) and apps/native (React Native + Expo). Brewery-specific widgets live in @umbraculum/brewery-recipes-ui.",
   "type": "module",
   "scripts": {
     "build": "tsup --config tsup.config.ts",
@@ -34,7 +34,7 @@
     "@tamagui/animations-css": "2.2.0",
     "@tamagui/animations-react-native": "2.2.0",
     "@tamagui/config": "2.2.0",
-    "react-native-svg": "15.12.1",
+    "react-native-svg": "15.16.0",
     "tamagui": "2.2.0"
   },
   "peerDependencies": {

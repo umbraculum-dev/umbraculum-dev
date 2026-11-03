@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Node resolver for installation profile (ci-parity / node:20-slim — no python3).
+ * Node resolver for installation profile (ci-parity / node:22-slim — no python3).
  * Keep in sync with scripts/lib/resolve-install-manifest.py
  */
 import { readFileSync, existsSync } from "node:fs";

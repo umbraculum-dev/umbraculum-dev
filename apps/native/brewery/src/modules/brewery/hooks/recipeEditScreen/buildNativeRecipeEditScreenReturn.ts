@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import type { ScrollView } from "react-native";
+import type { ScrollViewInstance } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import type { TranslationValues } from "@umbraculum/i18n-react";
@@ -23,7 +23,7 @@ export function buildNativeRecipeEditScreenReturn(params: {
   recipeId: string;
   locale: string;
   navigation: RecipeEditNavigationProp;
-  scrollRef: RefObject<ScrollView | null>;
+  scrollRef: RefObject<ScrollViewInstance | null>;
   t: NativeRecipeEditT;
   tBrewSessions: NativeRecipeEditT;
   tSparge: NativeRecipeEditT;

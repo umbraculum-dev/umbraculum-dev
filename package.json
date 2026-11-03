@@ -25,7 +25,7 @@
     "build:packages:core": "npm run build -w @umbraculum/ai-tool-sdk && npm run build -w @umbraculum/i18n-keys && npm run build -w @umbraculum/i18n && npm run build -w @umbraculum/i18n-react && npm run build -w @umbraculum/native-shell && npm run build -w @umbraculum/navigation && npm run build -w @umbraculum/contracts && npm run build -w @umbraculum/module-sdk && npm run build -w @umbraculum/rendering && npm run build -w @umbraculum/pim-contracts && npm run build -w @umbraculum/automation-contracts && npm run build -w @umbraculum/mrp-contracts && npm run build -w @umbraculum/crp-contracts && npm run build:core -w @umbraculum/api-client && npm run build -w @umbraculum/ui && npm run build -w @umbraculum/media",
     "build:packages:verticals": "npm run build -w @umbraculum/brewery-i18n && npm run build -w @umbraculum/brewery-contracts && npm run build -w @umbraculum/brewery-api-client && npm run build -w @umbraculum/brewery-beerjson && npm run build -w @umbraculum/brewery-recipes-ui && npm run build -w @umbraculum/brewery-media-assets",
     "build:packages": "./scripts/build-packages-install-profile.sh",
-    "test:packages": "npm test -w @umbraculum/contracts && npm test -w @umbraculum/brewery-contracts && npm test -w @umbraculum/module-sdk && npm test -w @umbraculum/navigation && npm test -w @umbraculum/api-client && npm test -w @umbraculum/brewery-api-client && npm test -w @umbraculum/rendering && npm test -w @umbraculum/brewery-core && npm test -w @umbraculum/pim-contracts && npm test -w @umbraculum/mrp-contracts && npm test -w @umbraculum/crp-contracts",
+    "test:packages": "npm test -w @umbraculum/contracts && npm test -w @umbraculum/brewery-contracts && npm test -w @umbraculum/module-sdk && npm test -w @umbraculum/navigation && npm test -w @umbraculum/api-client && npm test -w @umbraculum/brewery-api-client && npm test -w @umbraculum/rendering && npm test -w @umbraculum/brewery-core && npm test -w @umbraculum/pim-contracts && npm test -w @umbraculum/mrp-contracts && npm test -w @umbraculum/crp-contracts && npm test -w @umbraculum/i18n",
     "test:all": "npm run test:packages",
     "lint": "eslint .",
     "check-web-url-segments": "tsx scripts/check-web-url-segments.ts",
@@ -53,6 +53,15 @@
     "down": "docker compose down",
     "logs": "docker compose logs -f --tail=200"
   },
+  "dependencies": {
+    "expo": "58.0.23",
+    "expo-constants": "58.0.15",
+    "expo-image": "58.0.18",
+    "expo-localization": "58.0.5",
+    "expo-secure-store": "58.0.2",
+    "react": "19.3.0",
+    "react-native": "0.88.1"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "eslint": "^9.39.4",
@@ -68,12 +77,13 @@
   },
   "overrides": {
     "postcss": "8.5.4",
-    "expo": "54.0.37",
-    "expo-font": "14.0.12",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.5",
-    "react-native-svg": "15.12.1",
+    "expo": "58.0.23",
+    "expo-font": "58.0.11",
+    "expo-constants": "58.0.15",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-svg": "15.16.0",
     "tamagui": "2.2.0",
     "@tamagui/core": "2.2.0",
     "@tamagui/config": "2.2.0",
@@ -81,6 +91,6 @@
     "@tamagui/animations-react-native": "2.2.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13.0"
   }
 }

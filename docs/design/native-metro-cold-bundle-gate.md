@@ -33,10 +33,10 @@ Restarts Metro with cleared bundler cache (`-c`) and asserts HTTP 200 + non-erro
 |------|-----------------|
 | **Trigger paths** | Diff touches any of: `apps/native/**`, `packages/sdk/module-sdk/**`, `packages/platform/i18n/**`, `scripts/start-metro-dev.sh`, `scripts/check-native-metro-cold.sh` |
 | **Mechanism** | New `nativeStep` sibling to `expo-doctor` in [`.umbraculum/gha-trigger-map.json`](../../.umbraculum/gha-trigger-map.json), invoked from [`scripts/verify-slice.sh`](../../scripts/verify-slice.sh) T2-PR companions (parallel with ci-parity, same pattern as expo-doctor) |
-| **Proof command** | `./scripts/check-native-metro-cold.sh` inside `node:20-slim` with warm npm volumes ([`docs/DEVELOPMENT-NPM-VOLUMES.md`](../DEVELOPMENT-NPM-VOLUMES.md)); Android `curl` only |
+| **Proof command** | `./scripts/check-native-metro-cold.sh` inside `node:22-slim` with warm npm volumes ([`docs/DEVELOPMENT-NPM-VOLUMES.md`](../DEVELOPMENT-NPM-VOLUMES.md)); Android `curl` only |
 | **Why not only expo-doctor** | Doctor checks dependency ABI alignment; it never builds the Metro Android graph |
 | **Why not full ci-parity job first** | Runtime cost (Metro boot + full Android bundle) is higher than lint/typecheck; path-aware companion keeps unrelated PRs cheap |
-| **Non-goals** | Physical Expo Go; Expo SDK 58 upgrade; `npm ci` on every PR (optional later `--fresh` flag on the script) |
+| **Non-goals** | Physical Expo Go device proof; `npm ci` on every PR (optional later `--fresh` flag on the script) |
 | **Rollout** | (1) Manual stub — **done** → (2) path-aware T2 companion → (3) optional GHA workflow when wall-time is acceptable |
 
 ## 4. Acceptance criteria for the future wiring PR
@@ -49,4 +49,4 @@ Restarts Metro with cleared bundler cache (`-c`) and asserts HTTP 200 + non-erro
 ## 5. Explicit non-goals of this proposal document
 
 - Implementing verify-slice / GHA wiring (tracked as follow-up).
-- Replacing device Expo Go SDK matching (still operator installs SDK 54 Expo Go from expo.dev/go).
+- Replacing device Expo Go SDK matching (operator uses store Expo Go SDK 58).
