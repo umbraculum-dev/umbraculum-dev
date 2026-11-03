@@ -101,10 +101,11 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
                 borderColor="borderColor"
               >
                 <View style={{ width: "100%" }}>
-                  <Text fontWeight="700" fontSize={16} lineHeight={20}>
+                  {/* Tamagui 3: bare numeric lineHeight is a font-size ratio, not px. */}
+                  <Text fontWeight="700" fontSize={16} lineHeight="20px">
                     {w.name}
                   </Text>
-                  <Text mt="1" opacity={0.8} fontSize={12} lineHeight={16}>
+                  <Text mt="1" opacity={0.8} fontSize={12} lineHeight="16px">
                     {w.role}
                     {isSubmitting ? ` · ${t("submitting")}` : ""}
                   </Text>

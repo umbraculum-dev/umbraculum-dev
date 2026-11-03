@@ -1,7 +1,7 @@
 # Tamagui: type-system situation + our adaptation strategy
 
 **Tier:** Public
-**Status:** v1.5 — descriptive (not prescriptive). Living document. Updated 2026-11-03 — monorepo Tamagui **3.2.0** (flat values + Config v5 kept). v1.4 — Tamagui CLI check gate (`scripts/check-tamagui-cli.sh`, agent rule 79). v1.3 — Tamagui **2.2.0** stable. v1.2 (2026-05-21) shorthand-prop counts. v1.1 (2026-05-16) "Tamagui wall" framing post-HIGH-full.
+**Status:** v1.5 — descriptive (not prescriptive). Living document. Updated 2026-11-03 — monorepo Tamagui **3.2.0** (flat values + Config **v6** tokens with v5 theme-key compat). v1.4 — Tamagui CLI check gate (`scripts/check-tamagui-cli.sh`, agent rule 79). v1.3 — Tamagui **2.2.0** stable. v1.2 (2026-05-21) shorthand-prop counts. v1.1 (2026-05-16) "Tamagui wall" framing post-HIGH-full.
 **Audience:** maintainers, contributors authoring web/native UI code, anyone debugging Tamagui-related lint/TS noise.
 **Owners:** maintainers
 **Related:** `docs/LINTING.md` (the lint phase log, including the post-mortem revision of the Tamagui-wall framing), `packages/platform/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
@@ -20,7 +20,7 @@ This document:
 2. Describes how we work around each one,
 3. Tells future maintainers when *not* to spend time fixing what is upstream.
 
-**Pinned version (2026-11-03):** `tamagui` and every declared `@tamagui/*` dependency use exact **`3.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (`tamagui` peer `>=3`). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. Keep `@tamagui/config/v5` for this wave (Config v6 is a separate design remap). Web config must import `createAnimations` from **`@tamagui/animations-css/extras`** (not bare `@tamagui/animations-css`) so Sheet/animated-number hooks work. Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps. See [`design/tamagui-3-upgrade-analysis.md`](design/tamagui-3-upgrade-analysis.md).
+**Pinned version (2026-11-03):** `tamagui` and every declared `@tamagui/*` dependency use exact **`3.2.0`** across `apps/web`, `packages/platform/ui`, `packages/verticals/brewery/recipes-ui`, `apps/native/brewery`, and `packages/platform/native-shell` (`tamagui` peer `>=3`). Root [`package.json`](../package.json) `overrides` dedupe the hoisted tree. App configs use **`@tamagui/config/v6`** (named radii / font sizes Tamagui 3 skins need) plus **`themesWithV5CompatKeys`** so existing `red10` / `borderColor` / `color4` theme keys still resolve. Web config must import `createAnimations` from **`@tamagui/animations-css/extras`** (not bare `@tamagui/animations-css`) so Sheet/animated-number hooks work. Numeric `lineHeight` is a **ratio** in v3 — use `"20px"` (or similar) when you mean absolute pixels. Web Docker uses a separate [`apps/web/package-lock.json`](../apps/web/package-lock.json) — both lockfiles must move together on bumps. See [`design/tamagui-3-upgrade-analysis.md`](design/tamagui-3-upgrade-analysis.md).
 
 ### Tamagui CLI check (duplicate instances)
 

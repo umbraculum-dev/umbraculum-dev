@@ -1,20 +1,14 @@
 import {
-  radiusNamedAliases
-} from "../chunk-PRJ6FR2T.js";
+  themesWithV5CompatKeys
+} from "../chunk-GZJL72HW.js";
 
 // src/tamagui/config.native.ts
 import { createAnimations } from "@tamagui/animations-react-native";
-import { defaultConfig } from "@tamagui/config/v5";
+import { defaultConfig } from "@tamagui/config/v6";
 import { createTamagui } from "tamagui";
 var config = createTamagui({
   ...defaultConfig,
-  tokens: {
-    ...defaultConfig.tokens,
-    radius: {
-      ...defaultConfig.tokens.radius,
-      ...radiusNamedAliases
-    }
-  },
+  themes: themesWithV5CompatKeys(),
   animations: createAnimations({
     quick: {
       damping: 20,

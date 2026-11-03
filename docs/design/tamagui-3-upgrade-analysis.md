@@ -4,7 +4,7 @@
 **Date:** 2026-11-03  
 **Pinned (landed):** Tamagui **3.2.0** (exact) across five manifests + root overrides; native-shell peer `>=3`  
 **Prior baseline:** Tamagui **2.2.0**  
-**Config strategy:** keep **`@tamagui/config/v5`** through the API migration (upstream: V3 APIs + frozen v5 pack; defer Config v6 design remap)
+**Config strategy (as landed):** **`@tamagui/config/v6`** for tokens/fonts Tamagui 3 skins require; merge v5 theme keys via `themesWithV5CompatKeys` so app `red10` / `borderColor` / `color4` keep working. (Initial plan kept v5 only — Expo Go Input/radius/font crashes forced the v6 token pack.)
 
 ## Inventory (current)
 

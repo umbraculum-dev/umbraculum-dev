@@ -25,39 +25,34 @@ __export(config_web_exports, {
 });
 module.exports = __toCommonJS(config_web_exports);
 var import_extras = require("@tamagui/animations-css/extras");
-var import_v5 = require("@tamagui/config/v5");
+var import_v62 = require("@tamagui/config/v6");
 var import_tamagui = require("tamagui");
 
-// src/tamagui/radiusNamedAliases.ts
-var radiusNamedAliases = {
-  xs: 2,
-  sm: 4,
-  md: 6,
-  lg: 8,
-  xl: 12,
-  "2xl": 16,
-  "3xl": 24,
-  "4xl": 32,
-  full: 9999
-};
+// src/tamagui/themesWithV5CompatKeys.ts
+var import_v5 = require("@tamagui/config/v5");
+var import_v6 = require("@tamagui/config/v6");
+function themesWithV5CompatKeys() {
+  const themes = { ...import_v6.defaultConfig.themes };
+  const v5Themes = import_v5.defaultConfig.themes;
+  for (const [name, theme] of Object.entries(import_v6.defaultConfig.themes)) {
+    const legacy = v5Themes[name];
+    if (!legacy) continue;
+    themes[name] = { ...legacy, ...theme };
+  }
+  return themes;
+}
 
 // src/tamagui/config.web.ts
 var config = (0, import_tamagui.createTamagui)({
-  ...import_v5.defaultConfig,
-  tokens: {
-    ...import_v5.defaultConfig.tokens,
-    radius: {
-      ...import_v5.defaultConfig.tokens.radius,
-      ...radiusNamedAliases
-    }
-  },
+  ...import_v62.defaultConfig,
+  themes: themesWithV5CompatKeys(),
   animations: (0, import_extras.createAnimations)({
     quick: "ease-out 150ms",
     medium: "ease-in 300ms",
     slow: "ease-in 450ms"
   }),
   media: {
-    ...import_v5.defaultConfig.media,
+    ...import_v62.defaultConfig.media,
     narrow: { maxWidth: 880 },
     gtNarrow: { minWidth: 881 },
     mobile: { maxWidth: 520 },

@@ -1,18 +1,12 @@
 import { createAnimations } from "@tamagui/animations-css/extras";
-import { defaultConfig } from "@tamagui/config/v5";
+import { defaultConfig } from "@tamagui/config/v6";
 import { createTamagui } from "tamagui";
 
-import { radiusNamedAliases } from "./radiusNamedAliases";
+import { themesWithV5CompatKeys } from "./themesWithV5CompatKeys";
 
 export const config = createTamagui({
   ...defaultConfig,
-  tokens: {
-    ...defaultConfig.tokens,
-    radius: {
-      ...defaultConfig.tokens.radius,
-      ...radiusNamedAliases,
-    },
-  },
+  themes: themesWithV5CompatKeys(),
   animations: createAnimations({
     quick: "ease-out 150ms",
     medium: "ease-in 300ms",
@@ -34,4 +28,3 @@ declare module "tamagui" {
 }
 
 export default config;
-
