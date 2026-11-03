@@ -1685,15 +1685,15 @@ function deepMerge(target, source) {
   }
   return result;
 }
-function loadBreweryMessages(locale) {
-  if (!isBreweryVerticalInstalled()) {
+function loadBreweryMessages(locale, env) {
+  if (!isBreweryVerticalInstalled(env)) {
     return {};
   }
   return locale === "it" ? breweryIt : breweryEn;
 }
-function getSharedMessages(locale) {
+function getSharedMessages(locale, options) {
   const platform = locale === "it" ? it : en;
-  const brewery = loadBreweryMessages(locale);
+  const brewery = loadBreweryMessages(locale, options?.env);
   return deepMerge(platform, brewery);
 }
 export {

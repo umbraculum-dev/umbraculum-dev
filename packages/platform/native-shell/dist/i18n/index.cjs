@@ -40,6 +40,7 @@ __export(i18n_exports, {
 module.exports = __toCommonJS(i18n_exports);
 
 // src/i18n/I18nProvider.tsx
+var import_expo_constants = __toESM(require("expo-constants"), 1);
 var import_react = require("react");
 var import_react_native = require("react-native");
 var import_i18n2 = require("@umbraculum/i18n");
@@ -76,6 +77,18 @@ async function writeString(key, value) {
 
 // src/i18n/I18nProvider.tsx
 var import_jsx_runtime = require("react/jsx-runtime");
+function envWithExpoModuleProfile() {
+  const base = process.env;
+  const expoExtra = import_expo_constants.default.expoConfig?.extra;
+  const fromExtra = expoExtra?.EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE;
+  const profile = typeof fromExtra === "string" && fromExtra.trim() || base["EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE"]?.trim() || base["UMBRACULUM_MODULE_PROFILE"]?.trim() || void 0;
+  if (!profile) return base;
+  return {
+    ...base,
+    EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE: profile,
+    UMBRACULUM_MODULE_PROFILE: profile
+  };
+}
 var LocaleControllerContext = (0, import_react.createContext)(null);
 function useLocaleController() {
   const ctx = (0, import_react.useContext)(LocaleControllerContext);
@@ -108,7 +121,7 @@ function I18nProvider({ children }) {
   if (!locale) {
     return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react_native.View, { style: { flex: 1, alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react_native.ActivityIndicator, {}) });
   }
-  const messages = (0, import_i18n2.getSharedMessages)(locale);
+  const messages = (0, import_i18n2.getSharedMessages)(locale, { env: envWithExpoModuleProfile() });
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LocaleControllerContext.Provider, { value: controller, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_i18n_react.LocaleProvider, { locale, messages, children }) });
 }
 // Annotate the CommonJS export names for ESM import in node:

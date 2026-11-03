@@ -1,5 +1,4 @@
-import * as react_jsx_runtime from 'react/jsx-runtime';
-import { ReactNode, ComponentProps } from 'react';
+import React__default, { ReactNode, ComponentProps } from 'react';
 import { EditorMashStep } from '@umbraculum/brewery-beerjson';
 import { Checkbox } from 'tamagui';
 export { H as HydrometerChartProps } from './hydrometerChartShared-9xtT3Voa.js';
@@ -14,7 +13,7 @@ interface RecipeMetaLineProps {
     enabled?: boolean;
     loadRecipeMeta: (recipeId: string) => Promise<RecipeMeta | null>;
 }
-declare function RecipeMetaLine(props: RecipeMetaLineProps): react_jsx_runtime.JSX.Element;
+declare function RecipeMetaLine(props: RecipeMetaLineProps): React__default.JSX.Element;
 
 interface RecipeImageProps {
     assetKey: string;
@@ -26,7 +25,7 @@ type RenderRecipeImage = (props: RecipeImageProps) => ReactNode;
 interface ManualCellCountHelpBoxProps {
     renderImage: RenderRecipeImage;
 }
-declare function ManualCellCountHelpBox(props: ManualCellCountHelpBoxProps): react_jsx_runtime.JSX.Element;
+declare function ManualCellCountHelpBox(props: ManualCellCountHelpBoxProps): React__default.JSX.Element;
 
 type SaltKey = "gypsum" | "calcium_chloride" | "epsom" | "table_salt" | "baking_soda";
 type SaltAdditionRow = {
@@ -38,7 +37,7 @@ declare function SaltAdditionsEditor(props: {
     onChange: (next: SaltAdditionRow[]) => void;
     idPrefix?: string;
     disabled?: boolean;
-}): react_jsx_runtime.JSX.Element;
+}): React__default.JSX.Element;
 
 type WaterVolumes = {
     mashLiters: number;
@@ -80,7 +79,7 @@ interface MashStepsEditorProps {
     formatFixed: (locale: string, value: number, decimals: number) => string;
 }
 
-declare function MashStepsEditor(props: MashStepsEditorProps): react_jsx_runtime.JSX.Element;
+declare function MashStepsEditor(props: MashStepsEditorProps): React__default.JSX.Element;
 
 interface SpargeStepReadOnlyRowProps {
     stepNumber: number;
@@ -104,10 +103,10 @@ interface SpargeStepReadOnlyRowProps {
         ramp: string;
     };
 }
-declare function SpargeStepReadOnlyRow(props: SpargeStepReadOnlyRowProps): react_jsx_runtime.JSX.Element;
+declare function SpargeStepReadOnlyRow(props: SpargeStepReadOnlyRowProps): React__default.JSX.Element;
 
 interface BrewCheckboxProps extends Omit<ComponentProps<typeof Checkbox>, "children" | "native" | "unstyled"> {
 }
-declare function BrewCheckbox(props: BrewCheckboxProps): react_jsx_runtime.JSX.Element;
+declare function BrewCheckbox(props: BrewCheckboxProps): React__default.JSX.Element;
 
 export { BrewCheckbox, type BrewCheckboxProps, ManualCellCountHelpBox, type ManualCellCountHelpBoxProps, MashStepsEditor, type MashStepsEditorProps, type RecipeImageProps, type RecipeMeta, RecipeMetaLine, type RecipeMetaLineProps, type RenderRecipeImage, type SaltAdditionRow, SaltAdditionsEditor, type SaltKey, SpargeStepReadOnlyRow, type SpargeStepReadOnlyRowProps, type WaterVolumes, parseRecipeMetaFromGetRecipeResponse };

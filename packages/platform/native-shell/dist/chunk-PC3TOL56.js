@@ -1,4 +1,5 @@
 // src/i18n/I18nProvider.tsx
+import Constants from "expo-constants";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { getSharedMessages, isLocale as isLocale2 } from "@umbraculum/i18n";
@@ -35,6 +36,18 @@ async function writeString(key, value) {
 
 // src/i18n/I18nProvider.tsx
 import { jsx } from "react/jsx-runtime";
+function envWithExpoModuleProfile() {
+  const base = process.env;
+  const expoExtra = Constants.expoConfig?.extra;
+  const fromExtra = expoExtra?.EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE;
+  const profile = typeof fromExtra === "string" && fromExtra.trim() || base["EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE"]?.trim() || base["UMBRACULUM_MODULE_PROFILE"]?.trim() || void 0;
+  if (!profile) return base;
+  return {
+    ...base,
+    EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE: profile,
+    UMBRACULUM_MODULE_PROFILE: profile
+  };
+}
 var LocaleControllerContext = createContext(null);
 function useLocaleController() {
   const ctx = useContext(LocaleControllerContext);
@@ -67,7 +80,7 @@ function I18nProvider({ children }) {
   if (!locale) {
     return /* @__PURE__ */ jsx(View, { style: { flex: 1, alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ jsx(ActivityIndicator, {}) });
   }
-  const messages = getSharedMessages(locale);
+  const messages = getSharedMessages(locale, { env: envWithExpoModuleProfile() });
   return /* @__PURE__ */ jsx(LocaleControllerContext.Provider, { value: controller, children: /* @__PURE__ */ jsx(LocaleProvider, { locale, messages, children }) });
 }
 

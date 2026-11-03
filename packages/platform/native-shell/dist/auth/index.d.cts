@@ -1,5 +1,4 @@
-import * as react_jsx_runtime from 'react/jsx-runtime';
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { SupportedLocale } from '@umbraculum/i18n';
 import { ApiClient } from '@umbraculum/api-client';
 
@@ -26,7 +25,7 @@ interface AuthContextValue {
 declare function useAuth(): AuthContextValue;
 declare function AuthProvider({ children }: {
     children: ReactNode;
-}): react_jsx_runtime.JSX.Element;
+}): React.JSX.Element;
 
 declare function getApiBaseUrl(): string;
 
