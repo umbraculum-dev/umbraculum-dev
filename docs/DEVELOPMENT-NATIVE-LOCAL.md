@@ -116,6 +116,8 @@ docker rm -f brewery-metro 2>/dev/null || true
 docker run -d --rm --name brewery-metro \
   -p 19000:19000 -p 19001:19001 -p 19002:19002 -p 8081:8081 \
   -e REACT_NATIVE_PACKAGER_HOSTNAME="${LAN_IP}" \
+  -e UMBRACULUM_MODULE_PROFILE=reference \
+  -e EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE=reference \
   -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native/brewery \
   node:20-slim \
@@ -147,6 +149,7 @@ The same logic applies to `EXPO_PUBLIC_MEDIA_BASE_URL` via `apps/native/brewery/
 
 - `EXPO_PUBLIC_API_BASE_URL` (used by native auth + API calls; see `apps/native/brewery/src/auth/apiBaseUrl.ts`)
 - `EXPO_PUBLIC_MEDIA_BASE_URL` (used by `RemoteImage`; see `apps/native/brewery/src/media/mediaBaseUrl.ts`)
+- `EXPO_PUBLIC_UMBRACULUM_MODULE_PROFILE` (brewery i18n merge gate via `@umbraculum/module-sdk/edge`; set to `reference` for the brewery app — Metro helper, manual §4.2, and `eas.json` profiles)
 
 For local dev on Expo Go you typically **leave both unset** — `apiBaseUrl.ts` auto-derives the host from Metro's `hostUri` (set by the helper script via `REACT_NATIVE_PACKAGER_HOSTNAME`), and `mediaBaseUrl.ts` delegates to it. See §4.3 for when to override.
 
