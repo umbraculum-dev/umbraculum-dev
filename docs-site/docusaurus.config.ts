@@ -317,6 +317,8 @@ const config: Config = {
             '**/design/pr3-routes-migration-handoff.md',
             '**/design/architectural-audit-template.md',
             '**/design/validation-library-adoption-audit.md',
+            '**/design/tamagui-3-flat-values-report.md',
+            '**/design/tamagui-3-flat-values-report.json',
           ],
           beforeDefaultRemarkPlugins: [
             rewriteRepoRelativeLinks,
