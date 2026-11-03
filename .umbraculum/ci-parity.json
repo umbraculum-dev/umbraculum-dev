@@ -3,7 +3,7 @@
   "profile": "ts-npm-monorepo",
   "runtime": {
     "image": "public.ecr.aws/docker/library/node:20-slim",
-    "nodeOptions": "--max-old-space-size=2048"
+    "nodeOptions": "--max-old-space-size=6144"
   },
   "docker": {
     "volumes": [
@@ -11,7 +11,7 @@
       { "name": "umbraculum_root_node_modules", "containerPath": "/repo/node_modules" }
     ],
     "resources": {
-      "memory": "2560m",
+      "memory": "4096m",
       "cpus": "2",
       "maxParallel": 2
     }

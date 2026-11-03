@@ -94,10 +94,10 @@ Unbounded `--parallel` + `--max-old-space-size=6144` × N containers has OOMed d
 
 | Cap | Default | Override |
 |-----|---------|----------|
-| Docker `--memory` / `--memory-swap` | `2560m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
+| Docker `--memory` / `--memory-swap` | `4096m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
 | Docker `--cpus` | `2` | `CI_PARITY_DOCKER_CPUS` or `docker.resources.cpus` |
 | Concurrent job containers | `2` | `--max-parallel <n>`, `CI_PARITY_MAX_PARALLEL`, or manifest `docker.resources.maxParallel` |
-| `NODE_OPTIONS` heap | clamped to ≤ memory−512 MiB (laptop base 2048) | manifest `runtime.nodeOptions` (still clamped) |
+| `NODE_OPTIONS` heap | ≤ memory−512 MiB (manifest may request more; never raised above cgroup) | manifest `runtime.nodeOptions` |
 | Escape hatch | — | `CI_PARITY_NO_RESOURCE_LIMITS=1` (not for juniors) |
 
 Requires `@umbraculum/ci-parity` **≥ 1.0.13** (sibling toolset `dist/cli.js` or published pin). GHA runners use a higher profile automatically.
@@ -121,7 +121,7 @@ CI_PARITY_MAX_PARALLEL=4 CI_PARITY_DOCKER_MEMORY=3g CI_PARITY_DOCKER_CPUS=3 \
   npm run verify:pre-push
 ```
 
-**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (e.g. 4 × 2560 m ≈ 10 GiB Docker pressure before host headroom). Prefer raising memory/cpus per container *or* concurrency — not both blindly. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
+**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (e.g. default 2 × 4096 m ≈ 8 GiB Docker pressure). Prefer raising memory/cpus per container *or* concurrency — not both blindly. Do **not** lower `runtime.nodeOptions` below what eslint/`npm ci` need — the cgroup clamp is the safety valve; a 2048 MiB heap aborts lint on this monorepo. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
 
 ## Pre-push commands reference (contributors and agents)
 
