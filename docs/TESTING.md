@@ -152,23 +152,25 @@ docker run --rm --network host \
 
 ##### Accordion: bogus `aria-controls` (axe `aria-valid-attr-value`)
 
-`platform/dashboard.spec.ts` skips the axe rule `aria-valid-attr-value` because `@tamagui/accordion@2.2.0` still ships an id-wiring bug (re-tested 2026-06-10 during the 2.2.0 monorepo bump): every `Accordion.Trigger` renders `aria-controls="<contentId>"` but the corresponding `Accordion.Content` DOM node never receives that id (the trigger and content sides each call `React.useId()` independently — see `node_modules/@tamagui/accordion/src/Accordion.tsx:407`). The interaction works for keyboard and screen readers (`aria-expanded`, `data-state` are correctly wired), but axe still flags the trigger as critical.
+`platform/dashboard.spec.ts` skips the axe rule `aria-valid-attr-value` because of an id-wiring bug first confirmed on **`@tamagui/accordion@2.2.0`** (re-tested 2026-06-10 during the 2.2.0 monorepo bump): every `Accordion.Trigger` renders `aria-controls="<contentId>"` but the corresponding `Accordion.Content` DOM node never receives that id (the trigger and content sides each call `React.useId()` independently). The interaction works for keyboard and screen readers (`aria-expanded`, `data-state` are correctly wired), but axe still flags the trigger as critical.
+
+**As of Tamagui 3.2.0 (2026-11):** treat the 2.2.0 finding as a **baseline**, not proof the bug still ships. Re-check on the pinned `@tamagui/accordion@3.2.0` (release notes or a manual repro) before assuming the skip is still required; retire the skip when the violation is gone.
 
 When this rule is retired here:
 
-1. Confirm the bug is fixed in a newer `@tamagui/accordion` release (release notes or a manual repro).
+1. Confirm the bug is fixed in the current pinned `@tamagui/accordion` (or a newer release).
 2. Remove the `skipFailures: ["aria-valid-attr-value"]` argument from `apps/web/e2e/platform/dashboard.spec.ts`.
 3. If the violation reappears on a non-Tamagui-Accordion element (i.e. our own code introduces a malformed ARIA value), fix it there — do **not** re-introduce the skip.
 
-If the bug persists past, say, two Tamagui releases, file an upstream issue with the reproducer text already in the dashboard spec's leading comment.
+If the bug persists past, say, two Tamagui major/minor bumps after the original 2.2.0 report, file an upstream issue with the reproducer text already in the dashboard spec's leading comment.
 
 ##### RadioGroup: `native={true}` swallows `onValueChange` on web
 
-`@tamagui/radio-group@2.2.0`'s "native mode" wraps a real `<input type="radio">` for accessibility, but the change event from that native input does **not** propagate back to the group's `onValueChange` callback. The visible bullet moves on click (because the native input toggles its own `checked` attribute), but React state never flips — so any conditional UI keyed on the selected value (button labels, dependent inputs) stays frozen.
+**As of `@tamagui/radio-group@2.2.0`:** "native mode" wrapped a real `<input type="radio">` for accessibility, but the change event from that native input did **not** propagate back to the group's `onValueChange` callback. The visible bullet moved on click (because the native input toggled its own `checked` attribute), but React state never flipped — so any conditional UI keyed on the selected value (button labels, dependent inputs) stayed frozen.
 
 We hit this in `packages/platform/ui/src/primitives/ModeFieldset.tsx`, which used to set `native={isWeb}`. Symptom on the mash/sparge/boil water pages: clicking "Manual acid amount" left the submit button reading "Calculate & save snapshot" and never revealed the "Acid added" input. Fixed by dropping `native={true}` (kept the Tamagui-native render path; ARIA + label wiring is unchanged). Covered by the regression test `apps/web/e2e/verticals/brewery/water-calc.spec.ts` → "mash acidification mode radio actually flips React state on web".
 
-If you ever need `RadioGroup native={true}` again (e.g. for a specific browser-autofill story) **and** a newer Tamagui version, first verify the propagation manually: render a controlled `RadioGroup` with a `console.log` in `onValueChange`, click an option, and confirm the log fires. Only then re-enable `native={true}` and remove the regression test guard.
+**On Tamagui 3.2.0:** keep the workaround unless you re-verify. If you ever need `RadioGroup native={true}` again (e.g. for a specific browser-autofill story), first verify propagation on the current pin: render a controlled `RadioGroup` with a `console.log` in `onValueChange`, click an option, and confirm the log fires. Only then re-enable `native={true}` and remove the regression test guard.
 
 ### L6 - Agentic browser E2E
 
