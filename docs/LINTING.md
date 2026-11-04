@@ -885,9 +885,33 @@ Error: Process completed with exit code 134.
 
 **Why local doesn't hit it:** local editors use `eslint.config.editor.mjs`, which strips the type-aware rules from IDE-level lint (per Phase 5a). When running `npm run lint` locally outside the container, the host machine isn't constrained by node:22-slim's container memory envelope.
 
-**Why 6 GB:** GitHub-hosted `ubuntu-latest` runners ship with 7 GB RAM, so a 6 GB v8 old-generation cap leaves enough headroom for the node runtime + npm + ESLint scaffolding. Re-evaluate the cap if the type-checked file count per package crosses ~100 on average.
+**Why 6 GB (Node heap, not Docker memory):** GitHub-hosted `ubuntu-latest` runners ship with ~7 GB RAM, so a **6 GB v8 old-generation** cap (`--max-old-space-size=6144`) leaves headroom for the node runtime + npm + ESLint scaffolding. That heap number is **not** a safe Docker `--memory` value — see next subsection. Re-evaluate the heap if the type-checked file count per package crosses ~100 on average.
 
-**Local fix (if your dev machine starts hitting this):** export the same `NODE_OPTIONS` before running `npm run lint` — `NODE_OPTIONS='--max-old-space-size=6144' npm run lint`. The CI bump is the canonical anchor; copy it locally as needed.
+**Local fix (if your host Node process starts hitting the heap limit):** export the same `NODE_OPTIONS` before running `npm run lint` — `NODE_OPTIONS='--max-old-space-size=6144' npm run lint`. The CI bump is the canonical anchor; copy it locally as needed.
+
+### Local CI-parity lint (Docker memory floor)
+
+When you run the **same lint gate CI uses** via ci-parity / `verify:pre-push` (not IDE eslint, not host-only `npm run lint`), the job runs inside a `node:22-slim` container with a **cgroup memory cap**.
+
+| Setting | Required floor | Why |
+|---------|----------------|-----|
+| Node heap (manifest / GHA request) | 6144 MiB | Type-aware eslint project graph |
+| Effective heap if you lower Docker memory | ≤ memory−512 MiB | ci-parity clamps heap to the cgroup; `6g` → ~5632 MiB heap |
+| Docker `--memory` / `CI_PARITY_DOCKER_MEMORY` | **`7168m` or `7g`** | Measured lint working set ≈ 7 GiB (not “match the 6144 heap figure”) |
+
+Repo default: [`.umbraculum/ci-parity.json`](../.umbraculum/ci-parity.json) `docker.resources.memory` = `7168m`, `maxParallel` = `1`. Full table + overrides: [`docs/CI-PARITY.md`](CI-PARITY.md) § Resource safety / Lint job memory floor.
+
+```bash
+# Preferred — uses the 7 GiB manifest default
+npm run verify:pre-push
+# or lint-only:
+./scripts/ci-parity-check.sh --archive run --jobs lint
+
+# Explicit (e.g. after you experimented with a lower cap):
+CI_PARITY_DOCKER_MEMORY=7g CI_PARITY_MAX_PARALLEL=1 npm run verify:pre-push
+```
+
+**Do not use `CI_PARITY_DOCKER_MEMORY=6g`.** That matches the *heap* number and looks plausible, but ci-parity already shrinks the heap to fit — lint still needs ~7 GiB **RSS**, so the cgroup OOM-kills the job (`exit: 137`), often with `lint=FAIL` while lighter jobs still pass. Free host RAM (stop other compose stacks) instead of lowering the lint cgroup.
 
 ---
 

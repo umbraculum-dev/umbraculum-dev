@@ -379,26 +379,27 @@ branches) is **necessary but not sufficient** here.
    direct `master` docs push hid failures that a PR check suite would surface.
    Do not “fix” with a revert unless asked.
 
-2. **Before any push** (feature branch included), **stop and ask** which local
-   gates to run — at least:
-   - `npm run verify:pre-push` (T2-PR / path-aware ci-parity — **default yes**)
-   - `typecheck` / `lint` / `docs-readmes` if the operator wants a named subset
-   - API vitest / expo-doctor / Tamagui CLI / lockfile checks when the change
-     surface warrants them (see sections below)
-   Do **not** push on a bare “push” / “push the branch” alone when T2 has not
-   been green on this commit, and do **not** skip asking “run `verify:pre-push`?”
-   to save time. GHA discovering `docs-readmes` / lockfile sync failures is the
-   anti-pattern this gate exists to kill (**2026-11-04** feature-branch push).
+2. **Before any push** (feature branch included): **you own** the default T2
+   gate — `npm run verify:pre-push` (path-aware ci-parity + companions per
+   change surface; see § Pre-push CI parity and toolset rules `40` / `72`).
+   On a bare “push” / “push the branch”, if T2 is not yet green on this commit,
+   **pause once**: confirm you will run the default T2 **now**, or ask whether
+   to **waive a named gate**. Do **not** hand the operator a menu of
+   `typecheck` / `lint` / `docs-readmes` subsets, and do **not** dump “run
+   `verify:pre-push` yourself” on them. Do **not** push red/unknown T2 unless
+   the operator explicitly waives named jobs. Incident **2026-11-04**:
+   feature-branch push without T2 let GHA discover `docs-readmes` / lockfile
+   sync failures.
 
-3. After the operator answers, **you** run the agreed gates (container /
-   `./scripts/ci-parity-check.sh` — not host npm). Push only when those are
-   green, or when the operator **explicitly waives** a named gate.
+3. After that confirmation (or an explicit named waiver), **you** run the
+   gates (container / `./scripts/ci-parity-check.sh` — not host npm). Push only
+   when they are green, or when waived jobs are named.
 
 ## Pre-push CI parity (agent-owned — do not delegate to the operator)
 
-After the operator confirms the gate set in § “Do not push to `master`; ask
-before any push” (or waives named jobs), **you** run the parity sequence —
-not the human contributor. Do not end a session with "before you push, run …".
+After § “Do not push to `master`; ask before any push” (run-now confirm or
+named waiver), **you** run the parity sequence — not the human contributor.
+Do not end a session with "before you push, run …".
 
 **Mandatory sequence before push** (once push + gates are authorized):
 
