@@ -129,6 +129,7 @@ export {
 /** Edge-safe profile → module set (Next middleware / RSC; no filesystem). */
 export {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
+  getBuiltinSegmentOwnerEdge,
   resolveEnabledModuleCodesEdge,
 } from "./edgeEnabledModules.js";
 

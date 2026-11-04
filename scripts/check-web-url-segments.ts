@@ -90,6 +90,8 @@ const PLATFORM_RESERVED_SEGMENTS = new Set<string>([
   "contact",
   "contributing",
   "i18n-contributing",
+  // In-app HTTP 404 page — middleware rewrites gated deep links here.
+  "page-not-found",
 ]);
 
 /**

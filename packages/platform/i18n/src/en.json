@@ -236,8 +236,12 @@
     "changeLanguage": "Change language",
     "toggleLanguage": "Toggle language",
     "dilutionDiagramLabel": "Dilution 1:100 diagram",
-    "imageUnavailable": "Image unavailable"
+    "imageUnavailable": "Image unavailable",
+    "httpNotFoundTitle": "Page not found",
+    "httpNotFoundBody": "This page does not exist, or it is not available in this installation.",
+    "httpNotFoundHome": "Back to home"
   },
+
   "locales": {
     "en": "English",
     "it": "Italiano",

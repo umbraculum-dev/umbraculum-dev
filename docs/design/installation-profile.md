@@ -123,11 +123,21 @@ Core profile: [`prisma-migrate-install-profile.sh`](../../scripts/prisma-migrate
 ## Verification
 
 ```bash
-# Core — brewery route absent (404)
+# Core — brewery API route absent (404)
 UMBRACULUM_MODULE_PROFILE=platform curl -s -o /dev/null -w "%{http_code}\n" http://localhost:18080/api/styles
 
-# Reference — route registered (401 without session OK)
+# Reference — brewery API route registered (401 without session OK)
 UMBRACULUM_MODULE_PROFILE=reference curl -s -o /dev/null -w "%{http_code}\n" http://localhost:18080/api/styles
+
+# Core — brewery web segments gated by middleware (404; no page/i18n crash)
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:18080/en/recipes
+curl -s -o /dev/null -w "%{http_code}\n" \
+  http://localhost:18080/en/recipes/2f323aed-19cd-4839-8ed5-c3de10262874/edit
+
+# Reference — brewery web segments served (200 or auth redirect; not middleware 404)
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:18080/en/recipes
 ```
+
+Web middleware returns HTTP 404 for URL segments owned by modules not in the installation profile (see `apps/web/middleware.ts`). It **rewrites** to the in-app `/{locale}/page-not-found` page (shell + “Page not found” copy) so browsers do not show a blank-body generic error. App Router files under `(brewery)/` may still exist on disk; the gate is runtime, not filesystem deletion.
 
 Module-sdk tests: `npm test -w @umbraculum/module-sdk`

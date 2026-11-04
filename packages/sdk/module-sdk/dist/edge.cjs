@@ -21,6 +21,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var edge_exports = {};
 __export(edge_exports, {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP: () => BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
+  getBuiltinSegmentOwnerEdge: () => getBuiltinSegmentOwnerEdge,
   resolveEnabledModuleCodesEdge: () => resolveEnabledModuleCodesEdge
 });
 module.exports = __toCommonJS(edge_exports);
@@ -49,18 +50,51 @@ var BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP = [
     segments: ["products", "categories", "attribute-sets", "channels"]
   }
 ];
+var PLATFORM_ENABLED = /* @__PURE__ */ new Set([
+  "automation",
+  "pim",
+  "mrp",
+  "crp"
+]);
+var REFERENCE_ENABLED = /* @__PURE__ */ new Set([
+  "brewery",
+  "automation",
+  "pim",
+  "mrp",
+  "crp"
+]);
+var segmentOwnerCache;
+function segmentOwnerMap() {
+  if (segmentOwnerCache) return segmentOwnerCache;
+  const map = /* @__PURE__ */ new Map();
+  for (const entry of BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP) {
+    for (const segment of entry.segments) {
+      map.set(segment, entry.code);
+    }
+  }
+  segmentOwnerCache = map;
+  return map;
+}
+function getBuiltinSegmentOwnerEdge(segment) {
+  return segmentOwnerMap().get(segment);
+}
 function resolveEnabledModuleCodesEdge(env = process.env) {
-  const profile = env["UMBRACULUM_MODULE_PROFILE"]?.trim() ?? "minimal";
+  const raw = env["UMBRACULUM_MODULE_PROFILE"]?.trim();
+  const profile = raw && raw.length > 0 ? raw : "platform";
   if (profile === "reference") {
-    return /* @__PURE__ */ new Set(["brewery", "automation", "pim", "mrp", "crp"]);
+    return new Set(REFERENCE_ENABLED);
   }
   if (profile === "platform") {
-    return /* @__PURE__ */ new Set(["automation", "pim", "mrp", "crp"]);
+    return new Set(PLATFORM_ENABLED);
+  }
+  if (profile === "minimal") {
+    return /* @__PURE__ */ new Set();
   }
   return /* @__PURE__ */ new Set();
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
+  getBuiltinSegmentOwnerEdge,
   resolveEnabledModuleCodesEdge
 });

@@ -1,7 +1,8 @@
 import {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
+  getBuiltinSegmentOwnerEdge,
   resolveEnabledModuleCodesEdge
-} from "./chunk-HHWYVHEM.js";
+} from "./chunk-NXLQFA6H.js";
 import {
   AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
   AI_PROMPT_MODULE_MAX_LENGTH,
@@ -474,6 +475,7 @@ export {
   composeModuleTierLimitSlices,
   composeWebSharedLayoutNavItems,
   fromParser,
+  getBuiltinSegmentOwnerEdge,
   getRegisteredDocumentTemplate,
   getSegmentOwner,
   isCanonicalModuleCode,

@@ -5,5 +5,6 @@
 
 export {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
+  getBuiltinSegmentOwnerEdge,
   resolveEnabledModuleCodesEdge,
 } from "./edgeEnabledModules.js";

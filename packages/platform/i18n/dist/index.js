@@ -247,7 +247,10 @@ var en_default = {
     changeLanguage: "Change language",
     toggleLanguage: "Toggle language",
     dilutionDiagramLabel: "Dilution 1:100 diagram",
-    imageUnavailable: "Image unavailable"
+    imageUnavailable: "Image unavailable",
+    httpNotFoundTitle: "Page not found",
+    httpNotFoundBody: "This page does not exist, or it is not available in this installation.",
+    httpNotFoundHome: "Back to home"
   },
   locales: {
     en: "English",
@@ -1076,7 +1079,10 @@ var it_default = {
     changeLanguage: "Cambia lingua",
     toggleLanguage: "Cambia lingua",
     dilutionDiagramLabel: "Diagramma diluizione 1:100",
-    imageUnavailable: "Immagine non disponibile"
+    imageUnavailable: "Immagine non disponibile",
+    httpNotFoundTitle: "Pagina non trovata",
+    httpNotFoundBody: "Questa pagina non esiste, oppure non \xE8 disponibile in questa installazione.",
+    httpNotFoundHome: "Torna alla home"
   },
   locales: {
     en: "Inglese",
