@@ -42,6 +42,8 @@ python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base or
 
 WIP only (not push proof): `./scripts/ci-parity-check.sh run`. Full detail: [`docs/CI-PARITY.md`](CI-PARITY.md) § Pre-push commands reference. Agents: skill `path-aware-pre-push`.
 
+**Lint cgroup floor:** local ci-parity **`lint`** needs Docker memory **≥ 7 GiB (`7168m`)** — do not set `CI_PARITY_DOCKER_MEMORY=6g` (`exit: 137`). See [`docs/CI-PARITY.md`](CI-PARITY.md) § Lint job memory floor and [`docs/LINTING.md`](LINTING.md) § Local CI-parity lint.
+
 Lower-level drivers:
 
 ```bash

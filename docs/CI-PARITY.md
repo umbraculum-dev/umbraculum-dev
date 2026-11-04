@@ -94,7 +94,7 @@ Unbounded `--parallel` + `--max-old-space-size=6144` × N containers has OOMed d
 
 | Cap | Default | Override |
 |-----|---------|----------|
-| Docker `--memory` / `--memory-swap` | `7168m` | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
+| Docker `--memory` / `--memory-swap` | `7168m` (**≈ 7 GiB — lint floor**) | `CI_PARITY_DOCKER_MEMORY` or manifest `docker.resources.memory` |
 | Docker `--cpus` | `2` | `CI_PARITY_DOCKER_CPUS` or `docker.resources.cpus` |
 | Concurrent job containers | `1` | `--max-parallel <n>`, `CI_PARITY_MAX_PARALLEL`, or manifest `docker.resources.maxParallel` |
 | `NODE_OPTIONS` heap | ≤ memory−512 MiB (manifest may request more; never raised above cgroup) | manifest `runtime.nodeOptions` |
@@ -104,9 +104,38 @@ Requires `@umbraculum/ci-parity` **≥ 1.0.14** (sibling toolset `dist/cli.js` o
 
 **maxParallel precedence:** CLI `--max-parallel` → env `CI_PARITY_MAX_PARALLEL` → manifest `docker.resources.maxParallel` → laptop default `1` (or CI default `8` under `GITHUB_ACTIONS`/`CI`).
 
+### Lint job memory floor (do not lower below 7 GiB)
+
+The **`lint`** ci-parity job (`npm ci` + `build:packages` + type-aware eslint) needs a Docker cgroup of **at least `7168m` / `7g`**. That is the repo default in [`.umbraculum/ci-parity.json`](../.umbraculum/ci-parity.json) (`docker.resources.memory`).
+
+| Layer | Budget | Notes |
+|-------|--------|--------|
+| Node heap (`NODE_OPTIONS=--max-old-space-size=6144`) | 6 GiB | Same as GHA `web-lint` — see [`docs/LINTING.md`](LINTING.md) § CI heap budget |
+| Docker `--memory` | **≥ 7 GiB (`7168m`)** | Heap + npm/eslint/OS overhead inside the container |
+
+**Do not set `CI_PARITY_DOCKER_MEMORY=6g` (or anything under `7168m`) to “save RAM”.** That clamps the cgroup below the heap request; the kernel kills the container mid-lint.
+
+| Symptom | Meaning |
+|---------|---------|
+| `lint` / job line shows `exit: 137` | SIGKILL — almost always Docker OOM under a too-small `--memory` |
+| Summary `lint=FAIL` while `docs-readmes` / `typecheck` are OK | Cap too low for lint specifically; raise memory, do not chase eslint findings |
+| Host still has free RAM | Irrelevant — the **container** cgroup is what kills the process |
+
+```bash
+# Correct local floors (match the manifest; serial is the laptop default)
+npm run verify:pre-push
+# or explicit:
+CI_PARITY_DOCKER_MEMORY=7g CI_PARITY_MAX_PARALLEL=1 npm run verify:pre-push
+
+# Lint-only archive replay (same floor):
+CI_PARITY_DOCKER_MEMORY=7g ./scripts/ci-parity-check.sh --archive run --jobs lint
+```
+
+If the host cannot spare ~7 GiB for one container (plus IDE/browser), free other stacks first — do **not** lower the lint cgroup. See [`docs/LINTING.md`](LINTING.md) § Local CI-parity lint.
+
 ### Why default concurrency is 1 (not 2)
 
-Measured on this monorepo: a single `lint` job (`npm ci` + `build:packages` + eslint) needs about **7 GiB** inside the cgroup. Two of those at once ≈ 14 GiB Docker pressure — fine on 32 GiB hosts, hostile to 16 GiB junior laptops once the IDE/browser are counted. So the **safe default is `maxParallel: 1` + `7168m`**; parallelism is an explicit opt-in.
+Measured on this monorepo: a single `lint` job needs about **7 GiB** inside the cgroup. Two of those at once ≈ 14 GiB Docker pressure — fine on 32 GiB hosts, hostile to 16 GiB junior laptops once the IDE/browser are counted. So the **safe default is `maxParallel: 1` + `7168m`**; parallelism is an explicit opt-in.
 
 ### Stronger laptop (opt-in more parallelism)
 
@@ -121,7 +150,7 @@ If you know the machine has headroom (32 GiB+ RAM, not overlapping heavy nativ
 CI_PARITY_MAX_PARALLEL=2 npm run verify:pre-push
 ```
 
-**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (default 1 × 7168 m ≈ 7 GiB; opt-in 2 × 7168 m ≈ 14 GiB). Do **not** lower `runtime.nodeOptions` below what eslint/`npm ci` need — the cgroup clamp is the safety valve; a 2048 MiB heap aborts lint here. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
+**Rule of thumb:** keep `maxParallel × container memory` well under host RAM minus OS/IDE/browser (default 1 × 7168 m ≈ 7 GiB; opt-in 2 × 7168 m ≈ 14 GiB). Do **not** lower `runtime.nodeOptions` below what eslint/`npm ci` need, and do **not** set `CI_PARITY_DOCKER_MEMORY` below **`7168m` / `7g`** — a 6 g cgroup OOMs lint with `exit: 137` even when the host looks fine. `CI_PARITY_NO_RESOURCE_LIMITS=1` removes caps entirely and is **not** the recommended path.
 
 ## Pre-push commands reference (contributors and agents)
 

@@ -77,6 +77,8 @@ npm run validate:gha-triggers        # when editing workflow paths: or trigger m
 
 Inspect resolved jobs: `python3 scripts/lib/verify-slice.py --repo-root . resolve-gha-triggers --base origin/master`. WIP iteration only: `./scripts/ci-parity-check.sh run` (not push proof). **Do not** use `./scripts/ci-parity-check.sh --archive run` without `--jobs` as pre-push — use `npm run verify:pre-push`. See [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § Pre-push commands reference and [`docs/VERIFICATION-TIERS.md`](docs/VERIFICATION-TIERS.md).
 
+**Lint memory floor (local):** the ci-parity **`lint`** job needs a Docker cgroup of **≥ 7 GiB (`7168m`)** — the repo default. Do **not** set `CI_PARITY_DOCKER_MEMORY=6g` (that OOMs lint with `exit: 137`). Details: [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § Lint job memory floor and [`docs/LINTING.md`](docs/LINTING.md) § Local CI-parity lint.
+
 ## Policies (apply by default)
 
 - **Node / npm container-only.** Do not run `node` / `npm` / `npx` on the host for project commands. Run inside the `api` or `web` containers via `docker compose exec -T <service> ...`. See the `node-npm-container-only` skill.
