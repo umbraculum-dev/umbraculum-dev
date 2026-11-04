@@ -6,5 +6,7 @@
 export {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
   getBuiltinSegmentOwnerEdge,
+  isModuleOwnedPathDenied,
   resolveEnabledModuleCodesEdge,
+  type ModuleOwnedPathGateInput,
 } from "./edgeEnabledModules.js";

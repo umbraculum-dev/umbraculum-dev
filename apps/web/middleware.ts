@@ -1,7 +1,9 @@
+import {
+  isModuleOwnedPathDenied,
+} from "@umbraculum/module-sdk/edge";
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, locales } from "./src/i18n/routing";
-import { isModuleOwnedPathDenied } from "./src/middleware/moduleProfilePathGate";
 
 const intlMiddleware = createMiddleware({
   locales,

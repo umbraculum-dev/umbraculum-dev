@@ -1,8 +1,9 @@
 import {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
   getBuiltinSegmentOwnerEdge,
+  isModuleOwnedPathDenied,
   resolveEnabledModuleCodesEdge
-} from "./chunk-NXLQFA6H.js";
+} from "./chunk-QV3HV36Y.js";
 import {
   AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
   AI_PROMPT_MODULE_MAX_LENGTH,
@@ -480,6 +481,7 @@ export {
   getSegmentOwner,
   isCanonicalModuleCode,
   isModuleEnabled,
+  isModuleOwnedPathDenied,
   isVerticalInstalled,
   listOwnedUrlSegments,
   listRegisteredAddonCodes,

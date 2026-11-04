@@ -65,6 +65,7 @@ __export(index_exports, {
   getSegmentOwner: () => getSegmentOwner,
   isCanonicalModuleCode: () => isCanonicalModuleCode,
   isModuleEnabled: () => isModuleEnabled,
+  isModuleOwnedPathDenied: () => isModuleOwnedPathDenied,
   isVerticalInstalled: () => isVerticalInstalled,
   listOwnedUrlSegments: () => listOwnedUrlSegments,
   listRegisteredAddonCodes: () => listRegisteredAddonCodes,
@@ -980,6 +981,21 @@ function resolveEnabledModuleCodesEdge(env = process.env) {
   }
   return /* @__PURE__ */ new Set();
 }
+function isModuleOwnedPathDenied(input) {
+  const { pathname, locales, env = process.env } = input;
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length === 0) return false;
+  let segmentIndex = 0;
+  if (locales.includes(parts[0])) {
+    segmentIndex = 1;
+  }
+  const segment = parts[segmentIndex];
+  if (!segment) return false;
+  const owner = getBuiltinSegmentOwnerEdge(segment);
+  if (!owner) return false;
+  const enabled = resolveEnabledModuleCodesEdge(env);
+  return !enabled.has(owner);
+}
 
 // src/composeWebSharedLayoutNav.ts
 function composeWebSharedLayoutNavItems() {
@@ -1073,6 +1089,7 @@ function resolveWebSharedLayoutNotice(env = process.env) {
   getSegmentOwner,
   isCanonicalModuleCode,
   isModuleEnabled,
+  isModuleOwnedPathDenied,
   isVerticalInstalled,
   listOwnedUrlSegments,
   listRegisteredAddonCodes,

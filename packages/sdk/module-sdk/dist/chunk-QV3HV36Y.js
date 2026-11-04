@@ -64,9 +64,25 @@ function resolveEnabledModuleCodesEdge(env = process.env) {
   }
   return /* @__PURE__ */ new Set();
 }
+function isModuleOwnedPathDenied(input) {
+  const { pathname, locales, env = process.env } = input;
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length === 0) return false;
+  let segmentIndex = 0;
+  if (locales.includes(parts[0])) {
+    segmentIndex = 1;
+  }
+  const segment = parts[segmentIndex];
+  if (!segment) return false;
+  const owner = getBuiltinSegmentOwnerEdge(segment);
+  if (!owner) return false;
+  const enabled = resolveEnabledModuleCodesEdge(env);
+  return !enabled.has(owner);
+}
 
 export {
   BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP,
   getBuiltinSegmentOwnerEdge,
-  resolveEnabledModuleCodesEdge
+  resolveEnabledModuleCodesEdge,
+  isModuleOwnedPathDenied
 };

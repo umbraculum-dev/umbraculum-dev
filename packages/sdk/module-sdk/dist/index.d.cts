@@ -2,7 +2,7 @@ import { AiToolRegistry } from '@umbraculum/ai-tool-sdk';
 import { ModuleNavLabelKey } from '@umbraculum/i18n-keys';
 export { ModuleNavLabelKey } from '@umbraculum/i18n-keys';
 export { NativeRouteId, RegisterNativeModuleOptions, RegisteredNativeModuleSnapshot, aggregateNativeAvailableRouteIds, clearNativeModuleRegistryForTests, listRegisteredNativeModules, registerNativeModule } from './native.cjs';
-export { BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP, getBuiltinSegmentOwnerEdge, resolveEnabledModuleCodesEdge } from './edge.cjs';
+export { BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP, ModuleOwnedPathGateInput, getBuiltinSegmentOwnerEdge, isModuleOwnedPathDenied, resolveEnabledModuleCodesEdge } from './edge.cjs';
 
 /**
  * Reserved canonical module codes per RFC-0001 Decision B.
