@@ -110,10 +110,11 @@ The **`lint`** ci-parity job (`npm ci` + `build:packages` + type-aware eslint) n
 
 | Layer | Budget | Notes |
 |-------|--------|--------|
-| Node heap (`NODE_OPTIONS=--max-old-space-size=6144`) | 6 GiB | Same as GHA `web-lint` — see [`docs/LINTING.md`](LINTING.md) § CI heap budget |
-| Docker `--memory` | **≥ 7 GiB (`7168m`)** | Heap + npm/eslint/OS overhead inside the container |
+| Node heap (manifest request) | 6144 MiB | Same as GHA `web-lint` — see [`docs/LINTING.md`](LINTING.md) § CI heap budget |
+| Effective heap under a custom cgroup | ≤ memory−512 MiB | `@umbraculum/ci-parity` **never raises** heap above the cgroup; a `6g` cap → ~5632 MiB heap, not uncapped 6144 |
+| Docker `--memory` | **≥ 7 GiB (`7168m`)** | Measured lint working set (eslint + npm/build + OS), not “6144 + a little” |
 
-**Do not set `CI_PARITY_DOCKER_MEMORY=6g` (or anything under `7168m`) to “save RAM”.** That clamps the cgroup below the heap request; the kernel kills the container mid-lint.
+**Do not set `CI_PARITY_DOCKER_MEMORY=6g` (or anything under `7168m`) to “save RAM”.** ci-parity will shrink the Node heap to fit the smaller cgroup, but lint’s **total RSS** still needs about **7 GiB** — the kernel OOM-kills the container mid-lint (`exit: 137`).
 
 | Symptom | Meaning |
 |---------|---------|

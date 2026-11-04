@@ -895,8 +895,9 @@ When you run the **same lint gate CI uses** via ci-parity / `verify:pre-push` (n
 
 | Setting | Required floor | Why |
 |---------|----------------|-----|
-| Node heap (`NODE_OPTIONS`) | 6144 MiB | Type-aware eslint project graph |
-| Docker `--memory` / `CI_PARITY_DOCKER_MEMORY` | **`7168m` or `7g`** | Heap + container overhead |
+| Node heap (manifest / GHA request) | 6144 MiB | Type-aware eslint project graph |
+| Effective heap if you lower Docker memory | ≤ memory−512 MiB | ci-parity clamps heap to the cgroup; `6g` → ~5632 MiB heap |
+| Docker `--memory` / `CI_PARITY_DOCKER_MEMORY` | **`7168m` or `7g`** | Measured lint working set ≈ 7 GiB (not “match the 6144 heap figure”) |
 
 Repo default: [`.umbraculum/ci-parity.json`](../.umbraculum/ci-parity.json) `docker.resources.memory` = `7168m`, `maxParallel` = `1`. Full table + overrides: [`docs/CI-PARITY.md`](CI-PARITY.md) § Resource safety / Lint job memory floor.
 
@@ -910,7 +911,7 @@ npm run verify:pre-push
 CI_PARITY_DOCKER_MEMORY=7g CI_PARITY_MAX_PARALLEL=1 npm run verify:pre-push
 ```
 
-**Do not use `CI_PARITY_DOCKER_MEMORY=6g`.** That matches the *heap* number and looks plausible, but the cgroup then cannot hold heap + overhead → container killed mid-lint (`exit: 137`), often with `lint=FAIL` while lighter jobs still pass. Free host RAM (stop other compose stacks) instead of lowering the lint cgroup.
+**Do not use `CI_PARITY_DOCKER_MEMORY=6g`.** That matches the *heap* number and looks plausible, but ci-parity already shrinks the heap to fit — lint still needs ~7 GiB **RSS**, so the cgroup OOM-kills the job (`exit: 137`), often with `lint=FAIL` while lighter jobs still pass. Free host RAM (stop other compose stacks) instead of lowering the lint cgroup.
 
 ---
 
