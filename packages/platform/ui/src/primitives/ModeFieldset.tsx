@@ -43,7 +43,7 @@ export function ModeFieldset<T extends string>(props: {
                   id={id}
                   value={o.value}
                   size="md"
-                  borderColor="border-color"
+                  borderColor="borderColor"
                 >
                   <RadioGroup.Indicator
                     width={10}

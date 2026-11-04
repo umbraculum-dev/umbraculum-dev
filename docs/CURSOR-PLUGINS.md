@@ -30,7 +30,11 @@ with the apparatus self-check.
 > see [Required plugin pack](#required-plugin-pack). Use the
 > [`workspaceOpen` hook](https://cursor.com/docs/hooks#workspaceopen) +
 > [WORKSPACE-PLUGIN-LOADING.md](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)
-> — not global install.
+> — not global install. Do **not** enable OpenPLC or Magento toolset plugins here.
+
+**Stack the apparatus must match (umbraculum-dev 1.0.0 testing banner):** Tamagui **3.2.0**, Expo SDK **58**, React ABI **19.3.0**, Zod v4, Node **≥22.13** / ci-parity image **`node:22-slim`**. Plugin patch versions are independent (common / node-react / platform need not share the same `0.0.x`); presence of the three witnesses matters more than matching patch numbers.
+
+**Optional per-developer local docs:** after the three plugins load, ask the agent to create gitignored repo-root `DEVELOPMENT-LOCAL.md` (`generate-development-local` skill) so compose service names, base URL, and PR base are filled once per machine/worktree.
 
 ## Why the apparatus matters (one paragraph)
 
@@ -469,7 +473,7 @@ declaring done; T2-PR uses **`path-aware-pre-push`** (default:
 triggered; else `api-integration-tests-pre-push`. Rule `76-verification-tiers-gate.mdc`.
 Repo doc: [`docs/VERIFICATION-TIERS.md`](../docs/VERIFICATION-TIERS.md).
 
-**Docs-site rules (umbraculum-dev):** `73-website-static-build-before-preview.mdc` (rebuild brochure `dist/` before preview); `74-docusaurus-swizzle-over-css-fights.mdc` (swizzle theme components instead of fighting `custom.css` — see [`docs-site/README.md`](../docs-site/README.md) § Theme customization).
+**Docs-site rules (umbraculum-dev):** `73-website-static-build-before-preview.mdc` (rebuild brochure `dist/` before preview); `74-docusaurus-swizzle-over-css-fights.mdc` (swizzle theme components instead of fighting `custom.css` — see [`docs-site/README.md`](../docs-site/README.md) § Theme customization); `81-docs-site-cloudflare-node-lockstep.mdc` (Cloudflare Workers Builds `NODE_VERSION` must stay lockstep with monorepo `engines.node` — dashboard is operator-only).
 
 ### `umbraculum-platform-tsjs-cursor-assistant`
 

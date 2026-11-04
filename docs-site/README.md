@@ -109,8 +109,10 @@ Cloudflare **Workers Builds** — second Worker project (after brochure is green
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production deploy | `npx wrangler versions upload --config docs-site/wrangler.toml` |
 | Path | `/` (repo root) |
-| `NODE_VERSION` | `20.19.4` (Cloudflare env var) |
+| `NODE_VERSION` | **`22.13.0`** (Cloudflare **Variables and secrets** — must match monorepo `engines.node` / GHA `docs-site-build`; **dashboard is operator-only**) |
 | Preview | https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev |
+
+**Node lockstep:** root `package.json` requires Node `>=22.13.0`; CI uses `node-version: "22"`. Cloudflare does not inherit that — if dashboard `NODE_VERSION` lags (e.g. still `20.x`), Workers Builds can fail native bindings (`@swc/html`) while archive/`docs-site-build` stays green. After any monorepo Node bump: update this table + [`public-alpha-cloudflare-pages-runbook.md`](../docs/design/public-alpha-cloudflare-pages-runbook.md) §3–§4, then have a maintainer set the dashboard var and **Retry deployment**. Agent guardrail: toolset `81-docs-site-cloudflare-node-lockstep.mdc`.
 
 **Post-flip (2026-06-27):** `noIndex: false` in [`docusaurus.config.ts`](docusaurus.config.ts); [`static/robots.txt`](static/robots.txt) allows crawling. Algolia DocSearch on production when Cloudflare **`DOCSEARCH_*`** env is set ([`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md) §4).
 

@@ -112,7 +112,7 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
         backgroundColor="background"
         borderRadius="3"
         borderWidth={1}
-        borderColor="border-color"
+        borderColor="borderColor"
         aria-live={"polite"}
       >
         {messages.length === 0 ? (
@@ -140,7 +140,7 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
                   gap="2"
                   padding="2"
                   borderWidth={1}
-                  borderColor="border-color"
+                  borderColor="borderColor"
                   borderRadius="2"
                 >
                   <SizableText size="2">{p.summary}</SizableText>

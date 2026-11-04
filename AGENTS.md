@@ -367,13 +367,40 @@ If the operator explicitly approves a debug stash: use a descriptive message,
 `git stash pop` in the **same session**, and tell the operator exactly what
 was stashed if the session ends before pop.
 
+## Do not push to `master`; ask before any push (hard)
+
+Toolset rule `40-workflow-and-navigation.mdc` (named confirm for sensitive
+branches) is **necessary but not sufficient** here.
+
+1. **Never** `git push origin master` (or fast-forward local `master` onto
+   `origin/master`). Default: **feature branch + PR into `master`**. Plan text
+   (“push/redeploy”, “complete todos”) is **not** permission — the operator must
+   name **`master`** and accept bypassing the PR path. Incident **2026-11-04**:
+   direct `master` docs push hid failures that a PR check suite would surface.
+   Do not “fix” with a revert unless asked.
+
+2. **Before any push** (feature branch included), **stop and ask** which local
+   gates to run — at least:
+   - `npm run verify:pre-push` (T2-PR / path-aware ci-parity — **default yes**)
+   - `typecheck` / `lint` / `docs-readmes` if the operator wants a named subset
+   - API vitest / expo-doctor / Tamagui CLI / lockfile checks when the change
+     surface warrants them (see sections below)
+   Do **not** push on a bare “push” / “push the branch” alone when T2 has not
+   been green on this commit, and do **not** skip asking “run `verify:pre-push`?”
+   to save time. GHA discovering `docs-readmes` / lockfile sync failures is the
+   anti-pattern this gate exists to kill (**2026-11-04** feature-branch push).
+
+3. After the operator answers, **you** run the agreed gates (container /
+   `./scripts/ci-parity-check.sh` — not host npm). Push only when those are
+   green, or when the operator **explicitly waives** a named gate.
+
 ## Pre-push CI parity (agent-owned — do not delegate to the operator)
 
-When **you** changed TypeScript, ESLint surface, module READMEs, lockfiles, or
-CI workflows and are about to **commit and push**, **you** run the parity gate —
+After the operator confirms the gate set in § “Do not push to `master`; ask
+before any push” (or waives named jobs), **you** run the parity sequence —
 not the human contributor. Do not end a session with "before you push, run …".
 
-**Mandatory sequence before push:**
+**Mandatory sequence before push** (once push + gates are authorized):
 
 1. **Commit** all intended changes (ci-parity archive mode tests **committed**
    tree only — uncommitted fixes can hide broken `HEAD`).

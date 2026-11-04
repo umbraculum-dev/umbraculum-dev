@@ -9,7 +9,7 @@ export function AiUsageSummaryCard({ label, value }: { label: string; value: str
       padding="3"
       borderRadius="3"
       borderWidth={1}
-      borderColor="border-color"
+      borderColor="borderColor"
       minWidth={140}
     >
       <SizableText size="2" theme="alt2">

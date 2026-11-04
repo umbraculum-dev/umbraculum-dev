@@ -37,8 +37,9 @@ Brochure and docs site share announcement copy from **`umbraculum-brochure`** (S
 ## Docs site (`docs-site`)
 
 - **Stack:** Docusaurus 3.10.x ([RFC-0005](rfcs/0005-docs-site.md)).
-- **CI:** [`.github/workflows/docs-site-build.yml`](../.github/workflows/docs-site-build.yml).
+- **CI:** [`.github/workflows/docs-site-build.yml`](../.github/workflows/docs-site-build.yml) (`node-version: "22"`).
 - **Search:** **Algolia DocSearch** on production when Cloudflare build env **`DOCSEARCH_*`** is set ([`design/docsearch-application-draft.md`](design/docsearch-application-draft.md) §4); lunr fallback in CI/local without env. Crawler **`umbraculum-docs`** — index refresh **~monthly, day 12**.
+- **Node / Cloudflare:** Workers Builds **`NODE_VERSION`** for `umbraculum-dev-docs-docusaurus` must stay **`22.13.0`** (or the current monorepo `engines.node` floor). Dashboard change is **maintainer-only**; see runbook §4 and toolset rule `81-docs-site-cloudflare-node-lockstep.mdc`.
 
 ---
 
@@ -48,6 +49,7 @@ Canonical runbook: [`design/public-alpha-cloudflare-pages-runbook.md`](design/pu
 
 - Two Cloudflare Worker projects (brochure repo + docs in this monorepo), separate Wrangler configs.
 - **No deploy secrets in GitHub Actions** — Cloudflare builds on push after repos are connected.
+- **Docs `NODE_VERSION` lockstep** with monorepo engines (not automatic — dashboard var). Brochure Worker may stay on Node 20 until that sister repo requires otherwise.
 - GitHub Pages is a documented fallback only; not the canonical path.
 
 ---

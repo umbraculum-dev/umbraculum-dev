@@ -166,7 +166,7 @@ If the bug persists past, say, two Tamagui major/minor bumps after the original 
 
 ##### RadioGroup: `native={true}` swallows `onValueChange` on web
 
-**As of `@tamagui/radio-group@2.2.0`:** "native mode" wrapped a real `<input type="radio">` for accessibility, but the change event from that native input did **not** propagate back to the group's `onValueChange` callback. The visible bullet moved on click (because the native input toggled its own `checked` attribute), but React state never flipped — so any conditional UI keyed on the selected value (button labels, dependent inputs) stayed frozen.
+**First confirmed on `@tamagui/radio-group@2.2.0` (historical):** "native mode" wrapped a real `<input type="radio">` for accessibility, but the change event from that native input did **not** propagate back to the group's `onValueChange` callback. The visible bullet moved on click (because the native input toggled its own `checked` attribute), but React state never flipped — so any conditional UI keyed on the selected value (button labels, dependent inputs) stayed frozen. Treat that report as a **baseline**, not proof the pinned `@tamagui/radio-group@3.2.0` still behaves the same.
 
 We hit this in `packages/platform/ui/src/primitives/ModeFieldset.tsx`, which used to set `native={isWeb}`. Symptom on the mash/sparge/boil water pages: clicking "Manual acid amount" left the submit button reading "Calculate & save snapshot" and never revealed the "Acid added" input. Fixed by dropping `native={true}` (kept the Tamagui-native render path; ARIA + label wiring is unchanged). Covered by the regression test `apps/web/e2e/verticals/brewery/water-calc.spec.ts` → "mash acidification mode radio actually flips React state on web".
 
