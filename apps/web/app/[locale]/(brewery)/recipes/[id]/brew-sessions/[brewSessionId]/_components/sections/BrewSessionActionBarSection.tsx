@@ -128,30 +128,30 @@ export function BrewSessionActionBarSection({ model }: { model: BrewSessionDetai
     <>
       <PageWideActionBar>
               <Button
-                onPress={() => void onSaveSteps()}
-                disabled={!canCall || savingSteps}
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
+          onPress={() => void onSaveSteps()}
+          disabled={!canCall || savingSteps}
+          size="md"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="body"
+        >
                 {savingSteps ? t("saving") : t("saveStepsButton")}
               </Button>
               <Button
-                onPress={() => void refresh()}
-                disabled={!canCall || loading}
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
+          onPress={() => void refresh()}
+          disabled={!canCall || loading}
+          size="md"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="body"
+        >
                 {t("refresh")}
               </Button>
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" flex={1}>
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" flex={1}>
                 {t("noteSaveSteps")}
               </SizableText>
             </PageWideActionBar>

@@ -86,10 +86,10 @@ export function SelectField({
       <View>
         <Button
           onPress={() => setOpen(true)}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
           disabled={disabled}
           accessibilityLabel={ariaLabel}
         >
@@ -101,7 +101,7 @@ export function SelectField({
             onPress={() => setOpen(false)}
           >
             <Pressable onPress={() => null}>
-              <Card gap="$2" background="$background" borderWidth={1} borderColor="$borderColor" padding="$3">
+              <Card gap="2" background="background" borderWidth={1} borderColor="borderColor" padding="3">
                 {ariaLabel ? <Text fontSize={16} fontWeight="700">{ariaLabel}</Text> : null}
                 <ScrollView style={{ maxHeight: 320 }}>
                   <View style={{ gap: 8 }}>
@@ -112,10 +112,10 @@ export function SelectField({
                           onValueChange(opt.value);
                           setOpen(false);
                         }}
-                        size="$3"
-                        background={opt.value === value ? "$color4" : "$background"}
+                        size="md"
+                        background={opt.value === value ? "color4" : "background"}
                         borderWidth={1}
-                        borderColor="$borderColor"
+                        borderColor="borderColor"
                       >
                         <Text fontSize={12}>{opt.label}</Text>
                       </Button>
@@ -123,7 +123,7 @@ export function SelectField({
                   </View>
                 </ScrollView>
                 {closeLabel ? (
-                  <Button onPress={() => setOpen(false)} size="$3" chromeless>
+                  <Button onPress={() => setOpen(false)} size="md" variant="quiet">
                     <Text>{closeLabel}</Text>
                   </Button>
                 ) : null}

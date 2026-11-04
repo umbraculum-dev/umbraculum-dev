@@ -17,9 +17,9 @@ export function EquipmentEditMashFields(props: {
   return (
     <fieldset className="brew-fieldset">
       <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-mash-vol">
               {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -29,18 +29,18 @@ export function EquipmentEditMashFields(props: {
               inputMode="decimal"
               value={editDraft["mashVolumeLiters"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, mashVolumeLiters: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-mash-eff">
               {t("mashEfficiencyPercentLabel")}
             </RecipeEditFieldLabel>
@@ -50,18 +50,18 @@ export function EquipmentEditMashFields(props: {
               inputMode="decimal"
               value={editDraft["mashEfficiencyPercent"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, mashEfficiencyPercent: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-mash-losses">
               {t("mashLossesLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -71,18 +71,18 @@ export function EquipmentEditMashFields(props: {
               inputMode="decimal"
               value={editDraft["mashLossesLiters"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, mashLossesLiters: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-thickness">
               {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
             </RecipeEditFieldLabel>
@@ -92,18 +92,18 @@ export function EquipmentEditMashFields(props: {
               inputMode="decimal"
               value={editDraft["mashThicknessLPerKg"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, mashThicknessLPerKg: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-grain-abs">
               {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
             </RecipeEditFieldLabel>
@@ -113,18 +113,18 @@ export function EquipmentEditMashFields(props: {
               inputMode="decimal"
               value={editDraft["mashGrainAbsorptionLPerKg"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, mashGrainAbsorptionLPerKg: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-edit-water-leftover">
               {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -134,13 +134,13 @@ export function EquipmentEditMashFields(props: {
               inputMode="decimal"
               value={editDraft["mashWaterLeftoverLiters"] ?? ""}
               onChangeText={(v) => setEditDraft((d) => ({ ...d, mashWaterLeftoverLiters: v }))}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

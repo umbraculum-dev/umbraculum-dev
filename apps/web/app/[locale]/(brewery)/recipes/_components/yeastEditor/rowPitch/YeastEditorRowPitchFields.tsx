@@ -29,7 +29,7 @@ export function YeastEditorRowPitchFields(props: YeastEditorRowPitchProps) {
 
   return (
     <>
-      <YStack gap="$1" minW={140}>
+      <YStack gap="1" minW={140}>
         <RecipeEditFieldLabel htmlFor={`yeast-format-${r.id}`}>
           {t("yeastFormatLabel")}
         </RecipeEditFieldLabel>
@@ -50,11 +50,11 @@ export function YeastEditorRowPitchFields(props: YeastEditorRowPitchProps) {
           placeholder="—"
         />
       </YStack>
-      <YStack gap="$1" minW={220}>
+      <YStack gap="1" minW={220}>
         <RecipeEditFieldLabel htmlFor={`yeast-pitch-rate-${r.id}`}>
           {t("yeastPitchRateLabel")}
           {!r.format || (r.format !== "dry" && r.format !== "liquid" && r.format !== "slurry") ? (
-            <SizableText size="$1" color="var(--text-muted)" fontFamily="$body" ml="$1" display="inline">
+            <SizableText size="1" color="var(--text-muted)" fontFamily="body" ml="1" display="inline">
               ({t("yeastPitchRateRequiresFormat")})
             </SizableText>
           ) : null}
@@ -77,8 +77,8 @@ export function YeastEditorRowPitchFields(props: YeastEditorRowPitchProps) {
           <RecipeEditReadOnlyValue>—</RecipeEditReadOnlyValue>
         )}
       </YStack>
-      <YStack gap="$1" minW={140}>
-        <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+      <YStack gap="1" minW={140}>
+        <XStack gap="2" alignItems="center" flexWrap="nowrap">
           <RecipeEditFieldLabel title={t("yeastEstimatedCellsTooltip")}>
             {t("yeastEstimatedCellsLabel")}
           </RecipeEditFieldLabel>
@@ -108,7 +108,7 @@ export function YeastEditorRowPitchFields(props: YeastEditorRowPitchProps) {
         </RecipeEditReadOnlyValue>
       </YStack>
       {r.format === "liquid" || r.format === "slurry" ? (
-        <YStack gap="$1" minW={140}>
+        <YStack gap="1" minW={140}>
           <RecipeEditFieldLabel htmlFor={`yeast-cells-per-l-${r.id}`}>
             {t("yeastCellsPerLLabel")}
           </RecipeEditFieldLabel>
@@ -120,62 +120,62 @@ export function YeastEditorRowPitchFields(props: YeastEditorRowPitchProps) {
             </RecipeEditReadOnlyValue>
           ) : (
             <Input
-              id={`yeast-cells-per-l-${r.id}`}
-              value={
-                r.cellsPerLOverride != null && Number.isFinite(r.cellsPerLOverride)
-                  ? String(r.cellsPerLOverride)
-                  : r.format === "liquid"
-                    ? String(CELLS_PER_L_LIQUID)
-                    : String(CELLS_PER_L_SLURRY)
-              }
-              onChangeText={(text) => {
-                const trimmed = text.trim();
-                const parsed = trimmed === "" ? null : Number(trimmed);
-                onUpdateRow(r.id, {
-                  cellsPerLOverride:
-                    parsed != null && Number.isFinite(parsed) && parsed > 0 ? parsed : null,
-                });
-              }}
-              keyboardType="decimal-pad"
-              size="$3"
-              w={100}
-              bg="var(--surface)"
-              borderWidth={1}
-              borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
-            />
+                id={`yeast-cells-per-l-${r.id}`}
+                value={
+                              r.cellsPerLOverride != null && Number.isFinite(r.cellsPerLOverride)
+                                ? String(r.cellsPerLOverride)
+                                : r.format === "liquid"
+                                  ? String(CELLS_PER_L_LIQUID)
+                                  : String(CELLS_PER_L_SLURRY)
+                            }
+                onChangeText={(text) => {
+                              const trimmed = text.trim();
+                              const parsed = trimmed === "" ? null : Number(trimmed);
+                              onUpdateRow(r.id, {
+                                cellsPerLOverride:
+                                  parsed != null && Number.isFinite(parsed) && parsed > 0 ? parsed : null,
+                              });
+                            }}
+                keyboardType="decimal-pad"
+                size="md"
+                w={100}
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
           )}
         </YStack>
       ) : r.format === "dry" ? (
-        <YStack gap="$1" minW={140}>
+        <YStack gap="1" minW={140}>
           <RecipeEditFieldLabel htmlFor={`yeast-cells-per-kg-${r.id}`}>
             {t("yeastCellsPerKGLabel")}
           </RecipeEditFieldLabel>
           <Input
-            id={`yeast-cells-per-kg-${r.id}`}
-            value={
-              r.cellsPerKGOverride != null && Number.isFinite(r.cellsPerKGOverride)
-                ? String(r.cellsPerKGOverride)
-                : String(CELLS_PER_KG_DRY)
-            }
-            onChangeText={(text) => {
-              const trimmed = text.trim();
-              const parsed = trimmed === "" ? null : Number(trimmed);
-              onUpdateRow(r.id, {
-                cellsPerKGOverride:
-                  parsed != null && Number.isFinite(parsed) && parsed > 0 ? parsed : null,
-              });
-            }}
-            keyboardType="decimal-pad"
-            size="$3"
-            w={100}
-            bg="var(--surface)"
-            borderWidth={1}
-            borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
-          />
+              id={`yeast-cells-per-kg-${r.id}`}
+              value={
+                          r.cellsPerKGOverride != null && Number.isFinite(r.cellsPerKGOverride)
+                            ? String(r.cellsPerKGOverride)
+                            : String(CELLS_PER_KG_DRY)
+                        }
+              onChangeText={(text) => {
+                          const trimmed = text.trim();
+                          const parsed = trimmed === "" ? null : Number(trimmed);
+                          onUpdateRow(r.id, {
+                            cellsPerKGOverride:
+                              parsed != null && Number.isFinite(parsed) && parsed > 0 ? parsed : null,
+                          });
+                        }}
+              keyboardType="decimal-pad"
+              size="md"
+              w={100}
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="2"
+              fontFamily="body"
+            />
         </YStack>
       ) : null}
     </>

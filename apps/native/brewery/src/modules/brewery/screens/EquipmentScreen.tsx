@@ -18,7 +18,7 @@ export function EquipmentScreen() {
   if (!api) {
     return (
       <Screen>
-        <Text fontSize={14} color="$red10">
+        <Text fontSize={14} color="red10">
           {tCommon("loading") || "Loading…"}
         </Text>
       </Screen>

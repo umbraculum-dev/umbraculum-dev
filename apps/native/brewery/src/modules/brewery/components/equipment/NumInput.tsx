@@ -12,17 +12,17 @@ export function NumInput(props: {
 }) {
   return (
     <View>
-      <Text fontSize={11} opacity={0.8} mb="$1">
+      <Text fontSize={11} opacity={0.8} mb="1">
         {props.label}
       </Text>
       <Input
         value={props.value}
         onChangeText={props.onChange}
         keyboardType="decimal-pad"
-        size="$3"
-        background="$background"
+        size="md"
+        background="background"
         borderWidth={1}
-        borderColor="$borderColor"
+        borderColor="borderColor"
       />
     </View>
   );

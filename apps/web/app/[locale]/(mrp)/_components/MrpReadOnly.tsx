@@ -48,8 +48,8 @@ export function SectionCard({
         padding: "12px",
       }}
     >
-      <YStack gap="$3">
-        <SizableText id={headingId} size="$4" fontWeight="bold" fontFamily="$heading">
+      <YStack gap="3">
+        <SizableText id={headingId} size="4" fontWeight="bold" fontFamily="heading">
           {title}
         </SizableText>
         {children}
@@ -60,11 +60,11 @@ export function SectionCard({
 
 export function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <XStack gap="$3" alignItems="flex-start" flexWrap="wrap">
-      <SizableText size="$2" fontWeight="bold" fontFamily="$body" minWidth={180}>
+    <XStack gap="3" alignItems="flex-start" flexWrap="wrap">
+      <SizableText size="2" fontWeight="bold" fontFamily="body" minWidth={180}>
         {label}
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {value}
       </SizableText>
     </XStack>
@@ -128,24 +128,24 @@ export function ProductionOrderSummary({
   });
 
   return (
-    <YStack gap="$1.5">
-      <SizableText fontFamily="$body">
+    <YStack gap="1-5">
+      <SizableText fontFamily="body">
         <SizableText fontWeight="bold">{labels.orderNumber}:</SizableText>{" "}
         {order.orderNumber}
       </SizableText>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <Meta label={labels.status} value={order.status} />
         <Meta label={labels.quantity} value={formatQuantity(order.quantity, order.unit)} />
         <Meta label={labels.lineCount} value={String(order.lines.length)} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <Meta
           label={labels.plannedStartAt}
           value={formatDateTime(order.plannedStartAt, labels.unknownDate)}
         />
         <Meta label={labels.dueAt} value={formatDateTime(order.dueAt, labels.unknownDate)} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <Meta label={labels.source} value={provenance} />
         <Meta label={labels.sourceRefId} value={order.sourceRefId ?? labels.none} />
         <Meta label={labels.debugId} value={order.id} />
@@ -170,12 +170,12 @@ export function OperationSummary({
   };
 }) {
   return (
-    <YStack gap="$1">
-      <SizableText fontFamily="$body">
+    <YStack gap="1">
+      <SizableText fontFamily="body">
         <SizableText fontWeight="bold">{operation.sequence}. </SizableText>
         {operation.name}
       </SizableText>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <Meta label={labels.operationCode} value={operation.code} />
         <Meta
           label={labels.duration}
@@ -210,11 +210,11 @@ export function MaterialRequirementSummary({
   };
 }) {
   return (
-    <YStack gap="$1">
-      <SizableText fontFamily="$body">
+    <YStack gap="1">
+      <SizableText fontFamily="body">
         <SizableText fontWeight="bold">{requirement.description}</SizableText>
       </SizableText>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <Meta
           label={labels.requiredQuantity}
           value={formatQuantity(requirement.requiredQuantity, requirement.unit)}
@@ -222,7 +222,7 @@ export function MaterialRequirementSummary({
         <Meta label={labels.availability} value={requirement.availabilityStatus} />
         <Meta label={labels.material} value={requirement.materialRefId ?? labels.none} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <Meta label={labels.availabilityNote} value={requirement.availabilityNote ?? labels.none} />
         <Meta label={labels.sourceRefId} value={requirement.bomLineId ?? labels.none} />
       </XStack>
@@ -232,7 +232,7 @@ export function MaterialRequirementSummary({
 
 function Meta({ label, value }: { label: string; value: string }) {
   return (
-    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
       <SizableText fontWeight="bold">{label}:</SizableText> {value}
     </SizableText>
   );

@@ -90,13 +90,13 @@ export default function CrpResourceDetailPage() {
         });
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <H1>{resource ? resource.name : tResources("listTitle")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("alphaNote")}
       </SizableText>
 
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <Link href="/resources">{tResources("back")}</Link>
         <RefreshButton onClick={() => void refresh()} disabled={!canCall || loading}>
           {loading ? t("refreshing") : t("refresh")}
@@ -108,13 +108,13 @@ export default function CrpResourceDetailPage() {
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
       {loading && !resource ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
       {notFound ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noResources")}
         </SizableText>
       ) : null}
@@ -122,13 +122,13 @@ export default function CrpResourceDetailPage() {
       {resource ? (
         <SectionCard headingId="crp-resource-detail-heading" title={tResources("listTitle")}>
           <ResourceSummary resource={resource} labels={labels} />
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <DetailRow label={tFields("source")} value={provenance} />
             <DetailRow label={tFields("createdAt")} value={formatDateTime(resource.createdAt, tValues("none"))} />
             <DetailRow label={tFields("updatedAt")} value={formatDateTime(resource.updatedAt, tValues("none"))} />
           </YStack>
           {resource.sourceModule === "automation" ? (
-            <XStack gap="$3" flexWrap="wrap">
+            <XStack gap="3" flexWrap="wrap">
               <Link href={`/vessels/${encodeURIComponent(resource.code)}`}>
                 {tResources("automationSourceLink")}
               </Link>

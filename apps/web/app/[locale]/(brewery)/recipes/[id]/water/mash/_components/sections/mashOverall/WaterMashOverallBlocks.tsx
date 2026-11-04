@@ -18,15 +18,15 @@ export function WaterMashOverallActionsBlock({ model }: { model: WaterMashPageMo
   } = model;
 
   return (
-    <YStack gap="$2" mt="$3">
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
-        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
+    <YStack gap="2" mt="3">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
+        <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
           {savingOverall ? "Calculating…" : "Preview overall"}
         </Button>
-        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
+        <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
           {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
         </Button>
-        {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
+        {overallStatus ? <SizableText size="2" color="var(--text-muted)" fontFamily="body">{overallStatus}</SizableText> : null}
       </XStack>
       {overallSaveStatus ? (
         <MessageBox
@@ -46,7 +46,7 @@ export function WaterMashOverallActionsBlock({ model }: { model: WaterMashPageMo
 export function WaterMashOverallErrorBlock({ model }: { model: WaterMashPageModel }) {
   const { overallError } = model;
   if (!overallError) return null;
-  return <ErrorBox mt="$3">{overallError}</ErrorBox>;
+  return <ErrorBox mt="3">{overallError}</ErrorBox>;
 }
 
 export function WaterMashOverallIonsBlock({ model }: { model: WaterMashPageModel }) {
@@ -127,7 +127,7 @@ export function WaterMashOverallStatsBlock({ model }: { model: WaterMashPageMode
           );
         })() : null}
         <FieldBadge>Computed</FieldBadge>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
       </summary>
       <ul>
         <li>

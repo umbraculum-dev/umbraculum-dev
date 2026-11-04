@@ -18,7 +18,7 @@ export function RecipeImportFormContent({
 
   return (
     <>
-      <YStack gap="$0">
+      <YStack gap="0">
         <Accordion
           type="multiple"
           value={openSections}

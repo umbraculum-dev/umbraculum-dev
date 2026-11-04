@@ -16,9 +16,9 @@
     "i18n:guardrail": "node scripts/i18n-guardrail.mjs"
   },
   "dependencies": {
-    "@tamagui/animations-css": "2.2.0",
-    "@tamagui/config": "2.2.0",
-    "@tamagui/core": "2.2.0",
+    "@tamagui/animations-css": "3.2.0",
+    "@tamagui/config": "3.2.0",
+    "@tamagui/core": "3.2.0",
     "@umbraculum/api-client": "file:../../packages/platform/api-client",
     "@umbraculum/automation-contracts": "file:../../packages/canonical/automation/contracts",
     "@umbraculum/brewery-api-client": "file:../../packages/verticals/brewery/api-client",
@@ -42,12 +42,12 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-native-web": "~0.21.4",
-    "tamagui": "2.2.0",
+    "tamagui": "3.2.0",
     "victory": "^36.9.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@tamagui/cli": "2.2.0",
+    "@tamagui/cli": "3.2.0",
     "@types/node": "^20.0.0",
     "@types/react": "~19.3.0",
     "@types/react-dom": "^19.0.0",

@@ -15,19 +15,19 @@ export function FermDataIntegrationPageContent(props: { model: Model }) {
   const { t, openSections, setOpenSections } = model;
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <DashboardClient />
 
-      <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <H1 mb="2">{t("title")}</H1>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("subtitle")}
       </SizableText>
 
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         <Link href="/">{t("backToDashboard")}</Link>
       </SizableText>
 
-      <YStack gap="$0">
+      <YStack gap="0">
         <Accordion
           type="multiple"
           value={openSections}

@@ -93,31 +93,31 @@ export default function SelectWorkspacePage() {
       bg="var(--surface)"
       borderWidth={1}
       borderColor="var(--border)"
-      rounded="$2"
-      p="$3"
+      rounded="2"
+      p="3"
     >
       {authExpired ? <AuthExpiredNotice forceVisible nextOverride={`/${locale}/select-workspace`} /> : null}
       <H1 mt={0}>{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("subtitle")}
       </SizableText>
 
       {loading ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
-      {error ? <ErrorBox mt="$3">{error}</ErrorBox> : null}
+      {error ? <ErrorBox mt="3">{error}</ErrorBox> : null}
 
       {!loading && !hasWorkspaces ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noWorkspacesFound")}
         </SizableText>
       ) : null}
 
       {hasWorkspaces ? (
-        <YStack gap="$2" mt="$3">
+        <YStack gap="2" mt="3">
           {workspaces.map((w) => (
             <Button
               key={w.id}
@@ -129,17 +129,17 @@ export default function SelectWorkspacePage() {
               borderWidth={1}
               borderColor="var(--border)"
               color="var(--text)"
-              size="$3"
+              size="md"
             >
-              <XStack gap="$1" flex={1} justifyContent="flex-start" alignItems="center">
-                <SizableText size="$3" fontWeight="bold" fontFamily="$body" color="var(--text)">
+              <XStack gap="1" flex={1} justifyContent="flex-start" alignItems="center">
+                <SizableText size="3" fontWeight="bold" fontFamily="body" color="var(--text)">
                   {w.name}
                 </SizableText>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                   · {w.role}
                 </SizableText>
                 {submittingId === w.id ? (
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                     · Saving…
                   </SizableText>
                 ) : null}

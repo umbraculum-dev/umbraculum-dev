@@ -20,7 +20,7 @@ export function InventoryFermentablesSection(props: InventorySectionProps) {
       open={openSections['fermentables']}
       onOpenChange={(o) => setSectionOpen("fermentables", o)}
     >
-      <YStack gap="$2">
+      <YStack gap="2">
         <InventoryFermentablesSearchBlock {...props} />
         <InventoryFermentablesCustomAddBlock {...props} />
         <InventoryFermentablesItemListBlock {...props} />

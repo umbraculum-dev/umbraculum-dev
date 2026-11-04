@@ -35,12 +35,12 @@ export function RecipeEditAnalysisSection({ model }: { model: RecipeEditPageMode
       open={openSections["analysis"]}
       onOpenChange={(open) => setSectionOpen("analysis", open)}
     >
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {tAnalysis("help")}
       </SizableText>
 
       <View overflowX="auto">
-        <YStack gap="$2">
+        <YStack gap="2">
           {rows.map((row, idx) => (
             <StripedRow key={idx} odd={idx % 2 === 1}>
               {row}
@@ -48,15 +48,15 @@ export function RecipeEditAnalysisSection({ model }: { model: RecipeEditPageMode
           ))}
           {gristWaterConsistency.status === "error" ? (
             <View
-              mt="$2"
-              px="$3"
-              py="$2"
+              mt="2"
+              px="3"
+              py="2"
               bg="color-mix(in srgb, var(--warning) 18%, var(--surface))"
               borderWidth={1}
               borderColor="color-mix(in srgb, var(--warning) 40%, var(--border))"
-              rounded="$2"
+              rounded="2"
             >
-              <SizableText size="$2" fontFamily="$body" color="var(--text)">
+              <SizableText size="2" fontFamily="body" color="var(--text)">
                 {tAnalysis.rich("gristWaterConsistencyWarning", {
                   link: (chunks) => (
                     <Link href={`/recipes/${recipeId}/water/mash#grist-summary-heading`}>
@@ -66,7 +66,7 @@ export function RecipeEditAnalysisSection({ model }: { model: RecipeEditPageMode
                 })}
               </SizableText>
               {gristWaterConsistency.diffPct != null ? (
-                <SizableText size="$2" fontFamily="$body" color="var(--text)" mt="$1">
+                <SizableText size="2" fontFamily="body" color="var(--text)" mt="1">
                   {tAnalysis("gristWaterConsistencyDifference", {
                     value: formatFixed(locale, gristWaterConsistency.diffPct, 2),
                   })}
@@ -83,31 +83,31 @@ export function RecipeEditAnalysisSection({ model }: { model: RecipeEditPageMode
           bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
           borderWidth={1}
           borderColor="var(--field-computed-border)"
-          rounded="$2"
-          p="$3"
-          mt="$3"
+          rounded="2"
+          p="3"
+          mt="3"
         >
           <RecipeEditSummary>
-            <XStack gap="$2" flexWrap="wrap" items="baseline" display="inline-flex">
-              <SizableText size="$3" fontWeight="bold" fontFamily="$body" color="var(--text)">
+            <XStack gap="2" flexWrap="wrap" items="baseline" display="inline-flex">
+              <SizableText size="3" fontWeight="bold" fontFamily="body" color="var(--text)">
                 {tAnalysis("warningsTitle")}
               </SizableText>
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                 {tAnalysis("warningsClickToExpand")}
               </SizableText>
             </XStack>
           </RecipeEditSummary>
-          <RecipeEditList gap="$1" mt="$2">
+          <RecipeEditList gap="1" mt="2">
             {warnings.map((w, idx) => (
               <SizableText
                 as="li"
                 key={`${String(w?.code ?? "warn")}-${idx}`}
-                size="$2"
-                fontFamily="$body"
+                size="sm"
+                fontFamily="body"
                 color="var(--text)"
               >
                 <CodeInline>{String(w?.code ?? "warning")}</CodeInline>{" "}
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">
                   {tAnalysis(`warnings.${String(w?.code ?? "unknown")}`)}
                 </SizableText>
               </SizableText>

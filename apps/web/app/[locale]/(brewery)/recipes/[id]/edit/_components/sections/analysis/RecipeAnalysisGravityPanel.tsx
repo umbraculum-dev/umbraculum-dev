@@ -11,9 +11,9 @@ export function recipeAnalysisGristConsistencyRow(model: RecipeEditPageModel): R
   const { tAnalysis, gristWaterConsistency } = model;
 
   return (
-    <XStack key="grist-water" gap="$2" ai="baseline">
-      <View minW={180} pr="$3">
-        <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">
+    <XStack key="grist-water" gap="2" ai="baseline">
+      <View minW={180} pr="3">
+        <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">
           {tAnalysis("gristWaterConsistencyCheck")}
         </SizableText>
       </View>
@@ -45,25 +45,25 @@ export function recipeAnalysisGravityPanelRows(model: RecipeEditPageModel): Reac
 
   return [
     (
-      <XStack key="boil-time" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.boilTimeMinutes")}</SizableText>
+      <XStack key="boil-time" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.boilTimeMinutes")}</SizableText>
           </XStack>
         </View>
         <View>
-          <XStack gap="$1" ai="baseline" display="inline-flex">
+          <XStack gap="1" display="inline-flex" ai="baseline">
             <CodeInline>{fmtField("boilTimeMinutes", a?.boilTimeMinutes, 0)}</CodeInline>
-            {typeof a?.boilTimeMinutes === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span"> min</SizableText> : null}
+            {typeof a?.boilTimeMinutes === "number" ? <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span"> min</SizableText> : null}
           </XStack>
         </View>
       </XStack>
     ),
     (
-      <XStack key="kettle-volume" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.kettleVolume")}</SizableText>
+      <XStack key="kettle-volume" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.kettleVolume")}</SizableText>
             {renderMath(
               "analysis.kettleVolume",
               renderDerivationMath(
@@ -80,18 +80,18 @@ export function recipeAnalysisGravityPanelRows(model: RecipeEditPageModel): Reac
           </XStack>
         </View>
         <View>
-          <XStack gap="$1" ai="baseline" display="inline-flex">
+          <XStack gap="1" display="inline-flex" ai="baseline">
             <CodeInline>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</CodeInline>
-            {typeof a?.kettleVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
+            {typeof a?.kettleVolumeLiters === "number" ? <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">L</SizableText> : null}
           </XStack>
         </View>
       </XStack>
     ),
     (
-      <XStack key="pre-boil-volume" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.preBoilVolume")}</SizableText>
+      <XStack key="pre-boil-volume" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.preBoilVolume")}</SizableText>
             {renderMath(
               "analysis.preBoilVolume",
               renderDerivationMath(
@@ -108,18 +108,18 @@ export function recipeAnalysisGravityPanelRows(model: RecipeEditPageModel): Reac
           </XStack>
         </View>
         <View>
-          <XStack gap="$1" ai="baseline" display="inline-flex">
+          <XStack gap="1" display="inline-flex" ai="baseline">
             <CodeInline>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</CodeInline>
-            {typeof a?.preBoilVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
+            {typeof a?.preBoilVolumeLiters === "number" ? <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">L</SizableText> : null}
           </XStack>
         </View>
       </XStack>
     ),
     (
-      <XStack key="og" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.og")}</SizableText>
+      <XStack key="og" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.og")}</SizableText>
             {renderMath(
               "analysis.og",
               renderDerivationMath(
@@ -143,10 +143,10 @@ export function recipeAnalysisGravityPanelRows(model: RecipeEditPageModel): Reac
       </XStack>
     ),
     (
-      <XStack key="fg" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.fg")}</SizableText>
+      <XStack key="fg" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.fg")}</SizableText>
             {renderMath(
               "analysis.fg",
               renderDerivationMath(
@@ -170,10 +170,10 @@ export function recipeAnalysisGravityPanelRows(model: RecipeEditPageModel): Reac
       </XStack>
     ),
     (
-      <XStack key="pbg" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
+      <XStack key="pbg" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
             {renderMath(
               "analysis.pbg",
               renderDerivationMath(

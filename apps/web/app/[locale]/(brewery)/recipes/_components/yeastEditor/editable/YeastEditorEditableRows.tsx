@@ -17,15 +17,15 @@ export function YeastEditorEditableRows(props: YeastEditorEditableRowsProps) {
 
   if (!yeastRows.length) {
     return (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3" mb={0}>
         {t("yeastEmpty")}
       </SizableText>
     );
   }
 
   return (
-    <View overflowX="auto" mt="$3">
-      <YStack gap="$3">
+    <View overflowX="auto" mt="3">
+      <YStack gap="3">
         {yeastRows.map((r, idx) => (
           <YeastEditorRow key={r.id} row={r} idx={idx} ctx={rowCtx} />
         ))}

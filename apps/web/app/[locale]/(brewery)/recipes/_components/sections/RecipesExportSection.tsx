@@ -18,13 +18,13 @@ export function RecipesExportSection({ model }: { model: RecipesPageModel }) {
       open={openSections.includes("export")}
       spaced
     >
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("export.subtitle")}
       </SizableText>
 
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={180}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="export-recipe">{t("export.selectLabel")}</RecipeEditFieldLabel>
             <BrewSelect
               id="export-recipe"
@@ -61,7 +61,7 @@ export function RecipesExportSection({ model }: { model: RecipesPageModel }) {
           {t("export.exportAllCta")}
         </a>
       </XStack>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2.5" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2-5" mb={0}>
         {t("export.strictNote")}
       </SizableText>
     </BrewAccordionSection>

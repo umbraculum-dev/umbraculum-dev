@@ -71,7 +71,7 @@ export function YeastEditorEditable({
         onAddRow={onAddRow}
       />
 
-      <View borderTopWidth={1} borderColor="var(--border)" my="$3" />
+      <View borderTopWidth={1} borderColor="var(--border)" my="3" />
 
       <YeastEditorEditableToolbar
         t={t}

@@ -28,7 +28,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditPageModel }
             open={openSections['yeast']}
             onOpenChange={(open) => setSectionOpen("yeast", open)}
           >
-            <View mt="$3">
+            <View mt="3">
               <YeastEditor
                 yeastRows={yeastRows}
                 yeastAttenuationOverrides={yeastAttenuationOverrides}
@@ -41,7 +41,7 @@ export function RecipeEditYeastSection({ model }: { model: RecipeEditPageModel }
                 formatFixed={formatFixed}
               />
             </View>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3" mb={0}>
               {t("rawMaterialsCtaPrefix")}{" "}
               <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
             </SizableText>

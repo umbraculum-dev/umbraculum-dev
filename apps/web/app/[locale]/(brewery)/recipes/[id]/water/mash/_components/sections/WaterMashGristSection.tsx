@@ -148,10 +148,10 @@ export function WaterMashGristSection({ model }: { model: WaterMashPageModel }) 
                 open={openMashSections.includes("grist")}
               />
               <Accordion.Content>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
                   {t("gristSummaryHelp")}
                 </SizableText>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1" mb={0}>
                   {t("lateFermentablesExcludedNote", { kg: fmt("kg", lateAdditionsTotalKg, 2) })}
                 </SizableText>
                 <ul className="brew-list-mt0">
@@ -166,26 +166,26 @@ export function WaterMashGristSection({ model }: { model: WaterMashPageModel }) 
                     Source recipe updated at: <code>{gristSourceRecipeUpdatedAt ?? "—"}</code>
                   </li>
                 </ul>
-                <XStack gap="$3" alignItems="center">
+                <XStack gap="3" alignItems="center">
                   <Button
-                    size="$3"
-                    bg="var(--surface-2)"
-                    borderWidth={1}
-                    borderColor="var(--border)"
-                    color="var(--text)"
-                    onPress={() => void onImportGristFromRecipe()}
-                    disabled={!canCall || importingGrist}
-                  >
+              size="md"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              onPress={() => void onImportGristFromRecipe()}
+              disabled={!canCall || importingGrist}
+            >
                     {importingGrist ? "Importing…" : "Import/update grist snapshot"}
                   </Button>
                   <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
                   {gristImportStatus ? (
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                       {gristImportStatus}
                     </SizableText>
                   ) : null}
                 </XStack>
-                {gristImportError ? <ErrorBox mt="$3">{gristImportError}</ErrorBox> : null}
+                {gristImportError ? <ErrorBox mt="3">{gristImportError}</ErrorBox> : null}
               </Accordion.Content>
             </View>
           </Accordion.Item>

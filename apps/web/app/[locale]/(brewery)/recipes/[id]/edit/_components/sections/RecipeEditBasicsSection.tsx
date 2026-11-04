@@ -40,36 +40,35 @@ export function RecipeEditBasicsSection({ model }: { model: RecipeEditPageModel 
             onOpenChange={(open) => setSectionOpen("basics", open)}
           >
             <XStack
-              gap="$3"
-              mt="$2"
-              flexWrap="wrap"
-              $gtNarrow={{ flexWrap: "nowrap" }}
-            >
+        gap="3"
+        mt="2"
+        flexWrap="wrap gtNarrow:nowrap"
+      >
               <View flex={1} minW={200}>
                 <RecipeEditField id="recipe-name" label="Name">
-                  <XStack gap="$2" items="center" flexWrap="wrap">
+                  <XStack gap="2" items="center" flexWrap="wrap">
                     <Input
-                      id="recipe-name"
-                      value={name}
-                      onChangeText={setName}
-                      size="$3"
-                      flex={1}
-                      minW={180}
-                      bg="var(--surface)"
-                      borderWidth={1}
-                      borderColor="var(--border)"
-                      rounded="$2"
-                      fontFamily="$body"
-                    />
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                id="recipe-name"
+                value={name}
+                onChangeText={setName}
+                size="md"
+                flex={1}
+                minW={180}
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="2"
+                fontFamily="body"
+              />
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                       {t("versionLabel")}{" "}
                       <SizableText
-                        size="$2"
-                        color="var(--text-muted)"
-                        fontFamily="$body"
-                        fontWeight="bold"
-                        as="span"
-                      >
+                  size="sm"
+                  color="var(--text-muted)"
+                  fontFamily="body"
+                  fontWeight="bold"
+                  as="span"
+                >
                         {typeof recipe?.version === "number"
                           ? String(recipe.version).padStart(2, "0")
                           : "—"}
@@ -92,7 +91,7 @@ export function RecipeEditBasicsSection({ model }: { model: RecipeEditPageModel 
                     width="full"
                   />
                 {stylesError ? (
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1-5">
                     {String(stylesError)}
                   </SizableText>
                 ) : null}
@@ -100,78 +99,78 @@ export function RecipeEditBasicsSection({ model }: { model: RecipeEditPageModel 
               </View>
             </XStack>
 
-            <YStack gap="$2" mt="$3">
-              <XStack gap="$3" items="center" flexWrap="wrap">
+            <YStack gap="2" mt="3">
+              <XStack gap="3" items="center" flexWrap="wrap">
                 <Button
-                  onPress={() => { void onSave(); }}
-                  disabled={!canCallAccountScoped || saving}
-                  size="$3"
-                  bg="var(--surface-2)"
-                  borderWidth={1}
-                  borderColor="var(--border)"
-                  color="var(--text)"
-                  fontFamily="$body"
-                >
+            onPress={() => { void onSave(); }}
+            disabled={!canCallAccountScoped || saving}
+            size="md"
+            bg="var(--surface-2)"
+            borderWidth={1}
+            borderColor="var(--border)"
+            color="var(--text)"
+            fontFamily="body"
+          >
                   {saving ? "Saving…" : "Save"}
                 </Button>
                 {recipe ? (
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                     Updated: <CodeInline>{recipe.updatedAt}</CodeInline>
                   </SizableText>
                 ) : null}
               </XStack>
             </YStack>
 
-            <YStack gap="$2" mt="$3">
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <YStack gap="2" mt="3">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
                 {t("versionCreateNote")}
               </SizableText>
               <Button
-                onPress={() => { void onCreateAnotherVersion(); }}
-                disabled={
-                  !canCallAccountScoped ||
-                  creatingVersion ||
-                  (Array.isArray(versions) && versions.some((v) => v.version >= 99))
-                }
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
+          onPress={() => { void onCreateAnotherVersion(); }}
+          disabled={
+                          !canCallAccountScoped ||
+                          creatingVersion ||
+                          (Array.isArray(versions) && versions.some((v) => v.version >= 99))
+                        }
+          size="md"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="body"
+        >
                 {creatingVersion ? t("versionCreateWorking") : t("versionCreateButton")}
               </Button>
               {Array.isArray(versions) && versions.some((v) => v.version >= 99) ? (
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
                   {t("versionLimitReached")}
                 </SizableText>
               ) : null}
               {(versionsError || createVersionError) ? (
-                <ErrorBox mt="$1.5">
+                <ErrorBox mt="1.5">
                   {createVersionError ? createVersionError : versionsError}
                 </ErrorBox>
               ) : null}
             </YStack>
 
-            <YStack gap="$2" mt="$3">
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <YStack gap="2" mt="3">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
                 {t("duplicateRecipeNote")}
               </SizableText>
               <Button
-                onPress={() => { void onDuplicateRecipe(); }}
-                disabled={!canCallAccountScoped || duplicatingRecipe}
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
+          onPress={() => { void onDuplicateRecipe(); }}
+          disabled={!canCallAccountScoped || duplicatingRecipe}
+          size="md"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="body"
+        >
                 {duplicatingRecipe ? t("duplicateRecipeWorking") : t("duplicateRecipeButton")}
               </Button>
               {duplicateRecipeError ? (
-                <ErrorBox mt="$1.5">{duplicateRecipeError}</ErrorBox>
+                <ErrorBox mt="1.5">{duplicateRecipeError}</ErrorBox>
               ) : null}
             </YStack>
           </RecipeEditSection>

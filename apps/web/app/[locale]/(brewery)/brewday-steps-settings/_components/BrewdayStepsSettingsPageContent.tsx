@@ -30,15 +30,15 @@ export function BrewdayStepsSettingsPageContent(props: { model: Model }) {
   } = props.model;
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <DashboardClient />
 
-      <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <H1 mb="2">{t("title")}</H1>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("subtitle")}
       </SizableText>
 
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         <Link href="/">{t("backToDashboard")}</Link>
       </SizableText>
 
@@ -54,13 +54,13 @@ export function BrewdayStepsSettingsPageContent(props: { model: Model }) {
           position="fixed"
           top={16}
           left="50%"
-          style={{ transform: "translateX(-50%)" }}
           zIndex={1000}
           width="100%"
           maxWidth={600}
-          px="$4"
+          px="4"
+          style={{ transform: "translateX(-50%)" }}
         >
-          <YStack gap="$2" width="100%">
+          <YStack gap="2" width="100%">
             {saveStatus ? (
               <MessageBox
                 variant="success"
@@ -79,7 +79,7 @@ export function BrewdayStepsSettingsPageContent(props: { model: Model }) {
         </View>
       ) : null}
 
-      <YStack gap="$4">
+      <YStack gap="4">
         <BrewdayStepsRecapSection model={props.model} />
         <BrewdayBrewingTypeSection model={props.model} />
         <BrewdayStepsSectionsSection model={props.model} />

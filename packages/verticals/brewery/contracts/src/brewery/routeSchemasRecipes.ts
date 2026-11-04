@@ -23,7 +23,8 @@ export const RecipeCreateRequestSchema = z.object({
 export const RecipePatchRequestSchema = z.object({
   name: z.string().optional(),
   styleKey: z.string().optional(),
-  notes: z.string().optional(),
+  // Clients send null for empty notes (native + web editors); service stores null.
+  notes: z.string().nullable().optional(),
   beerJsonRecipeJson: z.unknown().optional(),
   recipeExtJson: z.unknown().optional(),
 });

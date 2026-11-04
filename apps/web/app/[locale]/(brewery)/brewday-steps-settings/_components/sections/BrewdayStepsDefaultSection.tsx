@@ -38,35 +38,35 @@ export function BrewdayStepsDefaultSection(props: { model: Model }) {
       onOpenChange={(open) => setSectionOpen("brewdayStepsDefault", open)}
     >
       <SizableText
-        size="$2"
+        size="sm"
         color="var(--text-muted)"
-        fontFamily="$body"
+        fontFamily="body"
         mt={0}
-        mb="$2"
+        mb="2"
       >
         {t("defaultSectionNote")}
       </SizableText>
 
       {loading ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : (
         <>
           {defaultSteps.length ? (
-            <YStack gap="$2" mt="$3">
+            <YStack gap="2" mt="3">
               {defaultSteps.map((s, idx) => (
                 <RecipeEditIngredientCard key={s.id}>
-                  <YStack gap="$2">
-                    <XStack gap="$2" items="center" flexWrap="wrap">
-                      <XStack gap="$1" flexShrink={0}>
+                  <YStack gap="2">
+                    <XStack gap="2" items="center" flexWrap="wrap">
+                      <XStack gap="1" flexShrink={0}>
                         <Button
-                          size="$2"
+                          size="sm"
                           bg="var(--surface-2)"
                           borderWidth={1}
                           borderColor="var(--border)"
                           color="var(--text)"
-                          fontFamily="$body"
+                          fontFamily="body"
                           onPress={() => moveDefaultStepUp(idx)}
                           disabled={idx === 0}
                           aria-label={t("moveUp")}
@@ -74,12 +74,12 @@ export function BrewdayStepsDefaultSection(props: { model: Model }) {
                           ↑
                         </Button>
                         <Button
-                          size="$2"
+                          size="sm"
                           bg="var(--surface-2)"
                           borderWidth={1}
                           borderColor="var(--border)"
                           color="var(--text)"
-                          fontFamily="$body"
+                          fontFamily="body"
                           onPress={() => moveDefaultStepDown(idx)}
                           disabled={idx === defaultSteps.length - 1}
                           aria-label={t("moveDown")}
@@ -95,13 +95,13 @@ export function BrewdayStepsDefaultSection(props: { model: Model }) {
                           id={`default-name-${s.id}`}
                           value={s.name}
                           onChangeText={(v) => updateDefaultStep(s.id, { name: v })}
-                          size="$3"
+                          size="md"
                           w="100%"
                           bg="var(--surface)"
                           borderWidth={1}
                           borderColor="var(--border)"
-                          rounded="$2"
-                          fontFamily="$body"
+                          rounded="2"
+                          fontFamily="body"
                         />
                       </View>
                       <View minW={80}>
@@ -111,25 +111,25 @@ export function BrewdayStepsDefaultSection(props: { model: Model }) {
                         <Input
                           id={`default-minutes-${s.id}`}
                           value={
-                            s.minutes != null && s.minutes !== undefined
-                              ? String(s.minutes)
-                              : ""
-                          }
+                                                    s.minutes != null && s.minutes !== undefined
+                                                      ? String(s.minutes)
+                                                      : ""
+                                                  }
                           onChangeText={(v) => {
-                            const m = parseMinutes(v);
-                            updateDefaultStep(s.id, {
-                              minutes: m,
-                            });
-                          }}
+                                                    const m = parseMinutes(v);
+                                                    updateDefaultStep(s.id, {
+                                                      minutes: m,
+                                                    });
+                                                  }}
                           placeholder="—"
                           keyboardType="numeric"
-                          size="$3"
+                          size="md"
                           w="100%"
                           bg="var(--surface)"
                           borderWidth={1}
                           borderColor="var(--border)"
-                          rounded="$2"
-                          fontFamily="$body"
+                          rounded="2"
+                          fontFamily="body"
                         />
                       </View>
                       <View minW={140}>
@@ -145,14 +145,14 @@ export function BrewdayStepsDefaultSection(props: { model: Model }) {
                           width="full"
                         />
                       </View>
-                      <XStack gap="$2" items="center">
+                      <XStack gap="2" items="center">
                         <Checkbox
                           id={`default-exclude-${s.id}`}
                           checked={s.exclude}
                           onCheckedChange={(c) =>
-                            updateDefaultStep(s.id, { exclude: c === true })
-                          }
-                          size="$2"
+                                                    updateDefaultStep(s.id, { exclude: c === true })
+                                                  }
+                          size="sm"
                           aria-label={`${t("exclude")} ${s.name}`}
                         >
                           <Checkbox.Indicator />
@@ -160,9 +160,9 @@ export function BrewdayStepsDefaultSection(props: { model: Model }) {
                         <SizableText
                           as="label"
                           htmlFor={`default-exclude-${s.id}`}
-                          size="$2"
+                          size="sm"
                           color="var(--text-muted)"
-                          fontFamily="$body"
+                          fontFamily="body"
                         >
                           {t("exclude")}
                         </SizableText>
@@ -174,17 +174,17 @@ export function BrewdayStepsDefaultSection(props: { model: Model }) {
             </YStack>
           ) : null}
 
-          <XStack gap="$3" items="center" mt="$3">
+          <XStack gap="3" items="center" mt="3">
             <Button
-              size="$3"
-              bg="var(--surface-2)"
-              borderWidth={1}
-              borderColor="var(--border)"
-              color="var(--text)"
-              fontFamily="$body"
-              onPress={() => { void onSave(); }}
-              disabled={!canCallAccountScoped || saving}
-            >
+                size="md"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="body"
+                onPress={() => { void onSave(); }}
+                disabled={!canCallAccountScoped || saving}
+              >
               {saving
                 ? t("saving")
                 : t("save")}

@@ -14,8 +14,8 @@ export function RecipeEditIngredientCard({ children }: RecipeEditIngredientCardP
       bg="color-mix(in srgb, var(--surface-2) 55%, var(--surface))"
       borderWidth={1}
       borderColor="var(--border)"
-      rounded="$2"
-      p="$3"
+      rounded="2"
+      p="3"
     >
       {children}
     </View>

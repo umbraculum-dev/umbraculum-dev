@@ -20,7 +20,7 @@ export function PlatformAdsTable({ items, loading, onToggleActive, onDelete }: P
       <H2 mt={0}>{t("listTitle")}</H2>
 
       {!items.length ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noAds")}
         </SizableText>
       ) : null}
@@ -54,24 +54,24 @@ export function PlatformAdsTable({ items, loading, onToggleActive, onDelete }: P
                     </a>
                   </td>
                   <td className="brew-table-cell-top">
-                    <XStack gap="$2" alignItems="center" className="brew-muted">
+                    <XStack gap="2" alignItems="center" className="brew-muted">
                       <Checkbox
                         id={`ad-toggle-active-${a.id}`}
                         checked={a.isActive}
                         onCheckedChange={(c) => void onToggleActive(a.id, c === true)}
                         aria-label={t("table.toggleActiveAria", { id: a.id })}
-                        size="$2"
+                        size="sm"
                         native
                       >
                         <Checkbox.Indicator />
                       </Checkbox>
-                      <SizableText as="label" htmlFor={`ad-toggle-active-${a.id}`} size="$2" color="var(--text-muted)" fontFamily="$body">
+                      <SizableText as="label" htmlFor={`ad-toggle-active-${a.id}`} size="2" color="var(--text-muted)" fontFamily="body">
                         {a.isActive ? t("table.yes") : t("table.no")}
                       </SizableText>
                     </XStack>
                   </td>
                   <td className="brew-table-cell-top">
-                    <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onDelete(a.id)} disabled={loading}>
+                    <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onDelete(a.id)} disabled={loading}>
                       {t("table.delete")}
                     </Button>
                   </td>

@@ -15,10 +15,10 @@ export function WaterBoilAcidificationProfileBlock(props: { model: WaterBoilScre
 
   return (
     <Button
-      size="$3"
-      background="$background"
+      size="md"
+      background="background"
       borderWidth={1}
-      borderColor="$borderColor"
+      borderColor="borderColor"
       onPress={() => {
         setStartingAlk(bicarbonatePpmToAlkalinityPpmCaCO3(mixedSourceProfile.bicarbonate));
         if (selectedSource?.ph != null) setStartingPh(String(selectedSource.ph));
@@ -75,7 +75,7 @@ export function WaterBoilAcidificationInputsBlock(props: { model: WaterBoilScree
   return (
     <>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
         </Text>
         <Input
@@ -85,39 +85,39 @@ export function WaterBoilAcidificationInputsBlock(props: { model: WaterBoilScree
             setStartingAlkTouched(true);
             setStartingAlk(Number(text) || 0);
           }}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           Starting pH
         </Text>
         <Input
           keyboardType="decimal-pad"
           value={startingPh}
           onChangeText={setStartingPh}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       {acidificationMode === "targetPh" ? (
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             Target pH
           </Text>
           <Input
             keyboardType="decimal-pad"
             value={String(targetPh)}
             onChangeText={(text) => setTargetPh(Number(text) || 0)}
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
           />
         </View>
       ) : null}
@@ -136,33 +136,33 @@ export function WaterBoilAcidificationInputsBlock(props: { model: WaterBoilScree
         closeLabel={tCommon("close")}
       />
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           Strength value {strengthKind === "percent" ? "(%)" : ""}
         </Text>
         <Input
           keyboardType="decimal-pad"
           value={String(strengthValue)}
           onChangeText={(text) => setStrengthValue(Number(text) || 0)}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
           disabled={strengthKind === "solid"}
         />
       </View>
       {acidificationMode === "manual" ? (
         <View>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
           </Text>
           <Input
             keyboardType="decimal-pad"
             value={String(manualAcidAdded)}
             onChangeText={(text) => setManualAcidAdded(Number(text) || 0)}
-            size="$3"
-            background="$background"
+            size="md"
+            background="background"
             borderWidth={1}
-            borderColor="$borderColor"
+            borderColor="borderColor"
           />
         </View>
       ) : null}

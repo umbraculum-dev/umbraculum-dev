@@ -1,9 +1,14 @@
+import {
+  themesWithV5CompatKeys
+} from "../chunk-GZJL72HW.js";
+
 // src/tamagui/config.web.ts
-import { createAnimations } from "@tamagui/animations-css";
-import { defaultConfig } from "@tamagui/config/v5";
+import { createAnimations } from "@tamagui/animations-css/extras";
+import { defaultConfig } from "@tamagui/config/v6";
 import { createTamagui } from "tamagui";
 var config = createTamagui({
   ...defaultConfig,
+  themes: themesWithV5CompatKeys(),
   animations: createAnimations({
     quick: "ease-out 150ms",
     medium: "ease-in 300ms",

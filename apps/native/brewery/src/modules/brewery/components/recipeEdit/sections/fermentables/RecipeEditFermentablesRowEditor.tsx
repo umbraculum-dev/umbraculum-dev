@@ -24,12 +24,11 @@ export function RecipeEditFermentablesRowEditor({
 
   return (
     <Accordion.Item key={row.id} value={`grist-${row.id}`}>
-      <Card gap="$2" mb="$2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
+      <Card gap="2" mb="2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="borderColor" p="3">
         <Accordion.Header>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
             <Accordion.Trigger
               flex={1}
-              unstyled
               accessibilityRole="button"
               accessibilityLabel={`${idx + 1}. ${row.name || "(unnamed)"}`}
               accessibilityState={{ expanded: openFermentableIds.includes(`grist-${row.id}`) }}
@@ -43,15 +42,15 @@ export function RecipeEditFermentablesRowEditor({
                 </Text>
               </View>
             </Accordion.Trigger>
-            <Button onPress={() => removeGristRow(row.id)} size="$2" chromeless>
-              <Text color="$red10">{tCommon("remove")}</Text>
+            <Button onPress={() => removeGristRow(row.id)} size="sm" variant="quiet">
+              <Text color="red10">{tCommon("remove")}</Text>
             </Button>
           </View>
         </Accordion.Header>
         <Accordion.Content>
           <View style={{ gap: 8, marginTop: 12 }}>
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 Name
               </Text>
               <Input
@@ -60,15 +59,15 @@ export function RecipeEditFermentablesRowEditor({
                   updateGristRow(row.id, { name: text, ingredientId: undefined, producer: null, group: null })
                 }
                 placeholder="Fermentable name"
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
             <View style={{ flexDirection: "row", gap: 8 }}>
               <View style={{ flex: 1 }}>
-                <Text fontSize={11} opacity={0.8} mb="$1">
+                <Text fontSize={11} opacity={0.8} mb="1">
                   {t("amountLabel", { unit: tUnits("kg") })}
                 </Text>
                 <Input
@@ -79,14 +78,14 @@ export function RecipeEditFermentablesRowEditor({
                   }}
                   placeholder="0"
                   keyboardType="decimal-pad"
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 />
               </View>
               <View style={{ flex: 1 }}>
-                <Text fontSize={11} opacity={0.8} mb="$1">
+                <Text fontSize={11} opacity={0.8} mb="1">
                   {t("colorLabel", { unit: "°L" })}
                 </Text>
                 <Input
@@ -97,10 +96,10 @@ export function RecipeEditFermentablesRowEditor({
                   }}
                   placeholder="—"
                   keyboardType="decimal-pad"
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 />
               </View>
             </View>
@@ -138,16 +137,16 @@ export function RecipeEditFermentablesRowEditor({
             />
             {(row.group ?? "") ? (
               <View>
-                <Text fontSize={11} opacity={0.8} mb="$1">
+                <Text fontSize={11} opacity={0.8} mb="1">
                   {t("fermentables.groupLabel")}
                 </Text>
                 <Input
                   value={row.group ?? ""}
                   disabled
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 />
               </View>
             ) : null}
@@ -174,7 +173,7 @@ export function RecipeEditFermentablesRowEditor({
               />
             </View>
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {t("fermentables.potentialValueLabel")}
               </Text>
               <Input
@@ -190,10 +189,10 @@ export function RecipeEditFermentablesRowEditor({
                 placeholder="—"
                 keyboardType="decimal-pad"
                 disabled={!row.potential}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
           </View>

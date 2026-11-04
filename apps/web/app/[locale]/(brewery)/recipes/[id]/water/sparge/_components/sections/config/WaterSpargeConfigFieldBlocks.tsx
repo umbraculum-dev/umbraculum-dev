@@ -9,9 +9,9 @@ export function WaterSpargeConfigFieldsBlock({ model }: { model: WaterSpargePage
   const { locale, t, tEdit, tUnits, spargeStepTimeMin, setSpargeStepTimeMin, spargeStepRampMin, setSpargeStepRampMin, spargeMethodType, setSpargeMethodType, spargeStepTemp, setSpargeStepTemp } = model;
 
   return (
-    <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+    <XStack gap="3" flexWrap="wrap" ai="flex-end">
       <View flex={1} minWidth={120}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="sparge-step-time">
             {tEdit("mashingStepTime", { unit: "min" })}
           </RecipeEditFieldLabel>
@@ -20,18 +20,18 @@ export function WaterSpargeConfigFieldsBlock({ model }: { model: WaterSpargePage
             keyboardType="decimal-pad"
             value={String(spargeStepTimeMin)}
             onChangeText={(text) => setSpargeStepTimeMin(Math.max(0, Math.min(600, Number(text) || 0)))}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       <View flex={1} minWidth={120}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="sparge-step-ramp">
             {tEdit("mashingStepRamp", { unit: "min" })}
           </RecipeEditFieldLabel>
@@ -40,18 +40,18 @@ export function WaterSpargeConfigFieldsBlock({ model }: { model: WaterSpargePage
             keyboardType="decimal-pad"
             value={String(spargeStepRampMin)}
             onChangeText={(text) => setSpargeStepRampMin(Math.max(0, Math.min(120, Number(text) || 0)))}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
       <View flex={1} minWidth={120}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="sparge-method-type">
             {tEdit("mashingStepType")}
           </RecipeEditFieldLabel>
@@ -68,7 +68,7 @@ export function WaterSpargeConfigFieldsBlock({ model }: { model: WaterSpargePage
         </YStack>
       </View>
       <View flex={1} minWidth={120}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="sparge-step-temp">
             {tEdit("mashingStepTemp", { unit: tUnits("C") })}
           </RecipeEditFieldLabel>
@@ -77,16 +77,16 @@ export function WaterSpargeConfigFieldsBlock({ model }: { model: WaterSpargePage
             keyboardType="decimal-pad"
             value={formatFixed(locale, spargeStepTemp, 1)}
             onChangeText={(text) => {
-              const parsed = Number(String(text).replace(",", "."));
-              setSpargeStepTemp(Math.max(0, Math.min(100, Number.isFinite(parsed) ? parsed : 0)));
-            }}
-            size="$3"
+                        const parsed = Number(String(text).replace(",", "."));
+                        setSpargeStepTemp(Math.max(0, Math.min(100, Number.isFinite(parsed) ? parsed : 0)));
+                      }}
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>

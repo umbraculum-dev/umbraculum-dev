@@ -35,12 +35,12 @@ export function YeastScreenRow(props: {
   return (
     <Card
       key={props.row.id}
-      gap="$2"
-      mb="$2"
-      background="$background"
+      gap="2"
+      mb="2"
+      background="background"
       borderWidth={1}
-      borderColor="$borderColor"
-      p="$3"
+      borderColor="borderColor"
+      p="3"
     >
       <View style={{ gap: 12 }}>
         <YeastScreenRowIdentity {...sectionProps} />

@@ -22,19 +22,19 @@ export function YeastEditorRowAttenuation(props: YeastEditorRowAttenuationProps)
 
   return (
     <>
-      <YStack gap="$1" minW={100}>
+      <YStack gap="1" minW={100}>
         <RecipeEditFieldLabel>{t("yeastAttenMinLabel")}</RecipeEditFieldLabel>
         <RecipeEditReadOnlyValue>
           {typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
         </RecipeEditReadOnlyValue>
       </YStack>
-      <YStack gap="$1" minW={100}>
+      <YStack gap="1" minW={100}>
         <RecipeEditFieldLabel>{t("yeastAttenMaxLabel")}</RecipeEditFieldLabel>
         <RecipeEditReadOnlyValue>
           {typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
         </RecipeEditReadOnlyValue>
       </YStack>
-      <YStack gap="$1" minW={100}>
+      <YStack gap="1" minW={100}>
         <RecipeEditFieldLabel htmlFor={`yeast-atten-override-${r.id}`}>
           {tAnalysis("customAttenuationPercentLabel")}
         </RecipeEditFieldLabel>
@@ -43,47 +43,47 @@ export function YeastEditorRowAttenuation(props: YeastEditorRowAttenuationProps)
           value={yeastAttenuationOverrides[r.id] ?? ""}
           onChangeText={(text) => onAttenuationOverrideChange(r.id, text)}
           keyboardType="decimal-pad"
-          size="$3"
+          size="md"
           w={100}
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </YStack>
-      <YStack gap="$1" minW={100}>
+      <YStack gap="1" minW={100}>
         <RecipeEditFieldLabel htmlFor={`yeast-fermentation-temp-${r.id}`}>
           {t("yeastFermentationTempLabel", { unit: tUnits("C") })}
         </RecipeEditFieldLabel>
         <Input
           id={`yeast-fermentation-temp-${r.id}`}
           value={
-            r.fermentationTempC != null && Number.isFinite(r.fermentationTempC)
-              ? String(r.fermentationTempC)
-              : ""
-          }
+                    r.fermentationTempC != null && Number.isFinite(r.fermentationTempC)
+                      ? String(r.fermentationTempC)
+                      : ""
+                  }
           onChangeText={(text) => {
-            const trimmed = text.trim();
-            const parsed = trimmed === "" ? null : Number(trimmed);
-            onUpdateRow(r.id, {
-              fermentationTempC:
-                parsed != null && Number.isFinite(parsed) && parsed >= -10 && parsed <= 50
-                  ? parsed
-                  : null,
-            });
-          }}
+                    const trimmed = text.trim();
+                    const parsed = trimmed === "" ? null : Number(trimmed);
+                    onUpdateRow(r.id, {
+                      fermentationTempC:
+                        parsed != null && Number.isFinite(parsed) && parsed >= -10 && parsed <= 50
+                          ? parsed
+                          : null,
+                    });
+                  }}
           keyboardType="decimal-pad"
-          size="$3"
+          size="md"
           w={80}
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
         />
       </YStack>
-      <YStack gap="$1" minW={100}>
+      <YStack gap="1" minW={100}>
         <RecipeEditFieldLabel htmlFor={`yeast-diacetyl-rest-${r.id}`}>
           {t("yeastDiacetylRestLabel")}
         </RecipeEditFieldLabel>

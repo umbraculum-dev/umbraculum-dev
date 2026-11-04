@@ -10,8 +10,8 @@ export function BrewdayStepsRecapSection(props: { model: NativeBrewdayStepsSetti
   const { t, openSections, toggleOpen, recapLines } = props.model;
 
   return (
-    <Card gap="$2">
-      <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("recap")} width="100%" justifyContent="space-between">
+    <Card gap="2">
+      <SectionToggleButton variant="quiet" size="md" onPress={() => toggleOpen("recap")} width="100%" justifyContent="space-between">
         <Heading fontSize={18}>{t("sections.brewdayStepsRecap.title")}</Heading>
         <Text opacity={0.7}>{openSections.includes("recap") ? "▾" : "▸"}</Text>
       </SectionToggleButton>

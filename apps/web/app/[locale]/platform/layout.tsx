@@ -23,14 +23,14 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
     pathnameNoLocale === href || pathnameNoLocale.startsWith(`${href}/`);
 
   return (
-    <YStack gap="$4">
+    <YStack gap="4">
       <nav aria-label={t("navLabel")}>
-        <XStack flexWrap="wrap" gap="$3">
+        <XStack flexWrap="wrap" gap="3">
           <Link
             href="/platform/ads"
             aria-current={isActive("/platform/ads") ? "page" : undefined}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">
               {t("ads")}
             </SizableText>
           </Link>
@@ -38,7 +38,7 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
             href="/platform/recipes"
             aria-current={isActive("/platform/recipes") ? "page" : undefined}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">
               {t("recipes")}
             </SizableText>
           </Link>

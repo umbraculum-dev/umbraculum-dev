@@ -29,8 +29,8 @@ export function ReadOnlyField({ value, placeholder = "—", textAlign }: ReadOnl
     >
       <Text
         fontSize={14}
-        color="$gray11"
-        fontFamily="$body"
+        color="gray11"
+        fontFamily="body"
         style={textAlign ? { textAlign } : undefined}
       >
         {display}

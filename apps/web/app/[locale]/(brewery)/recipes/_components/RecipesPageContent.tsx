@@ -16,13 +16,13 @@ export function RecipesPageContent({ model }: { model: RecipesPageModel }) {
   const { t, tImport, openSections, setOpenSections } = model;
 
   return (
-    <YStack gap="$3">
-      <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" mb="$2">
+    <YStack gap="3">
+      <H1 mb="2">{t("title")}</H1>
+      <SizableText size="2" mb="2">
         <AskAiLink fromRoute="recipes" />
       </SizableText>
 
-      <YStack gap="$0">
+      <YStack gap="0">
         <Accordion
           type="multiple"
           value={openSections}
@@ -37,10 +37,10 @@ export function RecipesPageContent({ model }: { model: RecipesPageModel }) {
             open={openSections.includes("import")}
             spaced
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {tImport("subtitle")}
             </SizableText>
-            <SizableText size="$2" fontFamily="$body" mb={0}>
+            <SizableText size="2" fontFamily="body" mb={0}>
               <Link href="/recipes/import">{tImport("cta")}</Link>
             </SizableText>
           </BrewAccordionSection>

@@ -127,14 +127,14 @@ export function BrewSessionStepsToolbarSection({ model }: { model: BrewSessionDe
   return (
     <>
       <View
-              mt="$2"
-              bg="var(--surface)"
-              borderWidth={1}
-              borderColor="var(--border)"
-              rounded="$2"
-              p="$3"
-            >
-              <SizableText size="$2" fontFamily="$body" color="var(--text)" mt={0}>
+        mt="2"
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="2"
+        p="3"
+      >
+              <SizableText size="2" fontFamily="body" color="var(--text)" mt={0}>
                 {t("timersAndLogsHelpNote")}
               </SizableText>
             </View>

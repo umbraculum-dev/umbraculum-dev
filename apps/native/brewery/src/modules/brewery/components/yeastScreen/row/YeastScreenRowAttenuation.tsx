@@ -31,7 +31,7 @@ export function YeastScreenRowAttenuation(props: YeastScreenRowSectionProps & {
     <>
       <View style={{ flexDirection: "row", gap: 8 }}>
         <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
-          <Text fontSize={11} opacity={0.8} mb="$1" style={{ textAlign: "center" }}>
+          <Text fontSize={11} opacity={0.8} mb="1" style={{ textAlign: "center" }}>
             {t("yeastAttenMinLabel")}
           </Text>
           <ReadOnlyField
@@ -44,7 +44,7 @@ export function YeastScreenRowAttenuation(props: YeastScreenRowSectionProps & {
           />
         </View>
         <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
-          <Text fontSize={11} opacity={0.8} mb="$1" style={{ textAlign: "center" }}>
+          <Text fontSize={11} opacity={0.8} mb="1" style={{ textAlign: "center" }}>
             {t("yeastAttenMaxLabel")}
           </Text>
           <ReadOnlyField
@@ -58,7 +58,7 @@ export function YeastScreenRowAttenuation(props: YeastScreenRowSectionProps & {
         </View>
       </View>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {tAnalysis("customAttenuationPercentLabel")}
         </Text>
         <Input
@@ -66,14 +66,14 @@ export function YeastScreenRowAttenuation(props: YeastScreenRowSectionProps & {
           onChangeText={(text) => onAttenuationOverrideChange(r.id, text)}
           keyboardType="decimal-pad"
           placeholder="—"
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {t("yeastFermentationTempLabel", { unit: tUnits("C") })}
         </Text>
         <Input
@@ -87,10 +87,10 @@ export function YeastScreenRowAttenuation(props: YeastScreenRowSectionProps & {
             });
           }}
           keyboardType="decimal-pad"
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       <View>

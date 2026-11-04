@@ -14,10 +14,10 @@ export function LoginLink() {
     >
       <XStack ai="center" height={28}>
         <SizableText
-          size="$2"
+          size="sm"
           color="var(--info)"
-          fontFamily="$body"
-          hoverStyle={{ textDecoration: "underline" }}
+          fontFamily="body"
+          textDecoration="hover:underline"
         >
           {t("login")}
         </SizableText>

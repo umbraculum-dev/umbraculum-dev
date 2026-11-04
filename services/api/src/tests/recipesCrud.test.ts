@@ -333,6 +333,18 @@ describe("recipes (workspace scoped)", () => {
     expect(patched.recipe.style).toBe("Custom");
     expect(patched.recipe.notes).toBe("Updated notes");
 
+    // Native/web editors send notes: null for empty; must not 400 validation_error.
+    const clearNotes = await app.inject({
+      method: "PATCH",
+      url: `/recipes/${created.recipe.id}`,
+      headers: { cookie: cookieA },
+      payload: { notes: null },
+    });
+    expect(clearNotes.statusCode).toBe(200);
+    const cleared = clearNotes.json() as { ok: boolean; recipe: { notes: string | null } };
+    expect(cleared.ok).toBe(true);
+    expect(cleared.recipe.notes).toBeNull();
+
     const getB = await app.inject({
       method: "GET",
       url: `/recipes/${created.recipe.id}`,

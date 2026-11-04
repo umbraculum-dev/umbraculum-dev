@@ -1,7 +1,7 @@
 {
   "enabled": true,
-  "id": "public-alpha-january-2027",
+  "id": "v1-0-0-testing",
   "variant": "info",
   "dismissible": true,
-  "html": "<strong>Going public soon.</strong> Umbraculum is preparing its public alpha — target date <time datetime=\"2027-01-01\">1&nbsp;January&nbsp;2027</time>. We are updating documentation, publishing the repository, and releasing packages. The native stack has <strong>upgraded to Expo SDK 58</strong>. You may browse, fork, and download what is available today, but expect gaps until the flip is complete. Thank you for your patience."
+  "html": "<strong>1.0.0 released for testing.</strong> Umbraculum is usable now — testing and fixes continue over the coming weeks. The stack has <strong>upgraded to Tamagui&nbsp;3</strong> and <strong>Expo&nbsp;SDK&nbsp;58</strong>. Browse, fork, and try the product; expect ongoing hardening rather than a finished-forever release."
 }

@@ -14,7 +14,7 @@ export function RecipeTitleWithMeta(props: {
   const { title, recipeId, enabled, loadRecipeMeta } = props;
 
   return (
-    <YStack gap="$1" mb="$2">
+    <YStack gap="1" mb="2">
       <H1 mb={0}>{title}</H1>
       <RecipeMetaLine
         recipeId={recipeId}

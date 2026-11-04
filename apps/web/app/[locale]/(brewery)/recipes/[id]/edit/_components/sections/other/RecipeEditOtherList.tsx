@@ -8,14 +8,14 @@ export function RecipeEditOtherList({model}: {model: RecipeEditPageModel}) {
 
   if (!miscRows.length) {
     return (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="3" mb={0}>
         No other ingredients yet.
       </SizableText>
     );
   }
 
   return (
-    <YStack gap="$3" mt="$3" w="100%" minWidth={0}>
+    <YStack gap="3" mt="3" w="100%" minWidth={0}>
       {miscRows.map((r, idx) => (
         <RecipeEditOtherRowFields key={r.id} model={model} row={r} idx={idx} />
       ))}

@@ -30,10 +30,10 @@ export default function AiPage() {
   }
 
   return (
-    <YStack gap="$4">
-      <XStack alignItems="center" gap="$3" mb="$2">
+    <YStack gap="4">
+      <XStack alignItems="center" gap="3" mb="2">
         <H1 id="ai-page-title">AI</H1>
-        <XStack gap="$3" marginLeft="auto">
+        <XStack gap="3" marginLeft="auto">
           <Link href="settings">{tActions("openSettings")}</Link>
           <Link href="usage">{tActions("openUsage")}</Link>
         </XStack>

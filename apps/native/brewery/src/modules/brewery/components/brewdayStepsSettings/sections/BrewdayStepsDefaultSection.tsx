@@ -20,8 +20,8 @@ export function BrewdayStepsDefaultSection(props: { model: NativeBrewdayStepsSet
   } = props.model;
 
   return (
-    <Card gap="$2">
-      <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("defaultSteps")} width="100%" justifyContent="space-between">
+    <Card gap="2">
+      <SectionToggleButton variant="quiet" size="md" onPress={() => toggleOpen("defaultSteps")} width="100%" justifyContent="space-between">
         <Heading fontSize={18}>{t("sections.brewdayStepsDefault.title")}</Heading>
         <Text opacity={0.7}>{openSections.includes("defaultSteps") ? "▾" : "▸"}</Text>
       </SectionToggleButton>
@@ -31,7 +31,7 @@ export function BrewdayStepsDefaultSection(props: { model: NativeBrewdayStepsSet
             {t("defaultSectionNote")}
           </Text>
           {defaultSteps.map((st, idx) => (
-            <Card key={st.id} gap="$2" p="$3" background="$background" borderWidth={1} borderColor="$borderColor">
+            <Card key={st.id} gap="2" p="3" background="background" borderWidth={1} borderColor="borderColor">
               <Text fontSize={12} fontWeight="600">
                 {idx + 1}. {st.name}
               </Text>
@@ -50,7 +50,7 @@ export function BrewdayStepsDefaultSection(props: { model: NativeBrewdayStepsSet
                 closeLabel={tCommon("close")}
               />
               <View>
-                <Text fontSize={11} opacity={0.8} mb="$1">
+                <Text fontSize={11} opacity={0.8} mb="1">
                   {t("minutes")}
                 </Text>
                 <Input
@@ -62,10 +62,10 @@ export function BrewdayStepsDefaultSection(props: { model: NativeBrewdayStepsSet
                   }
                   placeholder="—"
                   keyboardType="number-pad"
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 />
               </View>
             </Card>

@@ -40,9 +40,9 @@ export function EquipmentCreateMashFields(props: {
   return (
     <fieldset className="brew-fieldset">
       <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-mash-vol">
               {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -52,18 +52,18 @@ export function EquipmentCreateMashFields(props: {
               inputMode="decimal"
               value={createMashVolumeLiters}
               onChangeText={setCreateMashVolumeLiters}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-mash-eff">
               {t("mashEfficiencyPercentLabel")}
             </RecipeEditFieldLabel>
@@ -73,18 +73,18 @@ export function EquipmentCreateMashFields(props: {
               inputMode="decimal"
               value={createMashEfficiencyPercent}
               onChangeText={setCreateMashEfficiencyPercent}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-mash-losses">
               {t("mashLossesLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -94,18 +94,18 @@ export function EquipmentCreateMashFields(props: {
               inputMode="decimal"
               value={createMashLossesLiters}
               onChangeText={setCreateMashLossesLiters}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-mash-thickness">
               {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
             </RecipeEditFieldLabel>
@@ -115,18 +115,18 @@ export function EquipmentCreateMashFields(props: {
               inputMode="decimal"
               value={createMashThicknessLPerKg}
               onChangeText={setCreateMashThicknessLPerKg}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-grain-abs">
               {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
             </RecipeEditFieldLabel>
@@ -136,18 +136,18 @@ export function EquipmentCreateMashFields(props: {
               inputMode="decimal"
               value={createMashGrainAbsorptionLPerKg}
               onChangeText={setCreateMashGrainAbsorptionLPerKg}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="equip-water-leftover">
               {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
             </RecipeEditFieldLabel>
@@ -157,13 +157,13 @@ export function EquipmentCreateMashFields(props: {
               inputMode="decimal"
               value={createMashWaterLeftoverLiters}
               onChangeText={setCreateMashWaterLeftoverLiters}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

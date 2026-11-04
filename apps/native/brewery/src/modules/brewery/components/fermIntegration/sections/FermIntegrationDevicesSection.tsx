@@ -26,7 +26,7 @@ export function FermIntegrationDevicesSection(props: {
         </Text>
       ) : (
         devices.map((d) => (
-          <Card key={d.id} gap="$1">
+          <Card key={d.id} gap="1">
             <Text fontSize={12}>
               {t("sections.integration.device")}: {d.displayName ?? d.deviceKey}
             </Text>

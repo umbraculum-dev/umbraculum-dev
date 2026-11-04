@@ -34,13 +34,13 @@ export function SaltAdditionsEditor(props: {
   const removeRow = (idx: number) => onChange(rows.filter((_, i) => i !== idx));
 
   return (
-    <Card gap="$3" padding={0} backgroundColor="transparent" borderWidth={0}>
+    <Card gap="3" padding={0} backgroundColor="transparent" borderWidth={0}>
       {rows.length ? (
-        <YStack gap="$3">
+        <YStack gap="3">
           {rows.map((row, idx) => (
-            <XStack key={idx} gap="$3" flexWrap="wrap" alignItems="flex-end">
-              <YStack flex={1} minWidth={180} gap="$1.5">
-                <Text fontSize={11} opacity={0.8} marginBottom="$1">
+            <XStack key={idx} gap="3" flexWrap="wrap" alignItems="flex-end">
+              <YStack flex={1} minWidth={180} gap="1-5">
+                <Text fontSize={11} opacity={0.8} marginBottom="1">
                   {t("salt")}
                 </Text>
                 <SelectField
@@ -55,8 +55,8 @@ export function SaltAdditionsEditor(props: {
                 />
               </YStack>
 
-              <YStack flex={1} minWidth={140} gap="$1.5">
-                <Text fontSize={11} opacity={0.8} marginBottom="$1">
+              <YStack flex={1} minWidth={140} gap="1-5">
+                <Text fontSize={11} opacity={0.8} marginBottom="1">
                   {t("amountLabel", { unit: tUnits("g") })}
                 </Text>
                 <Input
@@ -64,19 +64,19 @@ export function SaltAdditionsEditor(props: {
                   keyboardType="decimal-pad"
                   value={String(row.grams)}
                   onChangeText={(text) => updateRow(idx, { grams: Number(text) || 0 })}
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                   disabled={disabled}
                 />
               </YStack>
 
               <Button
-                size="$3"
-                chromeless
+                size="md"
+                variant="quiet"
                 onPress={() => removeRow(idx)}
-                disabled={disabled}
+                disabled={disabled === true}
                 accessibilityLabel={tCommon("remove")}
               >
                 <Text fontSize={12}>{tCommon("remove")}</Text>
@@ -90,7 +90,7 @@ export function SaltAdditionsEditor(props: {
         </Text>
       )}
 
-      <Button size="$3" onPress={addRow} disabled={disabled}>
+      <Button size="md" onPress={addRow} disabled={disabled === true}>
         <Text>{t("addSalt")}</Text>
       </Button>
     </Card>

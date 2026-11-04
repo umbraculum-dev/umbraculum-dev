@@ -15,17 +15,17 @@ function BrewSessionStepTimerControls(props: {
   const { t, canCall, session, onStepTimer } = ctx;
 
   return (
-    <XStack gap="$2" items="center" flexWrap="wrap" width="100%">
+    <XStack gap="2" items="center" flexWrap="wrap" width="100%">
       {st.timerState === "idle" || st.timerState === "paused" ? (
         <Button
           onPress={() => void onStepTimer(st.id, "start")}
           disabled={!canCall || !session?.startedAt}
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
         >
           {t("timerStart")}
         </Button>
@@ -34,12 +34,12 @@ function BrewSessionStepTimerControls(props: {
         <Button
           onPress={() => void onStepTimer(st.id, "pause")}
           disabled={!canCall || !session?.startedAt}
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
         >
           {t("timerPause")}
         </Button>
@@ -48,12 +48,12 @@ function BrewSessionStepTimerControls(props: {
         <Button
           onPress={() => void onStepTimer(st.id, "stop")}
           disabled={!canCall || !session?.startedAt}
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
         >
           {t("timerStop")}
         </Button>
@@ -81,10 +81,10 @@ export function BrewSessionStepCardTimerBlock(props: {
 
   if (variant === "preset") {
     return (
-      <YStack gap="$1">
+      <YStack gap="1">
         {st.status === "in_progress" ? (
           <>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {st.timerState === "stopped"
                 ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) })
                 : t("timerLine", {
@@ -92,7 +92,7 @@ export function BrewSessionStepCardTimerBlock(props: {
                     planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
                   })}
               {st.timerState !== "stopped" && remainingSeconds != null ? (
-                <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+                <SizableText as="span" size="2" color="var(--text-muted)" fontFamily="body">
                   {" "}
                   · {t("countdownLine", { remaining: formatElapsedSeconds(remainingSeconds) })}
                 </SizableText>
@@ -101,7 +101,7 @@ export function BrewSessionStepCardTimerBlock(props: {
             <BrewSessionStepTimerControls step={st} ctx={ctx} />
           </>
         ) : (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
             {t("stepDurationTimerIdle")}
           </SizableText>
         )}
@@ -110,8 +110,8 @@ export function BrewSessionStepCardTimerBlock(props: {
   }
 
   return (
-    <YStack gap="$1">
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+    <YStack gap="1">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {st.timerState === "stopped"
           ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) })
           : t("timerLine", {
@@ -119,7 +119,7 @@ export function BrewSessionStepCardTimerBlock(props: {
               planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
             })}
         {st.timerState !== "stopped" && remainingSeconds != null ? (
-          <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText as="span" size="2" color="var(--text-muted)" fontFamily="body">
             {" "}
             · {t("countdownLine", { remaining: formatElapsedSeconds(remainingSeconds) })}
           </SizableText>
@@ -128,7 +128,7 @@ export function BrewSessionStepCardTimerBlock(props: {
         isRelativeCountdownRelevant &&
         relativeCountdownSecondsDisplay != null &&
         !showRelativeCountdown ? (
-          <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText as="span" size="2" color="var(--text-muted)" fontFamily="body">
             {" "}
             · {relativeCountdownLine}
           </SizableText>
@@ -147,11 +147,11 @@ export function BrewSessionStepCardLogFields(props: { step: BrewSessionStep; ctx
     <View flexBasis="100%" w="100%">
       <details>
         <RecipeEditSummary>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body">
             {t("stepNoteLabel")}
           </SizableText>
         </RecipeEditSummary>
-        <View mt="$2">
+        <View mt="2">
           <RecipeEditFieldLabel htmlFor={`step-note-${st.id}`}>{t("stepNoteLabel")}</RecipeEditFieldLabel>
           <TextArea
             id={`step-note-${st.id}`}
@@ -161,8 +161,8 @@ export function BrewSessionStepCardLogFields(props: { step: BrewSessionStep; ctx
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </View>
       </details>

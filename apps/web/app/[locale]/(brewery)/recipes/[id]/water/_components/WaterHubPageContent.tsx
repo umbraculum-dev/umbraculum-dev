@@ -27,14 +27,14 @@ export function WaterHubPageContent({ model }: { model: UseWaterHubPageModel }) 
 
   return (
     <>
-      <YStack width="100%" gap="$1" mb="$2">
+      <YStack width="100%" gap="1" mb="2">
         <H1 mt={0} mb={0}>{t("title")}</H1>
         <RecipeMetaLine
           recipeId={recipeId}
           enabled={authState.status === "ready"}
           loadRecipeMeta={loadRecipeMeta}
         />
-        <SizableText size="$2" fontFamily="$body" mt={0} mb={0} display="block">
+        <SizableText size="2" fontFamily="body" mt={0} mb={0} display="block">
           <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
         </SizableText>
       </YStack>
@@ -43,7 +43,7 @@ export function WaterHubPageContent({ model }: { model: UseWaterHubPageModel }) 
         left={null}
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
-        mb="$2"
+        mb="2"
       />
 
       {authState.status === "error" ? (

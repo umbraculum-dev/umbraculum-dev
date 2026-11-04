@@ -11,11 +11,11 @@ export function InventoryFermentablesItemListBlock(props: InventorySectionProps)
 
   if (itemsByCategory("fermentable").length === 0) {
     return (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("noItems")}</SizableText>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">{t("noItems")}</SizableText>
     );
   }
 
   return (
-    <YStack gap="$2">{itemsByCategory("fermentable").map((it) => renderInventoryItemRow(m, it))}</YStack>
+    <YStack gap="2">{itemsByCategory("fermentable").map((it) => renderInventoryItemRow(m, it))}</YStack>
   );
 }

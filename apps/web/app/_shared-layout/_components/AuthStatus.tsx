@@ -15,11 +15,11 @@ export function AuthStatus({ me, activeWorkspace }: AuthStatusProps) {
   const t = useTranslations("nav");
 
   return (
-    <XStack ai="center" gap="$2" flexWrap="wrap" minHeight={28}>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+    <XStack ai="center" gap="2" flexWrap="wrap" minHeight={28}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("signedInAs")}: <CodeInline>{me.user.email}</CodeInline>
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("activeWorkspace")}:{" "}
         {activeWorkspace ? (
           activeWorkspace.name

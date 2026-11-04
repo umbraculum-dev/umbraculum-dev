@@ -32,10 +32,10 @@ export function WaterSpargeSaltsEditorBlock({ model }: { model: WaterSpargeSalts
         disabled={!canCall}
       />
 
-      <YStack mt="$3" gap="$2">
-        <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <YStack mt="3" gap="2">
+        <XStack gap="3" alignItems="center" flexWrap="wrap">
           <Button
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -46,7 +46,7 @@ export function WaterSpargeSaltsEditorBlock({ model }: { model: WaterSpargeSalts
             {savingSpargeSalts ? "Saving…" : "Save salts draft"}
           </Button>
           <Button
-            size="$3"
+            size="md"
             bg="var(--surface-2)"
             borderWidth={1}
             borderColor="var(--border)"
@@ -57,7 +57,7 @@ export function WaterSpargeSaltsEditorBlock({ model }: { model: WaterSpargeSalts
             {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
           </Button>
           {spargeSaltsStatus ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" role="status" aria-live="polite">
               {spargeSaltsStatus}
             </SizableText>
           ) : null}
@@ -78,7 +78,7 @@ export function WaterSpargeSaltsEditorBlock({ model }: { model: WaterSpargeSalts
         ) : null}
       </YStack>
 
-      {spargeSaltsError ? <ErrorBox mt="$3">{spargeSaltsError}</ErrorBox> : null}
+      {spargeSaltsError ? <ErrorBox mt="3">{spargeSaltsError}</ErrorBox> : null}
     </>
   );
 }

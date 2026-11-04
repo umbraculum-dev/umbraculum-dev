@@ -28,11 +28,11 @@ export function BrewdayStepsCustomSection(props: { model: Model }) {
       onOpenChange={(open) => setSectionOpen("brewdayStepsCustom", open)}
     >
       <SizableText
-        size="$2"
+        size="sm"
         color="var(--text-muted)"
-        fontFamily="$body"
+        fontFamily="body"
         mt={0}
-        mb="$2"
+        mb="2"
       >
         {t("customSectionNote")}
       </SizableText>
@@ -41,14 +41,14 @@ export function BrewdayStepsCustomSection(props: { model: Model }) {
 
       <BrewdayStepsCustomStepRows model={props.model} />
 
-      <XStack gap="$3" items="center" mt="$3">
+      <XStack gap="3" items="center" mt="3">
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={() => { void onSave(); }}
           disabled={!canCallAccountScoped || saving}
         >

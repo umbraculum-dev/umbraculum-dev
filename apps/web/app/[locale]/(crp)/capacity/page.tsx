@@ -61,16 +61,16 @@ export default function CrpCapacityPage() {
   };
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <H1>{tCapacity("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("subtitle")}
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {tCapacity("note")}
       </SizableText>
 
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <RefreshButton onClick={() => void refresh()} disabled={!canCall || loading}>
           {loading ? t("refreshing") : t("refresh")}
         </RefreshButton>
@@ -91,13 +91,13 @@ export default function CrpCapacityPage() {
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
       {loading && buckets.length === 0 ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
       {!loading && buckets.length === 0 && !error ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noCapacity")}
         </SizableText>
       ) : null}
@@ -107,9 +107,9 @@ export default function CrpCapacityPage() {
           <ul className="brew-recipe-list">
             {buckets.map((bucket) => (
               <li key={`${bucket.resourceId}:${bucket.bucketStartAt}`} className="brew-recipe-list-row">
-                <YStack gap="$2">
+                <YStack gap="2">
                   <CapacityBucketSummary bucket={bucket} labels={labels} />
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="3" flexWrap="wrap">
                     <Link href={`/resources/${encodeURIComponent(bucket.resourceId)}`}>
                       {tCapacity("resourceLink")}
                     </Link>

@@ -11,9 +11,9 @@ export function WaterHubAlkVsBicarbSection(props: { model: NativeWaterHubScreenM
 
   return (
     <Accordion.Item value="alkVsBicarb">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("alkVsBicarbTitle")}</Heading>
               <Text opacity={0.7}>{openSections.includes("alkVsBicarb") ? "▾" : "▸"}</Text>
@@ -21,12 +21,12 @@ export function WaterHubAlkVsBicarbSection(props: { model: NativeWaterHubScreenM
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <Text fontSize={12} opacity={0.8} mb="$2">
+          <Text fontSize={12} opacity={0.8} mb="2">
             {t("alkVsBicarbSubtitle")}
           </Text>
-          <Text fontSize={12} mb="$1">{t("alkVsBicarbPoint1")}</Text>
-          <Text fontSize={12} mb="$1">{t("alkVsBicarbPoint2")}</Text>
-          <Text fontSize={12} mb="$1">{t("alkVsBicarbPoint3")}</Text>
+          <Text fontSize={12} mb="1">{t("alkVsBicarbPoint1")}</Text>
+          <Text fontSize={12} mb="1">{t("alkVsBicarbPoint2")}</Text>
+          <Text fontSize={12} mb="1">{t("alkVsBicarbPoint3")}</Text>
           <Text fontSize={12}>{t("alkVsBicarbPoint4")}</Text>
         </Accordion.Content>
       </Card>

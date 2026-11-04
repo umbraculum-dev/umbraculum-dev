@@ -25,23 +25,23 @@ export function AdSlotCard(props: AdSlotCardProps) {
     ? { accessibilityLabel: props.ariaLabel }
     : webAsideProps;
   return (
-    <YStack marginVertical={12} gap="$1.5">
+    <YStack marginVertical={12} gap="1-5">
       <Card
         {...a11yProps}
-        backgroundColor="$background"
+        backgroundColor="background"
         borderWidth={1}
-        borderColor="$borderColor"
-        borderRadius="$2"
+        borderColor="borderColor"
+        borderRadius="2"
         padding={10}
       >
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <Card
             height={props.mediaHeightPx}
             width="100%"
             maxWidth="100%"
             overflow="hidden"
-            borderRadius="$2"
-            backgroundColor="$background"
+            borderRadius="2"
+            backgroundColor="background"
             padding={0}
           >
             {props.media}

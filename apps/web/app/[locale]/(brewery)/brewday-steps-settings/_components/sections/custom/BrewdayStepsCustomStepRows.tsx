@@ -26,19 +26,19 @@ export function BrewdayStepsCustomStepRows(props: { model: Model }) {
   if (!customSteps.length) return null;
 
   return (
-    <YStack gap="$2" mt="$3">
+    <YStack gap="2" mt="3">
       {customSteps.map((s, idx) => (
         <RecipeEditIngredientCard key={s.id}>
-          <YStack gap="$2">
-            <XStack gap="$2" items="center" flexWrap="wrap">
-              <XStack gap="$1" flexShrink={0}>
+          <YStack gap="2">
+            <XStack gap="2" items="center" flexWrap="wrap">
+              <XStack gap="1" flexShrink={0}>
                 <Button
-                  size="$2"
+                  size="sm"
                   bg="var(--surface-2)"
                   borderWidth={1}
                   borderColor="var(--border)"
                   color="var(--text)"
-                  fontFamily="$body"
+                  fontFamily="body"
                   onPress={() => moveCustomStepUp(idx)}
                   disabled={idx === 0}
                   aria-label={t("moveUp")}
@@ -46,12 +46,12 @@ export function BrewdayStepsCustomStepRows(props: { model: Model }) {
                   ↑
                 </Button>
                 <Button
-                  size="$2"
+                  size="sm"
                   bg="var(--surface-2)"
                   borderWidth={1}
                   borderColor="var(--border)"
                   color="var(--text)"
-                  fontFamily="$body"
+                  fontFamily="body"
                   onPress={() => moveCustomStepDown(idx)}
                   disabled={idx === customSteps.length - 1}
                   aria-label={t("moveDown")}
@@ -67,14 +67,14 @@ export function BrewdayStepsCustomStepRows(props: { model: Model }) {
                   id={`custom-name-${s.id}`}
                   value={s.name}
                   onChangeText={(v) =>
-                    updateCustomStep(s.id, { name: v })}
-                  size="$3"
+                                    updateCustomStep(s.id, { name: v })}
+                  size="md"
                   w="100%"
                   bg="var(--surface)"
                   borderWidth={1}
                   borderColor="var(--border)"
-                  rounded="$2"
-                  fontFamily="$body"
+                  rounded="2"
+                  fontFamily="body"
                 />
               </View>
               <View minW={80}>
@@ -84,23 +84,23 @@ export function BrewdayStepsCustomStepRows(props: { model: Model }) {
                 <Input
                   id={`custom-minutes-${s.id}`}
                   value={
-                    s.minutes != null && s.minutes !== undefined
-                      ? String(s.minutes)
-                      : ""
-                  }
+                                    s.minutes != null && s.minutes !== undefined
+                                      ? String(s.minutes)
+                                      : ""
+                                  }
                   onChangeText={(v) => {
-                    const m = parseMinutes(v);
-                    updateCustomStep(s.id, { minutes: m });
-                  }}
+                                    const m = parseMinutes(v);
+                                    updateCustomStep(s.id, { minutes: m });
+                                  }}
                   placeholder="—"
                   keyboardType="numeric"
-                  size="$3"
+                  size="md"
                   w="100%"
                   bg="var(--surface)"
                   borderWidth={1}
                   borderColor="var(--border)"
-                  rounded="$2"
-                  fontFamily="$body"
+                  rounded="2"
+                  fontFamily="body"
                 />
               </View>
               <View minW={140}>
@@ -116,14 +116,14 @@ export function BrewdayStepsCustomStepRows(props: { model: Model }) {
                   width="full"
                 />
               </View>
-              <XStack gap="$2" items="center">
+              <XStack gap="2" items="center">
                 <Checkbox
                   id={`custom-exclude-${s.id}`}
                   checked={s.exclude}
                   onCheckedChange={(c) =>
-                    updateCustomStep(s.id, { exclude: c === true })
-                  }
-                  size="$2"
+                                    updateCustomStep(s.id, { exclude: c === true })
+                                  }
+                  size="sm"
                   aria-label={`${t("exclude")} ${s.name}`}
                 >
                   <Checkbox.Indicator />
@@ -131,20 +131,20 @@ export function BrewdayStepsCustomStepRows(props: { model: Model }) {
                 <SizableText
                   as="label"
                   htmlFor={`custom-exclude-${s.id}`}
-                  size="$2"
+                  size="sm"
                   color="var(--text-muted)"
-                  fontFamily="$body"
+                  fontFamily="body"
                 >
                   {t("exclude")}
                 </SizableText>
               </XStack>
               <Button
-                size="$2"
+                size="sm"
                 bg="var(--surface-2)"
                 borderWidth={1}
                 borderColor="var(--border)"
                 color="var(--text)"
-                fontFamily="$body"
+                fontFamily="body"
                 onPress={() => removeCustomStep(s.id)}
                 aria-label={`${t("remove")} ${s.name}`}
               >

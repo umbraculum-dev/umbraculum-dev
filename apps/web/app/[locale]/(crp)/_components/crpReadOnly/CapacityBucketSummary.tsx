@@ -23,16 +23,16 @@ export function CapacityBucketSummary({
   };
 }) {
   return (
-    <YStack gap="$1">
-      <SizableText fontFamily="$body">
+    <YStack gap="1">
+      <SizableText fontFamily="body">
         <SizableText fontWeight="bold">{labels.resource}:</SizableText>{" "}
         {bucket.resourceCode}
       </SizableText>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.bucketStartAt} value={formatDateTime(bucket.bucketStartAt, labels.none)} />
         <CrpMeta label={labels.bucketEndAt} value={formatDateTime(bucket.bucketEndAt, labels.none)} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta
           label={labels.availableMinutes}
           value={

@@ -12,9 +12,9 @@ export function WaterHubRecapSection(props: { model: NativeWaterHubScreenModel }
 
   return (
     <Accordion.Item value="recap">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("recap")}</Heading>
               <Text opacity={0.7}>{openSections.includes("recap") ? "▾" : "▸"}</Text>
@@ -22,7 +22,7 @@ export function WaterHubRecapSection(props: { model: NativeWaterHubScreenModel }
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <Text fontSize={12} opacity={0.8} mb="$2">
+          <Text fontSize={12} opacity={0.8} mb="2">
             {t("recapSubtitle")}
           </Text>
           {summary && displayStreams ? (

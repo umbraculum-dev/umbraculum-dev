@@ -11,7 +11,7 @@ export function WaterBoilSaltsEditorBlock({ model }: { model: WaterBoilPageModel
       <H2 id="boil-salts-heading" mt={0}>
         {t("saltAdditionsHeading")}
       </H2>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("saltAdditionsBaseHelp")}
       </SizableText>
 

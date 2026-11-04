@@ -15,7 +15,7 @@ export function PimProductsTable({ model }: { model: PimProductsPageModel }) {
 
   if (loading && filtered.length === 0) {
     return (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {tProducts("loading")}
       </SizableText>
     );
@@ -23,7 +23,7 @@ export function PimProductsTable({ model }: { model: PimProductsPageModel }) {
 
   if (!loading && filtered.length === 0 && !error) {
     return (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {tProducts("noProducts")}
       </SizableText>
     );
@@ -33,22 +33,22 @@ export function PimProductsTable({ model }: { model: PimProductsPageModel }) {
 
   return (
     <View role="region" aria-labelledby="products-heading">
-      <SizableText id="products-heading" size="$4" fontWeight="bold" fontFamily="$heading" mb="$2">
+      <SizableText id="products-heading" size="4" fontWeight="bold" fontFamily="heading" mb="2">
         {tProducts("listTitle")}
       </SizableText>
       <ul className="brew-recipe-list">
         {filtered.map((p) => (
           <li key={p.id} className="brew-recipe-list-row">
-            <YStack gap="$1.5">
-              <SizableText fontFamily="$body">
+            <YStack gap="1-5">
+              <SizableText fontFamily="body">
                 <SizableText fontWeight="bold">{p.sku}</SizableText>
                 <SizableText color="var(--text-muted)"> · {p.name}</SizableText>
               </SizableText>
-              <XStack gap="$3" flexWrap="wrap">
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              <XStack gap="3" flexWrap="wrap">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                   <SizableText fontWeight="bold">{tFields("status")}:</SizableText> {tValues(p.status)}
                 </SizableText>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                   <SizableText fontWeight="bold">{tFields("attributeSet")}:</SizableText>{" "}
                   {p.primaryAttributeSetId ?? tValues("none")}
                 </SizableText>

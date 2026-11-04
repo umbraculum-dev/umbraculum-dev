@@ -19,9 +19,9 @@ export function WaterMashSaltsSection(props: { model: WaterMashScreenModel }) {
 
   return (
     <Accordion.Item value="salts">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("saltAdditionsManualV0")}</Heading>
               <Text opacity={0.7}>{openSections.includes("salts") ? "▾" : "▸"}</Text>
@@ -36,8 +36,8 @@ export function WaterMashSaltsSection(props: { model: WaterMashScreenModel }) {
             disabled={!canCall}
           />
           <Button
-            size="$3"
-            mt="$2"
+            size="md"
+            mt="2"
             onPress={() => { void saveSettings({ mashSaltAdditionsJson: saltAdditions }); }}
             disabled={!canCall}
           >

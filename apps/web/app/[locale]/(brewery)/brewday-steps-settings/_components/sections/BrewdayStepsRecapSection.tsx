@@ -18,7 +18,7 @@ export function BrewdayStepsRecapSection(props: { model: Model }) {
       open={openSections['brewdayStepsRecap']}
       onOpenChange={(open) => setSectionOpen("brewdayStepsRecap", open)}
     >
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("sections.brewdayStepsRecap.empty")}
       </SizableText>
     </RecipeEditSection>

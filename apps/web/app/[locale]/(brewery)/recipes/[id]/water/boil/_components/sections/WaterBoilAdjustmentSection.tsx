@@ -15,7 +15,7 @@ export function WaterBoilAdjustmentSection({ model }: { model: WaterBoilPageMode
         <H2 id="boil-adjustment-heading" mt={0}>
           {t("adjustmentHeading")}
         </H2>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
           {t("adjustmentHelp")}
         </SizableText>
 
@@ -23,7 +23,7 @@ export function WaterBoilAdjustmentSection({ model }: { model: WaterBoilPageMode
         <WaterBoilAdjustmentActionsBlock model={model} />
         <WaterBoilMixedIonsBlock model={model} />
 
-        {profilesError ? <ErrorBox mt="$3">{profilesError}</ErrorBox> : null}
+        {profilesError ? <ErrorBox mt="3">{profilesError}</ErrorBox> : null}
       </View>
     </>
   );

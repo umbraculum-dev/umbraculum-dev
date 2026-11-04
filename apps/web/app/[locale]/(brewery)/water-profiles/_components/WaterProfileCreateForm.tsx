@@ -29,47 +29,47 @@ export function WaterProfileCreateForm(props: { model: Model }) {
   } = props.model;
 
   return (
-    <Accordion.Item value="admin" mt="$3">
+    <Accordion.Item value="admin" mt="3">
       <View className="brew-panel" aria-labelledby="admin-profiles-heading">
         <Accordion.Header>
-          <Accordion.Trigger unstyled cursor="pointer">
+          <Accordion.Trigger cursor="pointer">
             <XStack alignItems="center" justifyContent="space-between" width="100%">
               <H2 id="admin-profiles-heading" mt={0}>
                 {t("adminAddTitle")}
               </H2>
-              <SizableText size="$2" opacity={0.7}>
+              <SizableText size="2" opacity={0.7}>
                 {openSections.includes("admin") ? "▾" : "▸"}
               </SizableText>
             </XStack>
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
             {t("createdProfilesStartUnverified")}
           </SizableText>
 
           <form onSubmit={(...a) => { void onCreateProfile(...(a as Parameters<typeof onCreateProfile>)); }} aria-describedby={createError ? "create-error" : undefined}>
-            <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+            <XStack gap="3" flexWrap="wrap" ai="flex-end">
               <View width="100%" flexBasis="100%">
-                <YStack gap="$1.5">
+                <YStack gap="1-5">
                   <RecipeEditFieldLabel htmlFor="create-name">Profile name</RecipeEditFieldLabel>
                   <Input
                     id="create-name"
                     value={createName}
                     onChangeText={setCreateName}
-                    size="$3"
+                    size="md"
                     w="100%"
                     bg="var(--surface)"
                     borderWidth={1}
                     borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
+                    rounded="2"
+                    fontFamily="body"
                     required
                   />
                 </YStack>
               </View>
               <View flex={1} minWidth={200}>
-                <YStack gap="$1.5">
+                <YStack gap="1-5">
                   <RecipeEditFieldLabel htmlFor="create-scope">Scope</RecipeEditFieldLabel>
                   <BrewSelect
                     id="create-scope"
@@ -84,7 +84,7 @@ export function WaterProfileCreateForm(props: { model: Model }) {
                 </YStack>
               </View>
               <View flex={1} minWidth={200}>
-                <YStack gap="$1.5">
+                <YStack gap="1-5">
                   <RecipeEditFieldLabel htmlFor="create-type">Type</RecipeEditFieldLabel>
                   <BrewSelect
                     id="create-type"
@@ -99,20 +99,20 @@ export function WaterProfileCreateForm(props: { model: Model }) {
                 </YStack>
               </View>
               <View width="100%" flexBasis="100%">
-                <YStack gap="$1.5">
+                <YStack gap="1-5">
                   <RecipeEditFieldLabel htmlFor="create-ph">pH (optional)</RecipeEditFieldLabel>
                   <Input
                     id="create-ph"
                     keyboardType="decimal-pad"
                     value={createPh}
                     onChangeText={setCreatePh}
-                    size="$3"
+                    size="md"
                     w="100%"
                     bg="var(--surface)"
                     borderWidth={1}
                     borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
+                    rounded="2"
+                    fontFamily="body"
                     placeholder={t("phPlaceholder")}
                   />
                 </YStack>
@@ -121,11 +121,11 @@ export function WaterProfileCreateForm(props: { model: Model }) {
 
             <fieldset className="brew-fieldset-noborder">
               <legend className="brew-fieldset-legend">
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">
                   {t("ionsLegend", { unit: tUnits("ppm") })}
                 </SizableText>
               </legend>
-              <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+              <XStack gap="3" flexWrap="wrap" ai="flex-end">
                 {(
                   [
                     ["calcium", "Calcium (Ca)"],
@@ -137,20 +137,20 @@ export function WaterProfileCreateForm(props: { model: Model }) {
                   ] as const
                 ).map(([k, label]) => (
                   <View key={k} flex={1} minWidth={180}>
-                    <YStack gap="$1.5">
+                    <YStack gap="1-5">
                       <RecipeEditFieldLabel htmlFor={`ion-${k}`}>{label}</RecipeEditFieldLabel>
                       <Input
                         id={`ion-${k}`}
                         keyboardType="decimal-pad"
                         value={String((createIon as Record<string, number>)[k])}
                         onChangeText={(text) => setCreateIon((prev) => ({ ...prev, [k]: Number(text) || 0 }))}
-                        size="$3"
+                        size="md"
                         w="100%"
                         bg="var(--surface)"
                         borderWidth={1}
                         borderColor="var(--border)"
-                        rounded="$2"
-                        fontFamily="$body"
+                        rounded="2"
+                        fontFamily="body"
                       />
                     </YStack>
                   </View>
@@ -158,14 +158,14 @@ export function WaterProfileCreateForm(props: { model: Model }) {
               </XStack>
             </fieldset>
 
-            <XStack gap="$3" mt="$3" alignItems="center">
-              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!createName.trim() || createSubmitting}>
+            <XStack gap="3" mt="3" alignItems="center">
+              <Button as="button" type="submit" size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!createName.trim() || createSubmitting}>
                 {createSubmitting ? "Creating…" : "Create profile"}
               </Button>
             </XStack>
 
             {createError ? (
-              <ErrorBox id="create-error" mt="$3">{createError}</ErrorBox>
+              <ErrorBox id="create-error" mt="3">{createError}</ErrorBox>
             ) : null}
           </form>
         </Accordion.Content>

@@ -12,15 +12,15 @@ export function RecipeEditReadOnlyValue({ children }: RecipeEditReadOnlyValuePro
   return (
     <View
       data-readonly-field-value
-      p="$2"
+      p="2"
       bg="var(--field-readonly-bg)"
-      rounded="$2"
+      rounded="2"
       borderWidth={1}
       borderColor="var(--field-readonly-border)"
       userSelect="none"
       tabIndex={-1}
     >
-      <SizableText size="$2" fontFamily="$body" color="var(--text)">
+      <SizableText size="2" fontFamily="body" color="var(--text)">
         {children}
       </SizableText>
     </View>

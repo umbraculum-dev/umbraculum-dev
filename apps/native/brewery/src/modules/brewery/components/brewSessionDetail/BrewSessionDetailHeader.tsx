@@ -10,11 +10,11 @@ export function BrewSessionDetailHeader(props: { model: BrewSessionDetailScreenM
 
   return (
     <>
-      <Heading fontSize={20} mb="$2">
+      <Heading fontSize={20} mb="2">
         {t("detailTitle")}
       </Heading>
       {session ? (
-        <Text fontSize={12} opacity={0.8} mb="$3">
+        <Text fontSize={12} opacity={0.8} mb="3">
           {t("sessionCode")}: {session.code}
         </Text>
       ) : null}
@@ -23,20 +23,20 @@ export function BrewSessionDetailHeader(props: { model: BrewSessionDetailScreenM
         <Button
           onPress={() => { void exportWorkOrderPdf(); }}
           disabled={exportingPdf}
-          mb="$3"
+          mb="3"
         >
           <Text>{exportingPdf ? t("exportWorkOrderPdfWorking") : t("exportWorkOrderPdf")}</Text>
         </Button>
       ) : null}
 
       {error ? (
-        <Text fontSize={12} color="$red10" mb="$2">
+        <Text fontSize={12} color="red10" mb="2">
           {error}
         </Text>
       ) : null}
 
       {loading ? (
-        <Text fontSize={12} opacity={0.8} mb="$2">
+        <Text fontSize={12} opacity={0.8} mb="2">
           {t("loading")}
         </Text>
       ) : null}

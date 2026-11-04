@@ -12,7 +12,7 @@ export function WaterHubRecapMergedSummaryBlock({ model }: { model: UseWaterHubP
 
   return (
     <>
-      <H3 mt="$4">{t("mergedSummary")}</H3>
+      <H3 mt="4">{t("mergedSummary")}</H3>
       <ul className="brew-recipe-edit-list-disc brew-list-mt0">
         <li>
           {t("totalVolume")}: <code>{fmt("L", summary!.merged.totalVolumeLiters, 2)}</code> {tUnits("L")}
@@ -39,31 +39,31 @@ export function WaterHubRecapAdditionsBlock({ model }: { model: UseWaterHubPageM
 
   return (
     <>
-      <H4 mt="$3" mb="$1.5">{t("additionsPerStream")}</H4>
+      <H4 mt="3" mb="1-5">{t("additionsPerStream")}</H4>
       <ul className="brew-recipe-edit-list-disc brew-list-mt0">
         {displayStreams!.map((s) => (
           <li key={`adds-${s.key}`}>
-            <SizableText size="$2" fontFamily="$body">
+            <SizableText size="2" fontFamily="body">
               <SizableText fontWeight="bold">{s.label}</SizableText>
             </SizableText>
             <ul className="brew-recipe-edit-list-disc brew-list-mt1">
               {(s.saltsAddedLabel ? s.saltsAddedLabel.split("; ") : []).length ? (
                 (s.saltsAddedLabel as string).split("; ").map((p) => (
                   <li key={`adds-${s.key}-salt-${p}`}>
-                    <SizableText size="$2" fontFamily="$body">
+                    <SizableText size="2" fontFamily="body">
                       <SizableText color="var(--text-muted)">{t("salt")}</SizableText> <code>{p}</code>
                     </SizableText>
                   </li>
                 ))
               ) : (
                 <li>
-                  <SizableText size="$2" fontFamily="$body">
+                  <SizableText size="2" fontFamily="body">
                     <SizableText color="var(--text-muted)">{t("salt")}</SizableText> <code>—</code>
                   </SizableText>
                 </li>
               )}
               <li>
-                <SizableText size="$2" fontFamily="$body">
+                <SizableText size="2" fontFamily="body">
                   <SizableText color="var(--text-muted)">{t("acid")}</SizableText> <code>{s.acidType ?? "—"}</code>
                   {s.acidAmountLabel ? <SizableText color="var(--text-muted)"> · {s.acidAmountLabel}</SizableText> : null}
                 </SizableText>
@@ -81,7 +81,7 @@ export function WaterHubRecapMergedIonsBlock({ model }: { model: UseWaterHubPage
 
   if (!summary!.merged.ionsPpm) {
     return (
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2">
         {t("noMergedProfile")}
       </SizableText>
     );
@@ -89,8 +89,8 @@ export function WaterHubRecapMergedIonsBlock({ model }: { model: UseWaterHubPage
 
   return (
     <>
-      <XStack mt="$2" mb="$1.5" gap="$2" alignItems="baseline">
-        <SizableText size="$2" fontWeight="bold" fontFamily="$body">{t("mergedIonsTitle")}</SizableText>
+      <XStack mt="2" mb="1-5" gap="2" alignItems="baseline">
+        <SizableText size="2" fontWeight="bold" fontFamily="body">{t("mergedIonsTitle")}</SizableText>
         {surfaceMath
           ? (() => {
               const ex = mathExplain["waterHub.mergedIons"];
@@ -118,10 +118,10 @@ export function WaterHubRecapMergedIonsBlock({ model }: { model: UseWaterHubPage
             })()
           : null}
       </XStack>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb="$2">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb="2">
         {t("mergedIonsDescription")}
       </SizableText>
-      <View className="brew-table-wrap" mt="$2">
+      <View className="brew-table-wrap" mt="2">
         <table className="brew-table">
           <thead>
             <tr>

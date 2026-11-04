@@ -36,9 +36,9 @@ export function WaterMashAdjustmentSection(props: { model: WaterMashScreenModel 
 
   return (
     <Accordion.Item value="adjustment">
-      <Card gap="$2" mt="$2">
+      <Card gap="2" mt="2">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("adjustmentHeading")}</Heading>
               <Text opacity={0.7}>{openSections.includes("adjustment") ? "▾" : "▸"}</Text>
@@ -69,42 +69,42 @@ export function WaterMashAdjustmentSection(props: { model: WaterMashScreenModel 
               closeLabel={tCommon("close")}
             />
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </Text>
               <Input
                 keyboardType="decimal-pad"
                 value={tapVolumeLiters}
                 onChangeText={setTapVolumeLiters}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </Text>
               <Input
                 keyboardType="decimal-pad"
                 value={dilutionVolumeLiters}
                 onChangeText={setDilutionVolumeLiters}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
-            <Button size="$3" onPress={() => { void onSaveAdjustment(); }}>
+            <Button size="md" onPress={() => { void onSaveAdjustment(); }}>
               <Text>Save</Text>
             </Button>
             {mixedSourceProfile ? (
               <View style={{ marginTop: 12, padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
-                <Text fontSize={12} fontWeight="bold" mb="$2">
+                <Text fontSize={12} fontWeight="bold" mb="2">
                   Mixed water ions
                 </Text>
-                <Text fontSize={11} opacity={0.8} mb="$2">
+                <Text fontSize={11} opacity={0.8} mb="2">
                   Computed from profiles + volumes
                 </Text>
                 {[

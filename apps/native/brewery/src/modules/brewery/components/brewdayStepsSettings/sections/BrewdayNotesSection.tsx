@@ -10,8 +10,8 @@ export function BrewdayNotesSection(props: { model: NativeBrewdayStepsSettingsPa
   const { t, openSections, toggleOpen, brewdayNotes, setBrewdayNotes } = props.model;
 
   return (
-    <Card gap="$2">
-      <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("notes")} width="100%" justifyContent="space-between">
+    <Card gap="2">
+      <SectionToggleButton variant="quiet" size="md" onPress={() => toggleOpen("notes")} width="100%" justifyContent="space-between">
         <Heading fontSize={18}>{t("sections.brewdayNotes.title")}</Heading>
         <Text opacity={0.7}>{openSections.includes("notes") ? "▾" : "▸"}</Text>
       </SectionToggleButton>

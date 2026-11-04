@@ -33,7 +33,7 @@ export function RecipesListSection({ model }: { model: RecipesPageModel }) {
       spaced
     >
       {!loading && !hasRecipes ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noRecipes")}
         </SizableText>
       ) : null}
@@ -41,9 +41,9 @@ export function RecipesListSection({ model }: { model: RecipesPageModel }) {
         <ul className="brew-recipe-list">
           {pageRecipes.map((r) => (
             <li key={r.id} className="brew-recipe-list-row">
-              <YStack gap="$1.5">
-                <XStack justifyContent="space-between" alignItems="flex-start" columnGap="$3" rowGap="$0.5">
-                  <SizableText flex={1} fontFamily="$body">
+              <YStack gap="1-5">
+                <XStack justifyContent="space-between" alignItems="flex-start" columnGap="3" rowGap="0-5">
+                  <SizableText flex={1} fontFamily="body">
                     <SizableText fontWeight="bold">{r.name}</SizableText>
                     {r.style ? <SizableText color="var(--text-muted)"> ({r.style})</SizableText> : null}
                     {typeof r.version === "number" ? (
@@ -57,9 +57,9 @@ export function RecipesListSection({ model }: { model: RecipesPageModel }) {
                     ) : null}
                   </SizableText>
                   <Button
-                    size="$3"
-                    chromeless
+                    size="md"
                     color="var(--danger)"
+                    variant="quiet"
                     onPress={() => onAskDelete(r.id)}
                     disabled={!canCall || deletingId === r.id}
                     className="brew-recipe-list-delete-button"
@@ -67,20 +67,20 @@ export function RecipesListSection({ model }: { model: RecipesPageModel }) {
                     {t("delete.cta")}
                   </Button>
                 </XStack>
-                <XStack gap="$3" flexWrap="wrap">
+                <XStack gap="3" flexWrap="wrap">
                   <Link href={`/recipes/${r.id}/edit`}>{t("openEditor")}</Link>
                   <Link href={`/recipes/${r.id}/water`}>{t("openWater")}</Link>
                   <Link href={`/recipes/${r.id}/versions`}>{t("openVersions")}</Link>
                 </XStack>
                 {deleteConfirmId === r.id ? (
-                  <View className="brew-error-box" role="alert" mt="$1.5">
-                    <SizableText size="$2" fontFamily="$body" mt={0} mb="$2">
+                  <View className="brew-error-box" role="alert" mt="1-5">
+                    <SizableText size="2" fontFamily="body" mt={0} mb="2">
                       <SizableText fontWeight="bold">{t("delete.confirmTitle")}</SizableText>
                       <SizableText color="var(--text-muted)"> {t("delete.confirmBody")}</SizableText>
                     </SizableText>
-                    <XStack gap="$3" flexWrap="wrap" alignItems="center">
+                    <XStack gap="3" flexWrap="wrap" alignItems="center">
                       <Button
-                        size="$3"
+                        size="md"
                         bg="var(--surface-2)"
                         borderWidth={1}
                         borderColor="var(--border)"
@@ -91,7 +91,7 @@ export function RecipesListSection({ model }: { model: RecipesPageModel }) {
                         {deletingId === r.id ? t("delete.deleting") : t("delete.confirmCta")}
                       </Button>
                       <Button
-                        size="$3"
+                        size="md"
                         bg="var(--surface-2)"
                         borderWidth={1}
                         borderColor="var(--border)"
@@ -112,9 +112,9 @@ export function RecipesListSection({ model }: { model: RecipesPageModel }) {
 
       {hasRecipes && pageCount > 1 ? (
         <nav aria-label={t("pagination.ariaLabel")}>
-          <XStack gap="$3" mt="$3" alignItems="center">
+          <XStack gap="3" mt="3" alignItems="center">
             <Button
-              size="$3"
+              size="md"
               bg="var(--surface-2)"
               borderWidth={1}
               borderColor="var(--border)"
@@ -124,11 +124,11 @@ export function RecipesListSection({ model }: { model: RecipesPageModel }) {
             >
               {t("pagination.prev")}
             </Button>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" aria-live="polite">
               {t("pagination.status", { page, pages: pageCount })}
             </SizableText>
             <Button
-              size="$3"
+              size="md"
               bg="var(--surface-2)"
               borderWidth={1}
               borderColor="var(--border)"

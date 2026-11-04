@@ -5,4 +5,4 @@ export { AdSlot, Input, ReadOnlyField } from './components/index.cjs';
 import 'react';
 import '@umbraculum/i18n';
 import '@umbraculum/api-client';
-import 'tamagui';
+import '@umbraculum/ui';

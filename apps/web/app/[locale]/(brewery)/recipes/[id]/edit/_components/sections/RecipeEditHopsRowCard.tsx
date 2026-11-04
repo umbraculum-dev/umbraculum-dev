@@ -18,43 +18,43 @@ export function RecipeEditHopsRowCard({
 
   return (
     <RecipeEditIngredientCard>
-      <XStack gap="$3" flexWrap="wrap" items="flex-end">
+      <XStack gap="3" flexWrap="wrap" items="flex-end">
         <View alignSelf="center">
-          <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+          <SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">
             {idx + 1}
           </SizableText>
         </View>
-        <YStack gap="$1" flex={1} minW={280} minWidth={0}>
+        <YStack gap="1" flex={1} minW={280} minWidth={0}>
           <RecipeEditFieldLabel htmlFor={`hop-name-${row.id}`}>Name</RecipeEditFieldLabel>
           <Input
             id={`hop-name-${row.id}`}
             value={row.name}
             onChangeText={(text) =>
-              updateHopRow(row.id, { name: text, ingredientId: null, country: null })
-            }
+                        updateHopRow(row.id, { name: text, ingredientId: null, country: null })
+                      }
             autoComplete="off"
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
         {(row.country ?? "") ? (
-          <YStack gap="$1" w={240} maxW="100%">
+          <YStack gap="1" w={240} maxW="100%">
             <RecipeEditFieldLabel>Country</RecipeEditFieldLabel>
             <RecipeEditReadOnlyValue>{row.country}</RecipeEditReadOnlyValue>
           </YStack>
         ) : null}
         <Button
-          size="$2"
+          size="sm"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={() => removeHopRow(row.id)}
           aria-label={`Remove hop row ${idx + 1}`}
         >
@@ -62,8 +62,8 @@ export function RecipeEditHopsRowCard({
         </Button>
       </XStack>
 
-      <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
-        <YStack gap="$1" minW={100}>
+      <XStack gap="3" flexWrap="wrap" items="flex-end" mt="2">
+        <YStack gap="1" minW={100}>
           <RecipeEditFieldLabel htmlFor={`hop-g-${row.id}`}>
             {t("amountLabel", { unit: tUnits("g") })}
           </RecipeEditFieldLabel>
@@ -71,41 +71,41 @@ export function RecipeEditHopsRowCard({
             id={`hop-g-${row.id}`}
             value={String(row.amountGrams)}
             onChangeText={(text) =>
-              updateHopRow(row.id, { amountGrams: text === "" ? 0 : Number(text) })
-            }
+                        updateHopRow(row.id, { amountGrams: text === "" ? 0 : Number(text) })
+                      }
             keyboardType="decimal-pad"
-            size="$3"
+            size="md"
             w={120}
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
 
-        <YStack gap="$1" minW={90}>
+        <YStack gap="1" minW={90}>
           <RecipeEditFieldLabel htmlFor={`hop-aa-${row.id}`}>Alpha (%)</RecipeEditFieldLabel>
           <Input
             id={`hop-aa-${row.id}`}
             value={row.alphaAcidPercent ?? ""}
             onChangeText={(text) =>
-              updateHopRow(row.id, {
-                alphaAcidPercent: text === "" ? null : Number(text),
-              })
-            }
+                        updateHopRow(row.id, {
+                          alphaAcidPercent: text === "" ? null : Number(text),
+                        })
+                      }
             keyboardType="decimal-pad"
-            size="$3"
+            size="md"
             w={110}
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
 
-        <YStack gap="$1" minW={170}>
+        <YStack gap="1" minW={170}>
           <RecipeEditFieldLabel htmlFor={`hop-form-${row.id}`}>{tHops("typeLabel")}</RecipeEditFieldLabel>
           <BrewSelect
             id={`hop-form-${row.id}`}
@@ -128,7 +128,7 @@ export function RecipeEditHopsRowCard({
           />
         </YStack>
 
-        <YStack gap="$1" minW={130}>
+        <YStack gap="1" minW={130}>
           <RecipeEditFieldLabel htmlFor={`hop-use-${row.id}`}>Use</RecipeEditFieldLabel>
           <BrewSelect
             id={`hop-use-${row.id}`}
@@ -142,22 +142,22 @@ export function RecipeEditHopsRowCard({
           />
         </YStack>
 
-        <YStack gap="$1" minW={90}>
+        <YStack gap="1" minW={90}>
           <RecipeEditFieldLabel htmlFor={`hop-min-${row.id}`}>{tHops("timeBeforeEndOfBoilMin")}</RecipeEditFieldLabel>
           <Input
             id={`hop-min-${row.id}`}
             value={row.timeMinutes ?? ""}
             onChangeText={(text) =>
-              updateHopRow(row.id, { timeMinutes: text === "" ? null : Number(text) })
-            }
+                        updateHopRow(row.id, { timeMinutes: text === "" ? null : Number(text) })
+                      }
             keyboardType="decimal-pad"
-            size="$3"
+            size="md"
             w={110}
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </XStack>

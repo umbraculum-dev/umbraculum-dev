@@ -40,7 +40,7 @@ export function AboutScreen() {
               accessibilityRole="button"
               accessibilityLabel={t("translationsRowLinkText")}
             >
-              <Text fontSize={14} opacity={0.85} color="$blue10" textDecorationLine="underline">
+              <Text fontSize={14} opacity={0.85} color="blue10" textDecorationLine="underline">
                 {t("translationsRowLinkText")}
               </Text>
             </Pressable>

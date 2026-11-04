@@ -22,17 +22,17 @@ export function ConflictSummary({
   };
 }) {
   return (
-    <YStack gap="$1">
-      <SizableText fontFamily="$body">
+    <YStack gap="1">
+      <SizableText fontFamily="body">
         <SizableText fontWeight="bold">{labels.conflict}:</SizableText>{" "}
         {conflict.message}
       </SizableText>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.severity} value={conflict.severity} />
         <CrpMeta label={labels.status} value={conflict.status} />
         <CrpMeta label={labels.resource} value={conflict.resourceId ?? labels.none} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.startsAt} value={formatDateTime(conflict.startsAt, labels.none)} />
         <CrpMeta label={labels.endsAt} value={formatDateTime(conflict.endsAt, labels.none)} />
       </XStack>

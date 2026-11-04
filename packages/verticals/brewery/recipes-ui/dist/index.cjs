@@ -83,7 +83,7 @@ var import_tamagui = require("tamagui");
 var import_jsx_runtime2 = require("react/jsx-runtime");
 function StepBlock(props) {
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_tamagui.View, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_ui2.Text, { fontSize: 14, fontWeight: "600", marginBottom: "$1", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_ui2.Text, { fontSize: 14, fontWeight: "600", marginBottom: "1", children: [
       props.step,
       ". ",
       props.title
@@ -94,7 +94,7 @@ function StepBlock(props) {
 function ManualCellCountHelpBox(props) {
   const { t } = (0, import_i18n_react2.useT)("recipes.edit");
   const [expanded, setExpanded] = (0, import_react2.useState)(false);
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_ui2.Card, { gap: "$2", marginTop: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", padding: "$3", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_ui2.Card, { gap: "2", marginTop: "3", background: "background", borderWidth: 1, borderColor: "borderColor", padding: "3", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
     import_ui2.Collapsible,
     {
       title: t("yeastManualCellCountSummary"),
@@ -112,7 +112,7 @@ function ManualCellCountHelpBox(props) {
             body: t("yeastManualCellCountPrerequisitesBody")
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_tamagui.YStack, { gap: "$2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_tamagui.YStack, { gap: "2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(StepBlock, { step: 1, title: t("yeastManualCellCountStep1Title"), body: t("yeastManualCellCountStep1Body") }),
           /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_tamagui.View, { children: [
             props.renderImage({
@@ -121,7 +121,7 @@ function ManualCellCountHelpBox(props) {
               width: 320,
               height: 200
             }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_ui2.Text, { fontSize: 11, opacity: 0.8, marginTop: "$1", children: t("yeastManualCellCountStep1ImageLegend") })
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_ui2.Text, { fontSize: 11, opacity: 0.8, marginTop: "1", children: t("yeastManualCellCountStep1ImageLegend") })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(StepBlock, { step: 2, title: t("yeastManualCellCountStep2Title"), body: t("yeastManualCellCountStep2Body") }),
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(StepBlock, { step: 3, title: t("yeastManualCellCountStep3Title"), body: t("yeastManualCellCountStep3Body") }),
@@ -164,10 +164,10 @@ function SaltAdditionsEditor(props) {
   const addRow = () => onChange([...rows, { saltKey: "gypsum", grams: 0 }]);
   const updateRow = (idx, next) => onChange(rows.map((r, i) => i === idx ? { ...r, ...next } : r));
   const removeRow = (idx) => onChange(rows.filter((_, i) => i !== idx));
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_ui3.Card, { gap: "$3", padding: 0, backgroundColor: "transparent", borderWidth: 0, children: [
-    rows.length ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_tamagui2.YStack, { gap: "$3", children: rows.map((row, idx) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_tamagui2.XStack, { gap: "$3", flexWrap: "wrap", alignItems: "flex-end", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_tamagui2.YStack, { flex: 1, minWidth: 180, gap: "$1.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { fontSize: 11, opacity: 0.8, marginBottom: "$1", children: t("salt") }),
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_ui3.Card, { gap: "3", padding: 0, backgroundColor: "transparent", borderWidth: 0, children: [
+    rows.length ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_tamagui2.YStack, { gap: "3", children: rows.map((row, idx) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_tamagui2.XStack, { gap: "3", flexWrap: "wrap", alignItems: "flex-end", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_tamagui2.YStack, { flex: 1, minWidth: 180, gap: "1-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { fontSize: 11, opacity: 0.8, marginBottom: "1", children: t("salt") }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           import_ui3.SelectField,
           {
@@ -182,8 +182,8 @@ function SaltAdditionsEditor(props) {
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_tamagui2.YStack, { flex: 1, minWidth: 140, gap: "$1.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { fontSize: 11, opacity: 0.8, marginBottom: "$1", children: t("amountLabel", { unit: tUnits("g") }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_tamagui2.YStack, { flex: 1, minWidth: 140, gap: "1-5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { fontSize: 11, opacity: 0.8, marginBottom: "1", children: t("amountLabel", { unit: tUnits("g") }) }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           import_ui3.Input,
           {
@@ -191,10 +191,10 @@ function SaltAdditionsEditor(props) {
             keyboardType: "decimal-pad",
             value: String(row.grams),
             onChangeText: (text) => updateRow(idx, { grams: Number(text) || 0 }),
-            size: "$3",
-            background: "$background",
+            size: "md",
+            background: "background",
             borderWidth: 1,
-            borderColor: "$borderColor",
+            borderColor: "borderColor",
             disabled
           }
         )
@@ -202,16 +202,16 @@ function SaltAdditionsEditor(props) {
       /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         import_ui3.Button,
         {
-          size: "$3",
-          chromeless: true,
+          size: "md",
+          variant: "quiet",
           onPress: () => removeRow(idx),
-          disabled,
+          disabled: disabled === true,
           accessibilityLabel: tCommon("remove"),
           children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { fontSize: 12, children: tCommon("remove") })
         }
       )
     ] }, idx)) }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { fontSize: 12, opacity: 0.8, children: t("noSaltsAddedYet") }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Button, { size: "$3", onPress: addRow, disabled, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { children: t("addSalt") }) })
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Button, { size: "md", onPress: addRow, disabled: disabled === true, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_ui3.Text, { children: t("addSalt") }) })
   ] });
 }
 
@@ -236,24 +236,23 @@ function BrewCheckbox(props) {
   const sharedProps = {
     // Keep this custom-rendered so we control contrast/indicator on web.
     native: import_react_native.Platform.OS === "web" ? false : void 0,
-    size: size ?? "$2",
+    size: size ?? "2",
     ...disabled !== void 0 ? { disabled } : {},
     checked,
-    unstyled: true,
     width: 18,
     height: 18,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: isChecked ? "$color8" : "$borderColor",
-    backgroundColor: isChecked ? "$color8" : "transparent",
+    borderColor: isChecked ? "color8" : "borderColor",
+    backgroundColor: isChecked ? "color8" : "transparent",
     alignItems: "center",
     justifyContent: "center",
     ...rest
   };
   if (import_react_native.Platform.OS === "web") {
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox, { "aria-label": accessibilityLabel, ...sharedProps, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox.Indicator, { unstyled: true, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "$color1", children: "\u2713" }) }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox, { "aria-label": accessibilityLabel, ...sharedProps, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox.Indicator, { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "color1", children: "\u2713" }) }) });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox, { accessibilityLabel, accessibilityRole, ...sharedProps, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox.Indicator, { unstyled: true, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "$color1", children: "\u2713" }) }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox, { accessibilityLabel, accessibilityRole, ...sharedProps, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox.Indicator, { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "color1", children: "\u2713" }) }) });
 }
 
 // src/mash/MashStepRowEditable.tsx
@@ -267,20 +266,20 @@ var import_ui5 = require("@umbraculum/ui");
 var import_jsx_runtime5 = require("react/jsx-runtime");
 function MashProcedureEditor(props) {
   const { mashProcedure, onUpdateProcedure, t } = props;
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.Card, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.Card, { gap: "2", padding: "3", background: "background", borderWidth: 1, borderColor: "borderColor", children: [
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, fontWeight: "700", children: t("mashingProcedureName") }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       import_ui5.Input,
       {
         value: mashProcedure.name,
         onChangeText: (text) => onUpdateProcedure({ name: text }),
-        size: "$3",
-        background: "$background",
+        size: "md",
+        background: "background",
         borderWidth: 1,
-        borderColor: "$borderColor"
+        borderColor: "borderColor"
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, fontWeight: "700", marginTop: "$2", children: t("mashingGrainTemp") }),
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, fontWeight: "700", marginTop: "2", children: t("mashingGrainTemp") }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       import_ui5.Input,
       {
@@ -290,10 +289,10 @@ function MashProcedureEditor(props) {
           const v = Number(text);
           onUpdateProcedure({ grainTemperatureC: Number.isFinite(v) ? v : mashProcedure.grainTemperatureC });
         },
-        size: "$3",
-        background: "$background",
+        size: "md",
+        background: "background",
         borderWidth: 1,
-        borderColor: "$borderColor"
+        borderColor: "borderColor"
       }
     )
   ] });
@@ -301,13 +300,13 @@ function MashProcedureEditor(props) {
 function MashStepRowActions(props) {
   const { index: idx, rowId, move, onMoveStep, onDeleteStep, t } = props;
   const { canReorder, disableMoveUp, disableMoveDown } = move;
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.XStack, { gap: "$2", alignItems: "center", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.XStack, { gap: "2", alignItems: "center", children: [
     canReorder ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         import_ui5.Button,
         {
-          size: "$2",
-          chromeless: true,
+          size: "sm",
+          variant: "quiet",
           disabled: disableMoveUp,
           onPress: () => onMoveStep?.(rowId, "up"),
           accessibilityLabel: t("moveUp"),
@@ -317,8 +316,8 @@ function MashStepRowActions(props) {
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         import_ui5.Button,
         {
-          size: "$2",
-          chromeless: true,
+          size: "sm",
+          variant: "quiet",
           disabled: disableMoveDown,
           onPress: () => onMoveStep?.(rowId, "down"),
           accessibilityLabel: t("moveDown"),
@@ -326,7 +325,7 @@ function MashStepRowActions(props) {
         }
       )
     ] }) : null,
-    idx > 0 && onDeleteStep ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "$2", chromeless: true, onPress: () => onDeleteStep(rowId), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
+    idx > 0 && onDeleteStep ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "sm", variant: "quiet", onPress: () => onDeleteStep(rowId), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
   ] });
 }
 function MashStepsToolbar(props) {
@@ -337,19 +336,19 @@ function MashStepsToolbar(props) {
     return null;
   }
   return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
-    hasAddControls ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.XStack, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
-      onAddStep ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "$3", onPress: onAddStep, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { children: t("mashingAddStep") }) }) : null,
-      onAddFromTemplate ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.XStack, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
+    hasAddControls ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.XStack, { gap: "2", flexWrap: "wrap", alignItems: "center", children: [
+      onAddStep ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "md", onPress: onAddStep, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { children: t("mashingAddStep") }) }) : null,
+      onAddFromTemplate ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.XStack, { gap: "2", flexWrap: "wrap", alignItems: "center", children: [
         /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.Text, { fontSize: 12, opacity: 0.8, children: [
           t("mashingAddFromTemplate"),
           ":"
         ] }),
-        import_brewery_beerjson.MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "$3", chromeless: true, onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
+        import_brewery_beerjson.MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "md", variant: "quiet", onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
       ] }) : null
     ] }) : null,
-    hasSaveControls ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.YStack, { gap: "$2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "$3", onPress: onSave, disabled: !canSave || saving, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { children: saving ? t("saving") : t("mashingSaveMashSteps") }) }),
-      saveStatus ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Card, { gap: "$1", padding: "$2", background: "$color4", borderWidth: 1, borderColor: "$borderColor", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, children: saveStatus }) }) : null
+    hasSaveControls ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui4.YStack, { gap: "2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Button, { size: "md", onPress: onSave, disabled: !canSave || saving, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { children: saving ? t("saving") : t("mashingSaveMashSteps") }) }),
+      saveStatus ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Card, { gap: "1", padding: "2", background: "color4", borderWidth: 1, borderColor: "borderColor", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.Text, { fontSize: 12, children: saveStatus }) }) : null
     ] }) : null
   ] });
 }
@@ -372,7 +371,7 @@ function MashStepRowEditable(props) {
     formatFixed
   } = props;
   const { isSpargeStep, disableName, disableType, disableAmount, typeValue, typeOptions, move } = editState;
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_ui6.Card, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_ui6.Card, { gap: "2", padding: "3", background: "background", borderWidth: 1, borderColor: "borderColor", children: [
     /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.XStack, { justifyContent: "space-between", alignItems: "center", children: [
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_ui6.Text, { fontSize: 14, fontWeight: "700", children: [
         idx + 1,
@@ -391,22 +390,22 @@ function MashStepRowEditable(props) {
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "$2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "$1", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "1", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 11, opacity: 0.8, children: t("mashingStepName") }),
         disableName ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 12, opacity: 0.85, children: isSpargeStep ? "Sparge" : r.name || "Mash In" }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
           import_ui6.Input,
           {
             value: r.name,
             onChangeText: (text) => onUpdateStep?.(r.id, { name: text }),
-            size: "$3",
-            background: "$background",
+            size: "md",
+            background: "background",
             borderWidth: 1,
-            borderColor: "$borderColor"
+            borderColor: "borderColor"
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "$1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "1", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 11, opacity: 0.8, children: t("mashingStepType") }),
         disableType ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 12, opacity: 0.85, children: "Sparge" }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
           import_ui6.SelectField,
@@ -419,8 +418,8 @@ function MashStepRowEditable(props) {
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.XStack, { gap: "$2", flexWrap: "wrap", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "$1", flex: 1, minWidth: 120, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.XStack, { gap: "2", flexWrap: "wrap", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "1", flex: 1, minWidth: 120, children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 11, opacity: 0.8, children: t("mashingStepTemp", { unit: "\xB0C" }) }),
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
             import_ui6.Input,
@@ -428,14 +427,14 @@ function MashStepRowEditable(props) {
               keyboardType: "decimal-pad",
               value: String(r.stepTemperatureC),
               onChangeText: (text) => onUpdateStep?.(r.id, { stepTemperatureC: Number(text) || 0 }),
-              size: "$3",
-              background: "$background",
+              size: "md",
+              background: "background",
               borderWidth: 1,
-              borderColor: "$borderColor"
+              borderColor: "borderColor"
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "$1", flex: 1, minWidth: 120, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "1", flex: 1, minWidth: 120, children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 11, opacity: 0.8, children: t("mashingStepTime", { unit: "min" }) }),
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
             import_ui6.Input,
@@ -443,15 +442,15 @@ function MashStepRowEditable(props) {
               keyboardType: "decimal-pad",
               value: String(r.stepTimeMin),
               onChangeText: (text) => onUpdateStep?.(r.id, { stepTimeMin: Math.max(0, Number(text) || 0) }),
-              size: "$3",
-              background: "$background",
+              size: "md",
+              background: "background",
               borderWidth: 1,
-              borderColor: "$borderColor"
+              borderColor: "borderColor"
             }
           )
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "$1", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.YStack, { gap: "1", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 11, opacity: 0.8, children: t("mashingStepAmount", { unit: tUnits("L") }) }),
         isSpargeStep ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_ui6.Text, { fontSize: 12, opacity: 0.85, children: waterVolumes ? `${formatFixed(locale, waterVolumes.spargeLiters, 2)} ${tUnits("L")}` : "\u2014" }) : idx === 0 && firstStepAmountComputed != null ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_ui6.Text, { fontSize: 12, opacity: 0.85, children: [
           formatFixed(locale, firstStepAmountComputed, 2),
@@ -464,15 +463,15 @@ function MashStepRowEditable(props) {
             value: r.amountL != null ? String(r.amountL) : "",
             onChangeText: (text) => onUpdateStep?.(r.id, { amountL: text.trim() ? Math.max(0, Number(text) || 0) : null }),
             placeholder: "\u2014",
-            size: "$3",
-            background: "$background",
+            size: "md",
+            background: "background",
             borderWidth: 1,
-            borderColor: "$borderColor",
+            borderColor: "borderColor",
             disabled: disableAmount
           }
         )
       ] }),
-      idx > 0 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.XStack, { gap: "$2", alignItems: "center", children: [
+      idx > 0 ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui5.XStack, { gap: "2", alignItems: "center", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
           BrewCheckbox,
           {
@@ -481,7 +480,7 @@ function MashStepRowEditable(props) {
             onCheckedChange: (checked) => onUpdateStep?.(r.id, {
               deduceFromMashIn: checked === true
             }),
-            size: "$2",
+            size: "sm",
             accessibilityLabel: t("mashingDeduceFromMashIn"),
             accessibilityRole: "checkbox"
           }
@@ -507,11 +506,11 @@ function MashStepRowReadOnly(props) {
     {
       "data-mash-step-card": true,
       ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
-      gap: "$2",
-      padding: "$3",
-      backgroundColor: cardBackgroundColor ?? "$background",
+      gap: "2",
+      padding: "3",
+      backgroundColor: cardBackgroundColor ?? "background",
       borderWidth: 1,
-      borderColor: cardBorderColor ?? "$borderColor",
+      borderColor: cardBorderColor ?? "borderColor",
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_ui7.Text, { fontSize: 12, fontWeight: "700", children: [
           idx + 1,
@@ -562,7 +561,7 @@ var import_ui8 = require("@umbraculum/ui");
 var import_jsx_runtime8 = require("react/jsx-runtime");
 function MashStepsReadOnlyView(props) {
   const { mashRows, mashProcedure = null, waterVolumes, cardBackgroundColor, cardBorderColor, t, tUnits, locale, formatFixed } = props;
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_tamagui6.YStack, { gap: "$2", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_tamagui6.YStack, { gap: "2", children: [
     mashProcedure ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_ui8.Text, { fontSize: 12, opacity: 0.8, children: [
       mashProcedure.name,
       " \xB7 ",
@@ -684,7 +683,7 @@ function MashStepsEditor(props) {
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_tamagui7.YStack, { gap: "$3", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_tamagui7.YStack, { gap: "3", children: [
     mashWaterBudgetLiters != null ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_ui9.Text, { fontSize: 12, opacity: 0.8, children: t("mashStepsWaterBudgetNote") }) : null,
     mashProcedure && onUpdateProcedure ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(MashProcedureEditor, { mashProcedure, onUpdateProcedure, t }) : null,
     mashRows.map((r, idx) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
@@ -732,18 +731,18 @@ function SpargeStepReadOnlyRow(props) {
     {
       "data-mash-step-card": true,
       ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
-      backgroundColor: cardBackgroundColor ?? "$background",
+      backgroundColor: cardBackgroundColor ?? "background",
       borderWidth: 1,
-      borderColor: cardBorderColor ?? "$borderColor",
-      padding: "$3",
-      gap: "$2",
+      borderColor: cardBorderColor ?? "borderColor",
+      padding: "3",
+      gap: "2",
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_ui10.Text, { fontSize: 12, fontWeight: "700", children: [
           rest.stepNumber,
           ". ",
           rest.title
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_tamagui8.YStack, { gap: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_ui10.ReadOnlyFieldRow, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_tamagui8.YStack, { gap: "2", children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_ui10.ReadOnlyFieldRow, { children: [
           /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_ui10.ReadOnlyField, { label: labels.name, value: rest.name, minWidth: 90 }),
           /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_ui10.ReadOnlyField, { label: labels.type, value: rest.typeLabel, minWidth: 110 }),
           /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_ui10.ReadOnlyField, { label: labels.temp, value: rest.tempDisplay, minWidth: 90 }),

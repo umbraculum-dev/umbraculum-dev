@@ -18,23 +18,23 @@ export function WaterHubScreenContent(props: { model: NativeWaterHubScreenModel 
 
   return (
     <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32 }}>
-      <Heading fontSize={22} mb="$2">
+      <Heading fontSize={22} mb="2">
         {t("title")}
       </Heading>
       <RecipeMetaLine recipeId={recipeId} enabled={canCall} loadRecipeMeta={loadRecipeMeta} />
       <Button
-        chromeless
-        size="$3"
-        mt="$2"
-        mb="$3"
+        variant="quiet"
+        size="md"
+        mt="2"
+        mb="3"
         onPress={navigateToRecipeEdit}
       >
         <Text fontSize={12}>{t("backToRecipeEditor")}</Text>
       </Button>
 
       {error ? (
-        <Card background="$red3" p="$3" mb="$3">
-          <Text color="$red11">{error}</Text>
+        <Card background="red3" p="3" mb="3">
+          <Text color="red11">{error}</Text>
         </Card>
       ) : null}
 

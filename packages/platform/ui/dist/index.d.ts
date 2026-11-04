@@ -25,10 +25,22 @@ interface AdSlotCardProps {
 }
 declare function AdSlotCard(props: AdSlotCardProps): React__default.JSX.Element;
 
-type ButtonProps = ComponentProps<typeof Button$1>;
+/**
+ * Tamagui 3 types drop the v2 `background` style prop (use `backgroundColor`)
+ * and tighten layout props on some skins. Keep call-site compat for the brewery
+ * native/web surfaces that still pass `background` / string `width`.
+ */
+type LegacyStackStyleAliases = {
+    /** Maps to `backgroundColor` at the wrapper boundary. */
+    background?: string | number | undefined;
+    width?: string | number | undefined;
+};
+type WithLegacyStyleAliases<TBase> = Omit<TBase, keyof LegacyStackStyleAliases> & LegacyStackStyleAliases;
+
+type ButtonProps = WithLegacyStyleAliases<ComponentProps<typeof Button$1>>;
 declare function Button(props: ButtonProps): React__default.JSX.Element;
 
-type CardProps = Omit<ComponentProps<typeof YStack>, "children"> & {
+type CardProps = Omit<WithLegacyStyleAliases<ComponentProps<typeof YStack>>, "children"> & {
     children: ReactNode;
 };
 declare function Card(props: CardProps): React__default.JSX.Element;
@@ -43,7 +55,7 @@ interface CollapsibleProps {
 }
 declare function Collapsible(props: CollapsibleProps): React__default.JSX.Element;
 
-type InputProps = ComponentProps<typeof Input$1>;
+type InputProps = WithLegacyStyleAliases<ComponentProps<typeof Input$1>>;
 declare function Input(props: InputProps): React__default.JSX.Element;
 
 type ModeOption<T extends string> = {

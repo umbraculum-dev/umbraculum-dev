@@ -20,13 +20,13 @@ export function HomeAuthenticated({ breweryEnabled }: { breweryEnabled: boolean 
   const [openSections, setOpenSections] = useState<string[]>(["appPermissions"]);
 
   return (
-    <YStack gap="$3">
-      <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+    <YStack gap="3">
+      <H1 mb="2">{t("title")}</H1>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t(breweryEnabled ? "subtitleBrewery" : "subtitle")}
       </SizableText>
 
-      <YStack gap="$0">
+      <YStack gap="0">
         <Accordion
           type="multiple"
           value={openSections}
@@ -81,7 +81,7 @@ export function HomeAuthenticated({ breweryEnabled }: { breweryEnabled: boolean 
                     open={openSections.includes("links")}
                   />
                   <Accordion.Content>
-                    <YStack gap="$2" mt="$2" mb={0}>
+                    <YStack gap="2" mt="2" mb={0}>
                       <Link href="/ferm-data-integration">{t("links.fermDataIntegration")}</Link>
                       <Link href="/brewday-steps-settings">{t("links.brewdayStepsSettings")}</Link>
                       <Link href="/water-profiles">{t("links.waterProfiles")}</Link>
@@ -98,7 +98,7 @@ export function HomeAuthenticated({ breweryEnabled }: { breweryEnabled: boolean 
                     open={openSections.includes("brewery")}
                   />
                   <Accordion.Content>
-                    <YStack gap="$2" mt="$2" mb={0}>
+                    <YStack gap="2" mt="2" mb={0}>
                       <Link href="/equipment">{t("links.equipment")}</Link>
                       <Link href="/inventory">{t("links.inventory")}</Link>
                     </YStack>

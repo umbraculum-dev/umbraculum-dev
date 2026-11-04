@@ -80,7 +80,7 @@ export function YeastScreen() {
   if (!api) {
     return (
       <Screen>
-        <Text fontSize={14} color="$red10">{tCommon("loading")}</Text>
+        <Text fontSize={14} color="red10">{tCommon("loading")}</Text>
       </Screen>
     );
   }
@@ -89,21 +89,21 @@ export function YeastScreen() {
     <Screen>
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={{ gap: 16 }}>
-          <Heading fontSize={28} mb="$2">
+          <Heading fontSize={28} mb="2">
             {t("yeastPageTitle")}
           </Heading>
           <RecipeMetaLine recipeId={recipeId} enabled={!!recipeId} loadRecipeMeta={loadRecipeMeta} />
 
           {load.loadError ? (
-            <Text fontSize={12} color="$red10">{load.loadError}</Text>
+            <Text fontSize={12} color="red10">{load.loadError}</Text>
           ) : null}
 
           {load.loading ? (
             <Spinner />
           ) : load.recipe ? (
-            <Card gap="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+            <Card gap="2" background="background" borderWidth={1} borderColor="borderColor" p="3">
               <Heading fontSize={18}>{t("yeastSectionHeading")}</Heading>
-              <Text fontSize={12} opacity={0.8} mb="$2">
+              <Text fontSize={12} opacity={0.8} mb="2">
                 {t("yeastHelp")}
               </Text>
 
@@ -112,22 +112,22 @@ export function YeastScreen() {
                   value={search.yeastQuery}
                   onChangeText={search.setYeastQuery}
                   placeholder={t("yeastSearchLabel")}
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                   style={{ flex: 1, minWidth: 140 }}
                 />
-                <Button onPress={() => void search.searchYeasts()} disabled={search.yeastSearching} size="$3" background="$background" borderWidth={1} borderColor="$borderColor">
+                <Button onPress={() => void search.searchYeasts()} disabled={search.yeastSearching} size="md" background="background" borderWidth={1} borderColor="borderColor">
                   <Text>{search.yeastSearching ? "Searching…" : "Search"}</Text>
                 </Button>
                 <Button
                   onPress={search.clearSearch}
                   disabled={search.yeastSearching || (!search.yeastResults.length && !search.yeastQuery.trim())}
-                  size="$3"
-                  background="$background"
+                  size="md"
+                  background="background"
                   borderWidth={1}
-                  borderColor="$borderColor"
+                  borderColor="borderColor"
                 >
                   <Text>{t("buttons.clear")}</Text>
                 </Button>
@@ -150,10 +150,10 @@ export function YeastScreen() {
                             attenuationMax: attMax ?? attMin,
                           });
                         }}
-                        size="$2"
-                        background="$background"
+                        size="sm"
+                        background="background"
                         borderWidth={1}
-                        borderColor="$borderColor"
+                        borderColor="borderColor"
                       >
                         <Text fontSize={12}>{it.name} {it.lab ? `(${it.lab})` : ""} — Add</Text>
                       </Button>
@@ -162,7 +162,7 @@ export function YeastScreen() {
                 </ScrollView>
               ) : null}
 
-              <Button onPress={() => rows.addYeastRow()} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
+              <Button onPress={() => rows.addYeastRow()} size="md" background="background" borderWidth={1} borderColor="borderColor" mb="2">
                 <Text>{t("yeastAddCustomButton")}</Text>
               </Button>
 
@@ -187,12 +187,12 @@ export function YeastScreen() {
                 />
               ))}
 
-              <Button onPress={() => void actions.onSave()} disabled={actions.saving} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mt="$2">
+              <Button onPress={() => void actions.onSave()} disabled={actions.saving} size="md" background="background" borderWidth={1} borderColor="borderColor" mt="2">
                 <Text>{actions.saving ? "Saving…" : t("yeastSaveButton")}</Text>
               </Button>
-              {actions.saveStatus ? <Text fontSize={12} color="$green10">{actions.saveStatus}</Text> : null}
-              {actions.lowViabilityWarning != null ? <Text fontSize={12} color="$yellow10">Low viability warning: {actions.lowViabilityWarning.toFixed(1)}% (slurry + manual cell count &lt; 85%)</Text> : null}
-              {actions.saveError ? <Text fontSize={12} color="$red10">{actions.saveError}</Text> : null}
+              {actions.saveStatus ? <Text fontSize={12} color="green10">{actions.saveStatus}</Text> : null}
+              {actions.lowViabilityWarning != null ? <Text fontSize={12} color="yellow10">Low viability warning: {actions.lowViabilityWarning.toFixed(1)}% (slurry + manual cell count &lt; 85%)</Text> : null}
+              {actions.saveError ? <Text fontSize={12} color="red10">{actions.saveError}</Text> : null}
             </Card>
           ) : null}
 

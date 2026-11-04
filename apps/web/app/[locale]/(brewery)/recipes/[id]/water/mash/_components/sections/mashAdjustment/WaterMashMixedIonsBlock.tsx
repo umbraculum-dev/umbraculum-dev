@@ -13,7 +13,7 @@ export function WaterMashMixedIonsBlock({ model }: { model: WaterMashMixedIonsMo
       <summary className="brew-field-block-header brew-details-summary">
         <strong>Mixed water ions</strong>
         <FieldBadge>Read-only</FieldBadge>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body" display="inline">
           Computed from profiles + volumes
         </SizableText>
       </summary>

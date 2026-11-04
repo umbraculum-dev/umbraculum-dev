@@ -54,21 +54,17 @@ export function NavSheet({
   return (
     <>
       <Button
-        unstyled
+        variant="quiet"
         ai="center"
-        px="$2"
-        py="$1"
-        borderRadius="$2"
+        px="2"
+        py="1"
+        borderRadius="2"
         borderWidth={1}
-        borderColor="color-mix(in srgb, var(--focus-ring) 25%, var(--border))"
-        backgroundColor="color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))"
+        borderColor="color-mix(in srgb, var(--focus-ring) 25%, var(--border)) hover:color-mix(in srgb, var(--focus-ring) 25%, var(--border))"
+        backgroundColor="color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2)) hover:color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))"
         color="var(--text)"
         fontSize={11}
-        hoverStyle={{
-          textDecoration: "none",
-          borderColor: "color-mix(in srgb, var(--focus-ring) 25%, var(--border))",
-          backgroundColor: "color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))",
-        }}
+        textDecoration="hover:none"
         aria-label={ariaLabel ?? triggerLabel}
         aria-expanded={open}
         aria-haspopup="dialog"
@@ -92,22 +88,18 @@ export function NavSheet({
       >
         <Sheet.Overlay />
         <Sheet.Handle />
-        <Sheet.Frame
+        <Sheet.Container
           position="relative"
-          background="var(--surface)"
-          borderColor="var(--border)"
-          borderWidth={1}
-          borderTopLeftRadius="var(--radius)"
-          borderTopRightRadius="var(--radius)"
           padding={16}
           maxHeight="85%"
         >
+          <Sheet.Background background="var(--surface)" borderColor="var(--border)" borderWidth={1} borderTopLeftRadius="var(--radius)" borderTopRightRadius="var(--radius)" />
           <Button
-            unstyled
+            variant="quiet"
             position="absolute"
             top={8}
             right={8}
-            p="$1"
+            p="1"
             backgroundColor="transparent"
             borderWidth={0}
             cursor="pointer"
@@ -118,20 +110,20 @@ export function NavSheet({
             ×
           </Button>
           <YStack
-            pt="$4"
+            pt="4"
             onClickCapture={(e: MouseEvent<HTMLElement>) => {
-              if (!open) return;
-              const target = e.target;
-              if (!(target instanceof HTMLElement)) return;
-              if (target.closest('[data-navsheet-keep-open="true"]')) return;
+                        if (!open) return;
+                        const target = e.target;
+                        if (!(target instanceof HTMLElement)) return;
+                        if (target.closest('[data-navsheet-keep-open="true"]')) return;
 
-              const shouldClose = Boolean(target.closest('a[href], [data-navsheet-close="true"]'));
-              if (shouldClose) setOpen(false);
-            }}
+                        const shouldClose = Boolean(target.closest('a[href], [data-navsheet-close="true"]'));
+                        if (shouldClose) setOpen(false);
+                      }}
           >
             {children}
           </YStack>
-        </Sheet.Frame>
+        </Sheet.Container>
       </Sheet>
     </>
   );

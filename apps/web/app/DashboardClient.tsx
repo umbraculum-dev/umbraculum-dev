@@ -49,7 +49,7 @@ export function DashboardClient(_props: DashboardClientProps = {}) {
     };
   }, [locale, mounted]);
 
-  if (!mounted) return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{tCommon("loading")}</SizableText>;
+  if (!mounted) return <SizableText size="2" color="var(--text-muted)" fontFamily="body">{tCommon("loading")}</SizableText>;
   return null;
 }
 

@@ -41,14 +41,14 @@ export function WaterSpargePageContent({ model }: { model: WaterSpargePageModel 
       />
       <SurfaceMathToggleRow
         left={
-          <SizableText size="$2" fontFamily="$body" mt={0}>
+          <SizableText size="2" fontFamily="body" mt={0}>
             <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link> {" · "}
             <Link href={`/recipes/${recipeId}/water/mash`}>{tWater("goToMash")}</Link>
           </SizableText>
         }
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
-        mb="$2"
+        mb="2"
       />
 
       {authChecked && !canCall ? (
@@ -59,7 +59,7 @@ export function WaterSpargePageContent({ model }: { model: WaterSpargePageModel 
         </ErrorBox>
       ) : null}
 
-      <YStack gap="$4">
+      <YStack gap="4">
         <Accordion
           type="multiple"
           value={openSpargeSections}

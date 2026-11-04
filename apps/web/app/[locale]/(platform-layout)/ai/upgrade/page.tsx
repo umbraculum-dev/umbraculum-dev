@@ -70,10 +70,10 @@ export default function AiUpgradePage() {
   return (
     <>
       <main role="main" aria-labelledby="ai-upgrade-title">
-        <YStack gap="$4">
+        <YStack gap="4">
           <H1 id="ai-upgrade-title">{t("title")}</H1>
           <SizableText>{t("body")}</SizableText>
-          <YStack gap="$1" mt="$2">
+          <YStack gap="1" mt="2">
             <SizableText>• {t("bullet1")}</SizableText>
             <SizableText>• {t("bullet2")}</SizableText>
             <SizableText>• {t("bullet3")}</SizableText>
@@ -99,21 +99,21 @@ export default function AiUpgradePage() {
                 borderStyle: "solid",
               }}
             >
-              <YStack gap="$1">
+              <YStack gap="1">
                 <SizableText fontWeight="600">Intent #{intentInfo.billingIntentId.slice(0, 8)}</SizableText>
                 {intentInfo.stripePublishableKey && intentInfo.stripePricingTableId ? (
-                  <SizableText size="$1">
+                  <SizableText size="1">
                     Stripe pricing table: {intentInfo.stripePricingTableId}
                   </SizableText>
                 ) : (
-                  <SizableText size="$1" color="var(--text-muted)">
+                  <SizableText size="1" color="var(--text-muted)">
                     Stripe credentials are not configured on this environment. An admin will follow up.
                   </SizableText>
                 )}
               </YStack>
             </View>
           ) : (
-            <XStack mt="$2">
+            <XStack mt="2">
               <Button disabled={loading} onPress={() => void onUpgrade()}>
                 {loading ? t("ctaLoading") : t("ctaButton")}
               </Button>
@@ -129,10 +129,10 @@ export default function AiUpgradePage() {
                 marginTop: 12,
               }}
             >
-              <YStack gap="$1">
+              <YStack gap="1">
                 <H2>{t("concierge.title")}</H2>
                 <SizableText>{t("concierge.body")}</SizableText>
-                <XStack mt="$1">
+                <XStack mt="1">
                   <a href={CONCIERGE_URL} target="_blank" rel="noopener noreferrer">
                     <SizableText color="var(--accent, #06c)">{t("concierge.cta")}</SizableText>
                   </a>

@@ -18,28 +18,28 @@ export function YeastScreenRowIdentity(props: YeastScreenRowSectionProps) {
   return (
     <>
       <View>
-        <Text fontSize={11} opacity={0.8} mb="$1">
+        <Text fontSize={11} opacity={0.8} mb="1">
           {t("yeastNameLabel")}
         </Text>
         <Input
           value={r.name}
           onChangeText={(text) => updateYeastRow(r.id, { name: text, ingredientId: null })}
           placeholder={t("yeastCustomNamePlaceholder")}
-          size="$3"
-          background="$background"
+          size="md"
+          background="background"
           borderWidth={1}
-          borderColor="$borderColor"
+          borderColor="borderColor"
         />
       </View>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         <View style={{ minWidth: 140, flexGrow: 1 }}>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             {t("yeastLabLabel")}
           </Text>
           <ReadOnlyField value={r.lab ?? ""} />
         </View>
         <View style={{ minWidth: 140, flexGrow: 1 }}>
-          <Text fontSize={11} opacity={0.8} mb="$1">
+          <Text fontSize={11} opacity={0.8} mb="1">
             {t("yeastProductIdLabel")}
           </Text>
           <ReadOnlyField value={r.productId ?? ""} />

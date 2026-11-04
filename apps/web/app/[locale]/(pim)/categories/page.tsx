@@ -26,7 +26,7 @@ function CategoryTree({ nodes, depth }: { nodes: readonly CategoryTreeNode[]; de
     <ul className="brew-recipe-list" style={{ marginLeft: depth > 0 ? 16 : 0 }}>
       {nodes.map((node) => (
         <li key={node.id} className="brew-recipe-list-row">
-          <SizableText fontFamily="$body">
+          <SizableText fontFamily="body">
             <SizableText fontWeight="bold">{node.code}</SizableText>
             <SizableText color="var(--text-muted)"> · {node.label}</SizableText>
           </SizableText>
@@ -70,11 +70,11 @@ export default function PimCategoriesPage() {
   }, [authState.status]);
 
   return (
-    <YStack gap="$3">
+    <YStack gap="3">
       <Link href="/products">{tCategories("back")}</Link>
-      <H1 mb="$2">{tCategories("title")}</H1>
+      <H1 mb="2">{tCategories("title")}</H1>
       <Button
-        size="$3"
+        size="md"
         bg="var(--surface-2)"
         borderWidth={1}
         borderColor="var(--border)"
@@ -86,7 +86,7 @@ export default function PimCategoriesPage() {
       </Button>
       {error ? <ErrorBox>{error}</ErrorBox> : null}
       {!loading && tree.length === 0 && !error ? (
-        <SizableText size="$2" color="var(--text-muted)">
+        <SizableText size="2" color="var(--text-muted)">
           {tCategories("noCategories")}
         </SizableText>
       ) : null}

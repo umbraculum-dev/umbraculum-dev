@@ -11,10 +11,10 @@ export function recipeAnalysisHopsYeastPanelRows(model: RecipeEditPageModel): Re
 
   return [
     (
-      <XStack key="attenuation" gap="$2" ai="baseline">
-        <View minW={180} pr="$3">
-          <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-            <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.attenuation")}</SizableText>
+      <XStack key="attenuation" gap="2" ai="baseline">
+        <View minW={180} pr="3">
+          <XStack gap="2" alignItems="baseline" flexWrap="wrap">
+            <SizableText fontWeight="bold" fontFamily="body" color="var(--text)">{tAnalysis("fields.attenuation")}</SizableText>
             {renderMath(
               "analysis.attenuation",
               renderDerivationMath(
@@ -35,10 +35,10 @@ export function recipeAnalysisHopsYeastPanelRows(model: RecipeEditPageModel): Re
           </XStack>
         </View>
         <View>
-          <XStack gap="$1" ai="baseline" display="inline-flex">
+          <XStack gap="1" display="inline-flex" ai="baseline">
             <CodeInline>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</CodeInline>
             {typeof a?.attenuationEffectivePercent === "number" ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText>
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">%</SizableText>
             ) : null}
           </XStack>
         </View>

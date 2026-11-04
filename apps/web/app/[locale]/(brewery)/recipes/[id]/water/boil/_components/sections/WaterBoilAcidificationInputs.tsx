@@ -29,7 +29,7 @@ export function WaterBoilAcidificationInputs({ model }: { model: WaterBoilPageMo
   } = model;
 
   return (
-    <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+    <XStack gap="3" flexWrap="wrap" ai="flex-end">
       <WaterAcidificationModeFields
         idPrefix="boil"
         modeName="boil-mode"
@@ -52,7 +52,7 @@ export function WaterBoilAcidificationInputs({ model }: { model: WaterBoilPageMo
       />
 
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="boil-starting-alk">
             {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
           </RecipeEditFieldLabel>
@@ -61,56 +61,56 @@ export function WaterBoilAcidificationInputs({ model }: { model: WaterBoilPageMo
             keyboardType="decimal-pad"
             value={String(startingAlk)}
             onChangeText={(text) => {
-              setStartingAlkTouched(true);
-              const n = Number(text);
-              setStartingAlk(Number.isFinite(n) ? n : 0);
-            }}
-            size="$3"
+                        setStartingAlkTouched(true);
+                        const n = Number(text);
+                        setStartingAlk(Number.isFinite(n) ? n : 0);
+                      }}
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
 
       <View flex={1} minWidth={200}>
-        <YStack gap="$1.5">
+        <YStack gap="1-5">
           <RecipeEditFieldLabel htmlFor="boil-starting-ph">Starting pH</RecipeEditFieldLabel>
           <Input
             id="boil-starting-ph"
             keyboardType="decimal-pad"
             value={startingPh}
             onChangeText={setStartingPh}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </YStack>
       </View>
 
       {acidificationMode === "targetPh" ? (
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="boil-target-ph">Target pH</RecipeEditFieldLabel>
             <Input
               id="boil-target-ph"
               keyboardType="decimal-pad"
               value={String(targetPh)}
               onChangeText={(text) => setTargetPh(Number(text) || 0)}
-              size="$3"
+              size="md"
               w="100%"
               bg="var(--surface)"
               borderWidth={1}
               borderColor="var(--border)"
-              rounded="$2"
-              fontFamily="$body"
+              rounded="2"
+              fontFamily="body"
             />
           </YStack>
         </View>

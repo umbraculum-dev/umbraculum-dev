@@ -70,32 +70,31 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
 
   return (
     <YStack
-      gap="$4"
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      {...({ "aria-labelledby": "ai-chat-title", role: "main" } as any)}
+      gap="4"
+      aria-labelledby={"ai-chat-title"}
+      role={"main"}
     >
-      <YStack gap="$2">
+      <YStack gap="2">
         <H2 id="ai-chat-title">{t("title")}</H2>
-        <SizableText size="$2" theme="alt2">
+        <SizableText size="2" theme="alt2">
           {t("subtitle")}
         </SizableText>
       </YStack>
 
       {errorText ? (
         <View
-          backgroundColor="$yellow3"
-          borderColor="$yellow8"
+          backgroundColor="yellow3"
+          borderColor="yellow8"
           borderWidth={1}
-          padding="$3"
-          borderRadius="$3"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          {...({ role: "alert" } as any)}
+          padding="3"
+          borderRadius="3"
+          role={"alert"}
         >
           <SizableText>{errorText}</SizableText>
           {isSubscriptionError && onOpenUpgrade ? (
-            <XStack marginTop="$2">
+            <XStack marginTop="2">
               <Button
-                size="$2"
+                size="sm"
                 onPress={onOpenUpgrade}
                 accessibilityLabel={t("errors.subscriptionRequiredCta")}
               >
@@ -107,21 +106,20 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
       ) : null}
 
       <YStack
-        gap="$3"
+        gap="3"
         minHeight={300}
-        padding="$3"
-        backgroundColor="$background"
-        borderRadius="$3"
+        padding="3"
+        backgroundColor="background"
+        borderRadius="3"
         borderWidth={1}
-        borderColor="$borderColor"
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        {...({ "aria-live": "polite" } as any)}
+        borderColor="border-color"
+        aria-live={"polite"}
       >
         {messages.length === 0 ? (
           <SizableText theme="alt2">{t("messages.empty")}</SizableText>
         ) : (
           messages.map((m) => (
-            <YStack key={m.id} gap="$1">
+            <YStack key={m.id} gap="1">
               <SizableText fontWeight="600">
                 {m.role === "user" ? t("messages.you") : t("messages.assistant")}
               </SizableText>
@@ -130,7 +128,7 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
                   (pending && m.role === "assistant" ? t("composer.thinking") : "")}
               </SizableText>
               {m.turn?.toolCalls.map((tc, i) => (
-                <SizableText key={`${m.id}-tc-${i}`} size="$1" theme="alt2">
+                <SizableText key={`${m.id}-tc-${i}`} size="1" theme="alt2">
                   {tc.errored
                     ? t("messages.toolError", { message: tc.name })
                     : t("messages.toolCall", { tool: tc.name })}
@@ -139,24 +137,24 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
               {m.turn?.proposals.map((p) => (
                 <YStack
                   key={`${m.id}-prop-${p.proposalId}`}
-                  gap="$2"
-                  padding="$2"
+                  gap="2"
+                  padding="2"
                   borderWidth={1}
-                  borderColor="$borderColor"
-                  borderRadius="$2"
+                  borderColor="border-color"
+                  borderRadius="2"
                 >
-                  <SizableText size="$2">{p.summary}</SizableText>
+                  <SizableText size="2">{p.summary}</SizableText>
                   {p.status === "pending" ? (
-                    <XStack gap="$2">
+                    <XStack gap="2">
                       <Button
-                        size="$2"
+                        size="sm"
                         onPress={() => void chat.applyProposal(p.proposalId)}
                         accessibilityLabel={t("proposals.apply")}
                       >
                         {t("proposals.apply")}
                       </Button>
                       <Button
-                        size="$2"
+                        size="sm"
                         onPress={() => void chat.rejectProposal(p.proposalId)}
                         accessibilityLabel={t("proposals.dismiss")}
                       >
@@ -164,7 +162,7 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
                       </Button>
                     </XStack>
                   ) : (
-                    <SizableText size="$1" theme="alt2">
+                    <SizableText size="1" theme="alt2">
                       {p.status === "applied"
                         ? t("proposals.applied")
                         : t("proposals.dismissed")}
@@ -177,7 +175,7 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
         )}
       </YStack>
 
-      <XStack gap="$2" alignItems="center">
+      <XStack gap="2" alignItems="center">
         <View flex={1}>
           <Input
             value={draft}

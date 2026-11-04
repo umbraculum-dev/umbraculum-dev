@@ -4,14 +4,11 @@ import { TextArea } from "tamagui";
 
 import { Button, Card, Heading, Text } from "@umbraculum/ui";
 
-// Tamagui v2 RC's typed Button surface omits `chromeless` and a few layout
-// longhand props (`width`, `justifyContent`) even though they are valid at
-// runtime (see packages/platform/ui/src/primitives/{Collapsible,SelectField}.tsx). We
-// cast locally to keep the existing collapsible-section-header pattern
-// without weakening shared typings.
+// Tamagui Button may omit a few layout longhand props (`width`,
+// `justifyContent`) on the typed surface. Cast locally for section headers.
 export const SectionToggleButton = Button as unknown as React.ComponentType<
   React.ComponentProps<typeof Button> & {
-    chromeless?: boolean;
+    variant?: "quiet" | "outlined";
     width?: number | string;
     justifyContent?: string;
   }
@@ -73,10 +70,10 @@ export function PickerField(props: {
 
   return (
     <View>
-      <Text fontSize={11} opacity={0.8} mb="$1">
+      <Text fontSize={11} opacity={0.8} mb="1">
         {props.label}
       </Text>
-      <Button onPress={() => setOpen(true)} size="$3" background="$background" borderWidth={1} borderColor="$borderColor">
+      <Button onPress={() => setOpen(true)} size="md" background="background" borderWidth={1} borderColor="borderColor">
         <Text fontSize={12}>{buttonText}</Text>
       </Button>
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
@@ -85,7 +82,7 @@ export function PickerField(props: {
           onPress={() => setOpen(false)}
         >
           <Pressable onPress={() => null}>
-            <Card gap="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+            <Card gap="2" background="background" borderWidth={1} borderColor="borderColor" p="3">
               <Heading fontSize={16}>{props.label}</Heading>
               <View style={{ gap: 8 }}>
                 {props.options.map((opt) => (
@@ -95,16 +92,16 @@ export function PickerField(props: {
                       props.onChange(opt.value);
                       setOpen(false);
                     }}
-                    size="$3"
-                    background={opt.value === props.value ? "$color4" : "$background"}
+                    size="md"
+                    background={opt.value === props.value ? "color4" : "background"}
                     borderWidth={1}
-                    borderColor="$borderColor"
+                    borderColor="borderColor"
                   >
                     <Text fontSize={12}>{opt.label}</Text>
                   </Button>
                 ))}
               </View>
-              <Button onPress={() => setOpen(false)} size="$3" chromeless>
+              <Button onPress={() => setOpen(false)} size="md" variant="quiet">
                 <Text>{props.closeLabel}</Text>
               </Button>
             </Card>

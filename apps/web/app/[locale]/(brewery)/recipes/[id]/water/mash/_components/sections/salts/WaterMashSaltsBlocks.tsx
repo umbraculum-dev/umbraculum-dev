@@ -10,7 +10,7 @@ export function WaterMashSaltsEditorBlock({ model }: { model: WaterMashPageModel
 
   return (
     <>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
       </SizableText>
 
@@ -34,15 +34,15 @@ export function WaterMashSaltsActionsBlock({ model }: { model: WaterMashPageMode
   } = model;
 
   return (
-    <YStack gap="$2" mt="$3">
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
-        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
+    <YStack gap="2" mt="3">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
+        <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
           {savingSalts ? "Saving…" : "Save salts draft"}
         </Button>
-        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
+        <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
           {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
         </Button>
-        {saltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
+        {saltsStatus ? <SizableText size="2" color="var(--text-muted)" fontFamily="body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
       </XStack>
       {(saltsSaveStatus || saltsCalcSaveStatus) ? (
         <MessageBox
@@ -65,5 +65,5 @@ export function WaterMashSaltsActionsBlock({ model }: { model: WaterMashPageMode
 export function WaterMashSaltsErrorBlock({ model }: { model: WaterMashPageModel }) {
   const { saltsError } = model;
   if (!saltsError) return null;
-  return <ErrorBox mt="$3">{saltsError}</ErrorBox>;
+  return <ErrorBox mt="3">{saltsError}</ErrorBox>;
 }

@@ -34,11 +34,11 @@ export function Collapsible(props: CollapsibleProps) {
   }
 
   return (
-    <YStack gap="$2">
+    <YStack gap="2">
       <Button
         onPress={() => onExpandedChange(!expanded)}
-        chromeless
-        size="$4"
+        variant="quiet"
+        size="lg"
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel ?? title}
         accessibilityState={{ expanded }}

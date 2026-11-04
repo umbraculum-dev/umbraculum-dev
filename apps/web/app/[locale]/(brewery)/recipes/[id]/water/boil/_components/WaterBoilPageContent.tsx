@@ -30,17 +30,17 @@ export function WaterBoilPageContent({ model }: { model: WaterBoilPageModel }) {
 
   return (
     <>
-      <H1 mb="$2">{t("title")}</H1>
+      <H1 mb="2">{t("title")}</H1>
       <RecipeMetaLine recipeId={recipeId} enabled={authed} loadRecipeMeta={loadRecipeMeta} />
       <SurfaceMathToggleRow
         left={
-          <SizableText size="$2" fontFamily="$body" mt={0}>
+          <SizableText size="2" fontFamily="body" mt={0}>
             <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link>
           </SizableText>
         }
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
-        mb="$2"
+        mb="2"
       />
 
       {authChecked && !canCall ? (
@@ -51,7 +51,7 @@ export function WaterBoilPageContent({ model }: { model: WaterBoilPageModel }) {
         </ErrorBox>
       ) : null}
 
-      <YStack gap="$4">
+      <YStack gap="4">
         <WaterBoilAdjustmentSection model={model} />
         <WaterBoilSaltsSection model={model} />
         <WaterBoilAcidificationSection model={model} />

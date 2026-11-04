@@ -5,7 +5,7 @@ import { SizableText } from "tamagui";
 export type TextProps = ComponentProps<typeof SizableText>;
 
 export function Text(props: TextProps) {
-  return <SizableText fontFamily={props.fontFamily ?? "$body"} {...props} />;
+  return <SizableText fontFamily={props.fontFamily ?? "body"} {...props} />;
 }
 
 export type HeadingProps = Omit<TextProps, "size"> & {
@@ -15,9 +15,9 @@ export type HeadingProps = Omit<TextProps, "size"> & {
 export function Heading({ size, fontWeight, ...props }: HeadingProps) {
   return (
     <SizableText
-      fontFamily={props.fontFamily ?? "$body"}
+      fontFamily={props.fontFamily ?? "body"}
       fontWeight={fontWeight ?? "700"}
-      size={size ?? "$8"}
+      size={size ?? "8"}
       {...props}
     />
   );

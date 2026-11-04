@@ -22,15 +22,15 @@ export function BrewdayNotesSection(props: { model: Model }) {
         <TextArea
           id="brewday-notes"
           numberOfLines={6}
-          value={brewdayNotes}
-          onChangeText={setBrewdayNotes}
-          size="$3"
+          size="md"
           w="100%"
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
+          value={brewdayNotes}
+          onChangeText={setBrewdayNotes}
         />
       </RecipeEditField>
     </RecipeEditSection>

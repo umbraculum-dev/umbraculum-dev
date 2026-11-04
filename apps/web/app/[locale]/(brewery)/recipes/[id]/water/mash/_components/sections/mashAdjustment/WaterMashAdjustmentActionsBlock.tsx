@@ -15,10 +15,10 @@ export function WaterMashAdjustmentActionsBlock({ model }: { model: WaterMashAdj
   } = model;
 
   return (
-    <YStack gap="$2" mt="$3">
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+    <YStack gap="2" mt="3">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -29,7 +29,7 @@ export function WaterMashAdjustmentActionsBlock({ model }: { model: WaterMashAdj
           {loadingProfiles ? "Reloading…" : "Reload water profiles"}
         </Button>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"

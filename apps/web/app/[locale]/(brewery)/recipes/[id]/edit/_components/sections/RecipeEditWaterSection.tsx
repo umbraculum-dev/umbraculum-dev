@@ -23,27 +23,27 @@ export function RecipeEditWaterSection({ model }: { model: RecipeEditPageModel }
             open={openSections['water']}
             onOpenChange={(open) => setSectionOpen("water", open)}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {t("waterHelp")}
             </SizableText>
-            <XStack gap="$2" flexWrap="wrap" ai="center" mt="$2">
-              <SizableText size="$2" fontFamily="$body" as="span">
+            <XStack gap="2" flexWrap="wrap" mt="2" ai="center">
+              <SizableText size="2" fontFamily="body" as="span">
                 <Link href={`/recipes/${recipeId}/water`}>{t("nav.openWaterCalculator")}</Link>
               </SizableText>
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">
                 ·
               </SizableText>
-              <SizableText size="$2" fontFamily="$body" as="span">
+              <SizableText size="2" fontFamily="body" as="span">
                 <Link href={`/recipes/${recipeId}/water/mash`}>{tWater("mashWater")}</Link>
               </SizableText>
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" as="span">
                 ·
               </SizableText>
-              <SizableText size="$2" fontFamily="$body" as="span">
+              <SizableText size="2" fontFamily="body" as="span">
                 <Link href={`/recipes/${recipeId}/water/sparge`}>{tWater("spargeWater")}</Link>
               </SizableText>
             </XStack>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
               {t("waterProfilesManageText")} <Link href="/water-profiles">{tNav("waterProfiles")}</Link>.
             </SizableText>
           </RecipeEditSection>

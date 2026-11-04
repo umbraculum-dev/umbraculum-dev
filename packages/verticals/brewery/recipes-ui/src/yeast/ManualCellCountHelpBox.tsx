@@ -21,7 +21,7 @@ export interface ManualCellCountHelpBoxProps {
 function StepBlock(props: { step: number; title: string; body: string }) {
   return (
     <View>
-      <Text fontSize={14} fontWeight="600" marginBottom="$1">
+      <Text fontSize={14} fontWeight="600" marginBottom="1">
         {props.step}. {props.title}
       </Text>
       <Text fontSize={12} opacity={0.85}>
@@ -36,7 +36,7 @@ export function ManualCellCountHelpBox(props: ManualCellCountHelpBoxProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Card gap="$2" marginTop="$3" background="$background" borderWidth={1} borderColor="$borderColor" padding="$3">
+    <Card gap="2" marginTop="3" background="background" borderWidth={1} borderColor="borderColor" padding="3">
       <Collapsible
         title={t("yeastManualCellCountSummary")}
         expanded={expanded}
@@ -59,7 +59,7 @@ export function ManualCellCountHelpBox(props: ManualCellCountHelpBoxProps) {
             body={t("yeastManualCellCountPrerequisitesBody")}
           />
 
-          <YStack gap="$2">
+          <YStack gap="2">
             <StepBlock step={1} title={t("yeastManualCellCountStep1Title")} body={t("yeastManualCellCountStep1Body")} />
             <View>
               {props.renderImage({
@@ -68,7 +68,7 @@ export function ManualCellCountHelpBox(props: ManualCellCountHelpBoxProps) {
                 width: 320,
                 height: 200,
               })}
-              <Text fontSize={11} opacity={0.8} marginTop="$1">
+              <Text fontSize={11} opacity={0.8} marginTop="1">
                 {t("yeastManualCellCountStep1ImageLegend")}
               </Text>
             </View>

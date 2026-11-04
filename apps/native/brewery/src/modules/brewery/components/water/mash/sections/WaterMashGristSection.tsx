@@ -24,9 +24,9 @@ export function WaterMashGristSection(props: { model: WaterMashScreenModel }) {
 
   return (
     <Accordion.Item value="grist">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("gristSummaryHeading")}</Heading>
               <Text opacity={0.7}>{openSections.includes("grist") ? "▾" : "▸"}</Text>
@@ -40,10 +40,10 @@ export function WaterMashGristSection(props: { model: WaterMashScreenModel }) {
             </Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
               <Button
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
                 onPress={() => { void onImportGristFromRecipe(); }}
                 disabled={!canCall || importingGrist}
               >
@@ -51,7 +51,7 @@ export function WaterMashGristSection(props: { model: WaterMashScreenModel }) {
               </Button>
               {gristImportStatus ? <Text fontSize={12} opacity={0.85}>{gristImportStatus}</Text> : null}
             </View>
-            {gristImportError ? <Text fontSize={12} color="$red10">{gristImportError}</Text> : null}
+            {gristImportError ? <Text fontSize={12} color="red10">{gristImportError}</Text> : null}
             {gristImportedRows.length > 0 ? (
               <Text fontSize={12} opacity={0.8}>
                 Rows: {gristImportedRows.length} · Total:{" "}

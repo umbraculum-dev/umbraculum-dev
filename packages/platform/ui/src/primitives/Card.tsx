@@ -2,20 +2,33 @@ import type { ComponentProps, ReactNode } from "react";
 import React from "react";
 import { YStack } from "tamagui";
 
-export type CardProps = Omit<ComponentProps<typeof YStack>, "children"> & {
+import { splitLegacyStyleAliases, type WithLegacyStyleAliases } from "./legacyStyleAliases";
+
+export type CardProps = Omit<WithLegacyStyleAliases<ComponentProps<typeof YStack>>, "children"> & {
   children: ReactNode;
 };
 
 export function Card(props: CardProps) {
+  const { children, borderWidth, borderColor, borderRadius, padding, ...raw } = props;
+
+  const { rest, backgroundColor, style } = splitLegacyStyleAliases(
+    raw as Record<string, unknown>,
+  );
+
   return (
     <YStack
-      borderWidth={props.borderWidth ?? 1}
-      borderColor={props.borderColor ?? "$borderColor"}
-      borderRadius={props.borderRadius ?? "$4"}
-      backgroundColor={props.backgroundColor ?? "$background"}
-      padding={props.padding ?? "$3"}
-      {...props}
-    />
+      borderWidth={borderWidth ?? 1}
+      borderColor={borderColor ?? "borderColor"}
+      borderRadius={borderRadius ?? "4"}
+      backgroundColor={
+        (backgroundColor as ComponentProps<typeof YStack>["backgroundColor"] | undefined) ??
+        "background"
+      }
+      padding={padding ?? "3"}
+      {...(style !== undefined ? { style: style as ComponentProps<typeof YStack>["style"] } : {})}
+      {...(rest as ComponentProps<typeof YStack>)}
+    >
+      {children}
+    </YStack>
   );
 }
-

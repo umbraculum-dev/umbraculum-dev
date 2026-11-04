@@ -51,7 +51,7 @@ import { View, YStack } from "tamagui";
 import { jsx, jsxs as jsxs2 } from "react/jsx-runtime";
 function StepBlock(props) {
   return /* @__PURE__ */ jsxs2(View, { children: [
-    /* @__PURE__ */ jsxs2(Text2, { fontSize: 14, fontWeight: "600", marginBottom: "$1", children: [
+    /* @__PURE__ */ jsxs2(Text2, { fontSize: 14, fontWeight: "600", marginBottom: "1", children: [
       props.step,
       ". ",
       props.title
@@ -62,7 +62,7 @@ function StepBlock(props) {
 function ManualCellCountHelpBox(props) {
   const { t } = useT2("recipes.edit");
   const [expanded, setExpanded] = useState2(false);
-  return /* @__PURE__ */ jsx(Card, { gap: "$2", marginTop: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", padding: "$3", children: /* @__PURE__ */ jsx(
+  return /* @__PURE__ */ jsx(Card, { gap: "2", marginTop: "3", background: "background", borderWidth: 1, borderColor: "borderColor", padding: "3", children: /* @__PURE__ */ jsx(
     Collapsible,
     {
       title: t("yeastManualCellCountSummary"),
@@ -80,7 +80,7 @@ function ManualCellCountHelpBox(props) {
             body: t("yeastManualCellCountPrerequisitesBody")
           }
         ),
-        /* @__PURE__ */ jsxs2(YStack, { gap: "$2", children: [
+        /* @__PURE__ */ jsxs2(YStack, { gap: "2", children: [
           /* @__PURE__ */ jsx(StepBlock, { step: 1, title: t("yeastManualCellCountStep1Title"), body: t("yeastManualCellCountStep1Body") }),
           /* @__PURE__ */ jsxs2(View, { children: [
             props.renderImage({
@@ -89,7 +89,7 @@ function ManualCellCountHelpBox(props) {
               width: 320,
               height: 200
             }),
-            /* @__PURE__ */ jsx(Text2, { fontSize: 11, opacity: 0.8, marginTop: "$1", children: t("yeastManualCellCountStep1ImageLegend") })
+            /* @__PURE__ */ jsx(Text2, { fontSize: 11, opacity: 0.8, marginTop: "1", children: t("yeastManualCellCountStep1ImageLegend") })
           ] }),
           /* @__PURE__ */ jsx(StepBlock, { step: 2, title: t("yeastManualCellCountStep2Title"), body: t("yeastManualCellCountStep2Body") }),
           /* @__PURE__ */ jsx(StepBlock, { step: 3, title: t("yeastManualCellCountStep3Title"), body: t("yeastManualCellCountStep3Body") }),
@@ -132,10 +132,10 @@ function SaltAdditionsEditor(props) {
   const addRow = () => onChange([...rows, { saltKey: "gypsum", grams: 0 }]);
   const updateRow = (idx, next) => onChange(rows.map((r, i) => i === idx ? { ...r, ...next } : r));
   const removeRow = (idx) => onChange(rows.filter((_, i) => i !== idx));
-  return /* @__PURE__ */ jsxs3(Card2, { gap: "$3", padding: 0, backgroundColor: "transparent", borderWidth: 0, children: [
-    rows.length ? /* @__PURE__ */ jsx2(YStack2, { gap: "$3", children: rows.map((row, idx) => /* @__PURE__ */ jsxs3(XStack, { gap: "$3", flexWrap: "wrap", alignItems: "flex-end", children: [
-      /* @__PURE__ */ jsxs3(YStack2, { flex: 1, minWidth: 180, gap: "$1.5", children: [
-        /* @__PURE__ */ jsx2(Text3, { fontSize: 11, opacity: 0.8, marginBottom: "$1", children: t("salt") }),
+  return /* @__PURE__ */ jsxs3(Card2, { gap: "3", padding: 0, backgroundColor: "transparent", borderWidth: 0, children: [
+    rows.length ? /* @__PURE__ */ jsx2(YStack2, { gap: "3", children: rows.map((row, idx) => /* @__PURE__ */ jsxs3(XStack, { gap: "3", flexWrap: "wrap", alignItems: "flex-end", children: [
+      /* @__PURE__ */ jsxs3(YStack2, { flex: 1, minWidth: 180, gap: "1-5", children: [
+        /* @__PURE__ */ jsx2(Text3, { fontSize: 11, opacity: 0.8, marginBottom: "1", children: t("salt") }),
         /* @__PURE__ */ jsx2(
           SelectField,
           {
@@ -150,8 +150,8 @@ function SaltAdditionsEditor(props) {
           }
         )
       ] }),
-      /* @__PURE__ */ jsxs3(YStack2, { flex: 1, minWidth: 140, gap: "$1.5", children: [
-        /* @__PURE__ */ jsx2(Text3, { fontSize: 11, opacity: 0.8, marginBottom: "$1", children: t("amountLabel", { unit: tUnits("g") }) }),
+      /* @__PURE__ */ jsxs3(YStack2, { flex: 1, minWidth: 140, gap: "1-5", children: [
+        /* @__PURE__ */ jsx2(Text3, { fontSize: 11, opacity: 0.8, marginBottom: "1", children: t("amountLabel", { unit: tUnits("g") }) }),
         /* @__PURE__ */ jsx2(
           Input,
           {
@@ -159,10 +159,10 @@ function SaltAdditionsEditor(props) {
             keyboardType: "decimal-pad",
             value: String(row.grams),
             onChangeText: (text) => updateRow(idx, { grams: Number(text) || 0 }),
-            size: "$3",
-            background: "$background",
+            size: "md",
+            background: "background",
             borderWidth: 1,
-            borderColor: "$borderColor",
+            borderColor: "borderColor",
             disabled
           }
         )
@@ -170,16 +170,16 @@ function SaltAdditionsEditor(props) {
       /* @__PURE__ */ jsx2(
         Button,
         {
-          size: "$3",
-          chromeless: true,
+          size: "md",
+          variant: "quiet",
           onPress: () => removeRow(idx),
-          disabled,
+          disabled: disabled === true,
           accessibilityLabel: tCommon("remove"),
           children: /* @__PURE__ */ jsx2(Text3, { fontSize: 12, children: tCommon("remove") })
         }
       )
     ] }, idx)) }) : /* @__PURE__ */ jsx2(Text3, { fontSize: 12, opacity: 0.8, children: t("noSaltsAddedYet") }),
-    /* @__PURE__ */ jsx2(Button, { size: "$3", onPress: addRow, disabled, children: /* @__PURE__ */ jsx2(Text3, { children: t("addSalt") }) })
+    /* @__PURE__ */ jsx2(Button, { size: "md", onPress: addRow, disabled: disabled === true, children: /* @__PURE__ */ jsx2(Text3, { children: t("addSalt") }) })
   ] });
 }
 
@@ -204,24 +204,23 @@ function BrewCheckbox(props) {
   const sharedProps = {
     // Keep this custom-rendered so we control contrast/indicator on web.
     native: Platform.OS === "web" ? false : void 0,
-    size: size ?? "$2",
+    size: size ?? "2",
     ...disabled !== void 0 ? { disabled } : {},
     checked,
-    unstyled: true,
     width: 18,
     height: 18,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: isChecked ? "$color8" : "$borderColor",
-    backgroundColor: isChecked ? "$color8" : "transparent",
+    borderColor: isChecked ? "color8" : "borderColor",
+    backgroundColor: isChecked ? "color8" : "transparent",
     alignItems: "center",
     justifyContent: "center",
     ...rest
   };
   if (Platform.OS === "web") {
-    return /* @__PURE__ */ jsx3(TamaguiCheckbox, { "aria-label": accessibilityLabel, ...sharedProps, children: /* @__PURE__ */ jsx3(TamaguiCheckbox.Indicator, { unstyled: true, children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "$color1", children: "\u2713" }) }) });
+    return /* @__PURE__ */ jsx3(TamaguiCheckbox, { "aria-label": accessibilityLabel, ...sharedProps, children: /* @__PURE__ */ jsx3(TamaguiCheckbox.Indicator, { children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "color1", children: "\u2713" }) }) });
   }
-  return /* @__PURE__ */ jsx3(TamaguiCheckbox, { accessibilityLabel, accessibilityRole, ...sharedProps, children: /* @__PURE__ */ jsx3(TamaguiCheckbox.Indicator, { unstyled: true, children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "$color1", children: "\u2713" }) }) });
+  return /* @__PURE__ */ jsx3(TamaguiCheckbox, { accessibilityLabel, accessibilityRole, ...sharedProps, children: /* @__PURE__ */ jsx3(TamaguiCheckbox.Indicator, { children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "color1", children: "\u2713" }) }) });
 }
 
 // src/mash/MashStepRowEditable.tsx
@@ -235,20 +234,20 @@ import { Button as Button2, Card as Card3, Input as Input2, Text as Text5 } from
 import { Fragment, jsx as jsx4, jsxs as jsxs4 } from "react/jsx-runtime";
 function MashProcedureEditor(props) {
   const { mashProcedure, onUpdateProcedure, t } = props;
-  return /* @__PURE__ */ jsxs4(Card3, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
+  return /* @__PURE__ */ jsxs4(Card3, { gap: "2", padding: "3", background: "background", borderWidth: 1, borderColor: "borderColor", children: [
     /* @__PURE__ */ jsx4(Text5, { fontSize: 12, fontWeight: "700", children: t("mashingProcedureName") }),
     /* @__PURE__ */ jsx4(
       Input2,
       {
         value: mashProcedure.name,
         onChangeText: (text) => onUpdateProcedure({ name: text }),
-        size: "$3",
-        background: "$background",
+        size: "md",
+        background: "background",
         borderWidth: 1,
-        borderColor: "$borderColor"
+        borderColor: "borderColor"
       }
     ),
-    /* @__PURE__ */ jsx4(Text5, { fontSize: 12, fontWeight: "700", marginTop: "$2", children: t("mashingGrainTemp") }),
+    /* @__PURE__ */ jsx4(Text5, { fontSize: 12, fontWeight: "700", marginTop: "2", children: t("mashingGrainTemp") }),
     /* @__PURE__ */ jsx4(
       Input2,
       {
@@ -258,10 +257,10 @@ function MashProcedureEditor(props) {
           const v = Number(text);
           onUpdateProcedure({ grainTemperatureC: Number.isFinite(v) ? v : mashProcedure.grainTemperatureC });
         },
-        size: "$3",
-        background: "$background",
+        size: "md",
+        background: "background",
         borderWidth: 1,
-        borderColor: "$borderColor"
+        borderColor: "borderColor"
       }
     )
   ] });
@@ -269,13 +268,13 @@ function MashProcedureEditor(props) {
 function MashStepRowActions(props) {
   const { index: idx, rowId, move, onMoveStep, onDeleteStep, t } = props;
   const { canReorder, disableMoveUp, disableMoveDown } = move;
-  return /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", alignItems: "center", children: [
+  return /* @__PURE__ */ jsxs4(XStack2, { gap: "2", alignItems: "center", children: [
     canReorder ? /* @__PURE__ */ jsxs4(Fragment, { children: [
       /* @__PURE__ */ jsx4(
         Button2,
         {
-          size: "$2",
-          chromeless: true,
+          size: "sm",
+          variant: "quiet",
           disabled: disableMoveUp,
           onPress: () => onMoveStep?.(rowId, "up"),
           accessibilityLabel: t("moveUp"),
@@ -285,8 +284,8 @@ function MashStepRowActions(props) {
       /* @__PURE__ */ jsx4(
         Button2,
         {
-          size: "$2",
-          chromeless: true,
+          size: "sm",
+          variant: "quiet",
           disabled: disableMoveDown,
           onPress: () => onMoveStep?.(rowId, "down"),
           accessibilityLabel: t("moveDown"),
@@ -294,7 +293,7 @@ function MashStepRowActions(props) {
         }
       )
     ] }) : null,
-    idx > 0 && onDeleteStep ? /* @__PURE__ */ jsx4(Button2, { size: "$2", chromeless: true, onPress: () => onDeleteStep(rowId), children: /* @__PURE__ */ jsx4(Text5, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
+    idx > 0 && onDeleteStep ? /* @__PURE__ */ jsx4(Button2, { size: "sm", variant: "quiet", onPress: () => onDeleteStep(rowId), children: /* @__PURE__ */ jsx4(Text5, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
   ] });
 }
 function MashStepsToolbar(props) {
@@ -305,19 +304,19 @@ function MashStepsToolbar(props) {
     return null;
   }
   return /* @__PURE__ */ jsxs4(Fragment, { children: [
-    hasAddControls ? /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
-      onAddStep ? /* @__PURE__ */ jsx4(Button2, { size: "$3", onPress: onAddStep, children: /* @__PURE__ */ jsx4(Text5, { children: t("mashingAddStep") }) }) : null,
-      onAddFromTemplate ? /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", flexWrap: "wrap", alignItems: "center", children: [
+    hasAddControls ? /* @__PURE__ */ jsxs4(XStack2, { gap: "2", flexWrap: "wrap", alignItems: "center", children: [
+      onAddStep ? /* @__PURE__ */ jsx4(Button2, { size: "md", onPress: onAddStep, children: /* @__PURE__ */ jsx4(Text5, { children: t("mashingAddStep") }) }) : null,
+      onAddFromTemplate ? /* @__PURE__ */ jsxs4(XStack2, { gap: "2", flexWrap: "wrap", alignItems: "center", children: [
         /* @__PURE__ */ jsxs4(Text5, { fontSize: 12, opacity: 0.8, children: [
           t("mashingAddFromTemplate"),
           ":"
         ] }),
-        MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ jsx4(Button2, { size: "$3", chromeless: true, onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ jsx4(Text5, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
+        MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ jsx4(Button2, { size: "md", variant: "quiet", onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ jsx4(Text5, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
       ] }) : null
     ] }) : null,
-    hasSaveControls ? /* @__PURE__ */ jsxs4(YStack3, { gap: "$2", children: [
-      /* @__PURE__ */ jsx4(Button2, { size: "$3", onPress: onSave, disabled: !canSave || saving, children: /* @__PURE__ */ jsx4(Text5, { children: saving ? t("saving") : t("mashingSaveMashSteps") }) }),
-      saveStatus ? /* @__PURE__ */ jsx4(Card3, { gap: "$1", padding: "$2", background: "$color4", borderWidth: 1, borderColor: "$borderColor", children: /* @__PURE__ */ jsx4(Text5, { fontSize: 12, children: saveStatus }) }) : null
+    hasSaveControls ? /* @__PURE__ */ jsxs4(YStack3, { gap: "2", children: [
+      /* @__PURE__ */ jsx4(Button2, { size: "md", onPress: onSave, disabled: !canSave || saving, children: /* @__PURE__ */ jsx4(Text5, { children: saving ? t("saving") : t("mashingSaveMashSteps") }) }),
+      saveStatus ? /* @__PURE__ */ jsx4(Card3, { gap: "1", padding: "2", background: "color4", borderWidth: 1, borderColor: "borderColor", children: /* @__PURE__ */ jsx4(Text5, { fontSize: 12, children: saveStatus }) }) : null
     ] }) : null
   ] });
 }
@@ -340,7 +339,7 @@ function MashStepRowEditable(props) {
     formatFixed
   } = props;
   const { isSpargeStep, disableName, disableType, disableAmount, typeValue, typeOptions, move } = editState;
-  return /* @__PURE__ */ jsxs5(Card4, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
+  return /* @__PURE__ */ jsxs5(Card4, { gap: "2", padding: "3", background: "background", borderWidth: 1, borderColor: "borderColor", children: [
     /* @__PURE__ */ jsxs5(XStack3, { justifyContent: "space-between", alignItems: "center", children: [
       /* @__PURE__ */ jsxs5(Text6, { fontSize: 14, fontWeight: "700", children: [
         idx + 1,
@@ -359,22 +358,22 @@ function MashStepRowEditable(props) {
         }
       )
     ] }),
-    /* @__PURE__ */ jsxs5(YStack4, { gap: "$2", children: [
-      /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", children: [
+    /* @__PURE__ */ jsxs5(YStack4, { gap: "2", children: [
+      /* @__PURE__ */ jsxs5(YStack4, { gap: "1", children: [
         /* @__PURE__ */ jsx5(Text6, { fontSize: 11, opacity: 0.8, children: t("mashingStepName") }),
         disableName ? /* @__PURE__ */ jsx5(Text6, { fontSize: 12, opacity: 0.85, children: isSpargeStep ? "Sparge" : r.name || "Mash In" }) : /* @__PURE__ */ jsx5(
           Input3,
           {
             value: r.name,
             onChangeText: (text) => onUpdateStep?.(r.id, { name: text }),
-            size: "$3",
-            background: "$background",
+            size: "md",
+            background: "background",
             borderWidth: 1,
-            borderColor: "$borderColor"
+            borderColor: "borderColor"
           }
         )
       ] }),
-      /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", children: [
+      /* @__PURE__ */ jsxs5(YStack4, { gap: "1", children: [
         /* @__PURE__ */ jsx5(Text6, { fontSize: 11, opacity: 0.8, children: t("mashingStepType") }),
         disableType ? /* @__PURE__ */ jsx5(Text6, { fontSize: 12, opacity: 0.85, children: "Sparge" }) : /* @__PURE__ */ jsx5(
           SelectField2,
@@ -387,8 +386,8 @@ function MashStepRowEditable(props) {
           }
         )
       ] }),
-      /* @__PURE__ */ jsxs5(XStack3, { gap: "$2", flexWrap: "wrap", children: [
-        /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", flex: 1, minWidth: 120, children: [
+      /* @__PURE__ */ jsxs5(XStack3, { gap: "2", flexWrap: "wrap", children: [
+        /* @__PURE__ */ jsxs5(YStack4, { gap: "1", flex: 1, minWidth: 120, children: [
           /* @__PURE__ */ jsx5(Text6, { fontSize: 11, opacity: 0.8, children: t("mashingStepTemp", { unit: "\xB0C" }) }),
           /* @__PURE__ */ jsx5(
             Input3,
@@ -396,14 +395,14 @@ function MashStepRowEditable(props) {
               keyboardType: "decimal-pad",
               value: String(r.stepTemperatureC),
               onChangeText: (text) => onUpdateStep?.(r.id, { stepTemperatureC: Number(text) || 0 }),
-              size: "$3",
-              background: "$background",
+              size: "md",
+              background: "background",
               borderWidth: 1,
-              borderColor: "$borderColor"
+              borderColor: "borderColor"
             }
           )
         ] }),
-        /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", flex: 1, minWidth: 120, children: [
+        /* @__PURE__ */ jsxs5(YStack4, { gap: "1", flex: 1, minWidth: 120, children: [
           /* @__PURE__ */ jsx5(Text6, { fontSize: 11, opacity: 0.8, children: t("mashingStepTime", { unit: "min" }) }),
           /* @__PURE__ */ jsx5(
             Input3,
@@ -411,15 +410,15 @@ function MashStepRowEditable(props) {
               keyboardType: "decimal-pad",
               value: String(r.stepTimeMin),
               onChangeText: (text) => onUpdateStep?.(r.id, { stepTimeMin: Math.max(0, Number(text) || 0) }),
-              size: "$3",
-              background: "$background",
+              size: "md",
+              background: "background",
               borderWidth: 1,
-              borderColor: "$borderColor"
+              borderColor: "borderColor"
             }
           )
         ] })
       ] }),
-      /* @__PURE__ */ jsxs5(YStack4, { gap: "$1", children: [
+      /* @__PURE__ */ jsxs5(YStack4, { gap: "1", children: [
         /* @__PURE__ */ jsx5(Text6, { fontSize: 11, opacity: 0.8, children: t("mashingStepAmount", { unit: tUnits("L") }) }),
         isSpargeStep ? /* @__PURE__ */ jsx5(Text6, { fontSize: 12, opacity: 0.85, children: waterVolumes ? `${formatFixed(locale, waterVolumes.spargeLiters, 2)} ${tUnits("L")}` : "\u2014" }) : idx === 0 && firstStepAmountComputed != null ? /* @__PURE__ */ jsxs5(Text6, { fontSize: 12, opacity: 0.85, children: [
           formatFixed(locale, firstStepAmountComputed, 2),
@@ -432,15 +431,15 @@ function MashStepRowEditable(props) {
             value: r.amountL != null ? String(r.amountL) : "",
             onChangeText: (text) => onUpdateStep?.(r.id, { amountL: text.trim() ? Math.max(0, Number(text) || 0) : null }),
             placeholder: "\u2014",
-            size: "$3",
-            background: "$background",
+            size: "md",
+            background: "background",
             borderWidth: 1,
-            borderColor: "$borderColor",
+            borderColor: "borderColor",
             disabled: disableAmount
           }
         )
       ] }),
-      idx > 0 ? /* @__PURE__ */ jsxs5(XStack3, { gap: "$2", alignItems: "center", children: [
+      idx > 0 ? /* @__PURE__ */ jsxs5(XStack3, { gap: "2", alignItems: "center", children: [
         /* @__PURE__ */ jsx5(
           BrewCheckbox,
           {
@@ -449,7 +448,7 @@ function MashStepRowEditable(props) {
             onCheckedChange: (checked) => onUpdateStep?.(r.id, {
               deduceFromMashIn: checked === true
             }),
-            size: "$2",
+            size: "sm",
             accessibilityLabel: t("mashingDeduceFromMashIn"),
             accessibilityRole: "checkbox"
           }
@@ -475,11 +474,11 @@ function MashStepRowReadOnly(props) {
     {
       "data-mash-step-card": true,
       ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
-      gap: "$2",
-      padding: "$3",
-      backgroundColor: cardBackgroundColor ?? "$background",
+      gap: "2",
+      padding: "3",
+      backgroundColor: cardBackgroundColor ?? "background",
       borderWidth: 1,
-      borderColor: cardBorderColor ?? "$borderColor",
+      borderColor: cardBorderColor ?? "borderColor",
       children: [
         /* @__PURE__ */ jsxs6(Text7, { fontSize: 12, fontWeight: "700", children: [
           idx + 1,
@@ -530,7 +529,7 @@ import { Text as Text8 } from "@umbraculum/ui";
 import { jsx as jsx7, jsxs as jsxs7 } from "react/jsx-runtime";
 function MashStepsReadOnlyView(props) {
   const { mashRows, mashProcedure = null, waterVolumes, cardBackgroundColor, cardBorderColor, t, tUnits, locale, formatFixed } = props;
-  return /* @__PURE__ */ jsxs7(YStack5, { gap: "$2", children: [
+  return /* @__PURE__ */ jsxs7(YStack5, { gap: "2", children: [
     mashProcedure ? /* @__PURE__ */ jsxs7(Text8, { fontSize: 12, opacity: 0.8, children: [
       mashProcedure.name,
       " \xB7 ",
@@ -652,7 +651,7 @@ function MashStepsEditor(props) {
       }
     );
   }
-  return /* @__PURE__ */ jsxs8(YStack6, { gap: "$3", children: [
+  return /* @__PURE__ */ jsxs8(YStack6, { gap: "3", children: [
     mashWaterBudgetLiters != null ? /* @__PURE__ */ jsx9(Text9, { fontSize: 12, opacity: 0.8, children: t("mashStepsWaterBudgetNote") }) : null,
     mashProcedure && onUpdateProcedure ? /* @__PURE__ */ jsx9(MashProcedureEditor, { mashProcedure, onUpdateProcedure, t }) : null,
     mashRows.map((r, idx) => /* @__PURE__ */ jsx9(
@@ -700,18 +699,18 @@ function SpargeStepReadOnlyRow(props) {
     {
       "data-mash-step-card": true,
       ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
-      backgroundColor: cardBackgroundColor ?? "$background",
+      backgroundColor: cardBackgroundColor ?? "background",
       borderWidth: 1,
-      borderColor: cardBorderColor ?? "$borderColor",
-      padding: "$3",
-      gap: "$2",
+      borderColor: cardBorderColor ?? "borderColor",
+      padding: "3",
+      gap: "2",
       children: [
         /* @__PURE__ */ jsxs9(Text10, { fontSize: 12, fontWeight: "700", children: [
           rest.stepNumber,
           ". ",
           rest.title
         ] }),
-        /* @__PURE__ */ jsx10(YStack7, { gap: "$2", children: /* @__PURE__ */ jsxs9(ReadOnlyFieldRow2, { children: [
+        /* @__PURE__ */ jsx10(YStack7, { gap: "2", children: /* @__PURE__ */ jsxs9(ReadOnlyFieldRow2, { children: [
           /* @__PURE__ */ jsx10(ReadOnlyField2, { label: labels.name, value: rest.name, minWidth: 90 }),
           /* @__PURE__ */ jsx10(ReadOnlyField2, { label: labels.type, value: rest.typeLabel, minWidth: 110 }),
           /* @__PURE__ */ jsx10(ReadOnlyField2, { label: labels.temp, value: rest.tempDisplay, minWidth: 90 }),

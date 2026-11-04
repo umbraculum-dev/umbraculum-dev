@@ -14,21 +14,21 @@ export function ImportExportPanel(props: {
 
   const content = (
     <>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("importExport.supportedNote")}
       </SizableText>
-      <YStack gap="$2" mt="$2" mb={0} color="var(--text-muted)">
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <YStack gap="2" mt="2" mb={0} color="var(--text-muted)">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("importExport.importFormats")}
         </SizableText>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("importExport.exportFormats")}
         </SizableText>
       </YStack>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
         {t("importExport.actionsLiveInRecipes")} <Link href="/recipes">{t("importExport.actionsCta")}</Link>
       </SizableText>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
         {t("importExport.customImportNote")} <Link href="/contact">{t("importExport.customImportCta")}</Link>
       </SizableText>
     </>
@@ -43,8 +43,8 @@ export function ImportExportPanel(props: {
       bg="var(--surface)"
       borderWidth={1}
       borderColor="var(--border)"
-      rounded="$2"
-      p="$3"
+      rounded="2"
+      p="3"
       aria-labelledby={headingId}
       className={className}
     >

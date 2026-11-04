@@ -14,14 +14,14 @@ export function BrewAccordionHeader(props: {
 
   return (
     <Accordion.Header>
-      <Accordion.Trigger unstyled width="100%">
-        <XStack justifyContent="space-between" alignItems="center" width="100%" gap="$2">
+      <Accordion.Trigger width="100%">
+        <XStack justifyContent="space-between" alignItems="center" width="100%" gap="2">
           <H2 id={headingId} mt={0}>
             {title}
           </H2>
-          <XStack alignItems="center" gap="$2">
+          <XStack alignItems="center" gap="2">
             {rightSlot ? <View>{rightSlot}</View> : null}
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {open ? "▾" : "▸"}
             </SizableText>
           </XStack>

@@ -59,104 +59,104 @@ export function YeastEditorEditableSearch(props: YeastEditorEditableSearchProps)
   return (
     <form onSubmit={(...a) => { void onSearchYeasts(...(a as Parameters<typeof onSearchYeasts>)); }}>
       <RecipeEditFieldLabel htmlFor="yeast-search">{t("yeastSearchLabel")}</RecipeEditFieldLabel>
-      <XStack gap="$2" items="center" flexWrap="wrap" mt="$1">
+      <XStack gap="2" items="center" flexWrap="wrap" mt="1">
         <Input
           id="yeast-search"
           value={yeastQuery}
           onChangeText={setYeastQuery}
           flex={1}
           minW={200}
-          autoComplete="off"
-          size="$3"
+          size="md"
           w="100%"
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$2"
-          fontFamily="$body"
+          rounded="2"
+          fontFamily="body"
+          autoComplete="off"
         />
         <Button
           type="submit"
           disabled={!canCallAccountScoped || yeastSearching}
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
         >
           {yeastSearching ? "Searching…" : "Search"}
         </Button>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={clearYeastSearchResults}
           disabled={yeastSearching || (!yeastSearchError && yeastResults.length === 0)}
         >
           {t("buttons.clear")}
         </Button>
       </XStack>
-      {yeastSearchError ? <ErrorBox mt="$2">{yeastSearchError}</ErrorBox> : null}
+      {yeastSearchError ? <ErrorBox mt="2">{yeastSearchError}</ErrorBox> : null}
       {yeastResults.length ? (
-        <View overflowX="auto" mt="$2">
-          <YStack gap="$1">
-            <XStack gap="$2" ai="center" minW="max-content">
+        <View overflowX="auto" mt="2">
+          <YStack gap="1">
+            <XStack gap="2" minW="max-content" ai="center">
               <View minW={180}>
-                <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                <SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">
                   {t("yeastNameLabel")}
                 </SizableText>
               </View>
               <View minW={100}>
-                <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                <SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">
                   {t("yeastLabLabel")}
                 </SizableText>
               </View>
               <View minW={100}>
-                <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                <SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">
                   {t("yeastProductIdLabel")}
                 </SizableText>
               </View>
               <View minW={80}>
-                <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                <SizableText size="2" fontWeight="bold" fontFamily="body" color="var(--text)">
                   {t("yeastFormatLabel")}
                 </SizableText>
               </View>
               <View minW={60} />
             </XStack>
             {yeastResults.slice(0, 20).map((it) => (
-              <XStack key={it.id} gap="$2" ai="center" minW="max-content">
+              <XStack key={it.id} gap="2" minW="max-content" ai="center">
                 <View minW={180}>
-                  <SizableText size="$2" fontFamily="$body" color="var(--text)">
+                  <SizableText size="2" fontFamily="body" color="var(--text)">
                     {it.name}
                   </SizableText>
                 </View>
                 <View minW={100}>
-                  <SizableText size="$2" fontFamily="$body" color="var(--text)">
+                  <SizableText size="2" fontFamily="body" color="var(--text)">
                     {it.lab ?? ""}
                   </SizableText>
                 </View>
                 <View minW={100}>
-                  <SizableText size="$2" fontFamily="$body" color="var(--text)">
+                  <SizableText size="2" fontFamily="body" color="var(--text)">
                     {it.productId ?? ""}
                   </SizableText>
                 </View>
                 <View minW={80}>
-                  <SizableText size="$2" fontFamily="$body" color="var(--text)">
+                  <SizableText size="2" fontFamily="body" color="var(--text)">
                     {it.type ?? ""}
                   </SizableText>
                 </View>
                 <View minW={60}>
                   <Button
-                    size="$2"
+                    size="sm"
                     bg="var(--surface-2)"
                     borderWidth={1}
                     borderColor="var(--border)"
                     color="var(--text)"
-                    fontFamily="$body"
+                    fontFamily="body"
                     onPress={() => addYeastFromDb(it)}
                     disabled={!canCallAccountScoped}
                   >

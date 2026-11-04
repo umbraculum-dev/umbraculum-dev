@@ -59,20 +59,20 @@ export function RecipeEditFieldBlock({
     <View
       borderWidth={1}
       borderColor={styles.borderColor}
-      rounded="$2"
-      p="$3"
+      rounded="2"
+      p="3"
       bg={styles.bg}
       mt={mt}
       mb={mb}
     >
-      <YStack gap="$2">
-        <XStack gap="$2" flexWrap="wrap" items="baseline">
-          <SizableText size="$3" fontWeight="bold" fontFamily="$body" color="var(--text)">
+      <YStack gap="2">
+        <XStack gap="2" flexWrap="wrap" items="baseline">
+          <SizableText size="3" fontWeight="bold" fontFamily="body" color="var(--text)">
             {header}
           </SizableText>
           {badge ? <FieldBadge>{badge}</FieldBadge> : null}
           {source ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {source}
             </SizableText>
           ) : null}

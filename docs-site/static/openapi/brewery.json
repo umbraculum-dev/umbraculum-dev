@@ -322,6 +322,7 @@
                     "type": "string"
                   },
                   "notes": {
+                    "nullable": true,
                     "type": "string"
                   },
                   "beerJsonRecipeJson": {},

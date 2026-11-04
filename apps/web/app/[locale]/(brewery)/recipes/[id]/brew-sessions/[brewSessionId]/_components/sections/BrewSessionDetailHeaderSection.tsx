@@ -126,18 +126,18 @@ export function BrewSessionDetailHeaderSection({ model }: { model: BrewSessionDe
 
   return (
     <>
-      <H1 mb="$2">{t("detailTitle")}</H1>
+      <H1 mb="2">{t("detailTitle")}</H1>
 
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               <Link href={`/recipes/${recipeId}/brew-sessions`}>{t("backToSessions")}</Link>{" "}
-              <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+              <SizableText as="span" size="2" color="var(--text-muted)" fontFamily="body">
                 ·
               </SizableText>{" "}
               <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEdit")}</Link>
             </SizableText>
 
             {loading ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                 {t("loading")}
               </SizableText>
             ) : null}

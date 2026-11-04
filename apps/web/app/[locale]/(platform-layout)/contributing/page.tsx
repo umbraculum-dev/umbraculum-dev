@@ -44,9 +44,9 @@ export default function ContributingPage() {
   }, [topic]);
 
   return (
-    <YStack gap="$4" maxWidth={860}>
+    <YStack gap="4" maxWidth={860}>
       <H1 mt={0}>{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
         {t("subtitle")}
       </SizableText>
 
@@ -54,19 +54,19 @@ export default function ContributingPage() {
         bg="var(--surface)"
         borderWidth={1}
         borderColor="var(--border)"
-        rounded="$2"
-        p="$3"
+        rounded="2"
+        p="3"
       >
         <details ref={i18nRef} open={openI18n} onToggle={(e) => setOpenI18n(e.currentTarget.open)}>
           <summary className="brew-details-summary">
             <H2 mt={0} display="inline">{t("sections.i18n.title")}</H2>
           </summary>
-          <YStack mt="$3">
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <YStack mt="3">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {tI18n("subtitle")}
             </SizableText>
 
-            <H3 mb="$1.5">{tI18n("howItWorksTitle")}</H3>
+            <H3 mb="1-5">{tI18n("howItWorksTitle")}</H3>
             <ul>
               <li>{tI18n("howItWorks1")}</li>
               <li>
@@ -76,8 +76,8 @@ export default function ContributingPage() {
               <li>{tI18n("howItWorks3")}</li>
             </ul>
 
-            <H3 mb="$1.5">{tI18n("recommendedToolTitle")}</H3>
-            <SizableText size="$3" color="var(--text)" fontFamily="$body">
+            <H3 mb="1-5">{tI18n("recommendedToolTitle")}</H3>
+            <SizableText size="3" color="var(--text)" fontFamily="body">
               {tI18n("recommendedToolBody")}
             </SizableText>
             <ul>
@@ -85,12 +85,12 @@ export default function ContributingPage() {
               <li>{tI18n("recommendedTool2")}</li>
             </ul>
 
-            <H3 mb="$1.5">{tI18n("githubFallbackTitle")}</H3>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <H3 mb="1-5">{tI18n("githubFallbackTitle")}</H3>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body">
               {tI18n("githubFallbackBody")}
             </SizableText>
 
-            <H3 mb="$1.5">{tI18n("rulesTitle")}</H3>
+            <H3 mb="1-5">{tI18n("rulesTitle")}</H3>
             <ul>
               <li>{tI18n("rule1", { url: "{url}" })}</li>
               <li>{tI18n("rule2")}</li>
@@ -104,15 +104,15 @@ export default function ContributingPage() {
         bg="var(--surface)"
         borderWidth={1}
         borderColor="var(--border)"
-        rounded="$2"
-        p="$3"
+        rounded="2"
+        p="3"
       >
         <details ref={rawMaterialsRef} open={openRawMaterials} onToggle={(e) => setOpenRawMaterials(e.currentTarget.open)}>
           <summary className="brew-details-summary">
             <H2 mt={0} display="inline">{t("sections.rawMaterials.title")}</H2>
           </summary>
-          <YStack mt="$3">
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          <YStack mt="3">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {t("sections.rawMaterials.subtitle")}
             </SizableText>
             <ol>
@@ -120,7 +120,7 @@ export default function ContributingPage() {
               <li>{t("sections.rawMaterials.step2")}</li>
               <li>{t("sections.rawMaterials.step3")}</li>
             </ol>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb={0}>
               {t("sections.rawMaterials.issueTemplateNote")}
             </SizableText>
           </YStack>

@@ -25,36 +25,35 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <XStack ai="center" gap="$2" height={28} flexShrink={0}>
+    <XStack ai="center" gap="2" height={28} flexShrink={0}>
       <XStack ai="center" height={28}>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("language")}
         </SizableText>
       </XStack>
       <Select
         value={locale}
         onValueChange={handleValueChange}
-        size="$2"
+        size="sm"
         renderValue={(value) => LOCALE_LABELS[value] ?? value}
         lazyMount
       >
         <Select.Trigger
           aria-label={t("language")}
-          iconAfter={null}
-          size="$2"
+          size="sm"
           width="auto"
           minWidth={52}
           flexGrow={0}
           flexShrink={0}
-          jc="center"
-          px="$2"
+          px="2"
           height={28}
           color="var(--text)"
           backgroundColor="transparent"
           borderWidth={1}
           borderColor="var(--border)"
-          borderRadius="$2"
-          fontFamily="$body"
+          borderRadius="2"
+          fontFamily="body"
+          jc="center"
         >
           <Select.Value placeholder={t("language")} />
         </Select.Trigger>

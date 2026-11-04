@@ -23,18 +23,18 @@ export function RecipeEditNotesSection({ model }: { model: RecipeEditPageModel }
           >
             <RecipeEditField id="recipe-notes" label={t("sections.notes")}>
               <TextArea
-                id="recipe-notes"
-                numberOfLines={6}
-                value={notes}
-                onChangeText={setNotes}
-                size="$3"
-                w="100%"
-                bg="var(--surface)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                rounded="$2"
-                fontFamily="$body"
-              />
+          id="recipe-notes"
+          numberOfLines={6}
+          size="md"
+          w="100%"
+          bg="var(--surface)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          rounded="2"
+          fontFamily="body"
+          value={notes}
+          onChangeText={setNotes}
+        />
             </RecipeEditField>
           </RecipeEditSection>
   );

@@ -59,13 +59,13 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
         disabled={!canCall}
         aria-describedby="import-file-help"
       />
-      <SizableText id="import-file-help" size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5" mb="$3" display="block">
+      <SizableText id="import-file-help" size="2" color="var(--text-muted)" fontFamily="body" mt="1-5" mb="3" display="block">
         {fileName ? t("filePicked", { name: fileName }) : t("fileNotPicked")}
       </SizableText>
 
-      <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+      <XStack gap="3" flexWrap="wrap" ai="flex-end">
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="import-format">{t("formatLabel")}</RecipeEditFieldLabel>
             <BrewSelect
               id="import-format"
@@ -79,13 +79,13 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
               disabled={!canCall}
               width="full"
             />
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1-5">
               {format ? t("formatResolved", { format: formatLabel }) : t("formatNotResolved")}
             </SizableText>
           </YStack>
         </View>
         <View flex={1} minWidth={200}>
-          <YStack gap="$1.5">
+          <YStack gap="1-5">
             <RecipeEditFieldLabel htmlFor="import-style">{t("styleLabel")}</RecipeEditFieldLabel>
             <BrewSelect
               id="import-style"
@@ -99,7 +99,7 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
               width="full"
             />
             {stylesError ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="1-5">
                 {String(stylesError)}
               </SizableText>
             ) : null}
@@ -107,12 +107,12 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
         </View>
       </XStack>
 
-      <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
-        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onPreview()} disabled={!canPreview}>
+      <XStack gap="3" mt="3" alignItems="center" flexWrap="wrap">
+        <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onPreview()} disabled={!canPreview}>
           {previewLoading ? t("previewing") : t("preview")}
         </Button>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -128,9 +128,9 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
 
       {previewError ? (
         <>
-          <ErrorBox mt="$3">{previewError}</ErrorBox>
+          <ErrorBox mt="3">{previewError}</ErrorBox>
           {isFileTooLargeError(previewError) ? (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
               {t("errors.fileTooLargeHelp")}
             </SizableText>
           ) : null}
@@ -139,7 +139,7 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
 
       {preview ? (
         <View className="brew-panel brew-section" aria-labelledby="import-preview-heading">
-          <H3 id="import-preview-heading" mt={0} mb="$2">
+          <H3 id="import-preview-heading" mt={0} mb="2">
             {t("previewHeading")}
           </H3>
 
@@ -148,7 +148,7 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
               <tbody>
                 <tr>
                   <td className="brew-preview-label">
-                    <SizableText size="$2" fontWeight="bold" fontFamily="$body">
+                    <SizableText size="2" fontWeight="bold" fontFamily="body">
                       {t("previewNameLabel")}
                     </SizableText>
                   </td>
@@ -158,12 +158,12 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
                 </tr>
                 <tr>
                   <td className="brew-preview-label">
-                    <SizableText size="$2" fontWeight="bold" fontFamily="$body">
+                    <SizableText size="2" fontWeight="bold" fontFamily="body">
                       {t("previewNotesLabel")}
                     </SizableText>
                   </td>
                   <td>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                       {preview.notes ? preview.notes : dash}
                     </SizableText>
                   </td>
@@ -172,14 +172,14 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
             </table>
           </View>
 
-          <H3 mt="$4" mb="$1.5">
+          <H3 mt="4" mb="1-5">
             {t("warningsHeading")}
           </H3>
           {preview.warnings.length ? (
             <ul className="brew-recipe-edit-list-disc brew-list-mt0">
               {preview.warnings.map((w, idx) => (
                 <li key={`${String(w?.code ?? "warn")}-${idx}`}>
-                  <SizableText size="$2" fontFamily="$body">
+                  <SizableText size="2" fontFamily="body">
                     <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
                     <SizableText color="var(--text-muted)">{typeof w?.message === "string" ? w.message : ""}</SizableText>
                   </SizableText>
@@ -187,26 +187,26 @@ export function RecipeImportSingleSection({ model }: { model: UseRecipeImportFor
               ))}
             </ul>
           ) : (
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {t("noWarnings")}
             </SizableText>
           )}
 
-          <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onImport()} disabled={!canImport}>
+          <XStack gap="3" mt="3" alignItems="center" flexWrap="wrap">
+            <Button size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onImport()} disabled={!canImport}>
               {importing ? t("importing") : t("import")}
             </Button>
             {importError ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" aria-live="polite">
                 {importError}
               </SizableText>
             ) : null}
           </XStack>
           {importError ? (
             <>
-              <ErrorBox mt="$3">{importError}</ErrorBox>
+              <ErrorBox mt="3">{importError}</ErrorBox>
               {isFileTooLargeError(importError) ? (
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt="2" mb={0}>
                   {t("errors.fileTooLargeHelp")}
                 </SizableText>
               ) : null}

@@ -21,7 +21,7 @@ declare function classifyContractVersionSkew(runtime: string, expected?: string)
  * Shared brewery route schema primitives.
  */
 
-declare const isoDateTime: z.ZodPreprocess<z.ZodString>;
+declare const isoDateTime: z.ZodPreprocess<z.ZodString, unknown>;
 declare const OkResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
 }, z.core.$strip>;
@@ -78,8 +78,8 @@ declare const EquipmentProfilePayloadSchema: z.ZodObject<{
     workspaceId: z.ZodString;
     name: z.ZodString;
     equipment: z.ZodRecord<z.ZodString, z.ZodUnknown>;
-    createdAt: z.ZodPreprocess<z.ZodString>;
-    updatedAt: z.ZodPreprocess<z.ZodString>;
+    createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+    updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
 }, z.core.$strip>;
 declare const EquipmentProfilesListResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
@@ -88,8 +88,8 @@ declare const EquipmentProfilesListResponseSchema: z.ZodObject<{
         workspaceId: z.ZodString;
         name: z.ZodString;
         equipment: z.ZodRecord<z.ZodString, z.ZodUnknown>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 declare const EquipmentProfileResponseSchema: z.ZodObject<{
@@ -99,8 +99,8 @@ declare const EquipmentProfileResponseSchema: z.ZodObject<{
         workspaceId: z.ZodString;
         name: z.ZodString;
         equipment: z.ZodRecord<z.ZodString, z.ZodUnknown>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
     }, z.core.$strip>;
 }, z.core.$strip>;
 declare const EquipmentProfileCreateRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
@@ -115,8 +115,8 @@ declare const InventoryItemPayloadSchema: z.ZodObject<{
     quantity: z.ZodNumber;
     unit: z.ZodString;
     metadataJson: z.ZodNullable<z.ZodUnknown>;
-    createdAt: z.ZodPreprocess<z.ZodString>;
-    updatedAt: z.ZodPreprocess<z.ZodString>;
+    createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+    updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
 }, z.core.$strip>;
 declare const InventoryListResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
@@ -129,8 +129,8 @@ declare const InventoryListResponseSchema: z.ZodObject<{
         quantity: z.ZodNumber;
         unit: z.ZodString;
         metadataJson: z.ZodNullable<z.ZodUnknown>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 declare const InventoryItemResponseSchema: z.ZodObject<{
@@ -144,8 +144,8 @@ declare const InventoryItemResponseSchema: z.ZodObject<{
         quantity: z.ZodNumber;
         unit: z.ZodString;
         metadataJson: z.ZodNullable<z.ZodUnknown>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
     }, z.core.$strip>;
 }, z.core.$strip>;
 declare const InventoryCreateRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
@@ -176,7 +176,7 @@ declare const RecipeCreateRequestSchema: z.ZodObject<{
 declare const RecipePatchRequestSchema: z.ZodObject<{
     name: z.ZodOptional<z.ZodString>;
     styleKey: z.ZodOptional<z.ZodString>;
-    notes: z.ZodOptional<z.ZodString>;
+    notes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     beerJsonRecipeJson: z.ZodOptional<z.ZodUnknown>;
     recipeExtJson: z.ZodOptional<z.ZodUnknown>;
 }, z.core.$strip>;
@@ -320,9 +320,9 @@ declare const BrewSessionListItemSchema: z.ZodObject<{
     id: z.ZodString;
     code: z.ZodString;
     status: z.ZodString;
-    createdAt: z.ZodPreprocess<z.ZodString>;
-    startedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
-    stoppedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
+    createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+    startedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>, unknown>>;
+    stoppedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>, unknown>>;
 }, z.core.$strip>;
 type BrewSessionListItem = z.infer<typeof BrewSessionListItemSchema>;
 declare const BrewSessionsListResponseSchema: z.ZodObject<{
@@ -331,9 +331,9 @@ declare const BrewSessionsListResponseSchema: z.ZodObject<{
         id: z.ZodString;
         code: z.ZodString;
         status: z.ZodString;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        startedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
-        stoppedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        startedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>, unknown>>;
+        stoppedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>, unknown>>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 type BrewSessionsListResponse = z.infer<typeof BrewSessionsListResponseSchema>;
@@ -348,7 +348,7 @@ declare const BrewSessionLogSchema: z.ZodObject<{
     brewSessionId: z.ZodString;
     kind: z.ZodString;
     message: z.ZodString;
-    createdAt: z.ZodPreprocess<z.ZodString>;
+    createdAt: z.ZodPreprocess<z.ZodString, unknown>;
     stepId: z.ZodNullable<z.ZodString>;
     payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
 }, z.core.$loose>;
@@ -361,8 +361,8 @@ declare const BrewSessionStepSchema: z.ZodObject<{
     sortOrder: z.ZodNumber;
     sectionId: z.ZodString;
     sectionName: z.ZodNullable<z.ZodString>;
-    createdAt: z.ZodPreprocess<z.ZodString>;
-    updatedAt: z.ZodPreprocess<z.ZodString>;
+    createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+    updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
     isDisabled: z.ZodBoolean;
     customTimerEnabled: z.ZodBoolean;
     note: z.ZodNullable<z.ZodString>;
@@ -370,11 +370,11 @@ declare const BrewSessionStepSchema: z.ZodObject<{
     offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
     relativeToStepId: z.ZodNullable<z.ZodString>;
     timerAccumulatedSeconds: z.ZodNumber;
-    timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-    timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-    timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+    timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+    timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
     timerState: z.ZodString;
-    timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
 }, z.core.$loose>;
 declare const BrewSessionPayloadSchema: z.ZodObject<{
     id: z.ZodString;
@@ -382,12 +382,12 @@ declare const BrewSessionPayloadSchema: z.ZodObject<{
     recipeId: z.ZodString;
     code: z.ZodNullable<z.ZodString>;
     status: z.ZodString;
-    createdAt: z.ZodPreprocess<z.ZodString>;
-    updatedAt: z.ZodPreprocess<z.ZodString>;
-    startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-    pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-    stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-    scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+    updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
+    startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+    pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+    stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+    scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
     recipe: z.ZodOptional<z.ZodObject<{
         id: z.ZodString;
         name: z.ZodString;
@@ -401,8 +401,8 @@ declare const BrewSessionPayloadSchema: z.ZodObject<{
         sortOrder: z.ZodNumber;
         sectionId: z.ZodString;
         sectionName: z.ZodNullable<z.ZodString>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
         isDisabled: z.ZodBoolean;
         customTimerEnabled: z.ZodBoolean;
         note: z.ZodNullable<z.ZodString>;
@@ -410,18 +410,18 @@ declare const BrewSessionPayloadSchema: z.ZodObject<{
         offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
         relativeToStepId: z.ZodNullable<z.ZodString>;
         timerAccumulatedSeconds: z.ZodNumber;
-        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         timerState: z.ZodString;
-        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
     }, z.core.$loose>>>;
     logs: z.ZodOptional<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         brewSessionId: z.ZodString;
         kind: z.ZodString;
         message: z.ZodString;
-        createdAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
         stepId: z.ZodNullable<z.ZodString>;
         payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
     }, z.core.$loose>>>;
@@ -434,12 +434,12 @@ declare const BrewSessionDetailResponseSchema: z.ZodObject<{
         recipeId: z.ZodString;
         code: z.ZodNullable<z.ZodString>;
         status: z.ZodString;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
-        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
+        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         recipe: z.ZodOptional<z.ZodObject<{
             id: z.ZodString;
             name: z.ZodString;
@@ -453,8 +453,8 @@ declare const BrewSessionDetailResponseSchema: z.ZodObject<{
             sortOrder: z.ZodNumber;
             sectionId: z.ZodString;
             sectionName: z.ZodNullable<z.ZodString>;
-            createdAt: z.ZodPreprocess<z.ZodString>;
-            updatedAt: z.ZodPreprocess<z.ZodString>;
+            createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+            updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
             isDisabled: z.ZodBoolean;
             customTimerEnabled: z.ZodBoolean;
             note: z.ZodNullable<z.ZodString>;
@@ -462,18 +462,18 @@ declare const BrewSessionDetailResponseSchema: z.ZodObject<{
             offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
             relativeToStepId: z.ZodNullable<z.ZodString>;
             timerAccumulatedSeconds: z.ZodNumber;
-            timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-            timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-            timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+            timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+            timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
             timerState: z.ZodString;
-            timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         }, z.core.$loose>>>;
         logs: z.ZodOptional<z.ZodArray<z.ZodObject<{
             id: z.ZodString;
             brewSessionId: z.ZodString;
             kind: z.ZodString;
             message: z.ZodString;
-            createdAt: z.ZodPreprocess<z.ZodString>;
+            createdAt: z.ZodPreprocess<z.ZodString, unknown>;
             stepId: z.ZodNullable<z.ZodString>;
             payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
         }, z.core.$loose>>>;
@@ -487,12 +487,12 @@ declare const BrewSessionCreateResponseSchema: z.ZodObject<{
         recipeId: z.ZodString;
         code: z.ZodNullable<z.ZodString>;
         status: z.ZodString;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
-        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
+        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         recipe: z.ZodOptional<z.ZodObject<{
             id: z.ZodString;
             name: z.ZodString;
@@ -506,8 +506,8 @@ declare const BrewSessionCreateResponseSchema: z.ZodObject<{
             sortOrder: z.ZodNumber;
             sectionId: z.ZodString;
             sectionName: z.ZodNullable<z.ZodString>;
-            createdAt: z.ZodPreprocess<z.ZodString>;
-            updatedAt: z.ZodPreprocess<z.ZodString>;
+            createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+            updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
             isDisabled: z.ZodBoolean;
             customTimerEnabled: z.ZodBoolean;
             note: z.ZodNullable<z.ZodString>;
@@ -515,18 +515,18 @@ declare const BrewSessionCreateResponseSchema: z.ZodObject<{
             offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
             relativeToStepId: z.ZodNullable<z.ZodString>;
             timerAccumulatedSeconds: z.ZodNumber;
-            timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-            timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-            timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+            timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+            timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
             timerState: z.ZodString;
-            timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         }, z.core.$loose>>>;
         logs: z.ZodOptional<z.ZodArray<z.ZodObject<{
             id: z.ZodString;
             brewSessionId: z.ZodString;
             kind: z.ZodString;
             message: z.ZodString;
-            createdAt: z.ZodPreprocess<z.ZodString>;
+            createdAt: z.ZodPreprocess<z.ZodString, unknown>;
             stepId: z.ZodNullable<z.ZodString>;
             payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
         }, z.core.$loose>>>;
@@ -539,8 +539,8 @@ declare const BrewSessionCreateResponseSchema: z.ZodObject<{
         sortOrder: z.ZodNumber;
         sectionId: z.ZodString;
         sectionName: z.ZodNullable<z.ZodString>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
         isDisabled: z.ZodBoolean;
         customTimerEnabled: z.ZodBoolean;
         note: z.ZodNullable<z.ZodString>;
@@ -548,11 +548,11 @@ declare const BrewSessionCreateResponseSchema: z.ZodObject<{
         offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
         relativeToStepId: z.ZodNullable<z.ZodString>;
         timerAccumulatedSeconds: z.ZodNumber;
-        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         timerState: z.ZodString;
-        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
     }, z.core.$loose>>;
 }, z.core.$strip>;
 declare const BrewSessionStepResponseSchema: z.ZodObject<{
@@ -565,8 +565,8 @@ declare const BrewSessionStepResponseSchema: z.ZodObject<{
         sortOrder: z.ZodNumber;
         sectionId: z.ZodString;
         sectionName: z.ZodNullable<z.ZodString>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
         isDisabled: z.ZodBoolean;
         customTimerEnabled: z.ZodBoolean;
         note: z.ZodNullable<z.ZodString>;
@@ -574,11 +574,11 @@ declare const BrewSessionStepResponseSchema: z.ZodObject<{
         offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
         relativeToStepId: z.ZodNullable<z.ZodString>;
         timerAccumulatedSeconds: z.ZodNumber;
-        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         timerState: z.ZodString;
-        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
     }, z.core.$loose>;
 }, z.core.$strip>;
 declare const BrewSessionStepsResponseSchema: z.ZodObject<{
@@ -591,8 +591,8 @@ declare const BrewSessionStepsResponseSchema: z.ZodObject<{
         sortOrder: z.ZodNumber;
         sectionId: z.ZodString;
         sectionName: z.ZodNullable<z.ZodString>;
-        createdAt: z.ZodPreprocess<z.ZodString>;
-        updatedAt: z.ZodPreprocess<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString, unknown>;
+        updatedAt: z.ZodPreprocess<z.ZodString, unknown>;
         isDisabled: z.ZodBoolean;
         customTimerEnabled: z.ZodBoolean;
         note: z.ZodNullable<z.ZodString>;
@@ -600,11 +600,11 @@ declare const BrewSessionStepsResponseSchema: z.ZodObject<{
         offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
         relativeToStepId: z.ZodNullable<z.ZodString>;
         timerAccumulatedSeconds: z.ZodNumber;
-        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
-        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
         timerState: z.ZodString;
-        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString, unknown>>;
     }, z.core.$loose>>;
 }, z.core.$strip>;
 declare const BrewSessionPatchRequestSchema: z.ZodObject<{
@@ -621,7 +621,7 @@ declare const BrewSessionStopRequestSchema: z.ZodPreprocess<z.ZodObject<{
         auto: "auto";
         manual: "manual";
     }>>;
-}, z.core.$strip>>;
+}, z.core.$strip>, unknown>;
 declare const BrewSessionStepLogRequestSchema: z.ZodObject<{
     status: z.ZodEnum<{
         pending: "pending";
@@ -637,14 +637,14 @@ declare const BrewSessionStepLogRequestSchema: z.ZodObject<{
 declare const IntegrationAttachmentDeviceSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 declare const IntegrationAttachmentSchema: z.ZodObject<{
     id: z.ZodString;
-    attachedAt: z.ZodPreprocess<z.ZodString>;
+    attachedAt: z.ZodPreprocess<z.ZodString, unknown>;
     device: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 }, z.core.$strip>;
 declare const IntegrationAttachmentsResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
     attachments: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
-        attachedAt: z.ZodPreprocess<z.ZodString>;
+        attachedAt: z.ZodPreprocess<z.ZodString, unknown>;
         device: z.ZodRecord<z.ZodString, z.ZodUnknown>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
@@ -1086,11 +1086,11 @@ declare const RecipeWaterSettingsPutResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
     settings: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 }, z.core.$strip>;
-declare const MashComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+declare const MashComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>, unknown>;
 declare const MashComputeAndSaveResponseSchema: z.ZodCustom<MashComputeAndSaveResponseV1, MashComputeAndSaveResponseV1>;
-declare const SpargeComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+declare const SpargeComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>, unknown>;
 declare const SpargeComputeAndSaveResponseSchema: z.ZodCustom<SpargeComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1>;
-declare const BoilComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+declare const BoilComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>, unknown>;
 declare const BoilComputeAndSaveResponseSchema: z.ZodCustom<BoilComputeAndSaveResponseV1, BoilComputeAndSaveResponseV1>;
 declare const WaterCalcRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 declare const WaterCalcWithDerivationResponseSchema: z.ZodObject<{

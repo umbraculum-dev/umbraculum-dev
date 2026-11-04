@@ -33,9 +33,9 @@ export function WaterSpargeConfigSection(props: { model: WaterSpargeScreenModel 
 
   return (
     <Accordion.Item value="spargeConfig">
-      <Card gap="$2" mt="$2">
+      <Card gap="2" mt="2">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("spargeConfigurationHeading")}</Heading>
               <Text opacity={0.7}>{openSections.includes("spargeConfig") ? "▾" : "▸"}</Text>
@@ -45,7 +45,7 @@ export function WaterSpargeConfigSection(props: { model: WaterSpargeScreenModel 
         <Accordion.Content>
           <View style={{ gap: 12 }}>
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {tEdit("mashingStepTime", { unit: "min" })}
               </Text>
               <Input
@@ -54,14 +54,14 @@ export function WaterSpargeConfigSection(props: { model: WaterSpargeScreenModel 
                 onChangeText={(text) =>
                   setSpargeStepTimeMin(Math.max(0, Math.min(600, Number(text) || 0)))
                 }
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {tEdit("mashingStepRamp", { unit: "min" })}
               </Text>
               <Input
@@ -70,10 +70,10 @@ export function WaterSpargeConfigSection(props: { model: WaterSpargeScreenModel 
                 onChangeText={(text) =>
                   setSpargeStepRampMin(Math.max(0, Math.min(120, Number(text) || 0)))
                 }
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
             <PickerField
@@ -87,7 +87,7 @@ export function WaterSpargeConfigSection(props: { model: WaterSpargeScreenModel 
               closeLabel={tCommon("close")}
             />
             <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
+              <Text fontSize={11} opacity={0.8} mb="1">
                 {tEdit("mashingStepTemp", { unit: tUnits("C") })}
               </Text>
               <Input
@@ -99,22 +99,22 @@ export function WaterSpargeConfigSection(props: { model: WaterSpargeScreenModel 
                     Math.max(0, Math.min(100, Number.isFinite(parsed) ? parsed : 0)),
                   );
                 }}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               />
             </View>
             <Button
-              size="$3"
-              chromeless
+              size="md"
+              variant="quiet"
               onPress={() => { void onSaveSpargeConfig(); }}
               disabled={!canCall || savingSpargeConfig}
             >
               <Text>{savingSpargeConfig ? "Saving…" : "Save"}</Text>
             </Button>
             {spargeConfigSaveStatus ? (
-              <Text fontSize={12} color="$green11">
+              <Text fontSize={12} color="green11">
                 {spargeConfigSaveStatus}
               </Text>
             ) : null}

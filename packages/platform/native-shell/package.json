@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "tamagui": "2.2.0"
+    "tamagui": "3.2.0"
   },
   "peerDependencies": {
     "expo": "~58.0.23",
@@ -66,6 +66,6 @@
     "expo-secure-store": "~58.0.2",
     "react": ">=19",
     "react-native": "0.88.1",
-    "tamagui": ">=2"
+    "tamagui": ">=3"
   }
 }

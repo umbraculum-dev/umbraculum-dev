@@ -17,10 +17,10 @@ export function BrewSessionSummarySection({ model }: { model: BrewSessionDetailP
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
-          rounded="$3"
-          p="$3"
+          rounded="3"
+          p="3"
         >
-          <YStack gap="$1">
+          <YStack gap="1">
             <BrewSessionSummaryHeaderBlock model={model} />
             <BrewSessionSummaryStatsBlock model={model} />
           </YStack>

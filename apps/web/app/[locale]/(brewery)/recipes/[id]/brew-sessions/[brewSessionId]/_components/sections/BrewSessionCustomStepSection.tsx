@@ -127,31 +127,31 @@ export function BrewSessionCustomStepSection({ model }: { model: BrewSessionDeta
   return (
     <>
       <View
-              bg="var(--surface)"
-              borderWidth={1}
-              borderColor="var(--border)"
-              rounded="$3"
-              p="$3"
-            >
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="3"
+        p="3"
+      >
               <H2 mt={0}>{t("addCustomStepTitle")}</H2>
-              <XStack gap="$2" items="flex-end" flexWrap="wrap" mt="$2">
+              <XStack gap="2" items="flex-end" flexWrap="wrap" mt="2">
                 <View flex={1} minW={180}>
                   <RecipeEditFieldLabel htmlFor="custom-step-name">
                     {t("stepNameLabel")}
                   </RecipeEditFieldLabel>
                   <Input
-                    id="custom-step-name"
-                    value={customStepName}
-                    onChangeText={setCustomStepName}
-                    placeholder={t("stepNamePlaceholder")}
-                    size="$3"
-                    w="100%"
-                    bg="var(--surface)"
-                    borderWidth={1}
-                    borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
-                  />
+              id="custom-step-name"
+              value={customStepName}
+              onChangeText={setCustomStepName}
+              placeholder={t("stepNamePlaceholder")}
+              size="md"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="2"
+              fontFamily="body"
+            />
                 </View>
                 <View minW={120}>
                   <RecipeEditFieldLabel htmlFor="custom-step-section">
@@ -171,30 +171,30 @@ export function BrewSessionCustomStepSection({ model }: { model: BrewSessionDeta
                     {t("minutesPlannedLabel")}
                   </RecipeEditFieldLabel>
                   <Input
-                    id="custom-step-minutes"
-                    value={customStepMinutes}
-                    onChangeText={setCustomStepMinutes}
-                    placeholder="—"
-                    keyboardType="numeric"
-                    size="$3"
-                    w="100%"
-                    bg="var(--surface)"
-                    borderWidth={1}
-                    borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
-                  />
+              id="custom-step-minutes"
+              value={customStepMinutes}
+              onChangeText={setCustomStepMinutes}
+              placeholder="—"
+              keyboardType="numeric"
+              size="md"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="2"
+              fontFamily="body"
+            />
                 </View>
                 <Button
-                  onPress={() => { void addCustomStep(); }}
-                  disabled={!customStepName.trim()}
-                  size="$3"
-                  bg="var(--surface-2)"
-                  borderWidth={1}
-                  borderColor="var(--border)"
-                  color="var(--text)"
-                  fontFamily="$body"
-                >
+            onPress={() => { void addCustomStep(); }}
+            disabled={!customStepName.trim()}
+            size="md"
+            bg="var(--surface-2)"
+            borderWidth={1}
+            borderColor="var(--border)"
+            color="var(--text)"
+            fontFamily="body"
+          >
                   {t("addStepButton")}
                 </Button>
               </XStack>

@@ -14,7 +14,7 @@ export interface RecipeEditFieldProps {
 
 export function RecipeEditField({ id, label, children }: RecipeEditFieldProps) {
   return (
-    <YStack gap="$1" minW={0}>
+    <YStack gap="1" minW={0}>
       <RecipeEditFieldLabel htmlFor={id}>{label}</RecipeEditFieldLabel>
       {children}
     </YStack>

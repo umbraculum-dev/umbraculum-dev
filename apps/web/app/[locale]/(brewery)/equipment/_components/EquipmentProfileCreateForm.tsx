@@ -50,7 +50,7 @@ export function EquipmentProfileCreateForm(props: { model: Model }) {
   } = props.model;
 
   return (
-    <View mt="$3">
+    <View mt="3">
       <Accordion
         type="single"
         collapsible
@@ -63,9 +63,9 @@ export function EquipmentProfileCreateForm(props: { model: Model }) {
           title={t("createTitle")}
           open={openSections.includes("create")}
         >
-          <View mt="$3">
+          <View mt="3">
             <form onSubmit={(...a) => { void onCreate(...(a as Parameters<typeof onCreate>)); }} aria-describedby={createError ? "equipment-create-error" : undefined}>
-              <YStack gap="$3">
+              <YStack gap="3">
                 <EquipmentCreateNameField
                   t={t}
                   createName={createName}
@@ -111,13 +111,13 @@ export function EquipmentProfileCreateForm(props: { model: Model }) {
                   setCreateOtherLossesLiters={setCreateOtherLossesLiters}
                 />
               </YStack>
-              <XStack gap="$3" mt="$3" alignItems="center">
-                <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={createSubmitting}>
+              <XStack gap="3" mt="3" alignItems="center">
+                <Button as="button" type="submit" size="md" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={createSubmitting}>
                   {createSubmitting ? t("creating") : t("create")}
                 </Button>
               </XStack>
               {createError ? (
-                <ErrorBox id="equipment-create-error" mt="$3">{createError}</ErrorBox>
+                <ErrorBox id="equipment-create-error" mt="3">{createError}</ErrorBox>
               ) : null}
             </form>
           </View>

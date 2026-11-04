@@ -89,9 +89,9 @@ function AdSlot({ placement }) {
 }
 
 // src/components/AppInput.tsx
+import { Input as UiInput } from "@umbraculum/ui";
 import "react";
 import { Platform } from "react-native";
-import { Input as TamaguiInput } from "tamagui";
 import { jsx as jsx2 } from "react/jsx-runtime";
 function Input(props) {
   const isAndroid = Platform.OS === "android";
@@ -100,14 +100,14 @@ function Input(props) {
     paddingTop: 2,
     paddingBottom: 0
   } : null;
-  const passthrough = props;
-  const includeFontPadding = passthrough.includeFontPadding ?? (isAndroid ? false : void 0);
+  const { includeFontPadding: includeFontPaddingProp, style, ...rest } = props;
+  const includeFontPadding = includeFontPaddingProp ?? (isAndroid ? false : void 0);
   return /* @__PURE__ */ jsx2(
-    TamaguiInput,
+    UiInput,
     {
-      ...props,
+      ...rest,
       ...{ includeFontPadding },
-      style: androidSingleLineFixStyle ? [androidSingleLineFixStyle, props.style] : props.style
+      style: androidSingleLineFixStyle ? [androidSingleLineFixStyle, style] : style
     }
   );
 }
@@ -133,8 +133,8 @@ function ReadOnlyField({ value, placeholder = "\u2014", textAlign }) {
         Text2,
         {
           fontSize: 14,
-          color: "$gray11",
-          fontFamily: "$body",
+          color: "gray11",
+          fontFamily: "body",
           style: textAlign ? { textAlign } : void 0,
           children: display
         }

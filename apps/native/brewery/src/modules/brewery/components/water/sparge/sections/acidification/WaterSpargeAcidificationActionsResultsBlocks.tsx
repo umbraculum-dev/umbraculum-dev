@@ -11,7 +11,7 @@ export function WaterSpargeAcidificationActionsBlock(props: { model: WaterSparge
   return (
     <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
       <Button
-        size="$3"
+        size="md"
         onPress={() => {
           void onCalculateAndSave();
         }}
@@ -25,7 +25,7 @@ export function WaterSpargeAcidificationActionsBlock(props: { model: WaterSparge
               : "Calculate & save"}
         </Text>
       </Button>
-      <Button size="$3" chromeless onPress={() => { void onSaveDraft(); }} disabled={!canCall || saving}>
+      <Button size="md" variant="quiet" onPress={() => { void onSaveDraft(); }} disabled={!canCall || saving}>
         <Text>{saving ? "Saving…" : "Save draft"}</Text>
       </Button>
     </View>
@@ -39,7 +39,7 @@ export function WaterSpargeAcidificationResultsBlock(props: { model: WaterSparge
     <>
       {spargeResult ? (
         <View style={{ padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
-          <Text fontSize={12} fontWeight="bold" mb="$2">
+          <Text fontSize={12} fontWeight="bold" mb="2">
             {t("resultLastCalculated")}
           </Text>
           {spargeResult.acidRequiredMl != null ? (
@@ -68,7 +68,7 @@ export function WaterSpargeAcidificationResultsBlock(props: { model: WaterSparge
       ) : null}
       {spargeManualResult ? (
         <View style={{ padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
-          <Text fontSize={12} fontWeight="bold" mb="$2">
+          <Text fontSize={12} fontWeight="bold" mb="2">
             Result (manual mode)
           </Text>
           <Text fontSize={12}>Estimated achieved pH: {spargeManualResult.achievedPh.toFixed(2)}</Text>

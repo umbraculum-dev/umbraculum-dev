@@ -1,9 +1,12 @@
 import { createAnimations } from "@tamagui/animations-react-native";
-import { defaultConfig } from "@tamagui/config/v5";
+import { defaultConfig } from "@tamagui/config/v6";
 import { createTamagui } from "tamagui";
+
+import { themesWithV5CompatKeys } from "./themesWithV5CompatKeys";
 
 export const config = createTamagui({
   ...defaultConfig,
+  themes: themesWithV5CompatKeys(),
   animations: createAnimations({
     quick: {
       damping: 20,
@@ -35,4 +38,3 @@ declare module "tamagui" {
 }
 
 export default config;
-

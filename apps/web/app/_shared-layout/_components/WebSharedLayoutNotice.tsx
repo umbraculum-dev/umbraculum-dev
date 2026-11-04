@@ -73,7 +73,7 @@ function CredentialsTable({
           ))}
         </tbody>
       </table>
-      <SizableText size="$2" color="var(--text)" style={{ opacity: 0.9, marginTop: 6 }}>
+      <SizableText size="2" color="var(--text)" style={{ opacity: 0.9, marginTop: 6 }}>
         {footnote}
       </SizableText>
     </div>
@@ -108,7 +108,7 @@ function DemoSharedLayoutNoticeBody() {
 
   return (
     <div className="brew-shared-layout-notice__body">
-      <SizableText size="$2" fontWeight="650" color="var(--text)">
+      <SizableText size="2" fontWeight="650" color="var(--text)">
         {t("summaryLine")}
       </SizableText>
 
@@ -130,13 +130,13 @@ function DemoSharedLayoutNoticeBody() {
       <details className="brew-shared-layout-notice__details">
         <summary className="brew-shared-layout-notice__summary">{t("expanderLabel")}</summary>
         <div className="brew-shared-layout-notice__expander-body">
-          <SizableText size="$2" color="var(--text)">
+          <SizableText size="2" color="var(--text)">
             {t("dataLossWarning")}
           </SizableText>
-          <SizableText size="$2" color="var(--text)">
+          <SizableText size="2" color="var(--text)">
             {t("platformIntro")}
           </SizableText>
-          <SizableText size="$2" color="var(--text)">
+          <SizableText size="2" color="var(--text)">
             {t("referenceVertical")}
           </SizableText>
 
@@ -161,13 +161,13 @@ function DemoSharedLayoutNoticeBody() {
             </li>
           </ul>
 
-          <SizableText size="$2" color="var(--text)">
+          <SizableText size="2" color="var(--text)">
             {t("unsurePrefix")}
             {externalLink(DOC_URLS.forum, t("unsureForumLink"))}
             {t("unsureSuffix")}
           </SizableText>
 
-          <SizableText size="$2" color="var(--text)">
+          <SizableText size="2" color="var(--text)">
             {t("nativeIntro")}
           </SizableText>
           <ul className="brew-shared-layout-notice__list">

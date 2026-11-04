@@ -287,7 +287,7 @@ type paths = {
                     "application/json": {
                         name?: string;
                         styleKey?: string;
-                        notes?: string;
+                        notes?: string | null;
                         beerJsonRecipeJson?: unknown;
                         recipeExtJson?: unknown;
                     };

@@ -14,9 +14,9 @@ export interface CodeInlineProps {
 export function CodeInline({ children, color }: CodeInlineProps) {
   return (
     <SizableText
-      size="$2"
-      style={{ fontFamily: MONO_FONT }}
+      size="sm"
       color={color ?? "inherit"}
+      style={{ fontFamily: MONO_FONT }}
       as="code"
     >
       {children}

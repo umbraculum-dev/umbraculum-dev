@@ -21,11 +21,11 @@ export function MashStepRowReadOnly(props: MashStepRowReadOnlyProps) {
       key={r.id}
       data-mash-step-card
       {...((cardBackgroundColor ?? cardBorderColor) ? {} : { theme: "surface2" as const })}
-      gap="$2"
-      padding="$3"
-      backgroundColor={cardBackgroundColor ?? "$background"}
+      gap="2"
+      padding="3"
+      backgroundColor={cardBackgroundColor ?? "background"}
       borderWidth={1}
-      borderColor={cardBorderColor ?? "$borderColor"}
+      borderColor={cardBorderColor ?? "borderColor"}
     >
       <Text fontSize={12} fontWeight="700">
         {idx + 1}. {r.name}

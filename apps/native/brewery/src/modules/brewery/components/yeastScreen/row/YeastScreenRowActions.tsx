@@ -22,8 +22,8 @@ export function YeastScreenRowActions(props: {
         <Text fontSize={14} fontWeight="600">
           {idx + 1}. {r.name || "(unnamed)"}
         </Text>
-        <Button onPress={() => removeYeastRow(r.id)} size="$2" chromeless>
-          <Text color="$red10">{t("yeastRemove")}</Text>
+        <Button onPress={() => removeYeastRow(r.id)} size="sm" variant="quiet">
+          <Text color="red10">{t("yeastRemove")}</Text>
         </Button>
       </View>
       <Accordion
@@ -39,7 +39,7 @@ export function YeastScreenRowActions(props: {
       >
         <Accordion.Item value={`advanced-${r.id}`}>
           <Accordion.Header>
-            <Accordion.Trigger unstyled>
+            <Accordion.Trigger>
               <View
                 style={{
                   flexDirection: "row",

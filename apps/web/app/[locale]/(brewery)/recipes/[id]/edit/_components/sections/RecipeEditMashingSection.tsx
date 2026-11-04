@@ -33,7 +33,7 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditPageModel
             open={openSections['mashing']}
             onOpenChange={(open) => setSectionOpen("mashing", open)}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0}>
               {t("mashingHelp")}
             </SizableText>
 
@@ -43,28 +43,28 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditPageModel
                 header={t("mashingWaterVolumesTitle")}
                 badge="Computed"
                 source={t("mashingWaterVolumesSource")}
-                mt="$3"
-                mb="$3"
+                mt="3"
+                mb="3"
               >
-                <RecipeEditList gap="$1" mt="$2" mb={0}>
-                  <SizableText as="li" size="$2" fontFamily="$body" color="var(--text)">
+                <RecipeEditList gap="1" mt="2" mb={0}>
+                  <SizableText as="li" size="2" fontFamily="body" color="var(--text)">
                     Mash water: <CodeInline>{formatFixed(locale, waterVolumes.mashLiters, 2)}</CodeInline> {tUnits("L")}
                   </SizableText>
-                  <SizableText as="li" size="$2" fontFamily="$body" color="var(--text)">
+                  <SizableText as="li" size="2" fontFamily="body" color="var(--text)">
                     Sparge water: <CodeInline>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</CodeInline> {tUnits("L")}
                   </SizableText>
                 </RecipeEditList>
               </RecipeEditFieldBlock>
             ) : (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb="$3">
+              <SizableText size="2" color="var(--text-muted)" fontFamily="body" mt={0} mb="3">
                 {t("mashingWaterVolumesUnavailable")}
               </SizableText>
             )}
 
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb="$2">
+                <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb="2">
                   {t("mashStepsFromWaterPage")}
                 </SizableText>
-                <View mt="$3">
+                <View mt="3">
                   <MashStepsEditor
                     mashRows={mashRowsFiltered}
                     mashProcedure={mashProcedure}
@@ -78,13 +78,13 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditPageModel
                   />
                 </View>
 
-                <SizableText size="$2" fontFamily="$body" color="var(--text)" mt="$2" mb={0}>
+                <SizableText size="2" fontFamily="body" color="var(--text)" mt="2" mb={0}>
                   <Link href={`/recipes/${recipeId}/water/mash`}>{t("mashStepConfigureLink")}</Link>
                 </SizableText>
 
                 {spargeConfigured ? (
-                  <View mt="$4">
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb="$2">
+                  <View mt="4">
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body" mb="2">
                       {t("spargeStepFromWaterPage")}
                     </SizableText>
                     <SpargeStepReadOnlyRow
@@ -105,7 +105,7 @@ export function RecipeEditMashingSection({ model }: { model: RecipeEditPageModel
                         ramp: t("mashingStepRamp", { unit: "min" }),
                       }}
                     />
-                    <SizableText size="$2" fontFamily="$body" color="var(--text)" mt="$2" mb={0}>
+                    <SizableText size="2" fontFamily="body" color="var(--text)" mt="2" mb={0}>
                       <Link href={`/recipes/${recipeId}/water/sparge`}>
                         {t("spargeStepConfigureLink")}
                       </Link>

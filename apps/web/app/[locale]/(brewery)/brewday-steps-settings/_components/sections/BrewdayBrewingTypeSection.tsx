@@ -40,7 +40,7 @@ export function BrewdayBrewingTypeSection(props: { model: Model }) {
       open={openSections['brewingType']}
       onOpenChange={(open) => setSectionOpen("brewingType", open)}
     >
-      <XStack gap="$2" items="flex-end" flexWrap="wrap">
+      <XStack gap="2" items="flex-end" flexWrap="wrap">
         <View flex={1} minW={180}>
           <RecipeEditFieldLabel htmlFor="brewing-type-select">
             {t("sections.brewingType.label")}
@@ -54,12 +54,12 @@ export function BrewdayBrewingTypeSection(props: { model: Model }) {
           />
         </View>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={addBrewingMethodFromDropdown}
           disabled={!canCallAccountScoped || !brewingType}
           aria-label={`${t("add")} ${brewingType}`}
@@ -67,7 +67,7 @@ export function BrewdayBrewingTypeSection(props: { model: Model }) {
           {t("add")}
         </Button>
       </XStack>
-      <XStack gap="$2" items="flex-end" flexWrap="wrap" mt="$3">
+      <XStack gap="2" items="flex-end" flexWrap="wrap" mt="3">
         <View flex={1} minW={180}>
           <RecipeEditFieldLabel htmlFor="add-custom-brewing-method">
             {t("addCustomBrewingMethod")}
@@ -77,38 +77,38 @@ export function BrewdayBrewingTypeSection(props: { model: Model }) {
             value={customBrewingMethodName}
             onChangeText={setCustomBrewingMethodName}
             placeholder={t("name")}
-            size="$3"
+            size="md"
             w="100%"
             bg="var(--surface)"
             borderWidth={1}
             borderColor="var(--border)"
-            rounded="$2"
-            fontFamily="$body"
+            rounded="2"
+            fontFamily="body"
           />
         </View>
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={addCustomBrewingMethod}
           disabled={!canCallAccountScoped || !customBrewingMethodName.trim()}
         >
           {t("add")}
         </Button>
       </XStack>
-      <YStack gap="$2" mt="$3">
+      <YStack gap="2" mt="3">
         {(sections.customBrewingMethods ?? []).map((name, idx) => {
           const preset = BREWING_TYPE_OPTIONS.find((o) => o.value === name);
           const displayName = preset ? t(preset.labelKey) : name;
           return (
             <RecipeEditIngredientCard key={`${name}-${idx}`}>
-              <XStack gap="$2" items="center" flexWrap="wrap">
+              <XStack gap="2" items="center" flexWrap="wrap">
                 <SizableText
-                  size="$3"
-                  fontFamily="$body"
+                  size="md"
+                  fontFamily="body"
                   color="var(--text)"
                   flex={1}
                   minW={0}
@@ -116,12 +116,12 @@ export function BrewdayBrewingTypeSection(props: { model: Model }) {
                   {displayName}
                 </SizableText>
                 <Button
-                  size="$2"
+                  size="sm"
                   bg="var(--surface-2)"
                   borderWidth={1}
                   borderColor="var(--border)"
                   color="var(--text)"
-                  fontFamily="$body"
+                  fontFamily="body"
                   onPress={() => removeBrewingMethodFromList(idx)}
                   aria-label={`${t("remove")} ${displayName}`}
                 >
@@ -132,14 +132,14 @@ export function BrewdayBrewingTypeSection(props: { model: Model }) {
           );
         })}
       </YStack>
-      <XStack gap="$3" items="center" mt="$3">
+      <XStack gap="3" items="center" mt="3">
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
           color="var(--text)"
-          fontFamily="$body"
+          fontFamily="body"
           onPress={() => { void onSave(); }}
           disabled={!canCallAccountScoped || saving}
         >

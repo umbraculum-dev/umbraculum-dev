@@ -40,12 +40,12 @@ export function HealthStatusContent() {
 
   return (
     <>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("subtitle", { url: `${apiBase}/health` })}
       </SizableText>
-      <YStack gap="$3" mt="$3">
-        <View bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" overflow="auto">
-          <SizableText size="$2" style={{ fontFamily: MONO_FONT }} whiteSpace="pre-wrap">
+      <YStack gap="3" mt="3">
+        <View bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" rounded="2" p="3" overflow="auto">
+          <SizableText size="2" whiteSpace="pre-wrap" style={{ fontFamily: MONO_FONT }}>
             {JSON.stringify(state, null, 2)}
           </SizableText>
         </View>
@@ -106,23 +106,23 @@ export function AppPermissionsContent() {
 
   return (
     <>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("appPermissions.subtitle")}
       </SizableText>
 
-      <YStack gap="$1.5" mt="$2.5">
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+      <YStack gap="1-5" mt="2-5">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("appPermissions.userLabel")}: <CodeInline>{meSummary?.userEmail ?? "—"}</CodeInline>
         </SizableText>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("appPermissions.activeWorkspaceLabel")}: <CodeInline>{meSummary?.activeWorkspaceId ?? "—"}</CodeInline>
         </SizableText>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("appPermissions.roleLabel")}: <CodeInline>{meSummary?.role ?? t("appPermissions.roleUnknown")}</CodeInline>
         </SizableText>
       </YStack>
 
-      <View mt="$2.5">
+      <View mt="2-5">
         <Link href="/select-workspace">{t("appPermissions.selectWorkspaceCta")}</Link>
       </View>
     </>

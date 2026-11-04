@@ -7,10 +7,10 @@ export function WaterSpargeConfigSaveBlock({ model }: { model: WaterSpargePageMo
   const { canCall, savingSpargeConfig, onSaveSpargeConfig, spargeConfigSaveStatus, setSpargeConfigSaveStatus } = model;
 
   return (
-    <YStack mt="$3" gap="$2">
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+    <YStack mt="3" gap="2">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"

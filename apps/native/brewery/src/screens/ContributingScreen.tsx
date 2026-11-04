@@ -12,7 +12,7 @@ import type { RootStackParamList } from "../navigation/types";
 // existing collapsible-section-header pattern without weakening shared types.
 const SectionToggleButton = Button as unknown as React.ComponentType<
   React.ComponentProps<typeof Button> & {
-    chromeless?: boolean;
+    variant?: "quiet" | "outlined";
     width?: number | string;
     justifyContent?: string;
   }
@@ -79,10 +79,10 @@ export function ContributingScreen() {
             {t("subtitle")}
           </Text>
 
-          <Card gap="$2">
+          <Card gap="2">
             <SectionToggleButton
-              chromeless
-              size="$3"
+              variant="quiet"
+              size="md"
               onPress={() => setOpenI18n((v) => !v)}
               accessibilityRole="button"
               accessibilityLabel={t("sections.i18n.title")}
@@ -140,10 +140,10 @@ export function ContributingScreen() {
             ) : null}
           </Card>
 
-          <Card gap="$2">
+          <Card gap="2">
             <SectionToggleButton
-              chromeless
-              size="$3"
+              variant="quiet"
+              size="md"
               onPress={() => setOpenRawMaterials((v) => !v)}
               accessibilityRole="button"
               accessibilityLabel={t("sections.rawMaterials.title")}

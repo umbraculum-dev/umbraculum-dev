@@ -22,7 +22,7 @@ export function EquipmentScreenContent(props: { model: NativeEquipmentPageModel 
           </Text>
 
           {error ? (
-            <Text fontSize={12} color="$red10">
+            <Text fontSize={12} color="red10">
               {error}
             </Text>
           ) : null}

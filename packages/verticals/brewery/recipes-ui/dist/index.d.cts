@@ -105,7 +105,7 @@ interface SpargeStepReadOnlyRowProps {
 }
 declare function SpargeStepReadOnlyRow(props: SpargeStepReadOnlyRowProps): React__default.JSX.Element;
 
-interface BrewCheckboxProps extends Omit<ComponentProps<typeof Checkbox>, "children" | "native" | "unstyled"> {
+interface BrewCheckboxProps extends Omit<ComponentProps<typeof Checkbox>, "children" | "native"> {
 }
 declare function BrewCheckbox(props: BrewCheckboxProps): React__default.JSX.Element;
 

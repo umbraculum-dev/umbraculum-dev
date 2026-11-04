@@ -18,15 +18,15 @@ export function PickerField(props: {
 
   return (
     <View>
-      <Text fontSize={11} opacity={0.8} mb="$1">
+      <Text fontSize={11} opacity={0.8} mb="1">
         {props.label}
       </Text>
       <Button
         onPress={() => setOpen(true)}
-        size="$3"
-        background="$background"
+        size="md"
+        background="background"
         borderWidth={1}
-        borderColor="$borderColor"
+        borderColor="borderColor"
       >
         <Text fontSize={12}>{buttonText}</Text>
       </Button>
@@ -36,7 +36,7 @@ export function PickerField(props: {
           onPress={() => setOpen(false)}
         >
           <Pressable onPress={() => null}>
-            <Card gap="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+            <Card gap="2" background="background" borderWidth={1} borderColor="borderColor" p="3">
               <Heading fontSize={16}>{props.label}</Heading>
               <View style={{ gap: 8 }}>
                 {props.options.map((opt) => (
@@ -46,16 +46,16 @@ export function PickerField(props: {
                       props.onChange(opt.value);
                       setOpen(false);
                     }}
-                    size="$3"
-                    background={opt.value === props.value ? "$color4" : "$background"}
+                    size="md"
+                    background={opt.value === props.value ? "color4" : "background"}
                     borderWidth={1}
-                    borderColor="$borderColor"
+                    borderColor="borderColor"
                   >
                     <Text fontSize={12}>{opt.label}</Text>
                   </Button>
                 ))}
               </View>
-              <Button onPress={() => setOpen(false)} size="$3" chromeless>
+              <Button onPress={() => setOpen(false)} size="md" variant="quiet">
                 <Text>{props.closeLabel}</Text>
               </Button>
             </Card>

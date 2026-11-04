@@ -20,9 +20,9 @@ export function WaterBoilSaltsSection(props: { model: WaterBoilScreenModel }) {
 
   return (
     <Accordion.Item value="salts">
-      <Card gap="$2" mt="$3">
+      <Card gap="2" mt="3">
         <Accordion.Header>
-          <Accordion.Trigger unstyled>
+          <Accordion.Trigger>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Heading fontSize={18}>{t("saltAdditionsHeading")}</Heading>
               <Text opacity={0.7}>{openSections.includes("salts") ? "▾" : "▸"}</Text>
@@ -30,7 +30,7 @@ export function WaterBoilSaltsSection(props: { model: WaterBoilScreenModel }) {
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content>
-          <Text fontSize={12} opacity={0.8} mb="$2">
+          <Text fontSize={12} opacity={0.8} mb="2">
             {t("saltAdditionsBaseHelp")}
           </Text>
           <SaltAdditionsEditor
@@ -39,7 +39,7 @@ export function WaterBoilSaltsSection(props: { model: WaterBoilScreenModel }) {
             idPrefix="boil"
             disabled={!canCall}
           />
-          <Button size="$3" mt="$2" chromeless onPress={() => { void onSaveSalts(); }} disabled={!canCall || saving}>
+          <Button size="md" mt="2" variant="quiet" onPress={() => { void onSaveSalts(); }} disabled={!canCall || saving}>
             <Text>{saving ? "Saving…" : "Save salts"}</Text>
           </Button>
         </Accordion.Content>

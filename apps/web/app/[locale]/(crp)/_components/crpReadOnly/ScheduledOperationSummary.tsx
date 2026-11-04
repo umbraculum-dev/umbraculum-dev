@@ -36,22 +36,22 @@ export function ScheduledOperationSummary({
   });
 
   return (
-    <YStack gap="$1">
-      <SizableText fontFamily="$body">
+    <YStack gap="1">
+      <SizableText fontFamily="body">
         <SizableText fontWeight="bold">{operation.operationCode}</SizableText>
         <SizableText color="var(--text-muted)"> · {operation.name}</SizableText>
       </SizableText>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.productionOrder} value={operation.productionOrderId ?? labels.none} />
         <CrpMeta label={labels.resource} value={operation.resourceId ?? labels.none} />
         <CrpMeta label={labels.workCenter} value={operation.workCenterId ?? labels.none} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.startsAt} value={formatDateTime(operation.startsAt, labels.none)} />
         <CrpMeta label={labels.endsAt} value={formatDateTime(operation.endsAt, labels.none)} />
         <CrpMeta label={labels.duration} value={`${operation.plannedDurationMinutes} min`} />
       </XStack>
-      <XStack gap="$3" flexWrap="wrap">
+      <XStack gap="3" flexWrap="wrap">
         <CrpMeta label={labels.source} value={provenance} />
         <CrpMeta label={labels.sourceRefId} value={operation.sourceRefId ?? labels.none} />
       </XStack>

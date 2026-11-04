@@ -16,7 +16,7 @@ export function BrewSessionHydrometerReadingBlock({ model }: { model: BrewSessio
   return (
     <>
       {hydrometerLastReading ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("hydrometerLastReading")}:{" "}
           <CodeInline>
             {typeof hydrometerLastReading.temperatureC === "number"
@@ -28,7 +28,7 @@ export function BrewSessionHydrometerReadingBlock({ model }: { model: BrewSessio
           </CodeInline>
         </SizableText>
       ) : (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("hydrometerNoReadings")}
         </SizableText>
       )}

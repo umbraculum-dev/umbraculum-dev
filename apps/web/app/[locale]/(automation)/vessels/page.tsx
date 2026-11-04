@@ -66,16 +66,16 @@ export default function AutomationVesselsPage() {
   }, [authState.status]);
 
   return (
-    <YStack gap="$3">
-      <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+    <YStack gap="3">
+      <H1 mb="2">{t("title")}</H1>
+      <SizableText size="2" color="var(--text-muted)" fontFamily="body">
         {t("subtitle")}
       </SizableText>
 
-      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+      <XStack gap="3" alignItems="center" flexWrap="wrap">
         <AskAiLink fromRoute="vessels" />
         <Button
-          size="$3"
+          size="md"
           bg="var(--surface-2)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -90,13 +90,13 @@ export default function AutomationVesselsPage() {
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
       {loading && vessels.length === 0 ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("loading")}
         </SizableText>
       ) : null}
 
       {!loading && vessels.length === 0 && !error ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        <SizableText size="2" color="var(--text-muted)" fontFamily="body">
           {t("noVessels")}
         </SizableText>
       ) : null}
@@ -105,43 +105,43 @@ export default function AutomationVesselsPage() {
         <View role="region" aria-labelledby="vessels-heading">
           <SizableText
             id="vessels-heading"
-            size="$4"
+            size="lg"
             fontWeight="bold"
-            fontFamily="$heading"
-            mb="$2"
+            fontFamily="heading"
+            mb="2"
           >
             {t("listTitle")}
           </SizableText>
           <ul className="brew-recipe-list">
             {vessels.map((v) => (
               <li key={v.id} className="brew-recipe-list-row">
-                <YStack gap="$1.5">
-                  <XStack justifyContent="space-between" alignItems="flex-start" columnGap="$3" rowGap="$0.5">
-                    <SizableText flex={1} fontFamily="$body">
+                <YStack gap="1-5">
+                  <XStack justifyContent="space-between" alignItems="flex-start" columnGap="3" rowGap="0-5">
+                    <SizableText flex={1} fontFamily="body">
                       <SizableText fontWeight="bold">{v.code}</SizableText>
                       <SizableText color="var(--text-muted)"> · {v.displayName}</SizableText>
                       <SizableText color="var(--text-muted)"> ({v.vesselKind})</SizableText>
                     </SizableText>
                   </XStack>
-                  <XStack gap="$3" flexWrap="wrap" alignItems="center">
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  <XStack gap="3" flexWrap="wrap" alignItems="center">
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                       <SizableText fontWeight="bold">{tFields("mode")}:</SizableText>{" "}
                       {v.mode ?? tValues("none")}
                     </SizableText>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                       <SizableText fontWeight="bold">{tFields("currentTempC")}:</SizableText>{" "}
                       {v.currentTempC != null ? v.currentTempC.toFixed(1) : tValues("none")}
                     </SizableText>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                       <SizableText fontWeight="bold">{tFields("targetTempC")}:</SizableText>{" "}
                       {v.targetTempC != null ? v.targetTempC.toFixed(1) : tValues("none")}
                     </SizableText>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    <SizableText size="2" color="var(--text-muted)" fontFamily="body">
                       <SizableText fontWeight="bold">{tFields("alarmActive")}:</SizableText>{" "}
                       {v.alarmActive ? tValues("alarmOn") : tValues("alarmOff")}
                     </SizableText>
                   </XStack>
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="3" flexWrap="wrap">
                     <Link href={`/vessels/${v.code}`}>{t("openDetail")}</Link>
                   </XStack>
                 </YStack>

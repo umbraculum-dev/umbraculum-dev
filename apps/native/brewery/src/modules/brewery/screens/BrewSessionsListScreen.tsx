@@ -67,7 +67,7 @@ export function BrewSessionsListScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-        <Heading fontSize={20} mb="$3">
+        <Heading fontSize={20} mb="3">
           {t("listTitle")}
         </Heading>
 
@@ -75,40 +75,40 @@ export function BrewSessionsListScreen() {
           <Button onPress={() => { void createSession(); }} disabled={!canCall || creating || !recipeId}>
             <Text>{creating ? t("creating") : t("createButton")}</Text>
           </Button>
-          <Button onPress={() => void refresh()} disabled={!canCall || loading || !recipeId} background="$background" borderWidth={1}>
+          <Button onPress={() => void refresh()} disabled={!canCall || loading || !recipeId} background="background" borderWidth={1}>
             <Text>{loading ? t("loading") : t("refresh")}</Text>
           </Button>
         </View>
 
         {createError ? (
-          <Text fontSize={12} color="$red10" mb="$2">
+          <Text fontSize={12} color="red10" mb="2">
             {createError}
           </Text>
         ) : null}
         {error ? (
-          <Text fontSize={12} color="$red10" mb="$2">
+          <Text fontSize={12} color="red10" mb="2">
             {error}
           </Text>
         ) : null}
         {empty ? (
-          <Card borderWidth={1} borderColor="$borderColor" mb="$2">
+          <Card borderWidth={1} borderColor="borderColor" mb="2">
             <Text fontSize={12}>{t("empty")}</Text>
           </Card>
         ) : null}
 
         <View style={{ gap: 12 }}>
           {sessions.map((session) => (
-            <Card key={session.id} gap="$2">
+            <Card key={session.id} gap="2">
               <Heading fontSize={16}>{session.code}</Heading>
               <Text fontSize={12} opacity={0.8}>
                 {t("statusLine", { status: session.status })}
               </Text>
               <Button
                 onPress={() => navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: session.id })}
-                size="$3"
-                background="$background"
+                size="md"
+                background="background"
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor="borderColor"
               >
                 <Text>{t("detailTitle")}</Text>
               </Button>
