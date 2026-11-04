@@ -367,41 +367,40 @@ If the operator explicitly approves a debug stash: use a descriptive message,
 `git stash pop` in the **same session**, and tell the operator exactly what
 was stashed if the session ends before pop.
 
-## Do not push agent work directly to `master` (hard)
+## Do not push to `master`; ask before any push (hard)
 
-Toolset rule `40-workflow-and-navigation.mdc` requires a **named** confirmation
-before any push to sensitive branches (`master`, `main`, …). That is necessary
-but **not sufficient** for this repo.
+Toolset rule `40-workflow-and-navigation.mdc` (named confirm for sensitive
+branches) is **necessary but not sufficient** here.
 
-**Default for agents in umbraculum-dev:** do **not** `git push origin master`
-(or push a local `master` that fast-forwards `origin/master`). Land work on a
-**feature branch** and open a **PR into `master`** so:
+1. **Never** `git push origin master` (or fast-forward local `master` onto
+   `origin/master`). Default: **feature branch + PR into `master`**. Plan text
+   (“push/redeploy”, “complete todos”) is **not** permission — the operator must
+   name **`master`** and accept bypassing the PR path. Incident **2026-11-04**:
+   direct `master` docs push hid failures that a PR check suite would surface.
+   Do not “fix” with a revert unless asked.
 
-1. **Path-filtered GHA** and the PR checks UI remain the operator-visible CI
-   surface (direct `master` pushes are easy to miss; `docs-site-build`
-   `cancel-in-progress` can also bury intermediate runs).
-2. **Local `npm run verify:pre-push` (T2-PR)** stays the gate that would have
-   caught failures even when a narrow path filter would not schedule every
-   job on a bare `master` push.
-3. Plan text like “push/redeploy” or “complete all todos” is **not** permission
-   to push `master` — the operator must explicitly say **push to `master`**
-   (naming the branch) **and** accept bypassing the PR path.
+2. **Before any push** (feature branch included), **stop and ask** which local
+   gates to run — at least:
+   - `npm run verify:pre-push` (T2-PR / path-aware ci-parity — **default yes**)
+   - `typecheck` / `lint` / `docs-readmes` if the operator wants a named subset
+   - API vitest / expo-doctor / Tamagui CLI / lockfile checks when the change
+     surface warrants them (see sections below)
+   Do **not** push on a bare “push” / “push the branch” alone when T2 has not
+   been green on this commit, and do **not** skip asking “run `verify:pre-push`?”
+   to save time. GHA discovering `docs-readmes` / lockfile sync failures is the
+   anti-pattern this gate exists to kill (**2026-11-04** feature-branch push).
 
-**Incident (2026-11-04):** docs living-audit fix commit was pushed straight to
-`master`. Docs-only path filters + no PR meant a failed local/archive parity
-run (or a cancelled docs-site build) would not surface the way a PR check
-suite does. Do not repeat. Prefer branch + PR; run archive ci-parity **before**
-any push of the branch.
-
-**Do not** “fix” that incident with a revert unless the operator asks.
+3. After the operator answers, **you** run the agreed gates (container /
+   `./scripts/ci-parity-check.sh` — not host npm). Push only when those are
+   green, or when the operator **explicitly waives** a named gate.
 
 ## Pre-push CI parity (agent-owned — do not delegate to the operator)
 
-When **you** changed TypeScript, ESLint surface, module READMEs, lockfiles, or
-CI workflows and are about to **commit and push**, **you** run the parity gate —
+After the operator confirms the gate set in § “Do not push to `master`; ask
+before any push” (or waives named jobs), **you** run the parity sequence —
 not the human contributor. Do not end a session with "before you push, run …".
 
-**Mandatory sequence before push:**
+**Mandatory sequence before push** (once push + gates are authorized):
 
 1. **Commit** all intended changes (ci-parity archive mode tests **committed**
    tree only — uncommitted fixes can hide broken `HEAD`).
