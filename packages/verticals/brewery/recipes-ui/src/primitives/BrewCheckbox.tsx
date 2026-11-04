@@ -40,7 +40,7 @@ export function BrewCheckbox(props: BrewCheckboxProps) {
     return (
       <TamaguiCheckbox aria-label={accessibilityLabel} {...sharedProps}>
         <TamaguiCheckbox.Indicator>
-          <Text fontSize={12} lineHeight={12} fontWeight="700" color="color1">
+          <Text fontSize={12} lineHeight="12px" fontWeight="700" color="color1">
             ✓
           </Text>
         </TamaguiCheckbox.Indicator>
@@ -51,7 +51,7 @@ export function BrewCheckbox(props: BrewCheckboxProps) {
   return (
     <TamaguiCheckbox accessibilityLabel={accessibilityLabel} accessibilityRole={accessibilityRole} {...sharedProps}>
       <TamaguiCheckbox.Indicator>
-        <Text fontSize={12} lineHeight={12} fontWeight="700" color="color1">
+        <Text fontSize={12} lineHeight="12px" fontWeight="700" color="color1">
           ✓
         </Text>
       </TamaguiCheckbox.Indicator>

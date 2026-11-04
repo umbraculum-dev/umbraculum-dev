@@ -16,8 +16,8 @@ The platform-neutral UI primitives layer, consumed by both `apps/web` (Next.js) 
 
 ## Tamagui config entrypoints
 
-- Web: `@umbraculum/ui/tamagui-config-web` (uses `@tamagui/animations-css`)
-- Native: `@umbraculum/ui/tamagui-config-native` (native-safe; animation driver TBD)
+- Web: `@umbraculum/ui/tamagui-config-web` (uses `@tamagui/animations-css/extras` — required for Sheet / animated-number hooks on Tamagui 3.2.0; bare `@tamagui/animations-css` is insufficient — see [`docs/TAMAGUI.md`](../../../docs/TAMAGUI.md))
+- Native: `@umbraculum/ui/tamagui-config-native` (native-safe; `@tamagui/animations-react-native`)
 
 ## Build / test / lint (local)
 

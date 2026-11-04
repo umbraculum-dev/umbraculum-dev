@@ -50,7 +50,7 @@ export function UsageTokenChart({ data, ariaLabel }: UsageTokenChartProps) {
       padding="2"
       borderRadius="3"
       borderWidth={1}
-      borderColor="border-color"
+      borderColor="borderColor"
     >
       <VictoryChart
         theme={VictoryTheme.material}
