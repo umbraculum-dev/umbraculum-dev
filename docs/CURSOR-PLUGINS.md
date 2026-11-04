@@ -473,7 +473,7 @@ declaring done; T2-PR uses **`path-aware-pre-push`** (default:
 triggered; else `api-integration-tests-pre-push`. Rule `76-verification-tiers-gate.mdc`.
 Repo doc: [`docs/VERIFICATION-TIERS.md`](../docs/VERIFICATION-TIERS.md).
 
-**Docs-site rules (umbraculum-dev):** `73-website-static-build-before-preview.mdc` (rebuild brochure `dist/` before preview); `74-docusaurus-swizzle-over-css-fights.mdc` (swizzle theme components instead of fighting `custom.css` — see [`docs-site/README.md`](../docs-site/README.md) § Theme customization).
+**Docs-site rules (umbraculum-dev):** `73-website-static-build-before-preview.mdc` (rebuild brochure `dist/` before preview); `74-docusaurus-swizzle-over-css-fights.mdc` (swizzle theme components instead of fighting `custom.css` — see [`docs-site/README.md`](../docs-site/README.md) § Theme customization); `81-docs-site-cloudflare-node-lockstep.mdc` (Cloudflare Workers Builds `NODE_VERSION` must stay lockstep with monorepo `engines.node` — dashboard is operator-only).
 
 ### `umbraculum-platform-tsjs-cursor-assistant`
 

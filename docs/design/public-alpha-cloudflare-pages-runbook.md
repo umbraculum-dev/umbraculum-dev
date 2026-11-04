@@ -70,7 +70,7 @@ Repeat **Create application** with the same repo; different project name and Wra
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production branch deploy command | `npx wrangler versions upload --config docs-site/wrangler.toml` |
 | Path | `/` |
-| **Variables and secrets** (build) | **`NODE_VERSION`** = `20.19.4` · **`DOCSEARCH_APP_ID`** · **`DOCSEARCH_API_KEY`** (search-only) · **`DOCSEARCH_INDEX_NAME`** = **`umbraculum-docs`** — see [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4 |
+| **Variables and secrets** (build) | **`NODE_VERSION`** = **`22.13.0`** (must match monorepo `engines.node` / GHA `docs-site-build` — see §4) · **`DOCSEARCH_APP_ID`** · **`DOCSEARCH_API_KEY`** (search-only) · **`DOCSEARCH_INDEX_NAME`** = **`umbraculum-docs`** — see [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4 |
 
 Custom domain: `docs.umbraculum.dev`. **SEO gates removed 2026-06-27** (flip runbook §3.2).
 
@@ -82,7 +82,8 @@ Apply in each Worker → **Settings → Builds** after first green deploy:
 
 | Tuning | Action |
 |--------|--------|
-| **Node version** | **Variables and secrets** → **`NODE_VERSION`** = **`20.19.4`** — avoids `npm warn EBADENGINE` (RN/Metro/Vite want ≥20.19.4; Cloudflare default was 20.18.1). |
+| **Node version (docs Worker)** | **Variables and secrets** → **`NODE_VERSION`** = **`22.13.0`** — **lockstep with monorepo** root `engines.node` (`>=22.13.0`), root `.nvmrc`, GHA `docs-site-build` (`node-version: "22"`), and local `node:22-slim`. **Operator-only:** agents update this runbook / README pins; only a maintainer can change the Cloudflare dashboard variable. Skew symptom (2026-11): local/GHA Node 22 build OK, CF on `20.19.4` fails with `@swc/html` / “Failed to load native binding”. **When bumping monorepo Node, bump CF `NODE_VERSION` in the same change window.** Toolset rule: `81-docs-site-cloudflare-node-lockstep.mdc`. |
+| **Node version (brochure Worker)** | May remain **`20`** / **`20.19.4`** until [`umbraculum-brochure`](https://github.com/umbraculum-dev/umbraculum-brochure) engines require otherwise — **not** tied to monorepo `docs-site`. |
 | **DocSearch (docs worker only)** | **Variables and secrets** → **`DOCSEARCH_APP_ID`**, **`DOCSEARCH_API_KEY`**, **`DOCSEARCH_INDEX_NAME`** (`umbraculum-docs`) — [`docsearch-application-draft.md`](../docsearch-application-draft.md) §4; **Retry deployment** after adding vars. |
 | **Build command** | Drop redundant **`npm ci &&`** — Cloudflare already runs `npm clean-install` before your command. Use workspace build only (see table §1). |
 | **Branch previews** | Optional: uncheck **Builds for non-production branches** to halve build count on feature-branch pushes (~500 builds/month free-tier budget). Keep on if you want preview URLs per branch. |
