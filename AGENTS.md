@@ -367,6 +367,34 @@ If the operator explicitly approves a debug stash: use a descriptive message,
 `git stash pop` in the **same session**, and tell the operator exactly what
 was stashed if the session ends before pop.
 
+## Do not push agent work directly to `master` (hard)
+
+Toolset rule `40-workflow-and-navigation.mdc` requires a **named** confirmation
+before any push to sensitive branches (`master`, `main`, …). That is necessary
+but **not sufficient** for this repo.
+
+**Default for agents in umbraculum-dev:** do **not** `git push origin master`
+(or push a local `master` that fast-forwards `origin/master`). Land work on a
+**feature branch** and open a **PR into `master`** so:
+
+1. **Path-filtered GHA** and the PR checks UI remain the operator-visible CI
+   surface (direct `master` pushes are easy to miss; `docs-site-build`
+   `cancel-in-progress` can also bury intermediate runs).
+2. **Local `npm run verify:pre-push` (T2-PR)** stays the gate that would have
+   caught failures even when a narrow path filter would not schedule every
+   job on a bare `master` push.
+3. Plan text like “push/redeploy” or “complete all todos” is **not** permission
+   to push `master` — the operator must explicitly say **push to `master`**
+   (naming the branch) **and** accept bypassing the PR path.
+
+**Incident (2026-11-04):** docs living-audit fix commit was pushed straight to
+`master`. Docs-only path filters + no PR meant a failed local/archive parity
+run (or a cancelled docs-site build) would not surface the way a PR check
+suite does. Do not repeat. Prefer branch + PR; run archive ci-parity **before**
+any push of the branch.
+
+**Do not** “fix” that incident with a revert unless the operator asks.
+
 ## Pre-push CI parity (agent-owned — do not delegate to the operator)
 
 When **you** changed TypeScript, ESLint surface, module READMEs, lockfiles, or

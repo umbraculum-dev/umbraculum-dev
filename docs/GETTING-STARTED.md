@@ -519,12 +519,18 @@ Follow [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) end-to-end:
    umbraculum extensions for this workspace (common, node-react, platform-tsjs).
 5. Run the *Verify the install* step from `docs/CURSOR-PLUGINS.md` —
    ask the agent literally to list the three witness rule filenames.
+6. **Optional but recommended:** ask the agent to create your per-developer
+   `DEVELOPMENT-LOCAL.md` (gitignored) via the `generate-development-local`
+   skill — compose service names, health URL, and PR base once per
+   machine/worktree. See toolset
+   [`WORKSPACE-PLUGIN-LOADING.md`](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)
+   junior checklist.
 
 When the agent's first action in any non-trivial task hits
 [`AGENTS.md`](../AGENTS.md), it runs the **apparatus self-check** and
 either proceeds or soft-blocks. If you ever see the agent soft-block,
 that is the apparatus working as intended; install the missing plugin
-and retry.
+and retry. Do **not** enable OpenPLC or Magento plugins in this workspace.
 
 ---
 
