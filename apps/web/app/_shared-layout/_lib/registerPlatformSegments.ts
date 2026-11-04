@@ -88,6 +88,8 @@ export const PLATFORM_OWNED_SEGMENTS = [
   "accessibility",
   "contributing",
   "i18n-contributing",
+  // In-app HTTP 404 — middleware rewrites disabled-module deep links here.
+  "page-not-found",
 ] as const;
 
 export function registerPlatformSegments(): void {

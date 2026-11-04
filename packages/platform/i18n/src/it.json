@@ -236,8 +236,12 @@
     "changeLanguage": "Cambia lingua",
     "toggleLanguage": "Cambia lingua",
     "dilutionDiagramLabel": "Diagramma diluizione 1:100",
-    "imageUnavailable": "Immagine non disponibile"
+    "imageUnavailable": "Immagine non disponibile",
+    "httpNotFoundTitle": "Pagina non trovata",
+    "httpNotFoundBody": "Questa pagina non esiste, oppure non è disponibile in questa installazione.",
+    "httpNotFoundHome": "Torna alla home"
   },
+
   "locales": {
     "en": "Inglese",
     "it": "Italiano",

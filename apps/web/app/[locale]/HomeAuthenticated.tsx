@@ -12,7 +12,8 @@ import { BrewAccordionHeader } from "../_shared-layout/_components/AccordionSect
 /**
  * Authenticated home dashboard. Brewery vertical panels (import/export →
  * `/recipes`, water profiles, equipment, …) only render when the installation
- * profile enables `brewery` — same gate as middleware 404 for those segments.
+ * profile enables `brewery`. Middleware returns HTTP 404 for owned URL
+ * segments of disabled modules (e.g. `/en/recipes` on core/`platform`).
  */
 export function HomeAuthenticated({ breweryEnabled }: { breweryEnabled: boolean }) {
   const t = useTranslations("dashboard");

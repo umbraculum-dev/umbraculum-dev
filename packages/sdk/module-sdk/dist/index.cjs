@@ -60,10 +60,12 @@ __export(index_exports, {
   composeModuleTierLimitSlices: () => composeModuleTierLimitSlices,
   composeWebSharedLayoutNavItems: () => composeWebSharedLayoutNavItems,
   fromParser: () => fromParser,
+  getBuiltinSegmentOwnerEdge: () => getBuiltinSegmentOwnerEdge,
   getRegisteredDocumentTemplate: () => getRegisteredDocumentTemplate,
   getSegmentOwner: () => getSegmentOwner,
   isCanonicalModuleCode: () => isCanonicalModuleCode,
   isModuleEnabled: () => isModuleEnabled,
+  isModuleOwnedPathDenied: () => isModuleOwnedPathDenied,
   isVerticalInstalled: () => isVerticalInstalled,
   listOwnedUrlSegments: () => listOwnedUrlSegments,
   listRegisteredAddonCodes: () => listRegisteredAddonCodes,
@@ -937,15 +939,62 @@ var BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP = [
     segments: ["products", "categories", "attribute-sets", "channels"]
   }
 ];
+var PLATFORM_ENABLED = /* @__PURE__ */ new Set([
+  "automation",
+  "pim",
+  "mrp",
+  "crp"
+]);
+var REFERENCE_ENABLED = /* @__PURE__ */ new Set([
+  "brewery",
+  "automation",
+  "pim",
+  "mrp",
+  "crp"
+]);
+var segmentOwnerCache;
+function segmentOwnerMap() {
+  if (segmentOwnerCache) return segmentOwnerCache;
+  const map = /* @__PURE__ */ new Map();
+  for (const entry of BUILTIN_WEB_MODULE_SEGMENT_OWNERSHIP) {
+    for (const segment of entry.segments) {
+      map.set(segment, entry.code);
+    }
+  }
+  segmentOwnerCache = map;
+  return map;
+}
+function getBuiltinSegmentOwnerEdge(segment) {
+  return segmentOwnerMap().get(segment);
+}
 function resolveEnabledModuleCodesEdge(env = process.env) {
-  const profile = env["UMBRACULUM_MODULE_PROFILE"]?.trim() ?? "minimal";
+  const raw = env["UMBRACULUM_MODULE_PROFILE"]?.trim();
+  const profile = raw && raw.length > 0 ? raw : "platform";
   if (profile === "reference") {
-    return /* @__PURE__ */ new Set(["brewery", "automation", "pim", "mrp", "crp"]);
+    return new Set(REFERENCE_ENABLED);
   }
   if (profile === "platform") {
-    return /* @__PURE__ */ new Set(["automation", "pim", "mrp", "crp"]);
+    return new Set(PLATFORM_ENABLED);
+  }
+  if (profile === "minimal") {
+    return /* @__PURE__ */ new Set();
   }
   return /* @__PURE__ */ new Set();
+}
+function isModuleOwnedPathDenied(input) {
+  const { pathname, locales, env = process.env } = input;
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length === 0) return false;
+  let segmentIndex = 0;
+  if (locales.includes(parts[0])) {
+    segmentIndex = 1;
+  }
+  const segment = parts[segmentIndex];
+  if (!segment) return false;
+  const owner = getBuiltinSegmentOwnerEdge(segment);
+  if (!owner) return false;
+  const enabled = resolveEnabledModuleCodesEdge(env);
+  return !enabled.has(owner);
 }
 
 // src/composeWebSharedLayoutNav.ts
@@ -1035,10 +1084,12 @@ function resolveWebSharedLayoutNotice(env = process.env) {
   composeModuleTierLimitSlices,
   composeWebSharedLayoutNavItems,
   fromParser,
+  getBuiltinSegmentOwnerEdge,
   getRegisteredDocumentTemplate,
   getSegmentOwner,
   isCanonicalModuleCode,
   isModuleEnabled,
+  isModuleOwnedPathDenied,
   isVerticalInstalled,
   listOwnedUrlSegments,
   listRegisteredAddonCodes,

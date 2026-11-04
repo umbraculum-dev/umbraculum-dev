@@ -1,0 +1,36 @@
+---
+description: MUST use Tamagui for web/native UI pages — never substitute plain HTML/CSS blocks when Tamagui hits RSC/createContext errors; fix with use client instead
+alwaysApply: true
+---
+
+# Tamagui UI — no plain-HTML fallback (umbraculum-dev)
+
+## Rule (hard — MUST)
+
+When authoring or fixing **user-visible UI** under `apps/web/**`, `apps/native/**`, `packages/platform/ui/**`, or `packages/verticals/**/recipes-ui/**`:
+
+1. **MUST** use **Tamagui** primitives (`View`, `YStack`, `XStack`, `H1`, `SizableText`, `Button`, …) and project patterns (`className="brew-panel"`, etc.).
+2. **MUST NOT** ship page/section layout as raw HTML (`<div>`, `<section>`, `<h1>`, `<p>`) or ad-hoc inline `style={{…}}` layout as a substitute for Tamagui.
+3. If Tamagui fails in a Server Component (`createContext only works in Client Components`, missing theme context): **MUST** add **`"use client"`** (or a small Tamagui client child) — **MUST NOT** rewrite the UI in plain HTML.
+
+## Allowed exceptions (narrow)
+
+- Documented non-Tamagui hosts from [`docs/CODING-STANDARDS.md`](docs/CODING-STANDARDS.md): native `<select>`, `<table>`, `<details>`/`<summary>`, and similar where Tamagui does not apply.
+- Middleware / Route Handlers / non-UI modules (no visual surface).
+
+## Canonical patterns
+
+- Web page: `"use client"` + Tamagui — e.g. `apps/web/app/[locale]/(platform-layout)/about/page.tsx`, `HomeAuthenticated.tsx`.
+- Human SoT: [`docs/CODING-STANDARDS.md`](docs/CODING-STANDARDS.md) (Tamagui preferred over inline styles), [`docs/TAMAGUI.md`](docs/TAMAGUI.md).
+
+## Agent anti-patterns
+
+| Anti-pattern | Why it fails |
+|---|---|
+| Plain HTML “just to unblock” RSC errors | Breaks cross-platform UI contract; inconsistent chrome/tokens |
+| `maxWidth` / inline styles instead of `brew-panel` + Tamagui stack | Narrow one-off layouts that do not match app panels |
+| Mixing a Tamagui shell with large plain-HTML content blocks for new screens | Same MUST NOT — content blocks are UI too |
+
+## Enforcement (umbraculum-dev)
+
+Plugin `alwaysApply` is **not reliably enforced** by Cursor. This repo commits this rule at `.cursor/rules/81-tamagui-ui-no-plain-html.mdc` — agents must treat **this file** as binding.

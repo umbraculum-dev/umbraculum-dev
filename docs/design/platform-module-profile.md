@@ -44,7 +44,7 @@ See [`installation-profile.md`](installation-profile.md) for manifest format, bu
 | Layer | `reference` | `platform` (core) |
 |-------|-------------|-------------------|
 | API `registerBreweryModule` | Yes | No |
-| Web brewery URL segments | Yes | No |
+| Web brewery URL segments | Yes (served) | No — middleware **HTTP 404** (App Router files may remain on disk; deep links must not render) |
 | Native app | `apps/native/brewery` | `apps/native/blank` |
 | Prisma `brewery.*` schema | Present | Stripped after migrate (core) |
 | i18n brewery strings | Merged | Omitted |
