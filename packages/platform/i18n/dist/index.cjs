@@ -659,7 +659,7 @@ var en_default = {
     submitting: "Submitting\u2026",
     languageLabel: "Language",
     noteTitle: "Translations status",
-    noteBody: "English is the original language. Other languages (starting with Italian) will soon be 100% supported. Spanish and German are coming soon as well.",
+    noteBody: "English is the original language. Other languages (starting with French) will soon be 100% supported. Spanish, Italian and German are coming next.",
     helpTranslate: "Help translate (i18n contributing)",
     sessionExpired: {
       title: "Session expired",
@@ -1491,7 +1491,7 @@ var it_default = {
     submitting: "Invio\u2026",
     languageLabel: "Lingua",
     noteTitle: "Stato traduzioni",
-    noteBody: "L\u2019inglese \xE8 la lingua originale. Le altre lingue (a partire dall\u2019italiano) saranno presto supportate al 100%. Spagnolo e tedesco arriveranno presto.",
+    noteBody: "L\u2019inglese \xE8 la lingua originale. Le altre lingue (a partire dal francese) saranno presto supportate al 100%. Spagnolo, italiano e tedesco arriveranno a seguire.",
     helpTranslate: "Aiuta a tradurre (contributi i18n)",
     sessionExpired: {
       title: "Sessione scaduta",

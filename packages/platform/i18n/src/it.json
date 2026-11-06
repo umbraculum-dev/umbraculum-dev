@@ -626,7 +626,7 @@
     "submitting": "Invio…",
     "languageLabel": "Lingua",
     "noteTitle": "Stato traduzioni",
-    "noteBody": "L’inglese è la lingua originale. Le altre lingue (a partire dall’italiano) saranno presto supportate al 100%. Spagnolo e tedesco arriveranno presto.",
+    "noteBody": "L’inglese è la lingua originale. Le altre lingue (a partire dal francese) saranno presto supportate al 100%. Spagnolo, italiano e tedesco arriveranno a seguire.",
     "helpTranslate": "Aiuta a tradurre (contributi i18n)",
     "sessionExpired": {
       "title": "Sessione scaduta",
