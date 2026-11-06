@@ -32,6 +32,15 @@ Umbraculum publishes **two static HTML surfaces** on **Cloudflare Workers** (sta
 
 Brochure and docs site share announcement copy from **`umbraculum-brochure`** (SoT). Docs site imports `@umbraculum/brochure/announcement` via vendored mirror at `docs-site/vendor/brochure/` — run [`scripts/sync-brochure-vendor.sh`](../scripts/sync-brochure-vendor.sh) after announcement edits in the sister repo.
 
+**Two layers (do not conflate):**
+
+| Layer | Where | Meaning |
+|-------|--------|---------|
+| **Institutional** | Git tag / GitHub Release **`v0.0.1-alpha`**, brochure *Public alpha* section, docs footer, monorepo README callout | Public alpha **is open** (since 2026-06-27). Self-build; not hosted SaaS GA. |
+| **Ephemeral** | `announcement.config.json` bar (bump `id` when copy changes) | Current **stack-hardening** campaign (e.g. Tamagui 3 + Expo SDK 58). Must **not** invent a SemVer release that does not exist as a git tag. |
+
+Git tag `v1.0.0` remains operator-gated and is independent of the announcement bar.
+
 ---
 
 ## Docs site (`docs-site`)

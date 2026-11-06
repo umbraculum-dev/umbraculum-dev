@@ -33,7 +33,7 @@ This is the same **deliberately ordinary values** posture as [`MANIFESTO.md`](..
 
 [`MANIFESTO.md`](../../MANIFESTO.md) states that public values documents are **not marketing documents** — no hype, no superlatives, no “we revolutionize”. The brochure is the first public HTML many visitors see; it must follow the same discipline.
 
-Umbraculum is a **solo-maintained, community-governed open-source toolset** preparing a public alpha. Over-styled “startup” aesthetics signal a different kind of project than the one we are building. Our credibility comes from **what ships in the repo and docs**, not from conversion-optimized chrome.
+Umbraculum is a **solo-maintained, community-governed open-source toolset** whose **public alpha is open** (self-build today — not hosted SaaS GA). Over-styled “startup” aesthetics signal a different kind of project than the one we are building. Our credibility comes from **what ships in the repo and docs**, not from conversion-optimized chrome.
 
 ---
 
@@ -65,8 +65,8 @@ When in doubt: **would a senior engineer trust this page**, or would they assume
 Inherit the public-doc voice from [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) §6:
 
 - **Precise** — claims match what exists in the repo or roadmap.
-- **Honest about trade-offs** — public alpha, self-build today, not all modules shipped.
-- **Explicit about what is not settled** — pre-release, `noindex`, Phase 2 gates.
+- **Honest about trade-offs** — public alpha is open; self-build today; not all modules shipped.
+- **Explicit about what is not settled** — alpha ≠ GA; hosted SaaS is not the product path yet; hardening continues.
 
 **Do not use on the brochure:**
 

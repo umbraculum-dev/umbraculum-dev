@@ -70,8 +70,8 @@ Umbraculum Path B (post Expo 58 merge): React **19.3.0**, RN **0.88.1**, Expo SD
 - Exact **`3.2.0`** pins + root overrides; native-shell peer **`>=3`**.
 - **`@tamagui/config/v6`** for tokens/fonts; **`themesWithV5CompatKeys`** merges v5 theme keys so existing app theme references keep working.
 - Flat-values migration + Sheet anatomy updates shipped with the bump.
-- Living SoT: [`TAMAGUI.md`](../TAMAGUI.md). Git tag `v1.0.0` remains operator-gated; product banner is **1.0.0 released for testing**.
+- Living SoT: [`TAMAGUI.md`](../TAMAGUI.md). Git tag `v1.0.0` remains operator-gated. Visitor announcement bar is **public alpha — stack hardening** (Tamagui 3 + Expo SDK 58 under tag `v0.0.1-alpha`) — see [`WEBSITE.md`](../WEBSITE.md) § Shared announcement bar.
 
 ## Sign-off
 
-Phase 0 analysis complete; Phase 2 + Config v6 compat landed on `master` via `tamagui3-upgrade` (operator plan: brochure + T2; Git tag `v1.0.0` remains operator-gated).
+Phase 0 analysis complete; Phase 2 + Config v6 compat landed on `master` via `tamagui3-upgrade` (operator plan: brochure + T2; Git tag `v1.0.0` remains operator-gated; visitor bar = public-alpha stack hardening, not a `1.0.0` release claim).
