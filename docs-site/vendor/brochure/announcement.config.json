@@ -1,7 +1,7 @@
 {
   "enabled": true,
-  "id": "v1-0-0-testing",
+  "id": "public-alpha-stack-2026-11",
   "variant": "info",
   "dismissible": true,
-  "html": "<strong>1.0.0 released for testing.</strong> Umbraculum is usable now — testing and fixes continue over the coming weeks. The stack has <strong>upgraded to Tamagui&nbsp;3</strong> and <strong>Expo&nbsp;SDK&nbsp;58</strong>. Browse, fork, and try the product; expect ongoing hardening rather than a finished-forever release."
+  "html": "<strong>Public alpha — stack hardening.</strong> Usable now under tag <code>v0.0.1-alpha</code>; expect ongoing fixes. Current pins: <strong>Tamagui&nbsp;3</strong> and <strong>Expo&nbsp;SDK&nbsp;58</strong>. Browse, fork, and try — not a finished-forever release."
 }

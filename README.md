@@ -1,13 +1,13 @@
 # Umbraculum — toolset for operational applications
 
 > [!IMPORTANT]
-> This repository is **work in progress** and **not yet a public-facing
-> release** (visibility is **private** under the `umbraculum-dev` GitHub
-> org as of 2026-05-27). The path to a **July 2026 public alpha** is
-> documented in [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)
-> §10.1.1 and [`docs/ROADMAP.md`](docs/ROADMAP.md) §"Late H1 / July 2026".
-> The public project identity is **Umbraculum** (primary domain
-> `umbraculum.dev`; GitHub org `umbraculum-dev`; mascot **Umbi** —
+> **Public alpha is open** (since **2026-06-27**, tag
+> [`v0.0.1-alpha`](https://github.com/umbraculum-dev/umbraculum-dev/releases/tag/v0.0.1-alpha)).
+> The repo is public under the `umbraculum-dev` GitHub org. This is still
+> **work in progress** — not hosted SaaS GA or a feature-complete ERP.
+> Start at [`docs/GETTING-STARTED.md`](docs/GETTING-STARTED.md); announcement
+> copy: [`docs/PUBLIC-ALPHA-ANNOUNCEMENT.md`](docs/PUBLIC-ALPHA-ANNOUNCEMENT.md).
+> Identity: **Umbraculum** (`umbraculum.dev`; mascot **Umbi** —
 > [`docs/media/umbi.png`](docs/media/umbi.png)).
 
 ## What this is

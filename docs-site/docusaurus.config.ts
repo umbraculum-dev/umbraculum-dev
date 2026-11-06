@@ -498,7 +498,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Public alpha (target <time datetime="2027-01-01">1&nbsp;January&nbsp;2027</time>) · docs track <code>master</code><br />© ${new Date().getFullYear()} Umbraculum contributors. Documentation is AGPLv3-aligned with the monorepo core.`,
+      copyright: `Public alpha (since June 2026, <code>v0.0.1-alpha</code>) · docs track <code>master</code><br />© ${new Date().getFullYear()} Umbraculum contributors. Documentation is AGPLv3-aligned with the monorepo core.`,
     },
     prism: {
       theme: prismThemes.github,

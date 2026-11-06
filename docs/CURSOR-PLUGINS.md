@@ -32,7 +32,7 @@ with the apparatus self-check.
 > [WORKSPACE-PLUGIN-LOADING.md](https://github.com/umbraculum-dev/umbraculum-toolset/blob/master/cursor-plugins/docs/WORKSPACE-PLUGIN-LOADING.md)
 > — not global install. Do **not** enable OpenPLC or Magento toolset plugins here.
 
-**Stack the apparatus must match (umbraculum-dev 1.0.0 testing banner):** Tamagui **3.2.0**, Expo SDK **58**, React ABI **19.3.0**, Zod v4, Node **≥22.13** / ci-parity image **`node:22-slim`**. Plugin patch versions are independent (common / node-react / platform need not share the same `0.0.x`); presence of the three witnesses matters more than matching patch numbers.
+**Stack the apparatus must match (public-alpha stack-hardening banner — Tamagui 3 + Expo 58):** Tamagui **3.2.0**, Expo SDK **58**, React ABI **19.3.0**, Zod v4, Node **≥22.13** / ci-parity image **`node:22-slim`**. Plugin patch versions are independent (common / node-react / platform need not share the same `0.0.x`); presence of the three witnesses matters more than matching patch numbers.
 
 **Optional per-developer local docs:** after the three plugins load, ask the agent to create gitignored repo-root `DEVELOPMENT-LOCAL.md` (`generate-development-local` skill) so compose service names, base URL, and PR base are filled once per machine/worktree.
 
