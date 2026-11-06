@@ -73,9 +73,10 @@ feature surface and [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE
 
 - A second vertical configuration (WMS / CRM / MRP / CRP as standalone products). The platform is
   shaped to host them, but only the brewery reference vertical is live today.
-- A public release. The repository is currently developed privately;
-  the go-public criteria and plan are in
-  [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.
+- Hosted SaaS GA or feature-complete ERP coverage. **Public alpha is open**
+  (tag `v0.0.1-alpha`); maturity and deferrals live in
+  [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1 and
+  [`docs/PUBLIC-ALPHA-ANNOUNCEMENT.md`](docs/PUBLIC-ALPHA-ANNOUNCEMENT.md).
 
 ## Project values
 
@@ -201,7 +202,7 @@ separately under the **MIT License** (look for `"license": "MIT"` in
 the relevant package's `package.json` once published). See [`LICENSE`](LICENSE) for
 the full AGPLv3 text and [`docs/LICENSING.md`](docs/LICENSING.md) for
 the rationale and [`docs/LICENSING.md`](docs/LICENSING.md) §6.2.1 for
-which MIT SDK packages are on npm today (monorepo-only until July 2026 α).
+which MIT SDK packages are on npm today.
 
 Copyright (C) 2026 Umbraculum contributors.
 
